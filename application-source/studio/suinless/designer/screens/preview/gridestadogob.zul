@@ -1,0 +1,49 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('CODESTADO.label', 'Cod Estado'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CODESTADOAsc'])" sortDescending="@load(vm.comparators['CODESTADODesc'])"  visible="@load(vm.isVisible('CODESTADO'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ESTADOAsc'])" sortDescending="@load(vm.comparators['ESTADODesc'])"  visible="@load(vm.isVisible('ESTADO'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterestadogob.zul')">
+							             <label  value="@load(item.codestado) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.estado) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masterestadogob.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

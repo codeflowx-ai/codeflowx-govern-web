@@ -1,0 +1,33 @@
+<zk xmlns:h="native">
+	<div sclass="row">
+		<div sclass="col-md-3">
+
+		</div>
+		<div sclass="col-md-6">
+			<div sclass="form-group">
+				<label value="Asociar con  Aplicacion "></label>
+				<listbox model="@load(vm.applications)"
+					selectedItem="@load(fx.projectAsociado)"  checkmark="false"
+					multiple="false" height="200px" pagingPosition="top" 
+					onSelect="@command('selectApp',app=self.selectedItem)">
+				 <listhead>
+						<listheader label="Applications"></listheader>
+					</listhead>
+					<template name="model" var="item">
+					 <listitem value="@bind(item)" >
+						<listcell label="@load(item.txname)" />
+					</listitem>
+					</template>
+				</listbox>
+			</div>
+
+		</div>
+		<div sclass="col-md-3">
+			<html>
+				<p>${labels.MddMentity.text1}</p>
+				<p style="color:#ed4845">${labels.MddMentity.text2}</p>
+			</html>
+		</div>
+
+	</div>
+</zk>

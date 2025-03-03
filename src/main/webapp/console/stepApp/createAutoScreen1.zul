@@ -1,0 +1,255 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:h="native">
+	<div sclass="row">
+		<h:div class="col-lg-12 ">
+			<div class="card">
+				<div class="card-body" style="overflow:auto;">
+					<div sclass="row">
+						<div sclass="col-md-5">
+							<tabbox>
+								<tabs>
+									<tab
+										label="${labels.EntityMaster.fields}"
+										iconSclass="icon fa-list-ol" />
+									<tab
+										label="${labels.EntityMaster.subtables}"
+										iconSclass="icon fa-table" />
+								</tabs>
+								<tabpanels>
+									<tabpanel>
+										<div>
+											<hbox spacing="15px" align="center">
+											<!-- onSelect="@command('onSelectList',item=self.selectedItem.value)" -->
+												<listbox height="450px" id="fields"
+													model="@bind(vm.fields)"
+													 mold="paging" autopaging="true" selectedItem="@bind(vm.cp)">
+													<listhead>
+														<listheader
+															label="${labels.EntityMaster.type}" width="50px" />
+														<listheader
+															label="${labels.EntityMaster.name}" width="150px" />
+														<listheader
+															label="${labels.EntityMaster.unique}" />
+														<listheader
+															label="${labels.EntityMaster.primarykey}" />
+														<listheader
+															label="${labels.EntityMaster.size}" />
+														<listheader
+															label="${labels.EntityMaster.required}" />
+														<listheader
+															label="${labels.EntityMaster.criteria}" />
+													</listhead>
+													<template
+														name="model" var="item" status="s">
+														<listitem>
+															<choose>
+																<when test="${!empty item.atributte}">
+																   <listcell>
+																	<image
+																		src="@load(item.atributte.field.icono)">
+																	</image>
+																</listcell>
+																<listcell>
+																	<label
+																		class="text-primary font-weight-bold"
+																		value="@bind(item.atributte.atribute)" />
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="@load(item.atributte.bean.unique?'icon-checkmark2 btn btn-outline bg-primary ml-2 legitRipple':'icon-cross3 btn btn-link legitRipple')"
+																		style="font-size: 16px;">
+																	</label>
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="@load(item.atributte.bean.btpk?'icon-checkmark2 btn btn-outline bg-primary ml-2 legitRipple':'icon-cross3 btn btn-link legitRipple')"
+																		style="font-size: 16px;">
+																	</label>
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="btn btn-outline bg-primary ml-2 legitRipple)"
+																		style="font-size: 16px;"
+																		value="@load(item.atributte.field.size)">
+																	</label>
+																</listcell>
+																<listcell>
+																	<checkbox
+																		checked="@bind(item.atributte.required)"
+																		disabled="@load(item.atributte.bean.btpk eq true)">
+																	</checkbox>
+																</listcell>
+																<listcell>
+																	<checkbox
+																		checked="@bind(item.atributte.btcriteria)"
+																		disabled="@load(item.atributte.bean.btpk eq true)" />
+																</listcell>
+																</when>
+																<otherwise>
+																<listcell>
+																	<image src="@load(item.cp.icon16)"></image>
+																</listcell>
+																<listcell>
+																	<label
+																		class="text-primary font-weight-bold"
+																		value="@bind(item.foreing.alias)" />
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="icon-cross3 btn btn-link legitRipple)"
+																		style="font-size: 16px;">
+																	</label>
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="icon-cross3 btn btn-link legitRipple"
+																		style="font-size: 16px;">
+																	</label>
+																</listcell>
+																<listcell>
+																	<label
+																		sclass="btn btn-outline bg-primary ml-2 legitRipple)"
+																		style="font-size: 16px;"
+																		value="-">
+																	</label>
+																</listcell>
+																<listcell>
+																	<checkbox
+																		checked="@bind(item.foreing.required)" >
+																	</checkbox>
+																</listcell>
+																<listcell>
+																	<checkbox
+																		checked="@bind(item.foreing.btcriteria)" />
+																</listcell>
+																</otherwise>
+															</choose>
+														</listitem>
+													</template>
+												</listbox>
+												<vbox spacing="10px"
+													width="24px" align="center">
+													<a iconSclass="icon-arrow-up16 " id="upBtn"
+														tooltiptext="move up field">
+													</a>
+													<a iconSclass="icon-arrow-down16 " id="downBtn"
+														tooltiptext="move down field">
+													</a>
+												</vbox>
+											</hbox>
+										</div>
+
+									</tabpanel>
+									
+									<tabpanel>
+										<div>
+											<label
+												value="${labels.EntityMaster.drag3}" droppable="true"
+												onDrop="@command('dragEntitySub',dragged=event.dragged,form=fx)"
+												style="font-size:12px;color:#707070;">
+											</label>
+											<grid height="450px"
+												model="@bind(fx.descends)">
+												<columns>
+													<column
+														label="${labels.EntityMaster.entity}" width="150px" />
+													<column
+														label="${labels.EntityMaster.alias}" width="150px" />
+													<column
+														label="${labels.EntityMaster.label}" width="150px" />
+													<column label=""
+														width="150px">
+													</column>
+												</columns>
+												<rows>
+													<template
+														name="model" var="item" status="s">
+														<row>
+															<label
+																value="@load(item.entidad.entidad)">
+															</label>
+															<cell>
+																<textbox
+																	width="95%"
+																	value="@bind(item.bean.txaliasfk) @validator(vm.validator,maxl=30,minl=10,required=true)">
+																</textbox>
+																<label
+																	class="text-danger font-weight-bold"
+																	value="@bind(vmsgs[self.previousSibling])" />
+															</cell>
+															<cell>
+																<textbox
+																	width="95%"
+																	value="@bind(item.label) @validator(vm.validator,maxl=30,minl=5)"
+																	placeholder="${labels.EntityMaster.inputlabel}">
+																</textbox>
+																<label
+																	class="text-danger font-weight-bold"
+																	value="@bind(vmsgs[self.previousSibling])" />
+															</cell>
+															<cell>
+																<button
+																	onClick="@command('removeDescends',form=fx,item=item)"
+																	tooltiptext="${labels.EntityMaster.delete}"
+																	iconSclass="icon wb-trash"
+																	sclass="btn btn-pure btn-danger"
+																	style="font-size: 16px;">
+																</button>
+															</cell>
+														</row>
+													</template>
+												</rows>
+											</grid>
+										</div>
+									</tabpanel>
+								</tabpanels>
+							</tabbox>
+
+						</div>
+						<h:div class="col-lg-4">
+							<div class="card">
+
+								<div class="card-body"
+									style="overflow:auto;">
+									<tabbox id="propent">
+										<tabs>
+											<tab
+												label="${labels.EntityMaster.properties}" />
+
+										</tabs>
+										<tabpanels>
+											<tabpanel>
+												<grid style="align:top"
+													id="propiedades" width="99%" oddRowSclass="sinestilo"
+													height="450px" rowRenderer="@bind(vm.propRender)" model="@bind(vm.cp.cp.propsBeans)">
+													<columns>
+														<column
+															label="${labels.EntityMaster.property}" width="25%" />
+														<column
+															label="${labels.EntityMaster.value}" width="75%" />
+													</columns>
+													<rows></rows>
+												</grid>
+											</tabpanel>
+
+										</tabpanels>
+									</tabbox>
+								</div>
+							</div>
+						</h:div>
+						<h:div class="col-lg-3">
+						 <includeHTML src="xpress1.zhtml"/>
+						</h:div>
+						
+					</div>
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-right"
+						sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"
+						iconSclass="icon-arrow-right14 icon-2x" onClick="@command('nextTraslate')"
+						label="Next" />
+				</div>
+			</div>
+		</h:div>
+	</div>
+</zk>

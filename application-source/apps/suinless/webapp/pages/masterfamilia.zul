@@ -1,0 +1,305 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="familia" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='familia')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="familia" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slemfamiliapromp" />
+	   <custom-attributes namespace="suinless" />
+		<custom-attributes uid="99364" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('familia.screen', 'Categorías Funcionales'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')"></a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+<div id="JQAJNctlcJ"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="JQAJNctlcJ-card" class="card  default shadow-sm" style="overflow:hidden;" >
+       <div id="JQAJNctlcJ-body" class="card-body ">
+        <div id="JQAJNctlcJ-row" class="form-group row ">
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('FAMILIA'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('FAMILIA.label', 'Familia'))"  />
+	   
+	    <textbox   tabindex="1" id="169387" 
+	   placeholder="@load(vm.lang.getProperty('FAMILIA.label', 'introduzca la familia, marketing,ventas...'))" 
+	   value="@bind(vm.beanData.familia) @save(vm.beanData.familia, before=('grabar')) @validator(vm.unique, field='FAMILIA',required=true ,oldValue=vm.beanDataCpy.familia)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('FAMILIA'))" disabled="@load(vm.isEditable('FAMILIA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['169387'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslemparent.label', 'Fam. Padre'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslemparent" placeholder="@load(vm.lang.getProperty('idslemparent').label,'Fam. Padre')" model="@bind(vm.foreings['idslemparent'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslemparent',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idslemparent)"  onCreate="@command('onCreateCombo',component=self,alias='idslemparent')" value="@bind(vm.beanData.idslemparent .familia)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.familia)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslemparent'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('ALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ACTIVA.label', 'Activa'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="911767" value="@bind(vm.beanData.activa) @save(vm.beanData.activa, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVA'))" disabled="@load(vm.isEditable('ACTIVA')?false:true)" checked="@bind(vm.beanData.activa) @save(vm.beanData.activa, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('PUBLICA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PUBLICA.label', 'Publica'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="914905" value="@bind(vm.beanData.publica) @save(vm.beanData.publica, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('PUBLICA'))" disabled="@load(vm.isEditable('PUBLICA')?false:true)" checked="@bind(vm.beanData.publica) @save(vm.beanData.publica, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+<tabbox orient="top" mold="default" width="100%" maximalHeight="true" >
+     <tabs>
+                 <tab label="Info Publica" />      
+                 <tab label="Info Interna" />      
+                 <tab label="Avatar" />      
+                 <tab label="Background" />      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('INFOPUBLIC.label', ''))"/>
+	  
+	  <tbeditor id="BUWSygGele" value="@bind(vm.beanData.infopublic) @save(vm.beanData.infopublic, before=('grabar')) " />
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('INFOINTERNA.label', ''))"/>
+	  
+	  <tbeditor id="GzKwWlRYHn" value="@bind(vm.beanData.infointerna) @save(vm.beanData.infointerna, before=('grabar')) " />
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<h:div class="col-md-12 input-group">
+
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('AVATAR.label', 'Avatar'))"/>
+
+
+
+          <h:div class="image-cropper-container" style="width:200px;  height:200px;" >
+     <image id="AVATAR" sclass="image-download" content="@load(vm.loadImage('AVATAR'))" width="100%" height="100%"/>
+   </h:div>
+     <dropupload maxsize="1024" detection="browser" anchor="${AVATAR}" content="Drag your image here (max 1024KB)"
+	 onUpload="@command('onUploadImagen', file=event.media,field='AVATAR')" />
+   
+ 
+
+</h:div>
+
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<h:div class="col-md-12 input-group">
+
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('BACKGROUND.label', 'Imagen Backgroung'))"/>
+
+
+
+          <h:div class="image-cropper-container" style="width:300px;  height:300px;" >
+     <image id="BACKGROUND" sclass="image-download" content="@load(vm.loadImage('BACKGROUND'))" width="100%" height="100%"/>
+   </h:div>
+     <dropupload maxsize="1024" detection="browser" anchor="${BACKGROUND}" content="Drag your image here (max 1024KB)"
+	 onUpload="@command('onUploadImagen', file=event.media,field='BACKGROUND')" />
+   
+ 
+
+</h:div>
+
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['familia.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$familia');
+  binder.command('doLoad');
+});
+</script>
+</zk>

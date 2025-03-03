@@ -1,0 +1,273 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('org.suinsit.nocode.web.FindEntityUI')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="familia" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slemfamiliapromp" />
+	   <custom-attributes namespace="suinless" />
+	   <custom-attributes enviroment="preview" />
+	   <custom-attributes uid="99364" />
+	   <custom-attributes tipo="SEARCH" />
+	  <custom-attributes paginaIndex="indexfamilia.zul" />
+	   <custom-attributes templateView="gridfamilia.zul" />
+	   <h:div id="notificacion"></h:div>
+	   <div class="row  " style="background-color:;">
+	      <div >
+              <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('familia.screen', 'Categorías Funcionales'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                <label value="@load(vm.labelTotal)"></label>
+             </div>
+          </div>
+	      <div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+						   <div class="flex-grow-1">
+				                     <a iconSclass="fa-duotone fa-solid fa-notes-medical label-icon align-middle fs-16 me-2 " class="waves-effect waves-light" 	 onClick="@command('addData',page='masterfamilia.zul')">
+				                     </a>
+						 </div>
+						 <div class="flex-shrink-0">
+					      <div class="hstack text-nowrap gap-2 d-flex">
+			<a 	
+										iconSclass="fa-duotone fa-filters me-1 align-bottom"
+										tooltiptext="Filtros" class="waves-effect waves-light" 
+										onClick="@command('onFilter', win=WIN_FILTERS)">
+			</a> 
+	<div class="dropdown">
+                   <h:i class="fa-duotone fa-line-columns" aria-hidden="true"></h:i>
+                       <div class="dropdown-content">
+                          <vbox spacing="1px;">
+								<checkbox label="Familia" checked="@load(vm.isVisible('FAMILIA'))" onCheck="@command('onHidden', evento=event,field='FAMILIA' )"/>
+								<checkbox label="Activa" checked="@load(vm.isVisible('ACTIVA'))" onCheck="@command('onHidden', evento=event,field='ACTIVA' )"/>
+								<checkbox label="Publica" checked="@load(vm.isVisible('PUBLICA'))" onCheck="@command('onHidden', evento=event,field='PUBLICA' )"/>
+	                   </vbox>
+                     </div> 	    
+              </div>					 
+  <div class="dropdown">
+ 	    <h:i class="fa-duotone fa-file-export" aria-hidden="true"></h:i>
+         <div class="dropdown-content">
+           <a iconSclass="fa-duotone fa-file-pdf " onClick="@command('report',type='pdf')" >PDF</a>
+           <a iconSclass="fa-duotone fa-file-xls " onClick="@command('report',type='excel')" >Excel</a>
+           <a iconSclass="fa-duotone fa-file-csv" onClick="@command('report',type='CSV')" >CSV</a>
+          <a iconSclass="fa-duotone fa-file-doc " onClick="@command('report',type='DOCX')" >Word</a>
+       <a iconSclass="fa-duotone fa-chart-tree-map"
+			onClick="@command('changeView',view='cardfamilia.zul')">
+			Card
+	</a>
+   <a iconSclass="fa-duotone fa-list"
+		onClick="@command('changeView',view='gridfamilia.zul')">
+		List
+</a>
+  </div> 	    
+ </div>
+ 
+		</div>				 
+						 </div>
+						</div>
+					</div>
+				</div>
+			<!--end col-->
+	   </div>
+<div class="section filters">
+       <div class="search-bar">
+                  <textbox value="@bind(vm.search)"
+								onOK="@command('search')" width="98%"
+								 placeholder="buscar por .. familia">
+				</textbox>
+  	   </div>
+
+		<div class="filter-icons">
+               
+              <a tooltiptext="Find"
+					iconSclass="fa-duotone fa-magnifying-glass-waveform" 
+										onClick="@command('search')" />
+			<a tooltiptext="Clear"
+					  iconSclass="fa-duotone fa-broom-wide" onClick="@command('clear')"  />
+        </div>	
+</div>
+<div class="col-xxl-12 s-bot">
+	 <div class="card" >
+	     <div class="card-body">
+			<div id="divTemplate" sclass="col-lg-12"></div>
+		 </div>
+     </div>		 	
+      <div class="section footer-prd">
+            <div class="pagination">
+                <paging id="topagin"
+							pageSize="@load(vm.scroll.maxRows)"
+							totalSize="@load(vm.scroll.totalRows)" mold="os" width="100%"
+							 style="background-color:#FFF;"  />
+	        </div>
+            <div class="records">
+                <combobox
+								selectedItem="@bind(vm.scroll.maxRows)"
+								value="@bind(vm.scroll.maxRows)" width="75px">
+								<comboitem label="30" value="30" />
+								<comboitem label="50" value="50" />
+								<comboitem label="100" value="100" />
+							</combobox>
+            </div>
+       </div>	   
+	</div>
+</div><!--end col-->
+
+	   
+	<window id="WIN_showModal"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%" height="70%" >
+				<div class="modal-body" id="body_familia"></div>
+		</window>
+	<window id="WIN_FILTERS"  visible="false"
+			position="center,center" 
+			sclass="z-messagebox-window" border="none" width="90%">
+			<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">Búsqueda Avanzada</h:h5>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-12">
+							<div  class="card  " style="overflow:auto;" >
+                                 <div  class="card-body ">
+                                    <div  class="form-group row ">
+                                      <div class="col-md-3  input-group" >
+                                          <label
+											sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  "
+											value="Nombre de la búsqueda" />
+											<textbox  id="OXBshsbqpi"
+										placeholder="introduce un nombre para guardar tu búsqueda"
+										sclass=" " />
+										<label sclass="text-danger" value="@load(vmsgs['OXBshsbqpi'])"/>
+									</div>
+										<div class="col-md-4  input-group" >
+                                          <label
+											sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  "
+											value="La consulta pueden usarla otros usuarios" />
+											<checkbox />
+									</div>
+								    <div class="col-md-5  input-group" >
+								    <div class="flex-shrink-0">
+					                    <div class="hstack text-nowrap gap-4 d-flex">
+                                          <a
+										sclass="waves-effect waves-info"
+										iconSclass="fa-duotone fa-magnifying-glass-play align-middle fs-16 me-2"
+										tooltiptext="Ejecutar Consulta"
+										>
+									</a>
+									<a
+										sclass="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2"
+										tooltiptext="Grabar"
+										 >
+									</a>
+									<a
+										sclass="waves-effect waves-light"
+										iconSclass="fa-duotone fa-broom-wide align-middle fs-16 me-2"
+										tooltiptext="limpiar Búsqueda"
+										 >
+									</a>
+									<a
+										sclass="waves-effect waves-danger"
+										iconSclass="fa-duotone fa-nfc-trash fa-lg align-middle fs-16 me-2"
+										tooltiptext="eliminar busqueda"
+										 />
+										 </div></div>
+									</div>
+							</div>
+						</div></div></div>
+					</div>
+					
+					<div class="row">
+						<div class="col-lg-2">
+							<listbox
+								 height="500px">
+								<listhead>
+									<listheader label="Campo">
+									</listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="@load(item)"
+										draggable="true">
+										<listcell
+											label="@load(item.label)">
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+
+						</div>
+						<div class="col-lg-8">
+							<grid height="500px"
+								
+								
+								emptyMessage="No hay condiciones...">
+								<columns>
+									<column label="Campo" width="10%" />
+									<column label="Condición"
+										width="80%" />
+									<column label="Accion" width="10%" />
+								</columns>
+								<rows>
+
+								</rows>
+							</grid>
+						</div>
+						<div class="col-lg-2">
+							<listbox height="500px"  checkmark="true" 
+							
+							 onSelect="@command('onSelectBusqueda',evento=event)">
+								<listhead >
+									<listheader label="Búsquedas">
+									</listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="@load(item)" >
+										<listcell
+											label="@load(item.nombre)">
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="hstack gap-2 justify-content-end">
+						<button onClick="WIN_FILTERS.setVisible(false)"
+							class="btn btn-light">
+							Cerrar
+						</button>
+					</div>
+				</div>
+		
+		</window>
+  <window id="WIN_HELP"  visible="false"  position="center,center" 
+     sclass="z-messagebox-window" border="none"  width="70%">
+			
+				<div class="modal-header ">
+					<h:h5 class="modal-title">
+						Ayuda 
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+	
+	</window>
+	  
+              
+	</idspace>
+</zk>

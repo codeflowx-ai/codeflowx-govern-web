@@ -1,0 +1,375 @@
+<?page title="Marketplace Analytics" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.marketplace.analytics.MarketplaceAnalyticsVM')">
+        
+        <!-- Analytics Overview -->
+        <hlayout sclass="analytics-header">
+            <div sclass="metric-box">
+                <label value="Total Revenue"/>
+                <label value="$@load(vm.totalRevenue)"/>
+                <label value="@load(vm.revenueGrowth)%" 
+                       sclass="@load(vm.revenueGrowthStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Active Users"/>
+                <label value="@load(vm.activeUsers)"/>
+                <label value="@load(vm.userGrowth)%" 
+                       sclass="@load(vm.userGrowthStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Model Usage"/>
+                <label value="@load(vm.modelUsage)M"/>
+                <label value="@load(vm.usageGrowth)%" 
+                       sclass="@load(vm.usageGrowthStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Customer Satisfaction"/>
+                <label value="@load(vm.satisfaction)%"/>
+                <label value="@load(vm.satisfactionChange)%" 
+                       sclass="@load(vm.satisfactionChangeStyle)"/>
+            </div>
+        </hlayout>
+
+        <!-- Date Range Selection -->
+        <hlayout sclass="date-filter">
+            <datebox value="@bind(vm.startDate)" 
+                    format="yyyy-MM-dd"/>
+            <datebox value="@bind(vm.endDate)" 
+                    format="yyyy-MM-dd"/>
+            <button label="Apply" 
+                    onClick="@command('applyDateFilter')"/>
+            <combobox model="@load(vm.presetRanges)" 
+                     selectedItem="@bind(vm.selectedRange)"
+                     onSelect="@command('selectPresetRange')"/>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Business Insights"/>
+                <tab label="Model Performance"/>
+                <tab label="User Analytics"/>
+                <tab label="Financial Analysis"/>
+            </tabs>
+            <tabpanels>
+                <!-- Business Insights Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Key Metrics -->
+                        <hlayout>
+                            <charts id="revenueChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Revenue Trends"
+                                   model="@load(vm.revenueTrendsData)"/>
+                            
+                            <charts id="userGrowthChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="User Growth"
+                                   model="@load(vm.userGrowthData)"/>
+                        </hlayout>
+
+                        <!-- Business KPIs -->
+                        <grid model="@load(vm.businessKPIs)">
+                            <columns>
+                                <column label="KPI"/>
+                                <column label="Current"/>
+                                <column label="Target"/>
+                                <column label="Progress"/>
+                                <column label="Trend"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="kpi">
+                                <row>
+                                    <label value="@load(kpi.name)"/>
+                                    <label value="@load(kpi.currentValue)"/>
+                                    <label value="@load(kpi.target)"/>
+                                    <progressmeter value="@load(kpi.progress)"/>
+                                    <label value="@load(kpi.trend)" 
+                                           sclass="@load(kpi.trendStyle)"/>
+                                    <button label="Details" 
+                                            onClick="@command('showKPIDetails', kpi=kpi)"/>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Market Analysis -->
+                        <hlayout>
+                            <charts id="marketShareChart" 
+                                   type="pie"
+                                   height="300px"
+                                   title="Market Share"
+                                   model="@load(vm.marketShareData)"/>
+                            
+                            <charts id="competitiveAnalysisChart" 
+                                   type="radar"
+                                   height="300px"
+                                   title="Competitive Analysis"
+                                   model="@load(vm.competitiveAnalysisData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Model Performance Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Model Usage Metrics -->
+                        <hlayout>
+                            <charts id="modelUsageChart" 
+                                   type="column"
+                                   height="300px"
+                                   title="Model Usage Distribution"
+                                   model="@load(vm.modelUsageData)"/>
+                            
+                            <charts id="performanceMetricsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Performance Metrics"
+                                   model="@load(vm.performanceMetricsData)"/>
+                        </hlayout>
+
+                        <!-- Model Performance Table -->
+                        <grid model="@load(vm.modelPerformance)">
+                            <columns>
+                                <column label="Model"/>
+                                <column label="Usage"/>
+                                <column label="Response Time"/>
+                                <column label="Error Rate"/>
+                                <column label="Cost Efficiency"/>
+                                <column label="User Rating"/>
+                                <column label="Trend"/>
+                            </columns>
+                            <template name="model" var="perf">
+                                <row>
+                                    <label value="@load(perf.modelName)"/>
+                                    <label value="@load(perf.usage)"/>
+                                    <label value="@load(perf.responseTime)ms"/>
+                                    <label value="@load(perf.errorRate)%" 
+                                           sclass="@load(perf.errorRateStyle)"/>
+                                    <label value="@load(perf.costEfficiency)"/>
+                                    <rating value="@load(perf.userRating)" 
+                                           readonly="true"/>
+                                    <label value="@load(perf.trend)" 
+                                           sclass="@load(perf.trendStyle)"/>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Performance Insights -->
+                        <groupbox title="Performance Insights">
+                            <listbox model="@load(vm.performanceInsights)" 
+                                    emptyMessage="No insights available">
+                                <template name="model" var="insight">
+                                    <listitem>
+                                        <listcell>
+                                            <vlayout>
+                                                <label value="@load(insight.title)" 
+                                                       style="font-weight: bold"/>
+                                                <label value="@load(insight.description)"/>
+                                                <button label="Take Action" 
+                                                        onClick="@command('handleInsight', insight=insight)"/>
+                                            </vlayout>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- User Analytics Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- User Engagement -->
+                        <hlayout>
+                            <charts id="userEngagementChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="User Engagement"
+                                   model="@load(vm.userEngagementData)"/>
+                            
+                            <charts id="retentionChart" 
+        type="heatmap" 
+        title="User Retention Analysis"
+        model="@load(vm.userRetentionData)"
+        height="400px">
+    <attribute name="onClick">
+        // Manejo de eventos de click
+    </attribute>
+    <zscript>
+        import org.zkoss.chart.Charts;
+        import org.zkoss.chart.model.*;
+        
+        void initRetentionChart(Charts chart) {
+            chart.getPlotOptions().getHeatmap()
+                .setDataLabels(true)
+                .setEnabled(true);
+            
+            chart.getColorAxis()
+                .setMin(0)
+                .setMax(100)
+                .setStops("[[0, '#FF0000'], [0.5, '#FFFF00'], [1, '#00FF00']]");
+                
+            chart.getXAxis().setTitle("Months Since Join");
+            chart.getYAxis().setTitle("Cohort");
+        }
+        
+        initRetentionChart(retentionChart);
+    </zscript>
+</charts>
+                        </hlayout>
+
+                        <!-- User Segments -->
+                        <grid model="@load(vm.userSegments)">
+                            <columns>
+                                <column label="Segment"/>
+                                <column label="Users"/>
+                                <column label="Usage"/>
+                                <column label="Revenue"/>
+                                <column label="Growth"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="segment">
+                                <row>
+                                    <label value="@load(segment.name)"/>
+                                    <label value="@load(segment.userCount)"/>
+                                    <label value="@load(segment.usage)"/>
+                                    <label value="@load(segment.revenue)"/>
+                                    <label value="@load(segment.growth)" 
+                                           sclass="@load(segment.growthStyle)"/>
+                                    <button label="Details" 
+                                            onClick="@command('showSegmentDetails', segment=segment)"/>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- User Behavior Analysis -->
+                        <hlayout>
+                            <charts id="pathChart" 
+        type="sankey" 
+        title="User Journey Analysis"
+        model="@load(vm.userPathData)"
+        height="400px">
+    <zscript>
+        import org.zkoss.chart.Charts;
+        
+        void initPathChart(Charts chart) {
+            chart.getPlotOptions().getSankey()
+                .setNodeWidth(36)
+                .setNodePadding(10);
+        }
+        
+        initPathChart(pathChart);
+    </zscript>
+</charts>
+                            
+                            <charts id="behaviorChart" 
+        type="scatter" 
+        title="User Behavior Analysis"
+        model="@load(vm.userBehaviorData)"
+        height="400px">
+    <zscript>
+        import org.zkoss.chart.Charts;
+        
+        void initBehaviorChart(Charts chart) {
+            chart.getPlotOptions().getScatter()
+                .setMarker(new Marker().setRadius(5));
+                
+            chart.getXAxis().setTitle("Usage Frequency");
+            chart.getYAxis().setTitle("Transaction Value");
+        }
+        
+        initBehaviorChart(behaviorChart);
+    </zscript>
+</charts>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Financial Analysis Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Financial Metrics -->
+                        <hlayout>
+                            <charts id="revenueBreakdownChart" 
+                                   type="pie"
+                                   height="300px"
+                                   title="Revenue Breakdown"
+                                   model="@load(vm.revenueBreakdownData)"/>
+                            
+                            <charts id="marginAnalysisChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Margin Analysis"
+                                   model="@load(vm.marginAnalysisData)"/>
+                        </hlayout>
+
+                        <!-- Financial Performance -->
+                        <grid model="@load(vm.financialMetrics)">
+                            <columns>
+                                <column label="Metric"/>
+                                <column label="Current Period"/>
+                                <column label="Previous Period"/>
+                                <column label="Change"/>
+                                <column label="Forecast"/>
+                            </columns>
+                            <template name="model" var="metric">
+                                <row>
+                                    <label value="@load(metric.name)"/>
+                                    <label value="@load(metric.currentValue)"/>
+                                    <label value="@load(metric.previousValue)"/>
+                                    <label value="@load(metric.change)" 
+                                           sclass="@load(metric.changeStyle)"/>
+                                    <label value="@load(metric.forecast)"/>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Cost Analysis -->
+                        <groupbox title="Cost Analysis">
+                            <grid model="@load(vm.costAnalysis)">
+                                <columns>
+                                    <column label="Cost Center"/>
+                                    <column label="Current Cost"/>
+                                    <column label="Budget"/>
+                                    <column label="Variance"/>
+                                    <column label="Trend"/>
+                                </columns>
+                                <template name="model" var="cost">
+                                    <row>
+                                        <label value="@load(cost.center)"/>
+                                        <label value="@load(cost.currentCost)"/>
+                                        <label value="@load(cost.budget)"/>
+                                        <label value="@load(cost.variance)" 
+                                               sclass="@load(cost.varianceStyle)"/>
+                                        <label value="@load(cost.trend)" 
+                                               sclass="@load(cost.trendStyle)"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="kpiDetailsWindow" 
+                title="KPI Details" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- KPI Details Content -->
+        </window>
+
+        <window id="segmentDetailsWindow" 
+                title="Segment Details" 
+                visible="false" 
+                mode="modal"
+                width="900px">
+            <!-- Segment Details Content -->
+        </window>
+    </div>
+</zk>

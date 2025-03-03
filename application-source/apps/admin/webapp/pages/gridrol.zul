@@ -1,0 +1,58 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ROL.label', 'Rol'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ROLAsc'])" sortDescending="@load(vm.comparators['ROLDesc'])"  visible="@load(vm.isVisible('ROL'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('SYSTEM.label', 'De sistemas'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SYSTEMAsc'])" sortDescending="@load(vm.comparators['SYSTEMDesc'])"  visible="@load(vm.isVisible('SYSTEM'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('BAJA.label', 'Baja'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['BAJAAsc'])" sortDescending="@load(vm.comparators['BAJADesc'])"  visible="@load(vm.isVisible('BAJA'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;">
+							             <label  value="@load(item.rol) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.system) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.baja) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+                    		<a
+						onClick="@command('editPopup',item=item,body='body_rol',page='popuproles.zul',close='close-modal',win=WIN_showModal)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+						
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

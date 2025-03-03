@@ -1,0 +1,82 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ENVIROMENT.label', 'Environment'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ENVIROMENTAsc'])" sortDescending="@load(vm.comparators['ENVIROMENTDesc'])"  visible="@load(vm.isVisible('ENVIROMENT'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('DEVELOPMENT.label', 'Desarrollo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DEVELOPMENTAsc'])" sortDescending="@load(vm.comparators['DEVELOPMENTDesc'])"  visible="@load(vm.isVisible('DEVELOPMENT'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PRODUCTION.label', 'Producción'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRODUCTIONAsc'])" sortDescending="@load(vm.comparators['PRODUCTIONDesc'])"  visible="@load(vm.isVisible('PRODUCTION'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('TESTING.label', 'Testing'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TESTINGAsc'])" sortDescending="@load(vm.comparators['TESTINGDesc'])"  visible="@load(vm.isVisible('TESTING'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PRODUCTION.label', 'production'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRODUCTIONAsc'])" sortDescending="@load(vm.comparators['PRODUCTIONDesc'])"  visible="@load(vm.isVisible('PRODUCTION'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PREFIX.label', 'Pefijo DNS'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PREFIXAsc'])" sortDescending="@load(vm.comparators['PREFIXDesc'])"  visible="@load(vm.isVisible('PREFIX'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;">
+							             <label  value="@load(item.enviroment) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.development) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.production) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.testing) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.production) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.prefix) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+                    		<a
+						onClick="@command('editPopup',item=item,body='body_entorno',page='popuppopenviroemnt.zul',close='close-modal',win=WIN_showModal)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+						
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

@@ -1,0 +1,154 @@
+<!-- form-management.zul -->
+<?page title="Gestión de Formularios de Evaluación" contentType="text/html;charset=UTF-8"?>
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+	<div sclass="container-fluid"
+		viewModel="@id('vm') @init('org.suinsit.compliance.web.FormManagementVM')">
+
+		<!-- Toolbar Superior -->
+		<div sclass="row mb-3">
+			<div sclass="col">
+				<div
+					sclass="d-flex justify-content-between align-items-center">
+					<div sclass="h4 mb-0">Gestión de Formularios</div>
+					<div>
+						<button sclass="btn btn-primary"
+							onClick="@command('showNewFormDialog')">
+							<i sclass="fas fa-plus"></i>
+							Nuevo Formulario
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Filtros -->
+		<div sclass="row mb-3">
+			<div sclass="col-md-3">
+				<div sclass="form-group">
+					<label>Sector</label>
+					<combobox model="@load(vm.sectors)"
+						selectedItem="@bind(vm.selectedSector)"
+						onChange="@command('filterForms')">
+						<template name="model">
+							<comboitem label="@load(each.name)" />
+						</template>
+					</combobox>
+				</div>
+			</div>
+			<div sclass="col-md-3">
+				<div sclass="form-group">
+					<label>Estado</label>
+					<combobox model="@load(vm.statusList)"
+						selectedItem="@bind(vm.selectedStatus)"
+						onChange="@command('filterForms')" />
+				</div>
+			</div>
+			<div sclass="col-md-6">
+				<div sclass="form-group">
+					<label>Búsqueda</label>
+					<textbox value="@bind(vm.searchText)"
+						onOK="@command('filterForms')" sclass="form-control"
+						placeholder="Buscar por código o título..." />
+				</div>
+			</div>
+		</div>
+
+		<!-- Lista de Formularios -->
+		<div sclass="row">
+			<div sclass="col">
+				<grid model="@load(vm.forms)" mold="default">
+					<columns>
+						<column label="Código" sort="auto(formCode)" />
+						<column label="Título" sort="auto(title)" />
+						<column label="Sector" sort="auto(sectorName)" />
+						<column label="Estado" sort="auto(status)" />
+						<column label="Preguntas" />
+						<column label="Última Act."
+							sort="auto(updatedAt)" />
+						<column label="Acciones" />
+					</columns>
+					<template name="model">
+						<row>
+							<label value="@load(each.formCode)" />
+							<label value="@load(each.title)" />
+							<label value="@load(each.sectorName)" />
+							<label value="@load(each.status)"
+								sclass="@load(vm.getStatusClass(each.status))" />
+							<label value="@load(each.totalQuestions)" />
+							<label
+								value="@load(each.updatedAt) @converter('formattedDateTime')" />
+							<div>
+								<button sclass="btn btn-sm btn-info"
+									onClick="@command('editForm', form=each)"
+									tooltiptext="Editar">
+									<i sclass="fas fa-edit"></i>
+								</button>
+								<button sclass="btn btn-sm btn-primary"
+									onClick="@command('manageQuestions', form=each)"
+									tooltiptext="Gestionar Preguntas">
+									<i sclass="fas fa-list-check"></i>
+								</button>
+								<button sclass="btn btn-sm btn-success"
+									onClick="@command('viewStats', form=each)"
+									tooltiptext="Estadísticas">
+									<i sclass="fas fa-chart-bar"></i>
+								</button>
+								<button sclass="btn btn-sm btn-warning"
+									onClick="@command('createVersion', form=each)"
+									tooltiptext="Nueva Versión">
+									<i sclass="fas fa-code-branch"></i>
+								</button>
+
+								<button class="btn btn-sm btn-info"
+									onClick="@command('manageEvidences', form=each)"
+									tooltiptext="Gestionar Evidencias">
+									<i class="fas fa-file-alt"></i>
+								</button>
+							</div>
+						</row>
+					</template>
+				</grid>
+			</div>
+		</div>
+
+		<!-- Modal para Nuevo/Editar Formulario -->
+		<window id="formDialog" visible="false"
+			title="@load(vm.editingForm.idxcmpform eq null ? 'Nuevo Formulario' : 'Editar Formulario')"
+			mode="modal" closable="true">
+			<div sclass="modal-body">
+				<div sclass="form-group mb-3">
+					<label>Título</label>
+					<textbox value="@bind(vm.editingForm.title)"
+						sclass="form-control" />
+				</div>
+				<div sclass="form-group mb-3">
+					<label>Sector</label>
+					<combobox model="@load(vm.sectors)"
+						selectedItem="@bind(vm.editingForm.idxcmpsector)">
+						<template name="model">
+							<comboitem label="@load(each.name)" />
+						</template>
+					</combobox>
+				</div>
+				<div sclass="form-group mb-3">
+					<label>Descripción</label>
+					<textbox value="@bind(vm.editingForm.description)"
+						rows="3" sclass="form-control" />
+				</div>
+			</div>
+			<div sclass="modal-footer">
+				<button sclass="btn btn-secondary"
+					onClick="@command('closeFormDialog')">
+					Cancelar
+				</button>
+				<button sclass="btn btn-primary"
+					onClick="@command('saveForm')">
+					Guardar
+				</button>
+			</div>
+		</window>
+	</div>
+</zk>

@@ -1,0 +1,326 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:h="native">
+	<div sclass="row">
+		<h:div class="col-lg-12 ">
+			<div class="card">
+				<div
+					class="card-header bg-white header-elements-inline">
+					<h:div class="header-elements">
+						<h:div class="list-icons">
+							<a sclass="list-icons-item"
+								tooltiptext="traslate all data" iconSclass="fa fa-2x fa-gears "
+								onClick="@command('traslate')">
+							</a>
+						</h:div>
+					</h:div>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div sclass="col-md-6">
+							<div sclass="form-group">
+								<label
+									value="${labels.zknocode.langorigin}">
+								</label>
+								<listbox
+									model="@bind(vm.application.languages)"
+									selectedItem="@bind(vm.languageOrigin)" mold="select">
+									<template name="model" var="item">
+										<listitem value="${item}" 	label="@load(item.name)">
+
+										</listitem>
+									</template>
+								</listbox>
+							</div>
+						</div>
+					</div>
+					<div sclass="row">
+						<div sclass="col-md-8">
+							<tabbox>
+								<tabs>
+								    <tab label="Screen" />
+									<tab label="Fields" />
+									<tab label="Help Screen" />
+								</tabs>
+								<tabpanels>
+									<tabpanel>
+										<tabbox>
+											<tabs>
+												<tab label="Origin" />
+												<forEach
+													items="@init(vm.application.languages)" var="item">
+													<tab
+														label="@load(item.name)" iconSclass="@load(item.icono)" />
+												</forEach>
+											</tabs>
+											<tabpanels>
+												<tabpanel>
+													<h:div class="row">
+														<div class="col-lg-1">
+														</div>
+														<div
+															sclass="form-group">
+															<label
+																value="Name Screen">
+															</label>
+															<textbox
+																id="nameview" sclass="form-control required"
+																value="@bind(vm.nameScreen) @validator(vm.validator,required=true,minl=5,maxl=35)">
+															</textbox>
+															<label
+																sclass="text-danger" value="@load(vmsgs['nameview'])">
+															</label>
+														</div>
+														<div
+															sclass="form-group">
+															<label
+																value="Name Main">
+															</label>
+															<textbox
+																id="namemain" sclass="form-control required"
+																value="@bind(vm.nameMain) @validator(vm.validator,required=true,minl=5,maxl=35)">
+															</textbox>
+															<label
+																sclass="text-danger" value="@load(vmsgs['namemain'])">
+															</label>
+														</div>
+													</h:div>
+
+												</tabpanel>
+												<forEach
+													items="@init(vm.application.languages)" var="item1">
+													<tabpanel>
+														<h:div
+															class="row">
+															<div
+																sclass="form-group">
+																<label
+																	value="Name Screen">
+																</label>
+																<textbox
+																	sclass="form-control required"
+																	value="@bind(vm.trasScreen[item1.javatag])">
+																</textbox>
+
+															</div>
+															<div
+																sclass="form-group">
+																<label
+																	value="Name Main">
+																</label>
+																<textbox
+																	sclass="form-control required"
+																	value="@bind(vm.trasMain[item1.javatag])">
+																</textbox>
+
+															</div>
+														</h:div>
+
+													</tabpanel>
+												</forEach>
+											</tabpanels>
+										</tabbox>
+									</tabpanel>
+									<tabpanel>
+										<tabbox id="tbtraslate">
+
+											<tabs>
+												<tab label="Origin" />
+												<forEach
+													items="@init(vm.application.languages)" var="item">
+													<tab
+														label="@load(item.name)" iconSclass="@load(item.icono)" />
+												</forEach>
+											</tabs>
+											<tabpanels>
+												<tabpanel>
+													<listbox
+														height="350px" model="@bind(vm.atts)" mold="paging" autopaging="true">
+														<listhead>
+															<listheader
+																label="${labels.EntityMaster.name}" width="150px" />
+															<listheader
+																label="label" />
+															<listheader
+																label="tooltip" />
+															<listheader
+																label="Text help" />
+														</listhead>
+														<template
+															name="model" var="item" status="s">
+															<listitem>
+																<choose>
+																	<when
+																		test="${!item.btextfk}">
+																		<listcell>
+																			<label
+																				class="text-primary font-weight-bold"
+																				value="@bind(item.atribute)" />
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				value="@bind(item.label)">
+																			</textbox>
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				value="@bind(item.tooltip)">
+																			</textbox>
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				multiline="true"
+																				value="@bind(item.helptext)" rows="2">
+																			</textbox>
+																		</listcell>
+																	</when>
+																	<otherwise>
+																		<listcell>
+																			<label
+																				class="text-primary font-weight-bold"
+																				value="@bind(item.aliasFk)" />
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				value="@bind(item.label)">
+																			</textbox>
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				value="@bind(item.tooltip)">
+																			</textbox>
+																		</listcell>
+																		<listcell>
+																			<textbox
+																				multiline="true"
+																				value="@bind(item.helptext)" rows="2">
+																			</textbox>
+																		</listcell>
+																	</otherwise>
+																</choose>
+															</listitem>
+														</template>
+													</listbox>
+												</tabpanel>
+												<forEach
+													items="@init(vm.application.languages)" var="item1">
+													<tabpanel>
+														<listbox
+															height="350px" model="@bind(vm.atts)" mold="paging" autopaging="true">
+															<listhead>
+																<listheader
+																	label="${labels.EntityMaster.name}" width="150px" />
+																<listheader
+																	label="label" />
+																<listheader
+																	label="tooltip" />
+																<listheader
+																	label="Text help" />
+															</listhead>
+															<template
+																name="model" var="item" status="s">
+																<listitem>
+																	<choose>
+																		<when
+																			test="${!item.btextfk}">
+																			<listcell>
+																				<label
+																					class="text-primary font-weight-bold"
+																					value="@bind(item.atribute)" />
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['label'])">
+																				</textbox>
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['tooltip'])">
+																				</textbox>
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					multiline="true"
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['helptext'])"
+																					rows="2">
+																				</textbox>
+																			</listcell>
+																		</when>
+																		<otherwise>
+																			<listcell>
+																				<label
+																					class="text-primary font-weight-bold"
+																					value="@bind(item.aliasFk)" />
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['label'])">
+																				</textbox>
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['tooltip'])">
+																				</textbox>
+																			</listcell>
+																			<listcell>
+																				<textbox
+																					multiline="true"
+																					value="@bind(item.MI18Fields[item1.javatag].traslates['helptext'])"
+																					rows="2">
+																				</textbox>
+																			</listcell>
+																		</otherwise>
+																	</choose>
+																</listitem>
+															</template>
+														</listbox>
+
+													</tabpanel>
+												</forEach>
+											</tabpanels>
+										</tabbox>
+									</tabpanel>
+									<tabpanel>
+										<tabbox>
+											<tabs>
+												<tab label="Origin" />
+												<forEach
+													items="@init(vm.application.languages)" var="item">
+													<tab
+														label="@load(item.name)" iconSclass="@load(item.icono)" />
+												</forEach>
+											</tabs>
+											<tabpanels>
+												<tabpanel>
+													<tbeditor
+														value="@bind(vm.textTraslate)" />
+												</tabpanel>
+												<forEach
+													items="@init(vm.application.languages)" var="item1">
+													<tabpanel>
+														<tbeditor
+															value="@bind(vm.traslates[item1.javatag])" />
+													</tabpanel>
+												</forEach>
+											</tabpanels>
+										</tabbox>
+									</tabpanel>
+
+								</tabpanels>
+							</tabbox>
+
+						</div>
+						<div sclass="col-md-4">
+							<includeHTML src="traslate_xpress.zhtml" />
+						</div>
+					</div>
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-right"
+						sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"
+						iconSclass="icon-arrow-right14 icon-2x" onClick="@command('next')"
+						label="Next" />
+				</div>
+			</div>
+		</h:div>
+	</div>
+</zk>

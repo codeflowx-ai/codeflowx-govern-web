@@ -1,0 +1,62 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])"  visible="@load(vm.isVisible('AVATAR'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('APLICACION.label', 'aplicacion'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['APLICACIONAsc'])" sortDescending="@load(vm.comparators['APLICACIONDesc'])"  visible="@load(vm.isVisible('APLICACION'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('NAMESPACE.label', 'namespace'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NAMESPACEAsc'])" sortDescending="@load(vm.comparators['NAMESPACEDesc'])"  visible="@load(vm.isVisible('NAMESPACE'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ACTIVA.label', 'activa'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVAAsc'])" sortDescending="@load(vm.comparators['ACTIVADesc'])"  visible="@load(vm.isVisible('ACTIVA'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masteraplicaciones.zul')">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="30%" height="30%" />
+							             <label  value="@load(item.aplicacion) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.namespace) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.activa) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masteraplicaciones.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

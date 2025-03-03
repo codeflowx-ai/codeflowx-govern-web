@@ -1,0 +1,199 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+				 <grid  	model="@load(vm.beans)" sizedByContent="true" span="true" sclass="table align-middle mb-0" >  
+							<columns sizable="true" >
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('NOMBREDEEMPRESA.label', 'Empresa'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREDEEMPRESAAsc'])" sortDescending="@load(vm.comparators['NOMBREDEEMPRESADesc'])"  visible="@load(vm.isVisible('NOMBREDEEMPRESA'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ALTAAsc'])" sortDescending="@load(vm.comparators['ALTADesc'])"  visible="@load(vm.isVisible('ALTA'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ACTIVIDAD.label', 'Actividad'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVIDADAsc'])" sortDescending="@load(vm.comparators['ACTIVIDADDesc'])"  visible="@load(vm.isVisible('ACTIVIDAD'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('FECHAULTIMA.label', 'Última Accion'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECHAULTIMAAsc'])" sortDescending="@load(vm.comparators['FECHAULTIMADesc'])"  visible="@load(vm.isVisible('FECHAULTIMA'))"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Usuario Asignado.label', 'Usuario Asignado'))" align="center"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Estado.label', 'Estado'))" align="center"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TIPOPOTENCIAL.label', 'Tipo Potencial'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TIPOPOTENCIALAsc'])" sortDescending="@load(vm.comparators['TIPOPOTENCIALDesc'])"  visible="@load(vm.isVisible('TIPOPOTENCIAL'))"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Campaña.label', 'Campaña'))" align="center"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('LOCALIDAD.label', 'Localidad'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['LOCALIDADAsc'])" sortDescending="@load(vm.comparators['LOCALIDADDesc'])"  visible="@load(vm.isVisible('LOCALIDAD'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TELEFONO1.label', 'Telefono1'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TELEFONO1Asc'])" sortDescending="@load(vm.comparators['TELEFONO1Desc'])"  visible="@load(vm.isVisible('TELEFONO1'))"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Franquicia.label', 'Franquicia'))" align="center"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PROVINCIA.label', 'Provincia'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROVINCIAAsc'])" sortDescending="@load(vm.comparators['PROVINCIADesc'])"  visible="@load(vm.isVisible('PROVINCIA'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('SITIOWEB.label', 'SitioWeb'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SITIOWEBAsc'])" sortDescending="@load(vm.comparators['SITIOWEBDesc'])"  visible="@load(vm.isVisible('SITIOWEB'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('EMAIL.label', 'Email'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['EMAILAsc'])" sortDescending="@load(vm.comparators['EMAILDesc'])"  visible="@load(vm.isVisible('EMAIL'))"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterpotenciales.zul')">
+						
+							             <label  value="@load(item.nombredeempresa) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.actividad) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.fechaultima) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idssousuario.usuario) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+                                   <cell align="center">
+                                              <zscript>
+                                                    String estilo = item.idmktmestadopot.backcolor;
+                                              </zscript>
+                                              <label  sclass="fw-bolder badge rounded-pill"  style="font-size:12px;background-color:${estilo};"  value="@load(item.idmktmestadopot.estado) @converter(vm.fieldConverter)"></label>   
+                                                
+                                        
+                                      
+                                    <space></space>
+                                                
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							             <label  value="@load(item.tipopotencial) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                              <zscript>
+                                                    String estilo = item.idmktcampaing.backcolor;
+                                              </zscript>
+                                              <label  sclass="fw-bolder badge rounded-pill"  style="font-size:12px;background-color:${estilo};"  value="@load(item.idmktcampaing.code) @converter(vm.fieldConverter)"></label>   
+                                                
+                                        
+                                      
+                                    <space></space>
+                                                
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							             <label  value="@load(item.localidad) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.telefono1) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idfrcmfranchise.nombre) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							             <label  value="@load(item.provincia) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.sitioweb) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.email) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masterpotenciales.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"   />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2"   />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

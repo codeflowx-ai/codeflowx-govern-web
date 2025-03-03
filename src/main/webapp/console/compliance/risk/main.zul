@@ -1,0 +1,75 @@
+<?page title="Gestión de Evaluaciones IA" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <window id="mainWindow" apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('org.suinsit.compliance.web.MainVM')"
+            width="100%" height="100%">
+        
+        <!-- Header -->
+        <div sclass="navbar navbar-expand-lg navbar-dark bg-primary">
+            <div sclass="container-fluid">
+                <a sclass="navbar-brand">Evaluaciones IA</a>
+                <button sclass="navbar-toggler" type="button" 
+                        data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span sclass="navbar-toggler-icon"></span>
+                </button>
+                <div sclass="collapse navbar-collapse" id="navbarNav">
+                    <ul sclass="navbar-nav me-auto">
+                        <li sclass="nav-item">
+                            <a sclass="@load(vm.getMenuItemClass('dashboard'))" 
+                               onClick="@command('navigateToDashboard')">
+                                <i sclass="fas fa-home"></i> Dashboard
+                            </a>
+                        </li>
+                        <li sclass="nav-item" visible="@load(vm.hasPermission('FORMS_VIEW'))">
+                            <a sclass="@load(vm.getMenuItemClass('forms'))" 
+                               onClick="@command('navigateToForms')">
+                                <i sclass="fas fa-file-alt"></i> Formularios
+                            </a>
+                        </li>
+                        <li sclass="nav-item" visible="@load(vm.hasPermission('SECTORS_VIEW'))">
+                            <a sclass="@load(vm.getMenuItemClass('sectors'))" 
+                               onClick="@command('navigateToSectors')">
+                                <i sclass="fas fa-industry"></i> Sectores
+                            </a>
+                        </li>
+                        <li sclass="nav-item">
+                            <a sclass="@load(vm.getMenuItemClass('evaluations'))" 
+                               onClick="@command('navigateToMyEvaluations')">
+                                <i sclass="fas fa-tasks"></i> Mis Evaluaciones
+                            </a>
+                        </li>
+                        <li sclass="nav-item" visible="@load(vm.hasPermission('VALIDATION_VIEW'))">
+                            <a sclass="@load(vm.getMenuItemClass('validation'))" 
+                               onClick="@command('navigateToValidation')">
+                                <i sclass="fas fa-check-double"></i> Validación
+                            </a>
+                        </li>
+                        <li sclass="nav-item" visible="@load(vm.hasPermission('REPORTS_VIEW'))">
+                            <a sclass="@load(vm.getMenuItemClass('reports'))" 
+                               onClick="@command('navigateToReports')">
+                                <i sclass="fas fa-chart-bar"></i> Reportes
+                            </a>
+                        </li>
+                    </ul>
+                    <div sclass="navbar-nav">
+                        <li sclass="nav-item dropdown">
+                            <a sclass="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                                <i sclass="fas fa-user"></i> @load(vm.currentUser)
+                            </a>
+                            <div sclass="dropdown-menu dropdown-menu-end">
+                                <a sclass="dropdown-item" onClick="@command('logout')">
+                                    <i sclass="fas fa-sign-out-alt"></i> Cerrar Sesión
+                                </a>
+                            </div>
+                        </li>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div id="mainContent" sclass="container-fluid mt-3">
+            <!-- Aquí se cargarán las vistas dinámicamente -->
+        </div>
+    </window>
+</zk>

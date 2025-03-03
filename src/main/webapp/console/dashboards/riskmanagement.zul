@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Risk Management Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .risk-container { padding: 20px; background: #f8f9fa; }
+        .chart-container { 
+            background: white; 
+            padding: 15px; 
+            margin: 10px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .risk-high { background-color: #ffe6e6; }
+        .risk-medium { background-color: #fff3e6; }
+        .risk-low { background-color: #f0fff0; }
+        .data-list { border: none; }
+        .refresh-button { margin: 10px; }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.RiskManagementViewModel')"
+         sclass="risk-container">
+        
+        <!-- Risk Matrix and Trend Charts -->
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="riskMatrixChart"
+                       model="@bind(vm.riskMatrixChart)"
+                       height="400px"/>
+            </div>
+            <div sclass="chart-container" width="48%">
+                <charts id="riskTrendChart"
+                       model="@bind(vm.riskTrendChart)"
+                       height="400px"/>
+            </div>
+        </hlayout>
+        
+        <!-- Risk Assessments and Mitigation Plans -->
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <caption label="Risk Assessments"/>
+                <listbox model="@bind(vm.riskAssessmentsList)"
+                        emptyMessage="No risk assessments"
+                        sclass="data-list">
+                    <listhead>
+                        <listheader label="Model" width="150px"/>
+                        <listheader label="Risk Level" width="100px"/>
+                        <listheader label="Score" width="80px"/>
+                        <listheader label="Date" width="150px"/>
+                        <listheader label="Actions"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem sclass="risk-${each.risklevel.toLowerCase()}">
+                            <listcell label="@load(each.model_name)"/>
+                            <listcell label="@load(each.risklevel)"/>
+                            <listcell label="@load(each.risk_score)"/>
+                            <listcell label="@load(each.assessmentdate)"/>
+                            <listcell>
+                                <button label="Update Mitigation"
+                                        onClick="@command('updateMitigationPlan', 
+                                                risk=each, 
+                                                measures=each.mitigation_measures)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+            
+            <div sclass="chart-container" width="48%">
+                <caption label="Mitigation Plans"/>
+                <listbox model="@bind(vm.mitigationPlansList)"
+                        emptyMessage="No mitigation plans"
+                        sclass="data-list">
+                    <listhead>
+                        <listheader label="Model" width="150px"/>
+                        <listheader label="Risk Level" width="100px"/>
+                        <listheader label="Measures"/>
+                        <listheader label="Date" width="150px"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell label="@load(each.model_name)"/>
+                            <listcell label="@load(each.risklevel)"/>
+                            <listcell label="@load(each.mitigation_measures)"/>
+                            <listcell label="@load(each.assessmentdate)"/>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </hlayout>
+        
+        <!-- Regulatory Reports -->
+        <div sclass="chart-container">
+            <caption label="Regulatory Reports"/>
+            <listbox model="@bind(vm.regulatoryReportsList)"
+                     emptyMessage="No regulatory reports"
+                     sclass="data-list"
+                     height="300px">
+                <listhead>
+                    <listheader label="Model" width="150px"/>
+                    <listheader label="Report Date" width="150px"/>
+                    <listheader label="Compliance Status"/>
+                    <listheader label="Violations"/>
+                    <listheader label="Risk Level" width="100px"/>
+                </listhead>
+                <template name="model">
+                    <listitem>
+                        <listcell label="@load(each.model_name)"/>
+                        <listcell label="@load(each.report_date)"/>
+                        <listcell label="@load(each.compliance_metrics)"/>
+                        <listcell label="@load(each.violations)"/>
+                        <listcell label="@load(each.risklevel)"/>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+        
+        <button label="Refresh Risk Management"
+                sclass="refresh-button"
+                onClick="@command('refreshRiskManagement')"/>
+    </div>
+</zk>

@@ -1,0 +1,156 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="popcobro" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='popcobro')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popcobro" />
+	  <custom-attributes enviroment="preview" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+<h:div style="overflow:auto;" class=" col-lg-6 col-xlg-6 col-md-6">
+<h:div class="row">
+
+
+
+
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('FECHA'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHA.label', 'Fecha de cobro'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_FECHA" />
+	   </hbox>
+    <datebox id="FECHA"  placeholder="@load(vm.lang.getProperty('FECHA.label', 'Fecha de cobro'))" tabindex="1" value="@bind(vm.beanData.fecha) @save(vm.beanData.fecha, before=('store')) "   format="dd/MM/yyyy"  visible="@load(vm.isVisible('FECHA'))" disabled="@load(vm.isEditable('FECHA')?false:true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['FECHA'])"/>
+      </h:div>
+
+
+
+
+
+ <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('CBOPARCIAL'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('CBOPARCIAL.label', 'Es Cobro Parcial'))"/>
+	   </hbox>
+ <checkbox mold="default" id="434117" value="@bind(vm.beanData.cboparcial) @save(vm.beanData.cboparcial, before=('store'))" sclass="" visible="@load(vm.isVisible('CBOPARCIAL'))" disabled="@load(vm.isEditable('CBOPARCIAL')?false:true)" checked="@bind(vm.beanData.cboparcial) @save(vm.beanData.cboparcial, before=('store'))"/>
+</h:div>
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOTA'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOTA.label', 'Nota'))"  />
+	   </hbox>
+	   <textbox  tabindex="3" id="NOTA" placeholder="@load(vm.lang.getProperty('NOTA.label', 'Nota'))" value="@bind(vm.beanData.nota) @save(vm.beanData.nota, before=('store')) "  sclass="form-control  form-control" visible="@load(vm.isVisible('NOTA'))" disabled="@load(vm.isEditable('NOTA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['NOTA'])"/>
+    </h:div>   
+
+
+
+
+</h:div>
+</h:div>  <h:div style="overflow:auto;" class=" col-lg-6 col-xlg-6 col-md-6">
+<h:div class="row">
+
+
+
+
+  <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('IMPORTE'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('IMPORTE.label', 'Importe'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_IMPORTE" />
+	   </hbox>
+    <decimalbox tabindex="1" id="IMPORTE" onCreate="" placeholder="@load(vm.lang.getProperty('IMPORTE.label', 'Importe'))"   value="@bind(vm.beanData.importe) @save(vm.beanData.importe, before=('store')) "  format="###,###,###,###,##0.00€"  sclass="form-control  form-control" visible="@load(vm.isVisible('IMPORTE'))" disabled="@load(vm.isEditable('IMPORTE')?false:true)" onChange="@command('onChangeInput',field='IMPORTE',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['IMPORTE'])"/>
+    </h:div>
+
+
+
+
+<h:div class="col-md-12">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" style="" value="@load(vm.lang.getProperty('iderpmabnco.label', 'Banco de Abono'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_JtiZfeutDn" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="iderpmabnco" placeholder="@load(vm.lang.getProperty('iderpmabnco').label,'Banco de Abono')" model="@bind(vm.foreings['iderpmabnco'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='iderpmabnco',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.iderpmabnco)"  onCreate="@command('onCreateCombo',component=self,alias='iderpmabnco')" value="@bind(vm.beanData.iderpmabnco .banco)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(c:cat3(item.banco,' ',item.codiban))" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['iderpmabnco'])"/>
+   <popup id="pop_JtiZfeutDn" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('iderpmabnco.helptext', 'iderpmabnco'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+</h:div>
+</h:div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('store')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('storeNew')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['popcobro.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$popcobro');
+  binder.command('doLoad');
+});
+function loadpopcobro(){
+  var binder = zkbind.$('$popcobro');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,161 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="aplicaciones" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='aplicaciones')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="aplicaciones" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.admin.Aplicacion" />
+	   <custom-attributes namespace="admin" />
+	      <custom-attributes uid="54999" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('Aplicaciones.screen', 'Aplicaciones'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="PuhEibOYSE" style="overflow:auto;" class=" default col-lg-4 col-xlg-4 col-md-4"  visible="false" >
+<div id="PuhEibOYSE-row" class="row">
+</div>
+</div>  
+<div id="ZsJMrWeDEP" style="overflow:auto;" class=" default col-lg-4 col-xlg-4 col-md-4"  visible="false" >
+<div id="ZsJMrWeDEP-row" class="row">
+</div>
+</div>  
+<div id="bKEEZfeNJk" style="overflow:auto;" class=" default col-lg-4 col-xlg-4 col-md-4"  visible="false" >
+<div id="bKEEZfeNJk-row" class="row">
+
+
+				
+
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('APLICACION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style=" font-size:16px;" value="@load(vm.lang.getProperty('APLICACION.label', 'Aplicacion'))"  />
+	   
+	    <textbox   tabindex="1" id="198725" 
+	   placeholder="@load(vm.lang.getProperty('APLICACION.label', 'Nombre descriptivo de la aplicación'))" 
+	   value="@bind(vm.beanData.aplicacion) @save(vm.beanData.aplicacion, before=('grabar')) @validator(vm.unique, field='APLICACION',required=true ,oldValue=vm.beanDataCpy.aplicacion)"  sclass="   bg-light text-dark border-danger" 
+	   visible="@load(vm.isVisible('APLICACION'))" disabled="@load(vm.isEditable('APLICACION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['198725'])"/>
+            
+	   
+    </div>   
+
+
+
+
+</div>
+</div>  
+<div id="WImBwlPhQk" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="false" >
+<div id="WImBwlPhQk-row" class="row">
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['Aplicaciones.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+                  
+                 
+
+                  
+                 
+
+
+                  
+                 
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$aplicaciones');
+  binder.command('doLoad');
+});
+function loadaplicaciones(){
+  var binder = zkbind.$('$aplicaciones');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

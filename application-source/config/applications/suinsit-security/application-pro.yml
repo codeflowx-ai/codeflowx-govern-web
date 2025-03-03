@@ -1,0 +1,136 @@
+logging:
+  #file:
+    #path: ${SUINSIT_LOGS}
+    #name: ${SUINSIT_CUSTOMER_NAME}_apps.log
+  level:
+    root: ${ROOT_LOG}
+    com.enartsystems: ${TECHNICAL_LOG}
+    com.suinsit: ${TECHNICAL_LOG}
+
+
+jwt:
+  password:
+    encoder:
+      secret: 6d61f2bdf4ff42009d62accdefe2d87c_e4a44b5654da4bc5b350e4335c4d2c90
+      iteration: 33
+      keylength: 256
+  secret: e4a44b5654da4bc5b350e4335c4d2c90 #This Secret For JWT HS256 Signature Algorithm MUST Have 256 bits KeySize
+  expiration: 28800 # token expiration in seconds
+  
+s3:
+ accessKey: 6d61f2bdf4ff42009d62accdefe2d87c 
+ secretkey: e4a44b5654da4bc5b350e4335c4d2c90
+ endpointurl: https://s3.gra.io.cloud.ovh.net/
+ region: gra
+ backet: ${SUINSIT_CUSTOMER_NAME}
+ 
+suinsit:
+  mail:
+   proveedor: mailjet
+   clave:
+     api: 65efe0802e4428cc1a8f20a1b9010a31
+     #api : c74eefd7feb3fe78aab3b6150ee80ce1 
+     secret: 293e9c6fe6b556d38b0e8c09ac65f9e3
+     #secret: 163192987bbd1f16a410f5edeb6cab49
+   email:
+     support: soporte@suinsit.cloud
+     name: Soporte Suinsit      
+  security:
+     whilelist: /authenticate/autorize,/webjars/**,/v3/**,/swagger-ui-custom.html/**,/swagger-ui/**,/api-doc/**,/version,/status,/actuator/**
+     scope: aplicacion,sistema 
+     roles: developer
+  application:
+     server:
+       host: ${SUINSIT_SERVER_HOST}
+     product: ${SUINSIT_PRODUCT}
+     name: ${SUINSIT_APPLICATION}
+     version: 2.1.1
+     customer:
+        name: ${SUINSIT_CUSTOMER_NAME}
+        uid:  ${SUINSIT_CUSTOMER_UID}
+        label: ${SUINSIT_CUSTOMER_LABEL}
+        namespace: ${SUINSIT_NAMESPACE}
+     platform:
+        architectures: ${SUINSIT_PLATFORM_ARCHITECTURES}
+        home: ${SUINSIT_PLATFORM_HOME}
+        projects: ${SUINSIT_PLATFORM_PROJECTS}
+        datasource:
+            url: ${SUINSIT_PLATFORM_BBDD_URL}
+            username: ${SUINSIT_PLATFORM_BBDD_USERNAME}
+            password: ${SUINSIT_BBDD_PLATFORM_PASSWORD}
+            password_repmng: ${SUINSIT_BBDD_PLATFORM_PASSWORD_REPMGR}
+            driver-class-name: org.postgresql.Driver
+            hikari:
+              auto-commit: true
+              connection-timeout: 100000
+              idle-timeout: 600000
+              max-lifetime: 90000
+              maximum-pool-size: 40
+              minimum-idle: 10
+              pool-name: SUINSIT_PLATFORM_DS_0
+              
+     pathHome : ${SUINSIT_HOME}
+     pathArchitecture: ${SUINSIT_SERVER_HOST}
+     pathStudio: ${SUINSIT_STUDIO}
+     pathRoot: ${SUINSIT_ROOT}
+     pathDeploy: ${SUNSIT_DEPLOY}
+     pathSource: ${SUINSIT_HOME}/data/sources
+     pathClasses: ${SUINSIT_HOME}/data/classes
+     pltaformHome: ${SUINSIT_PLATFORM_HOME}
+     pltaformProject: ${SUINSIT_PLATFORM_PROJECTS}
+     pltaformArchitectures: ${SUINSIT_PLATFORM_ARCHITECTURES}
+     enviroment: ${SUINSIT_ENVIROMENT}
+     mode: ${SUINSIT_MODE}     
+server:
+  port: 8080
+  
+
+#spring.liquibase.enabled=true
+springdoc:
+ # show-actuator: true
+  version: '1.6.12'
+#  use-management-port: true
+  # This property enables the openapi and swagger-ui endpoints to be exposed beneath the actuator base path.
+#  management:
+#   endpoints:
+#     web:
+#      exposure:
+#       include: openapi, swagger-ui
+  swagger-ui:
+    #use-root-path: true
+    path: /swagger-ui.html-custom.html
+      
+spring:
+  datasource:
+    url: ${SUINSIT_BBDD_URL}
+    username: ${SUINSIT_BBDD_USERNAME}
+    password: ${SUINSIT_BBDD_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 100000
+      idle-timeout: 600000
+      max-lifetime: 90000
+      maximum-pool-size: 40
+      minimum-idle: 10
+      pool-name: SUINSIT_DS_0
+      
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: suinsit
+    password: 9xs8bpVtoC    
+           
+  mail:
+    host: in-v3.mailjet.com
+    port: 465
+    properties:
+      mail:
+       smtp:
+         auth: true
+         starttls:
+           enable: true
+    username: 65efe0802e4428cc1a8f20a1b9010a31
+    password: 293e9c6fe6b556d38b0e8c09ac65f9e3
+  
+

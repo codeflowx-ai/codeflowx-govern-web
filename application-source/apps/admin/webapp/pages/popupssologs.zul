@@ -1,0 +1,345 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="ssologs" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='ssologs')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="ssologs" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.admin.Ssologaccess" />
+	   <custom-attributes namespace="admin" />
+	      <custom-attributes uid="63641" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('ssologs.screen', 'Logs de acceso'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+<div id="ywZDylUyLi"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="ywZDylUyLi-card" class="card  default shadow-xl" style="overflow:auto;" >
+       <div id="ywZDylUyLi-body" class="card-body ">
+        <div id="ywZDylUyLi-row" class="form-group row ">
+
+
+
+
+
+<h:div class="col-md-3">
+       <hbox spacing="3px" visible="@load(vm.isVisible('LOGIN'))">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('LOGIN.label', 'Login'))"  />
+	   </hbox>
+	   <timebox sclass="col-md-3" format="HH:mm:ss" tabindex="1" id="LOGIN" value="@bind(vm.beanData.login) @save(vm.beanData.login, before=('grabar')) " visible="@load(vm.isVisible('LOGIN'))" disabled="@load(vm.isEditable('LOGIN')?false:true)"/>
+	   <label sclass="text-danger" value="@load(vmsgs['LOGIN'])"/>
+  </h:div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('USERNAME'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('USERNAME.label', 'User name'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="2" id="155366" 
+	   placeholder="@load(vm.lang.getProperty('USERNAME.label', 'User name'))" 
+	   value="@bind(vm.beanData.username) @save(vm.beanData.username, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('USERNAME'))" disabled="@load(vm.isEditable('USERNAME')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['155366'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('DIRIP'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DIRIP.label', 'IP'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="3" id="WJyDWptlRl" 
+	   placeholder="@load(vm.lang.getProperty('DIRIP.label', 'IP'))" 
+	   value="@bind(vm.beanData.dirip) @save(vm.beanData.dirip, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DIRIP'))" disabled="@load(vm.isEditable('DIRIP')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['WJyDWptlRl'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('DISPOSITIVO'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DISPOSITIVO.label', 'Dispositivo'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="4" id="139006" 
+	   placeholder="@load(vm.lang.getProperty('DISPOSITIVO.label', 'Dispositivo'))" 
+	   value="@bind(vm.beanData.dispositivo) @save(vm.beanData.dispositivo, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DISPOSITIVO'))" disabled="@load(vm.isEditable('DISPOSITIVO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['139006'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+
+
+
+<h:div class="col-md-3">
+       <hbox spacing="3px" visible="@load(vm.isVisible('LOGOUT'))">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('LOGOUT.label', 'Logout '))"  />
+	   </hbox>
+	   <timebox sclass="col-md-3" format="HH:mm:ss" tabindex="5" id="LOGOUT" value="@bind(vm.beanData.logout) @save(vm.beanData.logout, before=('grabar')) " visible="@load(vm.isVisible('LOGOUT'))" disabled="@load(vm.isEditable('LOGOUT')?false:true)"/>
+	   <label sclass="text-danger" value="@load(vmsgs['LOGOUT'])"/>
+  </h:div>   
+
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ERROR'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ERROR.label', 'Error'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="906147" value="@bind(vm.beanData.error) @save(vm.beanData.error, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ERROR'))" disabled="@load(vm.isEditable('ERROR')?false:true)" checked="@bind(vm.beanData.error) @save(vm.beanData.error, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('TIPOERROR'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('TIPOERROR.label', 'Tipo Error'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="7" id="731082" 
+	   placeholder="@load(vm.lang.getProperty('TIPOERROR.label', 'Tipo Error'))" 
+	   value="@bind(vm.beanData.tipoerror) @save(vm.beanData.tipoerror, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('TIPOERROR'))" disabled="@load(vm.isEditable('TIPOERROR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['731082'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('MENSAJE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MENSAJE.label', 'Mensaje'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="8" id="816728" 
+	   placeholder="@load(vm.lang.getProperty('MENSAJE.label', 'Mensaje'))" 
+	   value="@bind(vm.beanData.mensaje) @save(vm.beanData.mensaje, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('MENSAJE'))" disabled="@load(vm.isEditable('MENSAJE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['816728'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('APLICACION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('APLICACION.label', 'Aplicación'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="9" id="PLcZQmYjAD" 
+	   placeholder="@load(vm.lang.getProperty('APLICACION.label', 'Aplicación'))" 
+	   value="@bind(vm.beanData.aplicacion) @save(vm.beanData.aplicacion, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('APLICACION'))" disabled="@load(vm.isEditable('APLICACION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['PLcZQmYjAD'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('NAME'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NAME.label', 'Nombre'))"  />
+	   
+	    <textbox  readonly="true"  tabindex="10" id="DKPRbCcbiX" 
+	   placeholder="@load(vm.lang.getProperty('NAME.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.name) @save(vm.beanData.name, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('NAME'))" disabled="@load(vm.isEditable('NAME')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['DKPRbCcbiX'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('HEADERS.label', 'Headers'))"/>
+	  
+	      <extHTML value="@bind(vm.beanData.headers)"></extHTML>
+	     
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+<div id="YzdHpxALtI" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="false" >
+<div id="YzdHpxALtI-row" class="row">
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['ssologs.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+                 
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$ssologs');
+  binder.command('doLoad');
+});
+function loadssologs(){
+  var binder = zkbind.$('$ssologs');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,136 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+			
+			
+			
+			
+			
+			
+			
+			
+			
+				 <grid  	model="@load(vm.beans)" sizedByContent="true" span="true" sclass="table align-middle mb-0" >  
+							<columns sizable="true" >
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PRESUPUESTO.label', 'Presupuesto'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRESUPUESTOAsc'])" sortDescending="@load(vm.comparators['PRESUPUESTODesc'])"  visible="@load(vm.isVisible('PRESUPUESTO'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('FECHA.label', 'Fecha'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECHAAsc'])" sortDescending="@load(vm.comparators['FECHADesc'])"  visible="@load(vm.isVisible('FECHA'))"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Cliente.label', 'Cliente'))" align="center"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Comercial.label', 'Comercial'))" align="center"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Compañia.label', 'Compañia'))" align="center"/>
+						
+							      <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('Estado.label', 'Estado'))" align="center"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('SUBTOTAL.label', 'subtotal'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SUBTOTALAsc'])" sortDescending="@load(vm.comparators['SUBTOTALDesc'])"  visible="@load(vm.isVisible('SUBTOTAL'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('IMPUESTOS.label', 'impuestos'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['IMPUESTOSAsc'])" sortDescending="@load(vm.comparators['IMPUESTOSDesc'])"  visible="@load(vm.isVisible('IMPUESTOS'))"/>
+						
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TOTAL.label', 'total'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TOTALAsc'])" sortDescending="@load(vm.comparators['TOTALDesc'])"  visible="@load(vm.isVisible('TOTAL'))"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='presupuesto.zul')">
+						
+							             <label  value="@load(item.presupuesto) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+							             <label  value="@load(item.fecha) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idcliente.empresa) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.iderpcomercial.nombre) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idcompany.nombre) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+                                   <cell align="center">
+                                              <label style="font-size:12px;" sclass="@load(vm.concat('fw-bolder badge rounded-pill ',item.iderpmestado.bgcolor))" value="@load(item.iderpmestado.estado) @converter(vm.fieldConverter)"></label>   
+                                        
+                                      
+                                    <space></space>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							                     <label  value="@load(item.subtotal) @converter(vm.fieldConverter,format='###,###,###,##0.00€')"></label>
+							          
+                                   
+						
+							                     <label  value="@load(item.impuestos) @converter(vm.fieldConverter,format='###,###,###,##0.00€')"></label>
+							          
+                                   
+						
+							                     <label  value="@load(item.total) @converter(vm.fieldConverter,format='###,###,###,##0.00€')"></label>
+							          
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='presupuesto.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"   />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2"   />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							                <label value="@load(vm.totales['subtotal']) @converter(vm.fieldConverter,type='CURRENCY',format='###,###,###,##0.00€')"/>
+							      </footer>
+							      <footer>
+							                <label value="@load(vm.totales['impuestos']) @converter(vm.fieldConverter,type='CURRENCY',format='###,###,###,##0.00€')"/>
+							      </footer>
+							      <footer>
+							                <label value="@load(vm.totales['total']) @converter(vm.fieldConverter,type='CURRENCY',format='###,###,###,##0.00€')"/>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

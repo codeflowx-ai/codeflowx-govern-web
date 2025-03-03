@@ -1,0 +1,26 @@
+logging:
+  level:
+    org.springframework: ${ROOT_LOG}
+    com.suinsit: ${ROOT_LOG}
+    org.springframework.cloud: ${TECHNICAL_LOG} 
+    reactor.netty.http.client: ${ROOT_LOG}
+server:  
+  port: 8080
+suinsit:
+  url: paraisojerez
+  integracion:
+    woocommerce:
+      url: https://www.elherbolariobiosaludable.es
+      consumerKey: ck_b73946c253c3e47a98aa51d29990e8a9382ab79e #ck_9f40c22ccdbe0642d074a515d781fd3f01b93c11
+      consumerSecret: cs_6d119e1ae2ff8adb70089c79f3816cc6ed63d437 #cs_7da45cf23ad2f5111a49b5234144da93770c5ca9
+      wp:
+       url:
+       username:
+       password:   
+spring:
+  application:
+    name: suinsit-woocommerce
+  profiles:
+    active: ${SUINSIT_PROFILES}
+  config:
+    import: optional:configserver:${SUINSIT_CLOUD_CONFIG}

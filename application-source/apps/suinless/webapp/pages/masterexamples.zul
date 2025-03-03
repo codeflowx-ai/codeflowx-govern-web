@@ -1,0 +1,246 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="examples" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='examples')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="examples" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slexamples" />
+	   <custom-attributes namespace="suinless" />
+		<custom-attributes uid="76249" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('examples.screen', 'ejemplos'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')"></a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+
+<div id="UgdYuwkTaG" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="UgdYuwkTaG-row" class="row">
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('EJEMPLO'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('EJEMPLO.label', 'Ejemplo'))"  />
+	   
+	    <textbox   tabindex="1" id="101410" 
+	   placeholder="@load(vm.lang.getProperty('EJEMPLO.label', 'ejemplo'))" 
+	   value="@bind(vm.beanData.ejemplo) @save(vm.beanData.ejemplo, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('EJEMPLO'))" disabled="@load(vm.isEditable('EJEMPLO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['101410'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('DESCRIPCION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripcion'))"  />
+	   
+	    <textbox   tabindex="2" id="258958" 
+	   placeholder="@load(vm.lang.getProperty('DESCRIPCION.label', 'descripcion'))" 
+	   value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DESCRIPCION'))" disabled="@load(vm.isEditable('DESCRIPCION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['258958'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslesmodel.label', 'Modelo'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslesmodel" placeholder="@load(vm.lang.getProperty('idslesmodel').label,'Modelo')" model="@bind(vm.foreings['idslesmodel'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslesmodel',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idslesmodel)"  onCreate="@command('onCreateCombo',component=self,alias='idslesmodel')" value="@bind(vm.beanData.idslesmodel .model)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.model)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslesmodel'])"/>
+
+  
+</h:div>
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('TEXTO'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('TEXTO.label', 'Texto'))"/>
+             <checkbox mold="default" id="372440" value="@bind(vm.beanData.texto) @save(vm.beanData.texto, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('TEXTO'))" disabled="@load(vm.isEditable('TEXTO')?false:true)" checked="@bind(vm.beanData.texto) @save(vm.beanData.texto, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('VIDEO'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('VIDEO.label', 'Video'))"/>
+             <checkbox mold="default" id="457481" value="@bind(vm.beanData.video) @save(vm.beanData.video, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('VIDEO'))" disabled="@load(vm.isEditable('VIDEO')?false:true)" checked="@bind(vm.beanData.video) @save(vm.beanData.video, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('VOICE'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('VOICE.label', 'Voz'))"/>
+             <checkbox mold="default" id="RhYdPVepyZ" value="@bind(vm.beanData.voice) @save(vm.beanData.voice, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('VOICE'))" disabled="@load(vm.isEditable('VOICE')?false:true)" checked="@bind(vm.beanData.voice) @save(vm.beanData.voice, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('AUDIO'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('AUDIO.label', 'Audio'))"/>
+             <checkbox mold="default" id="944368" value="@bind(vm.beanData.audio) @save(vm.beanData.audio, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('AUDIO'))" disabled="@load(vm.isEditable('AUDIO')?false:true)" checked="@bind(vm.beanData.audio) @save(vm.beanData.audio, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+   <h:div class="col-md-6 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PROMPT.label', 'prompt'))"/>
+	  
+	      <textbox rows="16" cols="100" id="fHcVpWpPeE" multiline="true" placeholder="@load(vm.lang.getProperty('PROMPT.label', 'prompt'))" value="@bind(vm.beanData.prompt) @save(vm.beanData.prompt, before=('grabar')) "   visible="@load(vm.isVisible('PROMPT'))" disabled="@load(vm.isEditable('PROMPT')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['fHcVpWpPeE'])"/>
+	     
+</h:div>
+
+
+
+
+   <h:div class="col-md-6 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('USUARIO.label', 'Usuario'))"/>
+	  
+	      <textbox rows="16" cols="100" id="IBhQAPlQYF" multiline="true" placeholder="@load(vm.lang.getProperty('USUARIO.label', 'usuario'))" value="@bind(vm.beanData.usuario) @save(vm.beanData.usuario, before=('grabar')) "   visible="@load(vm.isVisible('USUARIO'))" disabled="@load(vm.isEditable('USUARIO')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['IBhQAPlQYF'])"/>
+	     
+</h:div>
+
+
+
+</div>
+</div>  
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['examples.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$examples');
+  binder.command('doLoad');
+});
+</script>
+</zk>

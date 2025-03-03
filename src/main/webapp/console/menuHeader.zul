@@ -1,0 +1,33 @@
+<zk xmlns:h="xhtml" xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<div class="container-fluid low-menu">
+<!-- @command('viewPage',page='misProyectos.zul') -->
+<!--   <button sclass="toggle-btn" image="img/hmb-2.png" onClick="@command('openMenuPage')" /> -->
+<!-- 	<h:button class="menu-toggle"> -->
+<!-- 	  <h:i class="fas fa-bars"></h:i> -->
+<!-- 	</h:button> -->
+    <div class="navbar">
+    <forEach items="@load(ds.items)" varStatus="st">
+       <div class="dropdown">
+			<h:button >
+			  <h:i class="${each.iconClass}"></h:i>
+			${each.name}
+		    </h:button>
+		    <div class="dropdown-content">
+		      <forEach items="${each.items}" var="item" varStatus="su">
+		       <a href="#" onClick="@command('selectItem',item=item,main=each.name)" >${item.name}</a>
+			 </forEach>
+		    </div>
+ 	  </div>
+    </forEach>
+  </div>
+  
+  	<div
+		class="page-title-box d-sm-flex align-items-center justify-content-between">
+		<include src="@load(ds.menuArquitectura)"></include>
+	</div>
+</div>
+
+
+			
+
+</zk>

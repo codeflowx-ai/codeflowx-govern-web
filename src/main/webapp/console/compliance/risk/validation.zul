@@ -1,0 +1,174 @@
+<?page title="Validación de Respuestas" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <div sclass="container-fluid" 
+         viewModel="@id('vm') @init('org.suinsit.compliance.web.ValidationVM')">
+        
+        <!-- Header -->
+        <div sclass="row mb-3">
+            <div sclass="col">
+                <div sclass="d-flex justify-content-between align-items-center">
+                    <div sclass="h4">Validación de Respuestas</div>
+                    <div>
+                        <button sclass="btn btn-outline-primary" 
+                                onClick="@command('refresh')">
+                            <i sclass="fas fa-sync"></i> Actualizar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div sclass="row mb-3">
+            <div sclass="col-md-3">
+                <div sclass="form-group">
+                    <label>Sector</label>
+                    <combobox model="@load(vm.sectors)" 
+                             selectedItem="@bind(vm.selectedSector)"
+                             onChange="@command('filterAnswers')">
+                        <template name="model">
+                            <comboitem label="@load(each.name)"/>
+                        </template>
+                    </combobox>
+                </div>
+            </div>
+            <div sclass="col-md-3">
+                <div sclass="form-group">
+                    <label>Empresa</label>
+                    <combobox model="@load(vm.companies)" 
+                             selectedItem="@bind(vm.selectedCompany)"
+                             onChange="@command('filterAnswers')">
+                        <template name="model">
+                            <comboitem label="@load(each.nombre)"/>
+                        </template>
+                    </combobox>
+                </div>
+            </div>
+            <div sclass="col-md-3">
+                <div sclass="form-group">
+                    <label>Estado</label>
+                    <combobox model="@load(vm.validationStates)" 
+                             selectedItem="@bind(vm.selectedState)"
+                             onChange="@command('filterAnswers')"/>
+                </div>
+            </div>
+            <div sclass="col-md-3">
+                <div sclass="form-group">
+                    <label>Buscar</label>
+                    <textbox value="@bind(vm.searchText)" 
+                            onOK="@command('filterAnswers')"
+                            placeholder="Buscar..."/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Respuestas Pendientes -->
+        <div sclass="row">
+            <div sclass="col">
+                <grid model="@load(vm.pendingAnswers)" 
+                      emptyMessage="No hay respuestas pendientes de validación">
+                    <columns>
+                        <column hflex="2" label="Empresa"/>
+                        <column hflex="2" label="Formulario"/>
+                        <column hflex="3" label="Pregunta"/>
+                        <column hflex="1" label="Peso"/>
+                        <column hflex="1" label="Valor"/>
+                        <column hflex="1" label="Evidencias"/>
+                        <column hflex="2" label="Acciones"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.companyName)"/>
+                            <label value="@load(each.formTitle)"/>
+                            <div>
+                                <label value="@load(each.questionText)" sclass="fw-bold"/>
+                                <label value="@load(each.category)" 
+                                       sclass="@load(vm.getCategoryClass(each.category))"/>
+                            </div>
+                            <label value="@load(each.weight)" 
+                                   sclass="@load(vm.getWeightClass(each.weight))"/>
+                            <div>
+                                <label value="@load(each.answerValue)"/>
+                                <label value="@load(each.score)" 
+                                       sclass="small text-muted d-block"/>
+                            </div>
+                            <button sclass="btn btn-sm btn-outline-primary" 
+                                    onClick="@command('viewEvidences', answer=each)"
+                                    disabled="@load(each.evidenceCount eq 0)">
+                                Ver (@load(each.evidenceCount))
+                            </button>
+                            <div>
+                                <button sclass="btn btn-sm btn-success" 
+                                        onClick="@command('approveAnswer', answer=each)"
+                                        tooltiptext="Aprobar">
+                                    <i sclass="fas fa-check"></i>
+                                </button>
+                                <button sclass="btn btn-sm btn-danger" 
+                                        onClick="@command('rejectAnswer', answer=each)"
+                                        tooltiptext="Rechazar">
+                                    <i sclass="fas fa-times"></i>
+                                </button>
+                                <button sclass="btn btn-sm btn-info" 
+                                        onClick="@command('addComment', answer=each)"
+                                        tooltiptext="Comentar">
+                                    <i sclass="fas fa-comment"></i>
+                                </button>
+                            </div>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+        </div>
+
+        <!-- Modal de Evidencias -->
+        <window id="evidenceDialog" visible="false" 
+                title="Evidencias" width="700px" 
+                mode="modal" closable="true">
+            <div sclass="modal-body">
+                <grid model="@load(vm.currentEvidences)" 
+                      emptyMessage="No hay evidencias">
+                    <columns>
+                        <column hflex="2" label="Archivo"/>
+                        <column hflex="3" label="Descripción"/>
+                        <column width="100px" label="Acciones"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.fileName)"/>
+                            <label value="@load(each.description)"/>
+                            <button sclass="btn btn-sm btn-primary"
+                                    onClick="@command('downloadEvidence', evidence=each)"
+                                    tooltiptext="Descargar">
+                                <i sclass="fas fa-download"></i>
+                            </button>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            <div sclass="modal-footer">
+                <button sclass="btn btn-secondary" 
+                        onClick="@command('closeEvidenceDialog')">Cerrar</button>
+            </div>
+        </window>
+
+        <!-- Modal de Comentarios -->
+        <window id="commentDialog" visible="false" 
+                title="Añadir Comentario" width="500px" 
+                mode="modal" closable="true">
+            <div sclass="modal-body">
+                <div sclass="form-group">
+                    <label>Comentario</label>
+                    <textbox value="@bind(vm.validationComment)" 
+                            rows="3" width="100%"/>
+                </div>
+            </div>
+            <div sclass="modal-footer">
+                <button sclass="btn btn-secondary" 
+                        onClick="@command('closeCommentDialog')">Cancelar</button>
+                <button sclass="btn btn-primary" 
+                        onClick="@command('saveComment')">Guardar</button>
+            </div>
+        </window>
+    </div>
+</zk>

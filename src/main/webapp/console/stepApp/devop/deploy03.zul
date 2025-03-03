@@ -1,0 +1,125 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+		<h:div class="col-lg-6 ">
+			<div class="card  shadow-xl" style="overflow:auto;">
+				<div class="card-body ">
+					<div class="row">
+						<h:div class="col-md-6 ">
+						  <div class="col-md-12">
+						  
+								<hbox spacing="3px">
+									<label
+										sclass="text form-label  text-capitalize  font-weight-normal align-text-middle "
+										style="  " value="Proyecto" />
+								</hbox>
+								<label
+									sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle"
+									style="  " value="@load(vm.almproject.proyectoalm)" />
+							
+						  </div>
+							<hbox spacing="3px">
+								<label
+									sclass="text form-label  text-capitalize  font-weight-normal align-text-middle "
+									style="  "
+									value="Seleccione los clusters donde quiere instalar" />
+							</hbox>
+							<listbox model="@load(vm.almclus)"
+								height="200px" checkmark="true">
+								<listhead>
+									<listheader label="Cluster"></listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="${item}"
+										label="${item.idatlkubecloud.cluster}" />
+								</template>
+							</listbox>
+						</h:div>
+					</div>
+				</div>
+			</div>
+		</h:div>
+
+
+
+
+
+		<h:div class="col-lg-6 ">
+			<div class="card  shadow-xl" style="overflow:auto;">
+				<div class="card-body ">
+					<div class="row">
+						<h:div class="col-md-6 ">
+							<hbox spacing="3px"
+								visible="@load(vm.showUpdateApp)">
+								<label
+									sclass="text form-label    font-weight-normal align-text-middle "
+									style="  "
+									value="Actualiza solamente los cambios de la aplicación" />
+							</hbox>
+							<button visible="@load(vm.showUpdateApp)"
+								tooltiptext="Actualizar Aplicacion"
+								iconSclass=" mdi mdi-file-upload label-icon align-middle fs-16 me-2"
+								onClick="@command('updateApp')"
+								sclass="btn btn-label btn-info waves-effect waves-light">
+								Actualizar aplicación
+							</button>
+						</h:div>
+						<h:div class="col-md-6 ">
+							<hbox spacing="3px"
+								visible="@load(vm.showUpdateServer)">
+								<label
+									sclass="text form-label    font-weight-normal align-text-middle "
+									style="  "
+									value="Actualiza cambios como dns , configuraciones e instala una nueva aplicación" />
+							</hbox>
+							<button visible="@load(vm.showUpdateServer)"
+								tooltiptext="Actualizar Servidor"
+								iconSclass=" mdi mdi-file-upload label-icon align-middle fs-16 me-2"
+								onClick="@command('updateServer')"
+								sclass="btn btn-label btn-dark waves-effect waves-light">
+								Actualizar Servidor
+							</button>
+						</h:div>
+						<h:div class="col-md-6 ">
+							<hbox spacing="3px"
+								visible="@load(vm.reinstallServer)">
+								<label
+									sclass="text form-label    font-weight-normal align-text-middle "
+									style="  "
+									value="Elimina la aplicación actual e instala una nueva" />
+							</hbox>
+							<button visible="@load(vm.reinstallServer)"
+								tooltiptext="Actualizar Servidor"
+								iconSclass=" mdi mdi-file-upload label-icon align-middle fs-16 me-2"
+								onClick="@command('reinstall')"
+								sclass="btn btn-label btn-danger waves-effect waves-light">
+								Reinstalar Servidor y Aplicación
+							</button>
+						</h:div>
+					</div>
+
+
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-right"
+						sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+						iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"
+						onClick="@command('nextGit')" label="Siguiente" />
+				</div>
+
+			</div>
+		</h:div>
+	</div>
+
+
+
+
+
+
+
+</zk>

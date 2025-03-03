@@ -1,0 +1,181 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="popdesglosefpago" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='popdesglosefpago')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popdesglosefpago" />
+<custom-attributes clase="org.suinsit.apps.facturacin.Erpdesfpago" />
+	   <custom-attributes namespace="facturacin" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="OfNgXsVXYL" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="OfNgXsVXYL-row" class="row">
+
+
+
+<h:div class="col-md-4 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal text-danger" style="" value="@load(vm.lang.getProperty('TIPO.label', 'Tipo'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="border-warning" id="TIPO" model="@load(vm.getEnums('TIPO'))" 
+selectedItem="@load(vm.beanData.tipo)"  value="@load(vm.beanData.tipo) @save(vm.beanData.tipo, before=('grabar'))  @validator(vm.validator,required=true ,oldValue=vm.bean.getFieldByAtribute('TIPO').value )">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['TIPO'])"/>
+</h:div>
+
+
+
+
+
+				
+
+
+  <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('IMPORTE'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('IMPORTE.label', 'Importe Fijo'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_IMPORTE" />
+	   </hbox>
+   <decimalbox   tabindex="2" id="moSNIOpBjf" onCreate="" placeholder="@load(vm.lang.getProperty('IMPORTE.label', 'Importe Fijo'))"   
+    value="@bind(vm.beanData.importe) @save(vm.beanData.importe, before=('grabar')) "  format="###,###,###,###,##0.00€"  sclass="margin-field form-control  form-control" visible="@load(vm.isVisible('IMPORTE'))" disabled="@load(vm.isEditable('IMPORTE')?false:true)" onChange="@command('onChangeInput',field='IMPORTE',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['moSNIOpBjf'])"/>
+ 
+    </h:div>
+
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('PERCENT'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PERCENT.label', 'Porcentaje %'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_PERCENT" />
+	   </hbox>
+	      <decimalbox   tabindex="3" id="mSYfjfywaK"  placeholder="@load(vm.lang.getProperty('PERCENT.label', 'Porcentaje %'))"  value="@bind(vm.beanData.percent) @save(vm.beanData.percent, before=('grabar')) "  format="###,###,##0.00" sclass="margin-field form-control  form-control" visible="@load(vm.isVisible('PERCENT'))" disabled="@load(vm.isEditable('PERCENT')?false:true)" onChange="@command('onChangeInput',field='PERCENT',evento=event,componente=self,calculate=true)" />
+           <label sclass="text-danger" value="@load(vmsgs['mSYfjfywaK'])"/>   
+    </h:div>
+
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('DIA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DIA.label', 'Debido en días'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_DIA" />
+	   </hbox>
+	      <intbox   tabindex="4" id="FubJaPCdKa"  placeholder="@load(vm.lang.getProperty('DIA.label', 'Debido en días'))" sclass="margin-field form-control  form-control "  value="@bind(vm.beanData.dia) @save(vm.beanData.dia, before=('grabar')) " visible="@load(vm.isVisible('DIA'))" disabled="@load(vm.isEditable('DIA')?false:true)" onChange="@command('onChangeInput',field='DIA',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['FubJaPCdKa'])"/>   
+    
+    </h:div>
+
+
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('VENCIMIENTO.label', 'Vencimiento'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="VENCIMIENTO" model="@load(vm.getEnums('VENCIMIENTO'))" 
+selectedItem="@load(vm.beanData.vencimiento)"  value="@load(vm.beanData.vencimiento) @save(vm.beanData.vencimiento, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['VENCIMIENTO'])"/>
+</h:div>
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['popdesglosefpago.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$popdesglosefpago');
+  binder.command('doLoad');
+});
+function loadpopdesglosefpago(){
+  var binder = zkbind.$('$popdesglosefpago');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

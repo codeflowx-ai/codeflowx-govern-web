@@ -1,0 +1,103 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="poptipooportunida" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='poptipooportunida')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="poptipooportunida" />
+	  
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="TWqtTKxZOQ" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="TWqtTKxZOQ-row" class="row">
+
+
+
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('TIPOOPORTUNIDAD'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style=" Font-Size:16px;" value="@load(vm.lang.getProperty('TIPOOPORTUNIDAD.label', 'Tipo Oportunidad'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="450516" 
+	   placeholder="@load(vm.lang.getProperty('TIPOOPORTUNIDAD.label', 'Tipo Oportunidad'))" 
+	   value="@bind(vm.beanData.tipooportunidad) @save(vm.beanData.tipooportunidad, before=('grabar')) @validator(vm.unique, field='TIPOOPORTUNIDAD',required=true ,oldValue=vm.beanDataCpy.tipooportunidad)"  sclass="margin-field form-control  form-control text-dark border-danger" 
+	   visible="@load(vm.isVisible('TIPOOPORTUNIDAD'))" disabled="@load(vm.isEditable('TIPOOPORTUNIDAD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['450516'])"/>
+    </h:div>   
+
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['poptipooportunida.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$poptipooportunida');
+  binder.command('doLoad');
+});
+function loadpoptipooportunida(){
+  var binder = zkbind.$('$poptipooportunida');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

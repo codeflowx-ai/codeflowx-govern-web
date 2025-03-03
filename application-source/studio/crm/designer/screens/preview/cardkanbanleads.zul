@@ -1,0 +1,320 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<toolbar>
+			<toolbarbutton label="+ Column"
+				iconSclass="mdi su-2x mdi-table-column-plus-after" sclass=""
+				d:data-bs-toggle="modal" d:data-bs-target="#addColumn" />
+			<toolbarbutton label="-- Column"
+				iconSclass="mdi su-2x mdi-table-column-remove" sclass=""
+				d:data-bs-toggle="modal" d:data-bs-target="#delColumn" />
+          				         				
+			<toolbarbutton 
+				iconSclass="icon-pencil7" sclass="btn-outline-info" label="Nuevo"
+				 onClick="@command('onNewtask',popup=modalDialog)"/>
+		</toolbar>
+		<portallayout id="kanban" orient="vertical"
+			onPortalMove="@command('onPortalMove',event=event)">
+			<forEach items="@bind(vm.columns)" var="item1">
+				<portalchildren title="${item1.status}" draggable="true"
+					droppable="true" onDrop="@command('onDropPanel' ,event=event)"
+					counterVisible="true" hflex="1"
+					style='@load("background-color:".concat(item1.color))'>
+					<custom-attributes estado="${item1}"
+						scope="component" />
+					<forEach items="@bind(vm.tasks[item1.status])" var="item2"> 
+<panel border="normal" hflex="1" sclass="kanbantask">
+            <toolbar align="end">
+             
+			<toolbarbutton 
+				iconSclass="icon-pencil7" sclass="btn-outline-secondary"
+				d:data-bs-toggle="modal"  onClick="@command('onEdit',parent=self.parent.parent,popup=modalDialog)"/>
+			<toolbarbutton 
+				iconSclass="icon-trash" sclass="btn-outline-warning" onClick="@command('onRemove',parent=self.parent.parent)"/>
+		
+</toolbar>
+	   <custom-attributes value="${item2}" scope="component"/>
+	   <custom-attributes estado="${item1}" scope="component"/>
+		<panelchildren >
+			<div class="row">
+			</div>
+		</panelchildren>
+	</panel>
+					</forEach>
+				</portalchildren>
+			</forEach>
+		</portallayout>
+
+		<h:div id="addColumn" class="modal" tabindex="-1" role="dialog"
+			aria-labelledby="addColumnLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h:h4 class="modal-title" id="addColumnLabel">
+							Add Column
+						</h:h4>
+						<h:button type="button" class="btn-close"
+							data-bs-dismiss="modal" aria-hidden="true">
+						</h:button>
+					</div>
+					<div class="modal-body">
+						<div sclass="row">
+							<h:div class="col-md-6">
+								<label sclass="form-label"
+									value="Column / Status" />
+								<textbox tabindex="4" id="STATUS"
+									placeholder="name column /status"
+									value="@bind(vm.status.status) " sclass="form-control " />
+							</h:div>
+							<h:div class="col-md-6">
+								<label sclass="form-label"
+									value="BackGround Color" />
+								<colorbox
+									value="@bind(vm.status.color) " />
+							</h:div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button"
+							sclass="btn btn-info waves-effect text-white"
+							d:data-bs-dismiss="modal" label="Save"
+							onClick="@command('createColumn',status=vm.status)">
+						</button>
+						<button type="button"
+							class="btn btn-light waves-effect text-black"
+							 onClick="modalDialog.setVisible(false)" label="Close" />
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</h:div>
+		<h:div id="delColumn" class="modal" tabindex="-1" role="dialog"
+			aria-labelledby="delColumnLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h:h4 class="modal-title" id="delColumnLabel">
+							Remove Column / Status
+						</h:h4>
+						<button type="button" class="btn-close" onClick="modalDialog.setVisible(false)">
+						</button>
+					</div>
+					<div class="modal-body">
+						<div sclass="row">
+							<h:div class="col-md-6">
+								<label sclass="form-label"
+									value="Remove Column / Status" />
+								<combobox id="selectStatus" model="@load(vm.columns)">
+								    <template name="model" var="item">
+								      <comboitem label="${item.status}" value="${item}"/>
+								    </template>
+									
+									<comboitem label="" />
+								</combobox>
+							</h:div>
+							<h:div class="col-md-6">
+								<label sclass="form-label"
+									value="Change Tasks To" />
+								<combobox id="changeStatus" model="@load(vm.columns)">
+									<template name="model" var="item">
+								      <comboitem label="${item.status}" value="${item}"/> 
+								    </template>
+								</combobox>
+							</h:div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button"
+							sclass="btn btn-info waves-effect text-white"
+							d:data-bs-dismiss="modal" label="Save"
+							onClick="@command('removeColumn',status=selectStatus.selectedItem.value,change=changeStatus.selectedItem.value)">
+						</button>
+						<button type="button"
+							sclass="btn btn-light waves-effect text-black"
+							label="Close" onClick="modalDialog.setVisible(false)" />
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</h:div>
+		<window id="modalDialog"    
+    position="center,center" closable="true" action="show: slideDown;hide: slideUp" sclass="modal-dialog modal-xl" width="85%"  visible="false">
+<h:div id="newtask" class="col-lg-12 col-xlg-12 col-md-12" tabindex="-1">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h:h4 class="modal-title" id="newtaskLabel">
+							New Leads
+						</h:h4>
+						<button type="button" class="btn-close"
+							 onClick="modalDialog.setVisible(false)" >
+						</button>
+					</div>
+					<div class="modal-body">
+						<div sclass="row">
+
+
+<h:div style="overflow:auto;" class=" col-lg-6 col-xlg-6 col-md-6">
+<h:div class="row">
+
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('OPORTUNIDAD'))">
+	    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))"  />
+	    <a iconSclass="su-icon su-icon-question" popup="pop_OPORTUNIDAD" />
+	   </hbox>
+       <textbox  tabindex="1" id="OPORTUNIDAD" placeholder="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))" value="@bind(vm.beanData.oportunidad) @save(vm.beanData.oportunidad, before=('store')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.oportunidad)"  sclass="form-control-warning" visible="@load(vm.isVisible('OPORTUNIDAD'))" disabled="@load(vm.isEditable('OPORTUNIDAD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['OPORTUNIDAD'])"/>
+    </h:div>   
+   <popup id="pop_OPORTUNIDAD" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Help</caption>
+            <fragment exps="@load(vm.lang.getProperty('OPORTUNIDAD.helptext', vm.form.getFieldByAtribute('OPORTUNIDAD').getFieldPropsBeanByID('Helptext').value))" >
+	    	   <![CDATA[
+                <span textContent='@load(exps)'></span>
+	    	   ]]>        
+	        </fragment>
+        </groupbox>
+ </popup>
+
+
+
+
+
+
+<h:div class="col-md-6">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('idmtipoprioridad.label', 'Prioridad'))"/>
+ 	 <a	iconSclass="su-icon su-icon-question" popup="pop_EAjYTrDrde" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  placeholder="@load(vm.lang.getProperty('idmtipoprioridad').label,'Prioridad')" model="@bind(vm.foreings['idmtipoprioridad'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmtipoprioridad',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmtipoprioridad)"  onCreate="@command('onCreateCombo',component=self,alias='idmtipoprioridad')" value="@load(vm.beanData.idmtipoprioridad .prioridad)"   ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.prioridad)" /></template></combobox>
+   <popup id="pop_EAjYTrDrde" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmtipoprioridad.helptext', 'idmtipoprioridad'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+<h:div class="col-md-6">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('idmtipooportunidad.label', 'Tipo Oportunidad'))"/>
+ 	 <a	iconSclass="su-icon su-icon-question" popup="pop_dUJAdMdAXf" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  placeholder="@load(vm.lang.getProperty('idmtipooportunidad').label,'Tipo Oportunidad')" model="@bind(vm.foreings['idmtipooportunidad'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmtipooportunidad',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmtipooportunidad)"  onCreate="@command('onCreateCombo',component=self,alias='idmtipooportunidad')" value="@load(vm.beanData.idmtipooportunidad .tipooportunidad)"   ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.tipooportunidad)" /></template></combobox>
+   <popup id="pop_dUJAdMdAXf" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmtipooportunidad.helptext', 'idmtipooportunidad'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+<h:div class="col-md-6">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('idcrmpipeline.label', 'Pipeline'))"/>
+ 	 <a	iconSclass="su-icon su-icon-question" popup="pop_KchOGBptOg" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  placeholder="@load(vm.lang.getProperty('idcrmpipeline').label,'Pipeline')" model="@bind(vm.foreings['idcrmpipeline'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idcrmpipeline',item=self.selectedItem.value,changefk='idcrmetapa')"  		selectedItem="@load(vm.beanData.idcrmpipeline)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmpipeline')" value="@load(vm.beanData.idcrmpipeline .pipeline)"   ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.pipeline)" /></template></combobox>
+   <popup id="pop_KchOGBptOg" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idcrmpipeline.helptext', 'idcrmpipeline'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+<h:div class="col-md-6">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('idcrmetapa.label', 'Etapa'))"/>
+ 	 <a	iconSclass="su-icon su-icon-question" popup="pop_hmRSgIUsqh" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  placeholder="@load(vm.lang.getProperty('idcrmetapa').label,'Etapa')" model="@bind(vm.foreings['idcrmetapa'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idcrmetapa',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idcrmetapa)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmetapa',loadFkFrom='idcrmpipeline')" value="@load(vm.beanData.idcrmetapa .etapa)"  disabled="@bind(vm.beanData.idcrmpipeline.idxcrmpipeline eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.etapa)" /></template></combobox>
+   <popup id="pop_hmRSgIUsqh" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idcrmetapa.helptext', 'idcrmetapa'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+  <h:div class="col-md-6">
+       <hbox spacing="3px" visible="@load(vm.isVisible('IMPORTEPREV'))">
+	    <label sclass="form-label font-weight-normal" value="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_IMPORTEPREV" />
+	   </hbox>
+    <decimalbox tabindex="6" id="IMPORTEPREV" onCreate="" placeholder="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))"   value="@bind(vm.beanData.importeprev) @save(vm.beanData.importeprev, before=('store')) "  format="###,###,###,###,##0.00€"  sclass="form-control " visible="@load(vm.isVisible('IMPORTEPREV'))" disabled="@load(vm.isEditable('IMPORTEPREV')?false:true)" onChange="@command('onChangeInput',field='IMPORTEPREV',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['IMPORTEPREV'])"/>
+    </h:div>
+   <popup id="pop_IMPORTEPREV" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Help</caption>
+            <fragment exps="@load(vm.lang.getProperty('IMPORTEPREV.helptext', vm.form.getFieldByAtribute('IMPORTEPREV').getFieldPropsBeanByID('Helptext').value))" >
+	    	   <![CDATA[
+                <span textContent='@load(exps)'></span>
+	    	   ]]>        
+	        </fragment>
+        </groupbox>
+ </popup>
+
+
+
+
+</h:div>
+</h:div>  
+
+
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button"
+							sclass="btn btn-info waves-effect text-white"
+							d:data-bs-dismiss="modal" label="Save"
+							onClick="@command('store')">
+						</button>
+						<button type="button"
+							class="btn btn-light waves-effect text-black"
+							 onClick="modalDialog.setVisible(false)" label="Close" />
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</h:div>
+	</window>	
+
+
+
+
+
+
+
+
+</zk>       

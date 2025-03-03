@@ -1,0 +1,178 @@
+<zk xmlns:h="native">
+	<div id="notificacion"></div>
+
+
+	<div class="row">
+		<div class="col-lg-12">
+			<div class="card">
+				<div class="card-header">
+					<div
+						class="d-flex align-items-center flex-wrap gap-2">
+						<div class="flex-grow-1">
+
+						</div>
+						<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								<button
+									iconSclass="mdi mdi-alpha-h-circle-outline me-1 align-bottom"
+									class="btn btn-light add-btn"
+									onClick="WIN_HELP.setVisible(true)">
+									Ayuda
+								</button>
+								<button tooltiptext="Evaluar"
+									iconSclass="mdi mdi-motion-play-outline label-icon align-middle fs-16 me-2"
+									onClick="@command('evalTraduccion')"
+									sclass="btn btn-label btn-secondary waves-effect waves-light">
+									Traduccir
+								</button>
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+		<h:div class="card col-lg-12">
+			<div class="card-body">
+				<div class="row">
+					<h:div class="card col-lg-2">
+						<div class="card">
+							<div
+								class="card-header header-elements-inline bg-indigo">
+								<h:h6 class="card-title">
+									Seleccione Idioma
+								</h:h6>
+							</div>
+							<div class="card-body">
+
+								<div class="form-group row ">
+									<h:div class="col-md-12">
+										<hbox spacing="3px"
+											sclass="margin-field">
+											<label
+												sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+												style="" value="Idioma Origen" />
+										</hbox>
+										<combobox model="@bind(vm.languajes)">
+											<template name="model">
+												<comboitem
+													label="${each.label}" >
+												</comboitem>
+											</template>
+										</combobox>
+
+									</h:div>
+									<h:div class="col-md-12">
+										<hbox spacing="3px"
+											sclass="margin-field">
+											<label
+												sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+												style="" value="Añadir Traducción" />
+										</hbox>
+										<listbox model="@bind(vm.translateTo)" height="500px" pagingPosition="top" autopaging="true" mold="paging">
+									<listhead>
+										<listheader label="Idiomas">
+										</listheader>
+									</listhead>
+									<template name="model" var="item">
+										<listitem value="${item}">
+											<listcell
+												label="${item.label }">
+											</listcell>
+										</listitem>
+
+									</template>
+								</listbox>
+
+									</h:div>
+								</div>
+							</div>
+
+						</div>
+					</h:div>
+					<h:div class="card col-lg-8">
+						<hbox spacing="3px" sclass="margin-field">
+							<label
+								sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+								style="" value="Etiquetas" />
+						</hbox>
+						<tabbox>
+							<tabs>
+								<forEach
+									items="@load(vm.entidades)" var="item">
+									<tab label="${item.namesql}" />
+								</forEach>
+							</tabs>
+							<tabpanels>
+								<forEach
+									items="@load(vm.entidades)" var="item">
+									<tabpanel>
+										<tabbox>
+											<tabs>
+												<forEach
+													items="@bind(vm.selecteds)" var="ilang">
+													<tab label="${ilang.label}" />
+												</forEach>
+											</tabs>
+											<tabpanels>
+											    <forEach items="@bind(vm.selecteds)" var="ilang">
+													<tabpanel>
+													<listbox model="@bind(vm.traduccion[item.namesql][ilang.iso])">
+														<listhead>
+														    <listheader	label="field-id" sort="auto" />
+														    <listheader	label="field" sort="auto" />
+															<listheader	label="traduccion" />
+															
+														</listhead>
+														<template name="model" var="prop">
+														   <listitem>
+														   <listcell label="${prop.id}" />
+															<listcell label="${prop.propiedad}" />
+															<listcell label="${prop.label}" />
+														</listitem>    
+														</template>
+													</listbox>
+													</tabpanel>
+												</forEach>
+											</tabpanels>
+										</tabbox>
+									</tabpanel>
+								</forEach>
+							</tabpanels>
+						</tabbox>
+
+
+
+					</h:div>
+					<h:div class="card col-lg-2">
+						<hbox spacing="3px" sclass="margin-field">
+							<label
+								sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+								style="" value="Total Traducciones" />
+						</hbox>
+
+
+
+
+					</h:div>
+
+				</div>
+			</div>
+			<div class="card-footer">
+				<button zclass="pull-left"
+					sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill"
+					onClick="@command('back')"
+					iconSclass="fa-duotone fa-solid fa-arrow-left align-middle rounded-pill fs-16 me-2"
+					label="Anterior" />
+
+				<button zclass="pull-right"
+					sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+					iconSclass="fa-duotone fa-solid fa-arrow-right align-middle rounded-pill fs-16 me-2"
+					onClick="@command('evalScreens')" label="Siguiente" />
+
+			</div>
+
+		</h:div>
+
+	</div>
+</zk>

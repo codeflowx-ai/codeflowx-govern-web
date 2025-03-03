@@ -1,0 +1,469 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="secureprompt" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='secureprompt')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="secureprompt" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.suinless.Slsecuritypromt" />
+	   <custom-attributes namespace="suinless" />
+	      <custom-attributes uid="64116" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('secureprompt.screen', 'Prompt de seguridad'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+<div id="NstUBKJaFB"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="NstUBKJaFB-card" class="card  default shadow-sm" style="overflow:hidden;" >
+       <div id="NstUBKJaFB-body" class="card-body ">
+        <div id="NstUBKJaFB-row" class="form-group row ">
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('NAME'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NAME.label', 'Nombre'))"  />
+	   
+	    <textbox   tabindex="1" id="hvZFQqEYzs" 
+	   placeholder="@load(vm.lang.getProperty('NAME.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.name) @save(vm.beanData.name, before=('grabar')) @validator(vm.unique, field='NAME',required=true ,oldValue=vm.beanDataCpy.name)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('NAME'))" disabled="@load(vm.isEditable('NAME')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['hvZFQqEYzs'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('ALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+<h:div class="col-md-3  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslprovider.label', 'Proveedor'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslprovider" placeholder="@load(vm.lang.getProperty('idslprovider').label,'Proveedor')" model="@bind(vm.foreings['idslprovider'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslprovider',item=self.selectedItem.value,changefk='idslesmodel',updatebean='true')"  		selectedItem="@load(vm.beanData.idslprovider)"  onCreate="@command('onCreateCombo',component=self,alias='idslprovider')" value="@bind(vm.beanData.idslprovider .provider)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.provider)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslprovider'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-3  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslesmodel.label', 'Aplicar Modelo'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslesmodel" placeholder="@load(vm.lang.getProperty('idslesmodel').label,'Aplicar Modelo')" model="@bind(vm.foreings['idslesmodel'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslesmodel',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idslesmodel)"  onCreate="@command('onCreateCombo',component=self,alias='idslesmodel',loadFkFrom='idslprovider')" value="@bind(vm.beanData.idslesmodel .model)" disabled="@bind(vm.beanData.idslprovider.idxslprovider eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.model)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslesmodel'])"/>
+
+  
+</h:div>
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="497752" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('AUDITAR'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('AUDITAR.label', 'Auditar'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="906789" value="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('AUDITAR'))" disabled="@load(vm.isEditable('AUDITAR')?false:true)" checked="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('FILTERPROMPT'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FILTERPROMPT.label', 'Filtro de proteccion'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="MDRxSVXzLl" value="@bind(vm.beanData.filterprompt) @save(vm.beanData.filterprompt, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('FILTERPROMPT'))" disabled="@load(vm.isEditable('FILTERPROMPT')?false:true)" checked="@bind(vm.beanData.filterprompt) @save(vm.beanData.filterprompt, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('MEDIATIC'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MEDIATIC.label', 'Reglas Mediaticas'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="wkKDnsHewx" value="@bind(vm.beanData.mediatic) @save(vm.beanData.mediatic, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('MEDIATIC'))" disabled="@load(vm.isEditable('MEDIATIC')?false:true)" checked="@bind(vm.beanData.mediatic) @save(vm.beanData.mediatic, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('PUBLICPROMPT'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PUBLICPROMPT.label', 'Publicos'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="XLwXWMnTOv" value="@bind(vm.beanData.publicprompt) @save(vm.beanData.publicprompt, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('PUBLICPROMPT'))" disabled="@load(vm.isEditable('PUBLICPROMPT')?false:true)" checked="@bind(vm.beanData.publicprompt) @save(vm.beanData.publicprompt, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('GLOBALCHAT'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('GLOBALCHAT.label', 'Todos los chat'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="rrefKjDsiM" value="@bind(vm.beanData.globalchat) @save(vm.beanData.globalchat, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('GLOBALCHAT'))" disabled="@load(vm.isEditable('GLOBALCHAT')?false:true)" checked="@bind(vm.beanData.globalchat) @save(vm.beanData.globalchat, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('GLOBALRAG'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('GLOBALRAG.label', 'Modelos RAG'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="WIRPaDbihN" value="@bind(vm.beanData.globalrag) @save(vm.beanData.globalrag, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('GLOBALRAG'))" disabled="@load(vm.isEditable('GLOBALRAG')?false:true)" checked="@bind(vm.beanData.globalrag) @save(vm.beanData.globalrag, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('RESPONSE'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('RESPONSE.label', 'Sobre respuestas'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="ETLAtyvFTy" value="@bind(vm.beanData.response) @save(vm.beanData.response, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('RESPONSE'))" disabled="@load(vm.isEditable('RESPONSE')?false:true)" checked="@bind(vm.beanData.response) @save(vm.beanData.response, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('SHOWERROR'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('SHOWERROR.label', 'Mostrar error'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="NLHHYKroVp" value="@bind(vm.beanData.showerror) @save(vm.beanData.showerror, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('SHOWERROR'))" disabled="@load(vm.isEditable('SHOWERROR')?false:true)" checked="@bind(vm.beanData.showerror) @save(vm.beanData.showerror, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('MESSAGE'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MESSAGE.label', 'Se envia como mensaje'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="BHVEGYuNni" value="@bind(vm.beanData.message) @save(vm.beanData.message, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('MESSAGE'))" disabled="@load(vm.isEditable('MESSAGE')?false:true)" checked="@bind(vm.beanData.message) @save(vm.beanData.message, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+<h:div class="col-md-6  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslmrulemoderation.label', 'Aplicar Regla Moderación'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslmrulemoderation" placeholder="@load(vm.lang.getProperty('idslmrulemoderation').label,'Aplicar Regla Moderación')" model="@bind(vm.foreings['idslmrulemoderation'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslmrulemoderation',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idslmrulemoderation)"  onCreate="@command('onCreateCombo',component=self,alias='idslmrulemoderation')" value="@bind(vm.beanData.idslmrulemoderation .nombre)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(c:cat3(item.nombre,' ',item.describe))" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslmrulemoderation'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+    <div class="col-md-6  input-group" visible="@load(vm.isVisible('DESCRIBE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESCRIBE.label', 'Breve descripción'))"  />
+	   
+	    <textbox   tabindex="16" id="fYiJEWiwTM" 
+	   placeholder="@load(vm.lang.getProperty('DESCRIBE.label', 'Breve descripción'))" 
+	   value="@bind(vm.beanData.describe) @save(vm.beanData.describe, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DESCRIBE'))" disabled="@load(vm.isEditable('DESCRIBE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['fYiJEWiwTM'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-6  input-group" visible="@load(vm.isVisible('CLAZZEVAL'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CLAZZEVAL.label', 'Clase de validación'))"  />
+	   
+	    <textbox   tabindex="17" id="lLbjubthhs" 
+	   placeholder="@load(vm.lang.getProperty('CLAZZEVAL.label', 'Clase de validación'))" 
+	   value="@bind(vm.beanData.clazzeval) @save(vm.beanData.clazzeval, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('CLAZZEVAL'))" disabled="@load(vm.isEditable('CLAZZEVAL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['lLbjubthhs'])"/>
+            
+	   
+    </div>   
+
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+<div id="aveMDxHYpM"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="aveMDxHYpM-card" class="card  default shadow-sm" style="overflow:auto;" >
+       <div id="aveMDxHYpM-body" class="card-body ">
+        <div id="aveMDxHYpM-row" class="form-group row ">
+
+   <h:div class="col-md-8 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PROMPT.label', 'Prompt'))"/>
+	  
+	      <textbox rows="16" cols="100" id="mcSzKkpHMZ" multiline="true" 
+	      placeholder="@load(vm.lang.getProperty('PROMPT.label', 'Introduzca las instrucciones de seguridad'))" value="@bind(vm.beanData.prompt) @save(vm.beanData.prompt, before=('grabar')) "   visible="@load(vm.isVisible('PROMPT'))" disabled="@load(vm.isEditable('PROMPT')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['mcSzKkpHMZ'])"/>
+	     
+</h:div>
+
+
+
+
+<div class="col-md-4">
+ <h:div class="col-md-6">
+ <label sclass=" font-weight-normal align-text-middle" style="" value="Prompts"  />
+   
+    </h:div>
+   
+
+<listbox  checkmark="true"  model="@load(vm.foreings['idslespromp'])" height="300px" onCreate="@command('onSubtableCreate',alias='subslrprompsecure',loadOnDemand='true')" ><listhead><listheader label="Nombre"></listheader></listhead> <template name="model" var="item"><listitem value="@load(item)"><listcell label="@load(item.nombre)"></listcell></listitem></template></listbox>
+</div>
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['secureprompt.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+                 
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$secureprompt');
+  binder.command('doLoad');
+});
+function loadsecureprompt(){
+  var binder = zkbind.$('$secureprompt');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,53 @@
+<!-- chat.zul -->
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+    <window apply="org.zkoss.bind.BindComposer" 
+            viewModel="@id('vm') @init('org.suinsit.nocode.web.chatbot.ChatBotUI')"
+            width="600px" height="800px">
+        
+        <style>
+            .chat-container { 
+                display: flex;
+                flex-direction: column;
+                height: 100%;
+            }
+            .message-list {
+                flex: 1;
+                overflow-y: auto;
+            }
+            .user-message {
+                background: #e3f2fd;
+                margin: 5px;
+                padding: 10px;
+                border-radius: 10px;
+                align-self: flex-end;
+            }
+            .claude-message {
+                background: #f5f5f5;
+                margin: 5px;
+                padding: 10px;
+                border-radius: 10px;
+                align-self: flex-start;
+            }
+        </style>
+
+        <div sclass="chat-container">
+            <listbox id="chatListbox" model="@load(vm.chatMessages)" 
+                    sclass="message-list" hflex="1" vflex="1">
+                <template name="model">
+                    <listitem sclass="${each.user ? 'user-message' : 'claude-message'}">
+                        <listcell>
+                            <label value="@load(each.content)" />
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+
+            <div sclass="message-input">
+                <textbox id="messageInput" placeholder="Escribe tu mensaje..."
+                         onOK="@command('sendMessage')" hflex="1" />
+                <button label="Enviar" onClick="@command('sendMessage')" />
+            </div>
+        </div>
+    </window>
+</zk>

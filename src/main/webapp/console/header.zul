@@ -1,0 +1,100 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('header') @init('com.suinsit.webapp.nocode.HeaderUI')">
+	<div class="banner banner-high">
+	
+		<div class="left-section">
+			<div class="icon-item" >
+				<a href="index.zhtml" >
+					<h:img src="img/logo_white.png" alt="" />
+				</a>
+			</div>
+			
+			<button sclass="toggle-btn icon-item" image="img/menu_h.png" onClick="@command('openMenuPage')" />
+<!-- 			<h:button class="menu-toggle"> -->
+<!-- 			  <h:i class="fas fa-bars"></h:i> -->
+<!-- 			</h:button> -->
+		    <drawer id="drawer" class="draw-left" position="top"
+				autodrop="false" >
+				<div>
+					<div class="sidebar-left-logo">
+						<h:img src="img/logo-discover-white.png" alt="Logo" />
+					</div>
+					<div sclass="col-12">
+					  <div sclass="row">
+					    <forEach items="@load(ds.menus)" varStatus="st">
+						<div >
+						<a iconSclass="${each.iconClass}" href="#" class="menu-item"
+							onClick="@global-command('onSelectMenu',item=each,menu=drawer)" >
+							${each.name}
+						</a>
+						</div>
+					</forEach>  
+					  </div>
+					</div>
+					
+				</div>
+			</drawer>
+		
+			<div class="empresa">
+				<fragment exps="@load(ds.ctxBean.customerLabel)">
+					<![CDATA[ <h3 textContent='@load(exps)'></h3> ]]>
+				</fragment>
+			</div>
+			
+		</div>
+			
+			
+		<div class="nav">
+			<div class="dropdown icon-item">
+				<h:button>
+				<h:i class="fas fa-envelope"></h:i>
+<!-- 					<h:span>Mensaje</h:span> -->
+				</h:button>
+				<div class="dropdown-content">
+					<a href="#">Mensaje 1</a>
+					<a href="#">Mensaje 2</a>
+					<a href="#">Mensaje 3</a>
+				</div>
+			</div>
+			<div class="dropdown icon-item">
+			<h:button  >
+				<h:i class="fa-solid fa-bell"></h:i>
+<!-- 					<h:span>Notificaciones</h:span> -->
+				</h:button>
+			
+				<div class="dropdown-content">
+					<a href="#">Notificación 1</a>
+					<a href="#">Notificación 2</a>
+					<a href="#">Notificación 3</a>
+				</div>
+			</div>
+			<div class="dropdown user-dropdown icon-item">
+			<h:button  >
+<!-- 				<h:img src="img/perfil.jpg" alt="Usuario" -->
+<!-- 						class="user-image" /> -->
+						 
+						<h:span>${header.user.firstname} </h:span>
+				</h:button>
+				<div class="dropdown-content">
+				<a href="#">
+						<span>${header.ctxBean.config.product}-${header.ctxBean.config.name}</span>
+					</a>
+					<a href="#">
+						<span>V.${header.ctxBean.config.version}</span>
+					</a>
+					<a href="/login.zhtml?logout">
+						<span>Cerrar Sesión</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+</idspace>
+</zk>

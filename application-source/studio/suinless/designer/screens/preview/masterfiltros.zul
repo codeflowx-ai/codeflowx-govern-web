@@ -1,0 +1,396 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="filtros" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='filtros')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="filtros" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Almfilterproject" />
+	   <custom-attributes namespace="suinless" />
+	    <custom-attributes enviroment="preview" />
+	     <custom-attributes uid="70183" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	
+	  	<div class="section header section-suinsit">
+            <div class="left tittle-principal">
+                <fragment exps="@load(vm.lang.getProperty('filtros.screen', 'Filtros de proteccion'))">
+							<![CDATA[ <h2 class="mb-sm-0"
+							textContent='@load(exps)'></h2> ]]>
+					</fragment>
+            </div>
+            <div class="right">
+                <h:p>	${ds.menu}  / Filtros de proteccion</h:p>
+            </div>
+        </div>
+			<div class="container-edit">
+				<div class="header-buttons">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" >
+										Volver
+									</button>	
+							
+							<div class="right-buttons">
+								
+								    <button class="btn btn-secondary"
+										iconSclass="s-icon s-icon-clear" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="s-icon s-icon-save me-1 align-bottom" onClick="@command('grabar',action='continuar')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="s-icon s-icon-save me-1 align-bottom" onClick="@command('grabar',action='nuevo')">
+										Guardar y Nuevo
+									</button>
+								
+						
+				</div>
+			</div>
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+<div id="SRmIzPlrHS"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="SRmIzPlrHS-card" class="card  default shadow-lg" style="overflow:hidden;" >
+       <div id="SRmIzPlrHS-body" class="card-body ">
+        <div id="SRmIzPlrHS-row" class="form-group row ">
+
+
+				
+
+  <!-- sclass="margin-field" -->
+     <h:div class="col-md-3 ">
+    <hbox spacing="3px" visible="@load(vm.isVisible('SERIE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-bolder align-text-middle " style=" font-size:18px;" value="@load(vm.lang.getProperty('SERIE.label', ''))"/>
+	   </hbox>
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-bolder align-text-middle" style=" font-size:18px;" value="@load(vm.beanData.serie)"  />
+    </h:div>
+
+
+
+
+
+<h:div class="col-md-3 ">
+   <hbox spacing="3px" sclass="margin-field">
+     <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('PROYECTO.label', 'Proyecto'))"/>
+   </hbox>
+<combobox model="@load(vm.getEnums('PROYECTO'))" selectedItem=" @load(vm.beanData.proyecto) "   value="@load(vm.beanData.proyecto) @save(vm.beanData.proyecto, before=('grabar'))    @validator(vm.unique, field='PROYECTO',required=true ,oldValue=vm.beanDataCpy.proyecto)" >
+<template name="model" var="item"><comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/></template></combobox>
+
+
+  
+</h:div>
+
+
+
+
+				
+
+    <h:div class="col-md-3 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('PROYECTO'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROYECTO.label', ''))"  />
+	   </hbox>
+	    <textbox  readonly="true"  tabindex="3" id="619866" 
+	   placeholder="@load(vm.lang.getProperty('PROYECTO.label', 'Proyecto'))" 
+	   value="@bind(vm.beanData.proyecto) @save(vm.beanData.proyecto, before=('grabar')) "  sclass="margin-field form-control  form-control border" 
+	   visible="@load(vm.isVisible('PROYECTO'))" disabled="@load(vm.isEditable('PROYECTO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['619866'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-3 ">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ALTA'))" sclass="margin-field">
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', ''))"/>
+	   </hbox>
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </h:div>
+
+
+
+
+
+
+
+<div id="JUDpFcEpda" style="overflow:auto;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="JUDpFcEpda-row" class="row">
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ACTIVO'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="910792" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('AUDITAR'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('AUDITAR.label', 'Auditar'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="892742" value="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('AUDITAR'))" disabled="@load(vm.isEditable('AUDITAR')?false:true)" checked="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('SUGERIRALTERNATIVO'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('SUGERIRALTERNATIVO.label', 'Sugerir texto alternativo'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="lRGMNYCemd" value="@bind(vm.beanData.sugeriralternativo) @save(vm.beanData.sugeriralternativo, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('SUGERIRALTERNATIVO'))" disabled="@load(vm.isEditable('SUGERIRALTERNATIVO')?false:true)" checked="@bind(vm.beanData.sugeriralternativo) @save(vm.beanData.sugeriralternativo, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ENVIO'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ENVIO.label', 'Envio mensaje'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="uMCacbxVNV" value="@bind(vm.beanData.envio) @save(vm.beanData.envio, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('ENVIO'))" disabled="@load(vm.isEditable('ENVIO')?false:true)" checked="@bind(vm.beanData.envio) @save(vm.beanData.envio, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('MOSTRARERROR'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MOSTRARERROR.label', 'Mostrar Error'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="297679" value="@bind(vm.beanData.mostrarerror) @save(vm.beanData.mostrarerror, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('MOSTRARERROR'))" disabled="@load(vm.isEditable('MOSTRARERROR')?false:true)" checked="@bind(vm.beanData.mostrarerror) @save(vm.beanData.mostrarerror, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('RESPUESTA'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('RESPUESTA.label', 'Respuesta del mensaje'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="uivZLfJIYV" value="@bind(vm.beanData.respuesta) @save(vm.beanData.respuesta, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('RESPUESTA'))" disabled="@load(vm.isEditable('RESPUESTA')?false:true)" checked="@bind(vm.beanData.respuesta) @save(vm.beanData.respuesta, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('GUARDARMENSAJE'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('GUARDARMENSAJE.label', 'Guardar Mensaje'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="274417" value="@bind(vm.beanData.guardarmensaje) @save(vm.beanData.guardarmensaje, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('GUARDARMENSAJE'))" disabled="@load(vm.isEditable('GUARDARMENSAJE')?false:true)" checked="@bind(vm.beanData.guardarmensaje) @save(vm.beanData.guardarmensaje, before=('grabar'))"/>
+</h:div>
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="KWIQmUUmRe" style="overflow:auto;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="KWIQmUUmRe-row" class="row">
+
+
+<h:div class="col-md-12">
+<label sclass="form-labelbadge  badge bg-danger font-weight-normal text-end" value="Limitar los contenidos de tipo" style=" Font-Size:14px;"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('BLASFEMIA'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('BLASFEMIA.label', 'Blasfemia'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="101124" value="@bind(vm.beanData.blasfemia) @save(vm.beanData.blasfemia, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('BLASFEMIA'))" disabled="@load(vm.isEditable('BLASFEMIA')?false:true)" checked="@bind(vm.beanData.blasfemia) @save(vm.beanData.blasfemia, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ARMAS'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ARMAS.label', 'Armas'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="449144" value="@bind(vm.beanData.armas) @save(vm.beanData.armas, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('ARMAS'))" disabled="@load(vm.isEditable('ARMAS')?false:true)" checked="@bind(vm.beanData.armas) @save(vm.beanData.armas, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('MALACONDUCTA'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MALACONDUCTA.label', 'Mala Conducta'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="159101" value="@bind(vm.beanData.malaconducta) @save(vm.beanData.malaconducta, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('MALACONDUCTA'))" disabled="@load(vm.isEditable('MALACONDUCTA')?false:true)" checked="@bind(vm.beanData.malaconducta) @save(vm.beanData.malaconducta, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('DISCRIMINACION'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DISCRIMINACION.label', 'Discriminación'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="DIfcNhMGoU" value="@bind(vm.beanData.discriminacion) @save(vm.beanData.discriminacion, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('DISCRIMINACION'))" disabled="@load(vm.isEditable('DISCRIMINACION')?false:true)" checked="@bind(vm.beanData.discriminacion) @save(vm.beanData.discriminacion, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ODIO'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ODIO.label', 'Odio'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="48543" value="@bind(vm.beanData.odio) @save(vm.beanData.odio, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('ODIO'))" disabled="@load(vm.isEditable('ODIO')?false:true)" checked="@bind(vm.beanData.odio) @save(vm.beanData.odio, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('SEXUAL'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('SEXUAL.label', 'Sexual'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="383215" value="@bind(vm.beanData.sexual) @save(vm.beanData.sexual, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('SEXUAL'))" disabled="@load(vm.isEditable('SEXUAL')?false:true)" checked="@bind(vm.beanData.sexual) @save(vm.beanData.sexual, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-3 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('VIOLENCIA'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('VIOLENCIA.label', 'Violencia'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="870018" value="@bind(vm.beanData.violencia) @save(vm.beanData.violencia, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('VIOLENCIA'))" disabled="@load(vm.isEditable('VIOLENCIA')?false:true)" checked="@bind(vm.beanData.violencia) @save(vm.beanData.violencia, before=('grabar'))"/>
+</h:div>
+
+
+
+</div>
+</div>  
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['filtros.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+<window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$filtros');
+  binder.command('doLoad');
+});
+</script>
+</zk>

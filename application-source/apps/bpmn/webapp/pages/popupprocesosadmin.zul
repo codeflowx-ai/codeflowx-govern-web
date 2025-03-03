@@ -1,0 +1,346 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="procesosadmin" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='procesosadmin')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="procesosadmin" />
+<custom-attributes clase="org.suinsit.apps.bpmn.Bpmmproces" />
+	   <custom-attributes namespace="bpmn" />
+	      <custom-attributes uid="80588" />
+	   <custom-attributes tipo="MASTER" />
+	   
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="CiFZmTrJIM" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="CiFZmTrJIM-row" class="row">
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('PROCESO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROCESO.label', 'Proceso'))"  />
+	   </hbox>
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.proceso) @save(vm.beanData.proceso, before=('grabar')) "/>
+	   
+    </h:div>   
+
+
+
+
+
+<tabbox orient="top" mold="default" >
+     <tabs>
+                 <tab label="Diagrama BPMN" />      
+                                  <tab label="Direcciones de correo"  onSelect="@command('loadSubtableOnDemand',alias='subbpmnemail')"/>      
+                                  <tab label="Plantillas de correos"  onSelect="@command('loadSubtableOnDemand',alias='subbpmntemplate')"/>      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+<h:div style="width:100%;  height:100%;" >
+<image content="@load(vm.loadImage('IMAGE'))" width="100%" height="100%"></image>
+</h:div>
+
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+
+<div class="col-lg-2">
+ <div class="col-lg-1">
+ <!--d:data-bs-toggle="modal" d:data-bs-target="#staticlcJPhTaITw"-->
+ <button label="Añadir" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square" 
+		onClick="@command('appendSubtable',alias='subbpmnemail',body='body_lcJPhTaITw',page='popuppopconfigemails.zul',close='btn_lcJPhTaITw',win=WIN_lcJPhTaITw)" 
+		disabled="@load(!vm.appendSubtable)" class="btn"/>
+ </div>
+  	<space></space>
+ </div>		
+ 
+ <div class="table-responsive "
+ 
+    onCreate="@command('onSubtableCreate',component=self,alias='subbpmnemail',body='body_lcJPhTaITw',page='popuppopconfigemails.zul',win=WIN_lcJPhTaITw,loadOnDemand='false')" >
+  
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('GRUPO.label', 'GRUPO'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('EMAILS.label', 'EMAILS'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('DESCRIPCION.label', 'DESCRIPCION'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subbpmnemail'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.grupo) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.emails) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <html><![CDATA[${item.descripcion}]]></html>
+              </h:td>
+        <h:td>
+            
+                   <a d:data-bs-toggle="modal" d:data-bs-target="#staticlcJPhTaITw" 
+						onClick="@command('editSubtable',alias='subbpmnemail',body='body_lcJPhTaITw',page='popuppopconfigemails.zul',close='btn_lcJPhTaITw',item=item,win=WIN_lcJPhTaITw)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+		                 <space></space>
+						<a
+						onClick="@command('removeSubtable',alias='subbpmnemail',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						 />
+           </h:td> 
+            
+           
+         </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+
+<div class="col-lg-2">
+ <div class="col-lg-1">
+ <!--d:data-bs-toggle="modal" d:data-bs-target="#staticolvOztbqhs"-->
+ <button label="Añadir" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square" 
+		onClick="@command('appendSubtable',alias='subbpmntemplate',body='body_olvOztbqhs',page='popuptemplateemail.zul',close='btn_olvOztbqhs',win=WIN_olvOztbqhs)" 
+		disabled="@load(!vm.appendSubtable)" class="btn"/>
+ </div>
+  	<space></space>
+ </div>		
+ 
+ <div class="table-responsive "
+ 
+    onCreate="@command('onSubtableCreate',component=self,alias='subbpmntemplate',body='body_olvOztbqhs',page='popuptemplateemail.zul',win=WIN_olvOztbqhs,loadOnDemand='false')" >
+  
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IDTASK.label', ''))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('SUBJECT.label', 'Asunto'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subbpmntemplate'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.idtask) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.subject) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+            
+                   <a d:data-bs-toggle="modal" d:data-bs-target="#staticolvOztbqhs" 
+						onClick="@command('editSubtable',alias='subbpmntemplate',body='body_olvOztbqhs',page='popuptemplateemail.zul',close='btn_olvOztbqhs',item=item,win=WIN_olvOztbqhs)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+		                 <space></space>
+						<a
+						onClick="@command('removeSubtable',alias='subbpmntemplate',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						 />
+           </h:td> 
+            
+           
+         </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+</div>
+</div>  
+<div id="ngbliZdZBO" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="ngbliZdZBO-row" class="row">
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+							       <button
+									iconSclass="mdi mdi-alpha-h-circle-outline me-1 align-bottom"
+									  class="btn btn-light add-btn" 
+									 onClick="WIN_HELP.setVisible(true)">
+									 Ayuda
+								</button>
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['procesosadmin.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+  
+  <window id="WIN_lcJPhTaITw" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="examplelcJPhTaITw">
+						
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_lcJPhTaITw"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticlcJPhTaITw" tabindex="-1" aria-labelledby="examplelcJPhTaITw" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="examplelcJPhTaITw"></h:h5>
+                                <h:button id="btn_lcJPhTaITw" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_lcJPhTaITw"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+
+  
+  <window id="WIN_olvOztbqhs" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleolvOztbqhs">
+						
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_olvOztbqhs"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticolvOztbqhs" tabindex="-1" aria-labelledby="exampleolvOztbqhs" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleolvOztbqhs"></h:h5>
+                                <h:button id="btn_olvOztbqhs" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_olvOztbqhs"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+                  
+                 
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+                               <html content="@load(vm.helpBean.texto)"/>
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$procesosadmin');
+  binder.command('doLoad');
+});
+function loadprocesosadmin(){
+  var binder = zkbind.$('$procesosadmin');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

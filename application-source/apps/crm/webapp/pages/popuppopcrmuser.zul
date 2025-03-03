@@ -1,0 +1,232 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="popcrmuser" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='popcrmuser')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popcrmuser" />
+	  
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="QUYTxxPtFk" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="QUYTxxPtFk-row" class="row">
+<h:div class="col-md-12 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idssousuario.label', 'Usuario'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_HanYOjKOaV" />
+   </hbox>
+<h:div class="col-md-12">
+<div >
+<button  iconSclass="fa-duotone fa-magnifying-glass-waveform" sclass="btn btn-icon"   onClick="searchHanYOjKOaV.visible=true"></button>
+<a sclass="" tooltiptext="add" iconSclass="fa-duotone fa-arrow-up-right-from-square"  onClick="@command('appendForeingPopup',alias='idssousuario',win=WIN_HanYOjKOaV,body='body_HanYOjKOaV',page='popuppopusuerempleado.zul')"></a>
+
+<window id="WIN_HanYOjKOaV" mode="modal" visible="false" position="center,center" action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none" width="80%">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title" id="staticUsuario PortalLabel"> Crear Usuario Portal</h:h5>
+</div>
+<div class="modal-body" id="body_HanYOjKOaV"></div>
+<div class="modal-footer"></div>
+</div>
+</window>
+</div>
+</h:div>
+<h:div class="mb-2">
+<textbox id="tboxHanYOjKOaV"  placeholder="" value="@bind(vm.beanData.idssousuario.usuario) @save(vm.beanData.idssousuario.usuario, before=('grabar')) @validator(vm.validator,required=true) " 
+ onChange="@command('onChangeFindTextForeing',alias='idssousuario',att='usuario',event=event,idcp='cbHanYOjKOaV')"  sclass="form-control  bg-light border-0" />
+<combobox id="cbHanYOjKOaV" mold="rounded" autodrop="true" visible="false" model="@load(vm.foreings['idssousuario'])" onSelect="@command('onSelectTextForeing',item=self.selectedItem.value,updatebean='true',alias='idssousuario',hidde=self)" width="85%">
+<template name="model" var="item"><comboitem value="${item}" label="${item.usuario}"></comboitem>
+</template></combobox>
+<label sclass="text-danger" value="@load(vmsgs['tboxHanYOjKOaV'])"/></h:div>
+<window id="searchHanYOjKOaV" mode="modal" visible="false">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title" id="examplesHanYOjKOaV">Usuario Portal</h:h5>
+<button id="btn_SHanYOjKOaV" class="btn-close"  onClick="searchHanYOjKOaV.visible=false" ></button>
+</div><div class="modal-body">
+<div sclass="mb-2">
+<textbox sclass="form-control  bg-light border-0" placeholder="introduzca criterios..." onOK="@command('onChangeFindForeing',alias='idssousuario',att='usuario,nombre,apellidos,email,',input=self)" onChange="@command('onChangeFindForeing',alias='idssousuario',att='usuario,nombre,apellidos,email,',event=event)"/>
+</div><div sclass="mb-2">
+<listbox height="400px" mold="paging" pageSize="20" pagingPosition="bottom" model="@bind(vm.foreings['idssousuario'])" onSelect="@command('onSelectForeingPopup', alias='idssousuario',item=self.selectedItem.value,hidde=searchHanYOjKOaV,updatebean='true' )">
+<listhead>
+<listheader label="@load(vm.lang.getProperty('USUARIO.label','usuario'))"  />
+<listheader label="@load(vm.lang.getProperty('NOMBRE.label','nombre'))"  />
+<listheader label="@load(vm.lang.getProperty('APELLIDOS.label','apellidos'))"  />
+<listheader label="@load(vm.lang.getProperty('EMAIL.label','email'))"  />
+</listhead>
+<template name="model" var="item">
+<listitem value="@load(item)">
+<listcell label="@load(item.usuario)" />
+<listcell label="@load(item.nombre)" />
+<listcell label="@load(item.apellidos)" />
+<listcell label="@load(item.email)" />
+</listitem></template></listbox>
+</div></div></div></div></window>
+
+   <popup id="pop_HanYOjKOaV" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idssousuario.helptext', 'idssousuario'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOMBRE'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="2" id="996576" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.idssousuario.nombre) @save(vm.beanData.idssousuario.nombre, before=('grabar')) "  sclass="margin-field form-control text-dark" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['996576'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('APELLIDOS'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('APELLIDOS.label', 'Apellidos'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="3" id="433831" 
+	   placeholder="@load(vm.lang.getProperty('APELLIDOS.label', 'Apellidos'))" 
+	   value="@bind(vm.beanData.idssousuario.apellidos) @save(vm.beanData.idssousuario.apellidos, before=('grabar')) "  sclass="margin-field form-control text-dark" 
+	   visible="@load(vm.isVisible('APELLIDOS'))" disabled="@load(vm.isEditable('APELLIDOS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['433831'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('EMAIL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('EMAIL.label', 'Email'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="4" id="688462" 
+	   placeholder="@load(vm.lang.getProperty('EMAIL.label', 'Email'))" 
+	   value="@bind(vm.beanData.idssousuario.email) @save(vm.beanData.idssousuario.email, before=('grabar')) "  sclass="margin-field form-control text-dark" 
+	   visible="@load(vm.isVisible('EMAIL'))" disabled="@load(vm.isEditable('EMAIL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['688462'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('USUARIO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('USUARIO.label', 'Usuario'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="5" id="905384" 
+	   placeholder="@load(vm.lang.getProperty('USUARIO.label', 'Usuario'))" 
+	   value="@bind(vm.beanData.idssousuario.usuario) @save(vm.beanData.idssousuario.usuario, before=('grabar')) "  sclass="margin-field form-control text-dark" 
+	   visible="@load(vm.isVisible('USUARIO'))" disabled="@load(vm.isEditable('USUARIO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['905384'])"/>
+    </h:div>   
+
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['popcrmuser.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$popcrmuser');
+  binder.command('doLoad');
+});
+function loadpopcrmuser(){
+  var binder = zkbind.$('$popcrmuser');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

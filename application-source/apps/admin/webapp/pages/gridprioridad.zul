@@ -1,0 +1,46 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	  						 
+<div class="table">					 
+					
+				 <grid  width="100%" height="100%"	model="@load(vm.beans)" sclass="table align-middle mb-0"  sizedByContent="true" span="true">  
+							<columns sizable="true" menupopup="auto">
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PRIORIDAD.label', 'Prioridad'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRIORIDADAsc'])" sortDescending="@load(vm.comparators['PRIORIDADDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('COLOR.label', 'COLOR'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['COLORAsc'])" sortDescending="@load(vm.comparators['COLORDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('BAJA.label', 'BAJA'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['BAJAAsc'])" sortDescending="@load(vm.comparators['BAJADesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;">
+							          <label  value="@load(item.prioridad) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.color) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.baja) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+                  		<button
+						onClick="@command('editPopup',item=item,body='body_prioridad',page='popupprioridad.zul',close='close-modal',win=WIN_showModal)"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+						
+                  		
+						<space></space>
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn" />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

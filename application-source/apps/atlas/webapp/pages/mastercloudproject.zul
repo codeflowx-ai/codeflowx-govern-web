@@ -1,0 +1,352 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="cloudproject" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='cloudproject')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="cloudproject" />
+	<custom-attributes clase="org.suinsit.apps.atlas.Atlcloudproject" />
+	   <custom-attributes namespace="atlas" />
+		<custom-attributes uid="61958" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('cloudproject.screen', 'Proyecto Cloud'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')">
+										
+									</a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+<div id="ZRWjYnzWTb"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="ZRWjYnzWTb-card" class="card  default shadow-xl" style="overflow:auto;" >
+       <div id="ZRWjYnzWTb-body" class="card-body ">
+        <div id="ZRWjYnzWTb-row" class="form-group row ">
+
+<tabbox orient="top" mold="default" >
+     <tabs>
+                 <tab label="Proyecto" />      
+                                  <tab label="Clusters"  onSelect="@command('loadSubtableOnDemand',alias='subatlkubecloud')"/>      
+                                  <tab label="Almacenamiento"  onSelect="@command('loadSubtableOnDemand',alias='subatlstorage')"/>      
+                                  <tab label="Proyectos"  onSelect="@command('loadSubtableOnDemand',alias='subatlproject')"/>      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+
+
+<h:div class=" col-lg-12 col-xlg-12 col-md-12">
+  <h:div class="card  default" style="overflow:auto;" >
+       <h:div class="card-body">
+        <h:div class="form-group row">
+
+
+				
+
+  <!-- sclass="margin-field" -->
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('REFPROJECT'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="  " value="@load(vm.lang.getProperty('REFPROJECT.label', 'Ref. proyecto'))"/>
+	   
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.refproject)"  />
+  </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('PROYECTO'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROYECTO.label', 'Proyecto'))"  />
+	   
+	    <textbox   tabindex="2" id="719508" 
+	   placeholder="@load(vm.lang.getProperty('PROYECTO.label', 'proyecto'))" 
+	   value="@bind(vm.beanData.proyecto) @save(vm.beanData.proyecto, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('PROYECTO'))" disabled="@load(vm.isEditable('PROYECTO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['719508'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('REFEXTERNA'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('REFEXTERNA.label', 'ID Externo'))"  />
+	   
+	    <textbox   tabindex="3" id="wasaXRnMZH" 
+	   placeholder="@load(vm.lang.getProperty('REFEXTERNA.label', 'refexterna'))" 
+	   value="@bind(vm.beanData.refexterna) @save(vm.beanData.refexterna, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('REFEXTERNA'))" disabled="@load(vm.isEditable('REFEXTERNA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['wasaXRnMZH'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+   <h:div class="col-md-8 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripcion'))"/>
+	  
+	      <textbox rows="4" cols="80" id="tEYxeFmsrW" multiline="true" placeholder="@load(vm.lang.getProperty('DESCRIPCION.label', 'descripcion'))" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) "   visible="@load(vm.isVisible('DESCRIPCION'))" disabled="@load(vm.isEditable('DESCRIPCION')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['tEYxeFmsrW'])"/>
+	     
+</h:div>
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlproveedor.label', 'Proveedor'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idatlproveedor" placeholder="@load(vm.lang.getProperty('idatlproveedor').label,'Proveedor')" model="@bind(vm.foreings['idatlproveedor'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idatlproveedor',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idatlproveedor)"  onCreate="@command('onCreateCombo',component=self,alias='idatlproveedor')" value="@bind(vm.beanData.idatlproveedor .proveedor)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proveedor)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlproveedor'])"/>
+<a sclass="btn " tooltiptext="add" iconSclass="fa-duotone fa-pen-to-square" d:data-bs-toggle="modal"  d:data-bs-target="#staticATLPROVEEDOR" onClick="@command('appendForeing',win=WIN_KqUTXzaqyy,alias='idatlproveedor',body='body_KqUTXzaqyy',page='popupproveedor.zul',close='btn_idatlproveedor')"></a>
+
+<window id="WIN_KqUTXzaqyy" mode="modal" visible="false" position="center,center" action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none" width="80%">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title"> Crear proveedor</h:h5>
+</div>
+<div class="modal-body" id="body_KqUTXzaqyy"></div>
+<div class="modal-footer"></div>
+</div>
+</window>
+
+
+  
+</h:div>
+
+
+         </h:div> 
+       </h:div>
+  </h:div>
+ </h:div> 
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="sJxVmnlteV" height="400px" width="100%" 
+   model="@bind(vm.grid['subatlkubecloud']) " 
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlkubecloud',loadOnDemand='false'  )" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('REFERENCIA.label', 'REFERENCIA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('CLUSTER.label', 'CLUSTER'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('REGION.label', 'REGION'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'IDPROVEEDOR'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('VERSIONKBUBE.label', 'VERSIONKBUBE'))"   align="center" sclass="text-capitalize"/>
+     
+	 </columns>
+
+  </grid>
+  </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="syCEVwDcJr" height="400px" width="100%" 
+   model="@bind(vm.grid['subatlstorage']) " 
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlstorage',loadOnDemand='false'  )" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('STORAGE.label', 'STORAGE'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('ALTA.label', 'ALTA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('CAPACIDAD.label', 'CAPACIDAD'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('PRECIO.label', 'PRECIO'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'IDPROVEEDOR'))"   align="center" sclass="text-capitalize"/>
+     
+	 </columns>
+
+  </grid>
+  </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="CjTkKYRnms" height="400px" width="100%" 
+   model="@bind(vm.grid['subatlproject']) " 
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlproject',loadOnDemand='false'  )" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('REFERENCIA.label', 'REFERENCIA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('PROJECT.label', 'PROJECT'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('ALTA.label', 'ALTA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('BAJA.label', 'BAJA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('EMPRESA.label', 'Empresa'))"   align="center" sclass="text-capitalize"/>
+     
+	 </columns>
+
+  </grid>
+  </div>
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+
+<div id="RQdovcfSMo" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="false" >
+<div id="RQdovcfSMo-row" class="row">
+</div>
+</div>  
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['cloudproject.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$cloudproject');
+  binder.command('doLoad');
+});
+</script>
+</zk>

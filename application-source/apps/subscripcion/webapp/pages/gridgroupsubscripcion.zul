@@ -1,0 +1,58 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('NOMBRE.label', 'NOMBRE'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVOAsc'])" sortDescending="@load(vm.comparators['ACTIVODesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('FECALTA.label', 'Fec. Alta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECALTAAsc'])" sortDescending="@load(vm.comparators['FECALTADesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('FECBAJA.label', 'Fec. Baja'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECBAJAAsc'])" sortDescending="@load(vm.comparators['FECBAJADesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('TOKENLIMITS.label', 'Limite Tokens'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TOKENLIMITSAsc'])" sortDescending="@load(vm.comparators['TOKENLIMITSDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('PROJECTLIMITS.label', 'Limite Projectos'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROJECTLIMITSAsc'])" sortDescending="@load(vm.comparators['PROJECTLIMITSDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('USERLIMITS.label', 'Limite de usuarios'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['USERLIMITSAsc'])" sortDescending="@load(vm.comparators['USERLIMITSDesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+                                   <label  value="@load(item.getFieldByAtribute('nombre').value) @converter(vm.fieldConverter)"></label>
+							         <label  value="@load(item.getFieldByAtribute('ACTIVO').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('FECALTA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('FECBAJA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('TOKENLIMITS').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('PROJECTLIMITS').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('USERLIMITS').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='mastersubscripcion.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

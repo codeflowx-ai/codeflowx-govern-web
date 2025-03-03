@@ -1,0 +1,41 @@
+<zk xmlns:h="native">
+<div class="row">
+	<h:div class="col-lg-8 ">
+		<div class="card">
+			<div class="card-header header-elements-inline bg-indigo">
+				<h:h6 class="card-title">Select Tables/Views</h:h6>
+			</div>
+			<div class="card-body">
+				<listbox model="@load(vm.entidades)"
+					 checkmark="true"
+					multiple="true" height="500px" pagingPosition="top" autopaging="true" mold="paging">
+					<listhead>
+						<listheader label="Tables/Views" ></listheader>
+						<listheader label="Type" sort="auto"></listheader>
+					</listhead>
+					<template name="model" var="item">
+						<listitem value="${item}" >
+							<listcell label="${item.name }"></listcell>
+							<listcell label="${item.entitype }"></listcell>
+							</listitem>
+							
+					</template>
+				</listbox>
+			</div>
+			<div class="card-footer">
+			
+				<button zclass="pull-right" sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"  
+			onClick="@command('nextTables',form=fx)" label="Siguiente" />
+			
+			</div>
+		</div>
+	</h:div>
+
+	<h:div sclass="col-md-4">
+		<html>
+			<p>${labels.MddMentity.text1}</p>
+			<p style="color:#ed4845">${labels.MddMentity.text2}</p>
+		</html>
+	</h:div>
+</div>
+</zk>

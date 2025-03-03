@@ -1,0 +1,357 @@
+
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('org.suinsit.nocode.web.FindEntityUI')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="tiposervicios" />
+	   <custom-attributes enviroment="preview" />
+	<custom-attributes clase="org.suinsit.apps.myalm.Almtiposervicio" />
+	   <custom-attributes namespace="myalm" />
+	   <custom-attributes uid="88624" />
+	   <custom-attributes tipo="SEARCH" />
+	  <custom-attributes paginaIndex="indextiposervicios.zul" />
+	   <custom-attributes templateView="gridtiposervicios.zul" />
+	   <h:div id="notificacion"></h:div>
+	   
+	   <div class="row  }" style="background-color:;">
+			<div class="col-12   " style="">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('tiposervicios.screen', 'Tipo de servicios'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    <label value="@load(vm.labelTotal)"></label>
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Tipo de servicios
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+			<div class="col-lg-12">
+				<div class="card   " style="background-color:;">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							
+							    <button
+									iconSclass="ri-add-fill me-1 align-bottom"
+									class="btn btn-info add-btn" 
+									onClick="@command('addPopup',win=WIN_showModal,body='body_tiposervicios',page='popuptiposervicio.zul',close='close-modal')">
+									Tipo de servicios
+								</button>
+								</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+									<button
+										class="btn btn-soft-info waves effect waves-light"
+										iconSclass="fa-duotone fa-filters me-1 align-bottom"
+										tooltiptext="Filtros"
+										onClick="@command('onFilter', win=WIN_FILTERS)">
+									</button>
+
+									<button
+										class="btn btn-soft-success">
+										Import
+									</button>
+
+																
+									<button iconSclass="las la-file-alt"
+										type="button" id="dropdownMenuLink1"
+										d:data-bs-toggle="dropdown" d:aria-expanded="false"
+										class="btn btn-soft-dark waves effect waves-light" >
+									</button>
+	
+									<h:ul class="dropdown-menu"	aria-labelledby="dropdownMenuLink1">
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-pdf "
+												onClick="@command('report',type='pdf')">
+												Pdf
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-excel "
+												onClick="@command('report',type='excel')">
+												Excel
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-csv"
+												onClick="@command('report',type='CSV')">
+												Csv
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-word "
+												onClick="@command('report',type='DOCX')">
+												Word
+											</a>
+										</h:li>  
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="s-icon s-icon-cards"
+												onClick="@command('changeView',view='cardtiposervicios.zul')">
+												Card
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="s-icon s-icon-listing"
+												onClick="@command('changeView',view='gridtiposervicios.zul')">
+												List
+											</a>
+										</h:li>
+									</h:ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<div class="col-xxl-12">
+				<div class="card" id="companyList">
+					<div class="card-header">
+						<div class="row g-2">
+							<div class="col-md-3">
+						    <div class="search-box">		
+			 </div> 
+			 </div>  	
+								
+							<div class="col-md-auto ms-auto">
+								<div
+									class="d-flex align-items-center gap-2">
+									<button tooltiptext="Find"
+										iconSclass="ri-search-line search-icon" sclass="btn"
+										onClick="@command('search')" />
+									<button tooltiptext="Clear"
+										label="Clear" sclass="btn" onClick="@command('clear')" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+							<div id="divTemplate" sclass="col-lg-12"></div>
+					</div>
+					<div class="card-footer">
+					<div class="row">
+					<div class="col-lg-2">
+							
+						</div>
+						
+						<div class="col-lg-6 align-items-start">
+						  <paging id="topagin"
+							pageSize="@load(vm.scroll.maxRows)"
+							totalSize="@load(vm.scroll.totalRows)" mold="os" width="100%"
+							 style="background-color:#FFF;" />
+						</div>
+						<div class="col-lg-2 align-items-start">
+							<combobox
+								selectedItem="@bind(vm.scroll.maxRows)"
+								value="@bind(vm.scroll.maxRows)" width="75px">
+								<comboitem label="30" value="30" />
+								<comboitem label="50" value="50" />
+								<comboitem label="100" value="100" />
+							</combobox>
+						</div>
+						
+					</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- row -->
+	
+	   <window id="WIN_showModal" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleModalLabel">
+						Tipo de servicios
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_tiposervicios"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+	
+  <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+	  <window id="WIN_FILTERS" mode="modal" visible="false"
+			position="center,center" action="show: slideDown;hide: slideUp"
+			sclass="z-messagebox-window" border="none" width="90%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">Búsqueda Avanzada</h:h5>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-lg-2"></div>
+						<div class="col-lg-8">
+							<div class="row">
+								<h:div class="col-md-3 ">
+									<hbox spacing="3px"	>
+										<label
+											sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  "
+											value="Nombre de la búsqueda" />
+									</hbox>
+									<textbox id="OXBshsbqpi" value="@bind(vm.criteriaBean.nombre) @save(vm.criteriaBean.nombre, before=('onSaveCriteria')) @validator(vm.validator,required=true)"
+										placeholder="introduce un nombre para guardar tu búsqueda"
+										sclass="margin-field form-control  form-control "
+									/>
+									  <label sclass="text-danger" value="@load(vmsgs['OXBshsbqpi'])"/>
+								</h:div>
+								<h:div class="col-md-3 ">
+									<hbox spacing="3px"	>
+										<label
+											sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  "
+											value="La consulta pueden usarla otros usuarios" />
+									</hbox>
+									<checkbox value="@bind(vm.criteriaBean.publico)" checked="@bind(vm.criteriaBean.publico)"/>
+								</h:div>
+								<h:div class="col-md-6 ">
+								    <button
+										class="btn btn-info"
+										iconSclass="fa-duotone fa-magnifying-glass-play me-1 align-bottom"
+										tooltiptext="Ejecutar Consulta"
+										onClick="@command('executeCriteria', win=WIN_FILTERS)" label="Ejecutar">
+									</button>
+									
+									<button
+										class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right me-1 align-bottom"
+										tooltiptext="Grabar"
+										onClick="@command('onSaveCriteria')" label="Guardar">
+									</button>
+								
+									<button
+										class="btn btn-soft-info waves effect waves-light"
+										iconSclass="fa-duotone fa-broom-wide me-1 align-bottom"
+										tooltiptext="limpiar Búsqueda"
+										onClick="@command('onClearCriteria')" label="Nueva">
+									</button>
+									
+									
+								</h:div>
+							</div>
+
+						</div>
+						<div class="col-lg-2">
+						      <button
+										class="btn btn-square btn-outline-danger m-1"
+										iconSclass="fa-light fa-nfc-trash fa-lg"
+										tooltiptext="limpiar Búsqueda"
+										onClick="@command('onRemoveCriteria')" >
+									</button>
+						</div>
+					</div>
+					<space></space>
+					<div class="row">
+						<div class="col-lg-2">
+							<listbox
+								model="@load(vm.screenModel.filters)" height="500px">
+								<listhead>
+									<listheader label="Campo">
+									</listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="@load(item)"
+										draggable="true">
+										<listcell
+											label="@load(item.label)">
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+
+						</div>
+						<div class="col-lg-8">
+							<grid height="500px"
+								model="@load(vm.customCriterias)"
+								rowRenderer="@load(vm.filterRender)" droppable="true"
+								draggable="true" onDrop="@command('onDropFilter',evento=event)"
+								emptyMessage="No hay condiciones...">
+								<columns>
+									<column label="Campo" width="10%" />
+									<column label="Condición"
+										width="80%" />
+									<column label="Accion" width="10%" />
+								</columns>
+								<rows>
+
+								</rows>
+							</grid>
+						</div>
+						<div class="col-lg-2">
+							<listbox height="500px" model="@bind(vm.criteriasBeans)" checkmark="true" 
+							
+							 onSelect="@command('onSelectBusqueda',evento=event)">
+								<listhead >
+									<listheader label="Búsquedas">
+									</listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="@load(item)" >
+										<listcell
+											label="@load(item.nombre)">
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<div class="hstack gap-2 justify-content-end">
+						<button onClick="WIN_FILTERS.setVisible(false)"
+							class="btn btn-light">
+							Cerrar
+						</button>
+					</div>
+				</div>
+			</div>
+		</window>
+                <!--end add modal-->
+	</idspace>
+</zk>

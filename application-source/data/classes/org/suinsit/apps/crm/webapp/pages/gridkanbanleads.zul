@@ -1,0 +1,86 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<vlayout >	
+	
+										<h:div class="card">
+					<h:div class="card-body">
+					 <div sclass="row bg-light">
+					       <div sclass="col-md-1">
+					      	<label value="${labels.MddMentity.pages}">	</label>
+							</div>
+					        <div sclass="col-md-9">
+								<paging id="topagin"
+									pageSize="@load(vm.scroll.maxRows)"
+									totalSize="@load(vm.scroll.totalRows)" mold="os" width="98%"
+									sclass="bg-light" />
+							</div>
+					        <div sclass="col-md-1">
+								<box orient="horizontal" spacing="15px"
+									width="100%">
+									<label
+										value="${labels.paging.mostrar}" />
+									<combobox
+										selectedItem="@bind(vm.scroll.maxRows)"
+										value="@bind(vm.scroll.maxRows)" width="75px">
+										<comboitem label="10"
+											value="10" />
+										<comboitem label="20"
+											value="20" />
+										<comboitem label="30"
+											value="30" />
+										<comboitem label="50"
+											value="50" />
+									</combobox>
+						        </box>
+									       </div>
+
+					</div>
+					
+		  
+					</h:div>
+				</h:div>
+					 <grid  height="600px" width="100%"	model="@load(vm.beans)" >  
+							<columns sizable="true">
+							       <column label="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('ETAPA.label', 'Etapa'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('FECTSTART.label', 'Fecha prevista'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('PROBABILIDAD.label', 'probabilidad'))" align="center"/>
+ 							      <column align="center" />
+							</columns >
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('OPORTUNIDAD').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('IMPORTEPREV').value) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.getFieldByAtribute('etapa').value) @converter(vm.fieldConverter)"></label>
+							         <label  value="@load(item.getFieldByAtribute('FECTSTART').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('PROBABILIDAD').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+							onClick="@command('onEditFind',item=item,popup=modalDialog)"
+							iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+							onClick="@command('onRemoveFind',item=item)"
+							iconSclass="icon-trash" sclass="btn btn-outline-warning" />
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>
+		   	
+		    </vlayout>	
+		
+</zk>		    

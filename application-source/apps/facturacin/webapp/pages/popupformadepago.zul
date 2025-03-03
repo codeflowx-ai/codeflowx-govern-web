@@ -1,0 +1,258 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="formadepago" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='formadepago')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="formadepago" />
+<custom-attributes clase="org.suinsit.apps.facturacin.Erpformapago" />
+	   <custom-attributes namespace="facturacin" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="JVEvntWwRQ" style="overflow:auto;" class=" col-lg-2 col-xlg-2 col-md-2"  visible="true" >
+<div id="JVEvntWwRQ-row" class="row">
+</div>
+</div>  <div id="pSoZjHItZo"   visible="true"  class="col-lg-8 col-xlg-8 col-md-8">
+  <div id="pSoZjHItZo-card" class="card  border-dark shadow-xl" style="overflow:auto;" >
+       <div id="pSoZjHItZo-body" class="card-body ">
+        <div id="pSoZjHItZo-row" class="form-group row text-center">
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('FORMADEPAGO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('FORMADEPAGO.label', 'Forma de Pago'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="481879" 
+	   placeholder="@load(vm.lang.getProperty('FORMADEPAGO.label', 'Forma de Pago'))" 
+	   value="@bind(vm.beanData.formadepago) @save(vm.beanData.formadepago, before=('grabar')) @validator(vm.unique, field='FORMADEPAGO',required=true ,oldValue=vm.beanDataCpy.formadepago)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('FORMADEPAGO'))" disabled="@load(vm.isEditable('FORMADEPAGO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['481879'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('DESFACTURA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESFACTURA.label', 'Descripción en factura'))"  />
+	   </hbox>
+	   <textbox   tabindex="2" id="GEhhAjfNWM" 
+	   placeholder="@load(vm.lang.getProperty('DESFACTURA.label', 'Descripción en factura'))" 
+	   value="@bind(vm.beanData.desfactura) @save(vm.beanData.desfactura, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.desfactura)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('DESFACTURA'))" disabled="@load(vm.isEditable('DESFACTURA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['GEhhAjfNWM'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+<h:div class="col-md-12">
+<label sclass="form-label font-weight-normal text-end" value="Vencimientos" style=" Font-Size:18px;"/>
+</h:div>
+
+
+
+
+
+<div class="col-lg-2">
+ <div class="col-lg-1">
+ <!--d:data-bs-toggle="modal" d:data-bs-target="#staticEiyVBVpmWz"-->
+ <button label="Nuevo Fraccionamiento" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square" 
+		onClick="@command('appendSubtable',alias='suberpdesfpago',body='body_EiyVBVpmWz',page='popuppopdesglosefpago.zul',close='btn_EiyVBVpmWz',win=WIN_EiyVBVpmWz)" 
+		disabled="@load(!vm.appendSubtable)" class="btn"/>
+ </div>
+  	<space></space>
+ </div>		
+ 
+ <div class="table-responsive "
+    onCreate="@command('onSubtableCreate',component=self,alias='suberpdesfpago',body='body_EiyVBVpmWz',page='popuppopdesglosefpago.zul',win=WIN_EiyVBVpmWz)" >
+  
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('TIPO.label', 'Tipo'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IMPORTE.label', 'Importe'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('PERCENT.label', 'Porcentaje'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('DIA.label', 'Día'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('VENCIMIENTO.label', 'Vencimiento'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['suberpdesfpago'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.tipo) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				        <label sclass="" value="@load(item.importe) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				        <label sclass="" value="@load(item.percent) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.dia) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.vencimiento) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+            
+                   <a d:data-bs-toggle="modal" d:data-bs-target="#staticEiyVBVpmWz" 
+						onClick="@command('editSubtable',alias='suberpdesfpago',body='body_EiyVBVpmWz',page='popuppopdesglosefpago.zul',close='btn_EiyVBVpmWz',item=item,win=WIN_EiyVBVpmWz)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+		                 <space></space>
+           </h:td> 
+            
+           
+         </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+<div id="dqYQOaloXW" style="overflow:auto;" class=" col-lg-2 col-xlg-2 col-md-2"  visible="true" >
+<div id="dqYQOaloXW-row" class="row">
+</div>
+</div>  
+<div id="vmrnLoQfpJ" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="vmrnLoQfpJ-row" class="row">
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['Forma de pago.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+                  
+                 
+
+
+
+
+
+  
+  <window id="WIN_EiyVBVpmWz" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleEiyVBVpmWz">
+						
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_EiyVBVpmWz"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticEiyVBVpmWz" tabindex="-1" aria-labelledby="exampleEiyVBVpmWz" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleEiyVBVpmWz"></h:h5>
+                                <h:button id="btn_EiyVBVpmWz" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_EiyVBVpmWz"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+                  
+                 
+
+                  
+                 
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$formadepago');
+  binder.command('doLoad');
+});
+function loadformadepago(){
+  var binder = zkbind.$('$formadepago');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

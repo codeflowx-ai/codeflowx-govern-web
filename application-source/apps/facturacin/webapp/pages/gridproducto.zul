@@ -1,0 +1,47 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	  						 
+<div class="table">					 
+					
+				 <grid  width="100%" height="100%"	model="@load(vm.beans)" sclass="table align-middle mb-0"  sizedByContent="true" span="true">  
+							<columns sizable="true" menupopup="auto">
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PRODUCTO.label', 'Producto'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRODUCTOAsc'])" sortDescending="@load(vm.comparators['PRODUCTODesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PRECIOVENTA.label', 'Precio de venta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRECIOVENTAAsc'])" sortDescending="@load(vm.comparators['PRECIOVENTADesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('STOCK.label', 'Stock Actual'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['STOCKAsc'])" sortDescending="@load(vm.comparators['STOCKDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TIPOPROD.label', 'Tipo de Producto'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TIPOPRODAsc'])" sortDescending="@load(vm.comparators['TIPOPRODDesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterproducto.zul')">
+							          <label  value="@load(item.producto) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.precioventa) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.stock) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.tipoprod) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masterproducto.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"/>
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn" />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

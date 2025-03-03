@@ -1,0 +1,46 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('SCM.label', 'scm'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SCMAsc'])" sortDescending="@load(vm.comparators['SCMDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ENVIROMENT.label', 'ENVIROMENT'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ENVIROMENTAsc'])" sortDescending="@load(vm.comparators['ENVIROMENTDesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('URLREPOMASTER.label', 'urlrepomaster'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['URLREPOMASTERAsc'])" sortDescending="@load(vm.comparators['URLREPOMASTERDesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('SCM').value) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.getFieldByAtribute('enviroment').value) @converter(vm.fieldConverter)"></label>
+							         <label  value="@load(item.getFieldByAtribute('URLREPOMASTER').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterrepositorios.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

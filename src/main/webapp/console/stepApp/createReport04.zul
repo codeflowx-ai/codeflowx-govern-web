@@ -1,0 +1,120 @@
+<zk xmlns:h="native">
+	<div class="row">
+		<h:div class="card border-1 border-indigo col-lg-12">
+			<div class="card">
+				<div
+					class="card-header header-elements-inline bg-indigo">
+					<h:h6 class="card-title">Configure Chart</h:h6>
+				</div>
+				<div class="card-body">
+					<div class="form-group row">
+					<div class="col-md-2">
+							<label value="${labels.wz.title.$}" />
+							<textbox type="text"
+								placeholder="Title of report" value="@bind(vm.report.chart.title)"
+								sclass="form-control border-warning" />
+						</div>
+						<div class="col-md-2">
+							<label value="${labels.wz.subtitle.$}" />
+							<textbox type="text"
+								placeholder="Sub Title of report"
+								value="@bind(vm.report.chart.subtitle) "
+								sclass="form-control border-warning" />
+						</div>
+						<div class="col-md-2">
+							<label value="${labels.wz.chart.type}" />
+							<combobox model="@load(vm.typeCharts)"
+								selectedItem="@bind(vm.report.chart.type)"
+								value="@bind(vm.report.chart.type)">
+								<template name="model">
+									<comboitem label="${each}"
+										value="${each}" />
+								</template>
+
+							</combobox>
+						</div>
+						<div class="col-md-2">
+							<label value="${labels.wz.chart.position}" />
+							<combobox model="@load(vm.chartPostions)"
+								selectedItem="@bind(vm.report.chart.position)"
+								value="@bind(vm.report.chart.position)">
+								<template name="model">
+									<comboitem label="${each}"
+										value="${each}" />
+								</template>
+							</combobox>
+						</div>
+						<div class="col-md-2">
+							<label value="${labels.wz.chart.category}" />
+							<!-- utilizar listbox -->
+							<listbox model="@load(vm.categoryTmp)"
+								selectedItem="@bind(vm.report.chart.category)" mold="select">
+								<template name="model" var="item">
+									<listitem value="${item}">
+										<listcell
+											label="${item.field.atribute}">
+										</listcell>
+									</listitem>
+
+								</template>
+							</listbox>
+						</div>
+						
+					</div>
+					<div class="form-group row">
+						<div class="col-md-3">
+							<label value="${labels.wz.chart.series}" />
+							<listbox model="@load(vm.seriesTmp)"
+								selectedItems="@bind(vm.report.chart.series)" checkmark="true"
+								multiple="true" height="400px" pagingPosition="top"
+								autopaging="true" mold="paging">
+								<listhead>
+									<listheader label="Series"></listheader>
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="${item}">
+										<listcell
+											label="${item.field.atribute}">
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+						</div>
+						<div class="col-md-6">
+						  <tabbox width="99%"
+									style="vertical-align:top;">
+									<tabs width="99%">
+										<tab label="Chart Style" />
+										<tab label="Category Style" />
+										<tab label="Serie Style" />
+									</tabs>
+									<tabpanels>
+										<tabpanel width="99%">
+											<apply templateURI="stepApp/report/chartStyle.zul"></apply>
+										</tabpanel>
+										<tabpanel width="99%">
+											<apply templateURI="stepApp/report/chartCategory.zul"></apply>
+										</tabpanel>
+										<tabpanel width="99%">
+											<apply templateURI="stepApp/report/chartSerie.zul"></apply>
+										</tabpanel>
+									</tabpanels>
+								</tabbox>
+						</div>
+					</div>
+
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-left"
+						sclass="btn btn-outline bg-secondary text-primary-800 btn-icon ml-2 legitRipple"
+						onClick="@command('back')" iconSclass="icon-arrow-left13 icon-2x"
+						label="Back" />
+					<button zclass="pull-right"
+						sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"
+						iconSclass="icon-arrow-right14 icon-2x"
+						onClick="@command('nextCreateReport')" label="Next" />
+				</div>
+			</div>
+		</h:div>
+	</div>
+</zk>

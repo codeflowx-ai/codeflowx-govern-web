@@ -1,0 +1,149 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<div class="table-responsive table-card">
+		<h:table
+			class="table table-nowrap table-striped-columns mb-0">
+			<h:thead class="table-light">
+				<h:tr>
+					<h:th scope="col">
+						${vm.lang.getProperty('FACTURA.label',
+						'Factura') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('FECHAFACT.label', 'Fecha
+						Factura')}
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('Cliente.label',
+						'Cliente') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('Comercial.label',
+						'Comercial') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('Empresa.label',
+						'Empresa') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('Estado.label', 'Estado')
+						}
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('IMPUESTOS.label',
+						'Impuestos') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('IMPUESTOS.label',
+						'Impuestos') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('TOTAL.label', 'Total') }
+					</h:th>
+					<h:th scope="col">
+						${vm.lang.getProperty('Estado Cobro.label',
+						'Estado Cobro') }
+					</h:th>
+				</h:tr>
+				<h:th scope="col"></h:th>
+			</h:thead>
+			<h:tbody>
+
+				<forEach items="@load(vm.beans)" var="item">
+					<h:tr>
+						
+							<h:td>
+								<label
+									value="@load(item.factura) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.fechafact) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.idcrmempresa.empresa) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.iderpcomercial.nombre) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.idcompany.nombre) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.idcompany.cif) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label style="font-size:12px;"
+									sclass="@load(vm.concat('fw-bolder badge rounded-pill ',item.iderpmestado.bgcolor))"
+									value="@load(item.iderpmestado.estado) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.idcompany.retencion) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.impuestos) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.subtotal) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label
+									value="@load(item.total) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<label style="font-size:12px;"
+									sclass="@load(vm.concat('fw-bolder badge rounded-pill ',item.iderpmestadocbo.bgcolor))"
+									value="@load(item.iderpmestadocbo.estado) @converter(vm.fieldConverter)">
+								</label>
+							</h:td>
+							<h:td>
+								<button
+									onClick="@command('editData',item=item,page='facturacion.zul')"
+									iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2" />
+								<space></space>
+								<button
+									onClick="@command('removeData',item=item)"
+									iconSclass="fa-light fa-nfc-trash fa-xl" sclass="btn btn-square btn-dark m-2" />
+							</h:td>
+
+
+
+
+					</h:tr>
+
+				</forEach>
+			</h:tbody>
+			<h:tfoot class="table-light">
+				<h:tr>
+					<h:td colspan="4">
+						<label value="@load(vm.labelTotal)" />
+					</h:td>
+
+				</h:tr>
+
+			</h:tfoot>
+		</h:table>
+	</div>
+
+</zk>

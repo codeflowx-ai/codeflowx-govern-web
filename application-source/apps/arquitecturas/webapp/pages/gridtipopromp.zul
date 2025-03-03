@@ -1,0 +1,83 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="table-responsive table-card">					 
+			
+				    <grid  	model="@load(vm.beans) @template(each.updatable ? 'modelWrite' : 'model')"  sclass="table align-middle mb-0" >  
+							<columns >
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TIPO.label', 'Tipo'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ASISTENTE.label', 'Asistente'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('GENERATION.label', 'Generación'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('REQUISITOS.label', 'Requisitos'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('RULES.label', 'Reglas'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('SOURCE.label', 'Cod. Fuente'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('DEPLOYMENT.label', 'Asistente'))" align="center"   />
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+      <template name="model" var="item">
+      <row>
+       				     <label  value="@load(item.tipo) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.asistente) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.generation) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.requisitos) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.rules) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.source) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.deployment) @converter(vm.fieldConverter)"></label>
+          <cell align="center"  class="d-flex">
+                 <div class="edit">
+		           <a onClick="@command('editItem',item=item)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+				</div>		
+							<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger"   />
+						</div>
+		                </cell> 
+       </row>
+   	</template>      <template name="modelWrite" var="item">
+      	 <row style="text-align:right;" >
+   				          <textbox  sclass="margin-field form-control  form-control   "  value="@bind(item.tipo)   @save(item.tipo, before=('saveItem'))" ></textbox>
+				         <checkbox  mold="default" value="@bind(item.asistente) @save(item.asistente, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.asistente)"/>
+				         <checkbox  mold="default" value="@bind(item.generation) @save(item.generation, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.generation)"/>
+				         <checkbox  mold="default" value="@bind(item.requisitos) @save(item.requisitos, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.requisitos)"/>
+				         <checkbox  mold="default" value="@bind(item.rules) @save(item.rules, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.rules)"/>
+				         <checkbox  mold="default" value="@bind(item.source) @save(item.source, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.source)"/>
+				         <checkbox  mold="default" value="@bind(item.deployment) @save(item.deployment, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.deployment)"/>
+
+           		<cell align="center"  class="d-flex">
+           		 <div class="edit">
+  					<a onClick="@command('saveItem',item=item)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+		           </div>
+		           <div class="delete">
+		            <a
+						onClick="@command('cancelItem',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger"  />
+						</div>
+                </cell> 
+       </row>
+   	</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

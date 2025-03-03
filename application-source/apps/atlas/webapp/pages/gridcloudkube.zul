@@ -1,0 +1,65 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('CLUSTER.label', 'Cluster'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CLUSTERAsc'])" sortDescending="@load(vm.comparators['CLUSTERDesc'])"  visible="@load(vm.isVisible('CLUSTER'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('REFERENCIA.label', 'Referencia'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['REFERENCIAAsc'])" sortDescending="@load(vm.comparators['REFERENCIADesc'])"  visible="@load(vm.isVisible('REFERENCIA'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('REGION.label', 'Region'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['REGIONAsc'])" sortDescending="@load(vm.comparators['REGIONDesc'])"  visible="@load(vm.isVisible('REGION'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('CTEESTIMADO.label', 'cteestimado'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CTEESTIMADOAsc'])" sortDescending="@load(vm.comparators['CTEESTIMADODesc'])"  visible="@load(vm.isVisible('CTEESTIMADO'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='mastercloudkube.zul')">
+							             <label  value="@load(item.cluster) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.referencia) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.region) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.cteestimado) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='mastercloudkube.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

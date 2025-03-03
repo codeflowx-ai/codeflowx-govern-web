@@ -1,0 +1,325 @@
+<?page title="Agent Advanced Monitoring" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.agent.AgentMonitoringVM')">
+        
+        <!-- Real-time Overview -->
+        <hlayout sclass="monitoring-header">
+            <div sclass="metric-box ${vm.systemHealthClass}">
+                <label value="System Health"/>
+                <label value="@load(vm.systemHealth)%"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Active Agents"/>
+                <label value="@load(vm.activeAgents)"/>
+            </div>
+            <div sclass="metric-box ${vm.alertLevelClass}">
+                <label value="Active Alerts"/>
+                <label value="@load(vm.activeAlerts)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Resource Usage"/>
+                <label value="@load(vm.resourceUsage)%"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Real-time Monitor"/>
+                <tab label="Behavior Analysis"/>
+                <tab label="Diagnostics"/>
+                <tab label="Predictive Analytics"/>
+            </tabs>
+            <tabpanels>
+                <!-- Real-time Monitor Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Real-time Agent Status -->
+                        <grid model="@load(vm.agentStatuses)" 
+                              mold="paging" pageSize="10"
+                              sclass="real-time-grid">
+                            <columns>
+                                <column label="Agent ID"/>
+                                <column label="Status"/>
+                                <column label="Load"/>
+                                <column label="Response Time"/>
+                                <column label="Error Rate"/>
+                                <column label="Memory Usage"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="status">
+                                <row sclass="@load(status.statusClass)">
+                                    <label value="@load(status.agentId)"/>
+                                    <label value="@load(status.status)" 
+                                           sclass="@load(status.statusStyle)"/>
+                                    <progressmeter value="@load(status.load)" 
+                                                 sclass="@load(status.loadStyle)"/>
+                                    <label value="@load(status.responseTime)ms"/>
+                                    <label value="@load(status.errorRate)%" 
+                                           sclass="@load(status.errorStyle)"/>
+                                    <progressmeter value="@load(status.memoryUsage)" 
+                                                 sclass="@load(status.memoryStyle)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('showAgentDetails', status=status)"/>
+                                        <button label="Restart" 
+                                                onClick="@command('restartAgent', status=status)"/>
+                                        <button label="Debug" 
+                                                onClick="@command('debugAgent', status=status)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Real-time Charts -->
+                        <hlayout>
+                            <charts id="performanceChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Performance Metrics"
+                                   model="@load(vm.performanceData)"
+                                   sclass="real-time-chart"/>
+                            
+                            <charts id="resourceChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Resource Utilization"
+                                   model="@load(vm.resourceData)"
+                                   sclass="real-time-chart"/>
+                        </hlayout>
+
+                        <!-- Active Alerts -->
+                        <groupbox title="Active Alerts" sclass="alert-box">
+                            <listbox model="@load(vm.activeAlertsList)" 
+                                    mold="paging" pageSize="5">
+                                <listhead>
+                                    <listheader label="Time"/>
+                                    <listheader label="Severity"/>
+                                    <listheader label="Agent"/>
+                                    <listheader label="Message"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="alert">
+                                    <listitem sclass="@load(alert.severityClass)">
+                                        <listcell label="@load(alert.time)"/>
+                                        <listcell>
+                                            <label value="@load(alert.severity)" 
+                                                   sclass="@load(alert.severityStyle)"/>
+                                        </listcell>
+                                        <listcell label="@load(alert.agentId)"/>
+                                        <listcell label="@load(alert.message)"/>
+                                        <listcell label="@load(alert.status)"/>
+                                        <listcell>
+                                            <button label="Acknowledge" 
+                                                    onClick="@command('acknowledgeAlert', alert=alert)"/>
+                                            <button label="Investigate" 
+                                                    onClick="@command('investigateAlert', alert=alert)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Behavior Analysis Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Behavior Patterns -->
+                        <grid model="@load(vm.behaviorPatterns)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Pattern Type"/>
+                                <column label="Frequency"/>
+                                <column label="Impact"/>
+                                <column label="Confidence"/>
+                                <column label="Trend"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="pattern">
+                                <row>
+                                    <label value="@load(pattern.type)"/>
+                                    <label value="@load(pattern.frequency)"/>
+                                    <label value="@load(pattern.impact)" 
+                                           sclass="@load(pattern.impactStyle)"/>
+                                    <progressmeter value="@load(pattern.confidence)"/>
+                                    <label value="@load(pattern.trend)" 
+                                           sclass="@load(pattern.trendStyle)"/>
+                                    <hlayout>
+                                        <button label="Analyze" 
+                                                onClick="@command('analyzePattern', pattern=pattern)"/>
+                                        <button label="Export" 
+                                                onClick="@command('exportPattern', pattern=pattern)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Behavior Analytics -->
+                        <hlayout>
+                            <charts id="behaviorTrendsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Behavior Trends"
+                                   model="@load(vm.behaviorTrendsData)"/>
+                            
+                            <charts id="patternDistributionChart" 
+                                   type="pie"
+                                   height="300px"
+                                   title="Pattern Distribution"
+                                   model="@load(vm.patternDistributionData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Diagnostics Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- System Health Metrics -->
+                        <grid model="@load(vm.healthMetrics)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Metric"/>
+                                <column label="Value"/>
+                                <column label="Threshold"/>
+                                <column label="Status"/>
+                                <column label="Trend"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="metric">
+                                <row>
+                                    <label value="@load(metric.name)"/>
+                                    <label value="@load(metric.value)"/>
+                                    <label value="@load(metric.threshold)"/>
+                                    <label value="@load(metric.status)" 
+                                           sclass="@load(metric.statusStyle)"/>
+                                    <label value="@load(metric.trend)" 
+                                           sclass="@load(metric.trendStyle)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('showMetricDetails', metric=metric)"/>
+                                        <button label="Adjust" 
+                                                onClick="@command('adjustThreshold', metric=metric)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Diagnostic Tools -->
+                        <hlayout>
+                            <groupbox title="System Diagnostics" width="50%">
+                                <vlayout>
+                                    <button label="Run System Check" 
+                                            onClick="@command('runSystemCheck')"/>
+                                    <button label="Performance Analysis" 
+                                            onClick="@command('analyzePerformance')"/>
+                                    <button label="Memory Profiling" 
+                                            onClick="@command('profileMemory')"/>
+                                    <button label="Network Diagnostics" 
+                                            onClick="@command('checkNetwork')"/>
+                                </vlayout>
+                            </groupbox>
+                            
+                            <groupbox title="Diagnostic Results" width="50%">
+                                <listbox model="@load(vm.diagnosticResults)" 
+                                        emptyMessage="No diagnostic results available">
+                                    <template name="model" var="result">
+                                        <listitem>
+                                            <listcell label="@load(result.summary)"/>
+                                        </listitem>
+                                    </template>
+                                </listbox>
+                            </groupbox>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Predictive Analytics Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Predictions -->
+                        <grid model="@load(vm.predictions)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Type"/>
+                                <column label="Prediction"/>
+                                <column label="Confidence"/>
+                                <column label="Time Horizon"/>
+                                <column label="Impact"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="prediction">
+                                <row>
+                                    <label value="@load(prediction.type)"/>
+                                    <label value="@load(prediction.value)"/>
+                                    <progressmeter value="@load(prediction.confidence)"/>
+                                    <label value="@load(prediction.timeHorizon)"/>
+                                    <label value="@load(prediction.impact)" 
+                                           sclass="@load(prediction.impactStyle)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('showPredictionDetails', prediction=prediction)"/>
+                                        <button label="Take Action" 
+                                                onClick="@command('actOnPrediction', prediction=prediction)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Prediction Charts -->
+                        <hlayout>
+                            <charts id="predictionTrendsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Prediction Trends"
+                                   model="@load(vm.predictionTrendsData)"/>
+                            
+                            <charts id="confidenceMatrixChart" 
+                                   type="heatmap"
+                                   height="300px"
+                                   title="Confidence Matrix"
+                                   model="@load(vm.confidenceMatrixData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="agentDetailsWindow" 
+                title="Agent Details" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="80%">
+            <!-- Agent Details Content -->
+        </window>
+
+        <window id="alertDetailsWindow" 
+                title="Alert Investigation" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Alert Details Content -->
+        </window>
+
+        <window id="patternAnalysisWindow" 
+                title="Pattern Analysis" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="80%">
+            <!-- Pattern Analysis Content -->
+        </window>
+
+        <window id="predictionDetailsWindow" 
+                title="Prediction Details" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Prediction Details Content -->
+        </window>
+    </div>
+</zk>

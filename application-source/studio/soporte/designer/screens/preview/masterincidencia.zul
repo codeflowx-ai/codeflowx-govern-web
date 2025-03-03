@@ -1,0 +1,341 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="incidencia" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='incidencia')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="incidencia" />
+	<custom-attributes clase="org.suinsit.apps.soporte.Sopmticket" />
+	   <custom-attributes namespace="soporte" />
+	    <custom-attributes enviroment="preview" />
+	     <custom-attributes uid="6978" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('Incidencia.screen', 'Incidencias'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Incidencias
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='continuar')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='nuevo')">
+										Guardar y Nuevo
+									</button>
+								
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+
+<div id="WZiidrvZwV" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="WZiidrvZwV-row" class="row">
+
+
+				
+
+
+  <!-- sclass="margin-field" -->
+     <h:div class="col-md-12 ">
+    <hbox spacing="3px" visible="@load(vm.isVisible('CODSOPORTE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="  " value="@load(vm.lang.getProperty('CODSOPORTE.label', ''))"/>
+	   </hbox>
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.codsoporte)"  />
+    </h:div>
+
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="DqCJUeQYbO" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="DqCJUeQYbO-row" class="row">
+
+
+
+
+
+<h:div class="">
+  <h:div class="card " style="overflow:auto;" >
+       <h:div class="card-body">
+        <h:div class="form-group row">
+
+<h:div class="col-md-12 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmempresa.label', 'Cliente'))"/>
+   </hbox>
+<h:div class="col-md-12">
+<div >
+<button  iconSclass="fa-duotone fa-magnifying-glass-waveform" sclass="btn btn-icon" onClick="@command('findComboForeing',win=searchEbWskWWXkg,alias='idcrmempresa',input=tboxEbWskWWXkg) " /><button  iconSclass="fa-duotone fa-paintbrush-fine" sclass="btn btn-icon" onClick="@command('clearForeing',alias='idcrmempresa')">	</button>
+</div>
+</h:div>
+<h:div class="mb-2">
+<textbox id="tboxEbWskWWXkg"  placeholder="" value="@bind(vm.beanData.idcrmempresa.empresa) @save(vm.beanData.idcrmempresa.empresa, before=('grabar'))  " 
+ onClick="@command('onChangeFindTextForeing',alias='idcrmempresa',att='empresa',event=event,idcp='cbEbWskWWXkg')" onChange="@command('onChangeFindTextForeing',alias='idcrmempresa',att='empresa',event=event,idcp='cbEbWskWWXkg')"  sclass="form-control  bg-light border-0" />
+<combobox id="cbEbWskWWXkg" mold="rounded" autodrop="true" visible="false" model="@load(vm.foreings['idcrmempresa'])" onSelect="@command('onSelectTextForeing',item=self.selectedItem.value,updatebean='true',changefk='idatlproject',alias='idcrmempresa',hidde=self)" width="85%">
+<template name="model" var="item"><comboitem value="${item}" label="${item.empresa}"></comboitem>
+</template></combobox>
+<label sclass="text-danger" value="@load(vmsgs['tboxEbWskWWXkg'])"/></h:div>
+<window id="searchEbWskWWXkg" mode="modal" visible="false">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title" id="examplesEbWskWWXkg">Cliente</h:h5>
+<button id="btn_SEbWskWWXkg" class="btn-close"  onClick="searchEbWskWWXkg.visible=false" ></button>
+</div><div class="modal-body">
+<div sclass="mb-2">
+<textbox sclass="form-control  bg-light border-0" placeholder="introduzca criterios..." onOK="@command('onChangeFindForeing',alias='idcrmempresa',att='empresa,',input=self)" onChange="@command('onChangeFindForeing',alias='idcrmempresa',att='empresa,',event=event)"/>
+</div><div sclass="mb-2">
+<listbox height="400px" mold="paging" pageSize="20" pagingPosition="bottom" model="@bind(vm.foreings['idcrmempresa'])" onSelect="@command('onSelectForeingPopup', alias='idcrmempresa',item=self.selectedItem.value,hidde=searchEbWskWWXkg,updatebean='true' )">
+<listhead>
+<listheader label="@load(vm.lang.getProperty('EMPRESA.label','Empresa'))"  />
+</listhead>
+<template name="model" var="item">
+<listitem value="@load(item)">
+<listcell label="@load(item.empresa)" />
+</listitem></template></listbox>
+</div></div></div></div></window>
+
+
+  
+</h:div>
+
+
+         </h:div> 
+       </h:div>
+  </h:div>
+ </h:div> 
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="LZRDvNaSdG" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="LZRDvNaSdG-row" class="row">
+
+
+
+
+
+<h:div class="">
+  <h:div class="card " style="overflow:auto;" >
+       <h:div class="card-body">
+        <h:div class="form-group row">
+
+<h:div class="col-md-6 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlproject.label', 'Proyecto'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idatlproject" placeholder="@load(vm.lang.getProperty('idatlproject').label,'Proyecto')" model="@bind(vm.foreings['idatlproject'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idatlproject',item=self.selectedItem.value,changefk='idatlrproject',updatebean='true')"  		selectedItem="@load(vm.beanData.idatlproject)"  onCreate="@command('onCreateCombo',component=self,alias='idatlproject',loadFkFrom='idcrmempresa')" value="@bind(vm.beanData.idatlproject .project)" disabled="@bind(vm.beanData.idcrmempresa.idxcrmempresa eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.project)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlproject'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-6 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlrproject.label', 'Aplicacion'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idatlrproject" placeholder="@load(vm.lang.getProperty('idatlrproject').label,'Aplicacion')" model="@bind(vm.foreings['idatlrproject'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idatlrproject',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idatlrproject)"  onCreate="@command('onCreateCombo',component=self,alias='idatlrproject',loadFkFrom='idatlproject')" value="@bind(vm.beanData.idatlrproject .referencia)" disabled="@bind(vm.beanData.idatlproject.idxatlproject eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(c:cat3(item.referencia,' ',item.version))" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlrproject'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+
+    <h:div class="col-md-12 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('URLPUBLIC'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('URLPUBLIC.label', 'Url'))"  />
+	   </hbox>
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.idatlrproject.urlpublic) @save(vm.beanData.idatlrproject.urlpublic, before=('grabar')) "/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-12 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('VERSION'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VERSION.label', 'Version'))"  />
+	   </hbox>
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.idatlrproject.version) @save(vm.beanData.idatlrproject.version, before=('grabar')) "/>
+	   
+    </h:div>   
+
+
+
+
+         </h:div> 
+       </h:div>
+  </h:div>
+ </h:div> 
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="iWfPAscwVr" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="iWfPAscwVr-row" class="row">
+</div>
+</div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['Incidencia.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+                  
+                 
+
+
+
+                  
+                 
+
+
+
+
+
+
+                  
+                 
+
+                  
+<window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$incidencia');
+  binder.command('doLoad');
+});
+</script>
+</zk>

@@ -1,0 +1,79 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="card">
+					<div class="card-body">
+	<div class="table">
+	    <grid  width="100%" height="100%"	model="@load(vm.beans)" sclass="table align-middle mb-0" sizedByContent="true" span="true" >
+	       <columns sizable="true">
+							       <column label="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('ETAPA.label', 'Etapa'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('FECTSTART.label', 'Fecha prevista'))" align="center"/>
+							       <column label="@load(vm.lang.getProperty('PROBABILIDAD.label', 'probabilidad'))" align="center"/>
+ 							      <column align="center" />
+							</columns >
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.oportunidad) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.importeprev) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.etapa) @converter(vm.fieldConverter)"></label>
+							         <label  value="@load(item.fectstart) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.probabilidad) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+							onClick="@command('editData',item=item,page='masterformoportunidad.zul')"
+							iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-outline-secondary" />
+						<space></space>
+<!-- 						<button -->
+<!-- 							onClick="@command('onRemoveFind',item=item)" -->
+<!-- 							iconSclass="fa-light fa-nfc-trash fa-xl" sclass="btn btn-outline-warning" /> -->
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+	    </grid> 
+	
+	
+	</div>	
+	</div>
+	
+	<div class="card-footer">
+					<div class="row">
+					<div class="col-lg-2">
+							
+						</div>
+						
+						<div class="col-lg-6 align-items-start">
+						  <paging id="topagin"
+							pageSize="@load(vm.scroll.maxRows)"
+							totalSize="@load(vm.scroll.totalRows)" mold="os" width="100%"
+							 style="background-color:#FFF;" />
+						</div>
+						<div class="col-lg-2 align-items-start">
+							<combobox
+								selectedItem="@bind(vm.scroll.maxRows)"
+								value="@bind(vm.scroll.maxRows)" width="75px">
+								<comboitem label="30" value="30" />
+								<comboitem label="50" value="50" />
+								<comboitem label="100" value="100" />
+							</combobox>
+						</div>
+						
+					</div>
+					</div>
+	</div>	
+
+		
+</zk>		    

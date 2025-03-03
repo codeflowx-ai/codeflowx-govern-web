@@ -1,0 +1,177 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('org.suinsit.nocode.web.FindEntityUI')">
+	  <custom-attributes pagina="tipoplantilla" />
+	  <custom-attributes paginaIndex="indextipoplantilla.zul" />
+	   <custom-attributes templateView="gridtipoplantilla.zul" />
+	   <h:div id="notificacion"></h:div>
+	   
+	   <div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('TipoPlantilla.screen', 'TipoPlantilla'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    <label value="@load(vm.labelTotal)"></label>
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								TipoPlantilla
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+	   <div class="row">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							   <button
+									iconSclass="ri-add-fill me-1 align-bottom"
+									  class="btn btn-outline-primary m-2" d:data-bs-toggle="modal"
+									d:data-bs-target="#showModal" onClick="@command('addPopup',body=body_tipoplantilla,page='popuppoptiponoti.zul',close='close-modal')">
+									 TipoPlantilla
+								</button>
+								
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+									<button class="btn btn-danger"
+										iconSclass="ri-filter-2-line me-1 align-bottom">
+										Filters
+									</button>
+																	
+									<button iconSclass="fa-duotone fa-circle-ellipsis-vertical"
+										type="button" id="dropdownMenuLink1"
+										d:data-bs-toggle="dropdown" d:aria-expanded="false"
+										class="btn btn-soft-info">
+									</button>
+	
+									<h:ul class="dropdown-menu"	aria-labelledby="dropdownMenuLink1">
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-pdf "
+												onClick="@command('report',type='pdf')">
+												Pdf
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-xls"
+												onClick="@command('report',type='excel')">
+												Excel
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-csv"
+												onClick="@command('report',type='CSV')">
+												Csv
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-doc"
+												onClick="@command('report',type='DOCX')">
+												Word
+											</a>
+										</h:li>  
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-list"
+												onClick="@command('changeView',view='gridtipoplantilla.zul')">
+												List
+											</a>
+										</h:li>
+									</h:ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<div class="col-xxl-12">
+				<div class="card" id="companyList">
+					<div class="card-header">
+						<div class="row g-2">
+							<div class="col-md-3">
+						    <div class="search-box">		
+			 </div> 
+			 </div>  					
+								
+							<div class="col-md-auto ms-auto">
+								<div
+									class="d-flex align-items-center gap-2">
+									<button tooltiptext="Find"
+										iconSclass="fa-duotone fa-magnifying-glass-waveform" sclass="btn"
+										onClick="@command('search')" />
+									<button tooltiptext="Clear"
+										sclass="btn btn-outline-dark m-2"  iconSclass="fa-duotone fa-broom-wide" onClick="@command('clear')" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12"></div>
+					</div>
+					<div class="card-footer">
+					<div class="row">
+					<div class="col-lg-2">
+							
+						</div>
+						
+						<div class="col-lg-6 align-items-start">
+						  <paging id="topagin"
+							pageSize="@load(vm.scroll.maxRows)"
+							totalSize="@load(vm.scroll.totalRows)" mold="os" width="100%"
+							 style="background-color:#FFF;" />
+						</div>
+						<div class="col-lg-2 align-items-start">
+							<combobox
+								selectedItem="@bind(vm.scroll.maxRows)"
+								value="@bind(vm.scroll.maxRows)" width="75px">
+								<comboitem label="30" value="30" />
+								<comboitem label="50" value="50" />
+								<comboitem label="100" value="100" />
+							</combobox>
+						</div>
+						
+					</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- row -->
+	
+	   <h:div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleModalLabel">TipoPlantilla</h:h5>
+                                <h:button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal"></h:button>
+                            </div>
+                            <div class="modal-body" id="body_tipoplantilla"></div>
+                             
+                        </div>
+                    </div>
+                  </h:div>
+                <!--end add modal-->
+	</idspace>
+</zk>

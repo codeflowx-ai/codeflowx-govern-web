@@ -1,0 +1,219 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="subscripmodelo" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='subscripmodelo')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="subscripmodelo" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.subscripcion.Subrtipomodelo" />
+	   <custom-attributes namespace="subscripcion" />
+	      <custom-attributes uid="62328" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('subscripmodelo.screen', 'Suscripción Modelo'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="MWvNVuxhHM" style="overflow:auto;" class=" default col-lg-8 col-xlg-8 col-md-8"  visible="true" >
+<div id="MWvNVuxhHM-row" class="row">
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idsubtiposub.label', 'Tipo Subscripción'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idsubtiposub" placeholder="@load(vm.lang.getProperty('idsubtiposub').label,'Tipo Subscripción')" model="@bind(vm.foreings['idsubtiposub'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idsubtiposub',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idsubtiposub)"  onCreate="@command('onCreateCombo',component=self,alias='idsubtiposub')" value="@bind(vm.beanData.idsubtiposub .nombre)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idsubtiposub'])"/>
+
+  
+</h:div>
+
+
+
+
+ <div class="col-md-4   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('PAIDUSED'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PAIDUSED.label', 'Pago por uso'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="YRoUVmpCjq" value="@bind(vm.beanData.paidused) @save(vm.beanData.paidused, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('PAIDUSED'))" disabled="@load(vm.isEditable('PAIDUSED')?false:true)" checked="@bind(vm.beanData.paidused) @save(vm.beanData.paidused, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('MAXTOKENS'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXTOKENS.label', 'Máx. tokens'))"/>
+	
+	      <intbox   tabindex="3" id="VoCekeUNti"  placeholder="@load(vm.lang.getProperty('MAXTOKENS.label', 'Máx. tokens'))" sclass="  "  value="@bind(vm.beanData.maxtokens) @save(vm.beanData.maxtokens, before=('grabar')) " visible="@load(vm.isVisible('MAXTOKENS'))" disabled="@load(vm.isEditable('MAXTOKENS')?false:true)" onChange="@command('onChangeInput',field='MAXTOKENS',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['VoCekeUNti'])"/>   
+    
+    </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('MAXMINUTES'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXMINUTES.label', 'Max. Minutos'))"/>
+	
+	      <intbox   tabindex="4" id="mYOyalCLNi"  placeholder="@load(vm.lang.getProperty('MAXMINUTES.label', 'Max. Minutos'))" sclass="  "  value="@bind(vm.beanData.maxminutes) @save(vm.beanData.maxminutes, before=('grabar')) " visible="@load(vm.isVisible('MAXMINUTES'))" disabled="@load(vm.isEditable('MAXMINUTES')?false:true)" onChange="@command('onChangeInput',field='MAXMINUTES',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['mYOyalCLNi'])"/>   
+    
+    </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('MAXIMAGEN'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXIMAGEN.label', 'Máx. Imagenes'))"/>
+	
+	      <intbox   tabindex="5" id="KwtkMvvVZv"  placeholder="@load(vm.lang.getProperty('MAXIMAGEN.label', 'Máx. Imagenes'))" sclass="  "  value="@bind(vm.beanData.maximagen) @save(vm.beanData.maximagen, before=('grabar')) " visible="@load(vm.isVisible('MAXIMAGEN'))" disabled="@load(vm.isEditable('MAXIMAGEN')?false:true)" onChange="@command('onChangeInput',field='MAXIMAGEN',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['KwtkMvvVZv'])"/>   
+    
+    </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('MAXDOC'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXDOC.label', 'Máx. Documentos'))"/>
+	
+	      <intbox   tabindex="6" id="WVJEdGRSaG"  placeholder="@load(vm.lang.getProperty('MAXDOC.label', 'Máx. Documentos'))" sclass="  "  value="@bind(vm.beanData.maxdoc) @save(vm.beanData.maxdoc, before=('grabar')) " visible="@load(vm.isVisible('MAXDOC'))" disabled="@load(vm.isEditable('MAXDOC')?false:true)" onChange="@command('onChangeInput',field='MAXDOC',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['WVJEdGRSaG'])"/>   
+    
+    </div>
+
+
+
+
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['subscripmodelo.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$subscripmodelo');
+  binder.command('doLoad');
+});
+function loadsubscripmodelo(){
+  var binder = zkbind.$('$subscripmodelo');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

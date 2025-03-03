@@ -1,0 +1,221 @@
+<?page title="Knowledge Management" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.knowledge.KnowledgeManagementVM')">
+        
+        <!-- Knowledge Overview -->
+        <hlayout sclass="knowledge-header">
+            <div sclass="metric-box">
+                <label value="Total Knowledge Bases"/>
+                <label value="@load(vm.totalKnowledgeBases)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Active Templates"/>
+                <label value="@load(vm.activeTemplates)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Last Update"/>
+                <label value="@load(vm.lastUpdateDate)"/>
+            </div>
+            <div sclass="actions-box">
+                <button label="New Knowledge Base" 
+                        onClick="@command('createKnowledgeBase')"
+                        sclass="action-button"/>
+                <button label="Import" 
+                        onClick="@command('importKnowledge')"
+                        sclass="action-button"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Knowledge Bases"/>
+                <tab label="Prompt Templates"/>
+                <tab label="Best Practices"/>
+                <tab label="Documentation"/>
+            </tabs>
+            <tabpanels>
+                <!-- Knowledge Bases Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Search and Filter -->
+                        <hlayout sclass="filter-container">
+                            <textbox value="@bind(vm.searchTerm)" 
+                                    placeholder="Search knowledge bases..."
+                                    onOK="@command('search')"/>
+                            <combobox model="@load(vm.categories)" 
+                                     selectedItem="@bind(vm.selectedCategory)"
+                                     onChange="@command('filterByCategory')"/>
+                            <button label="Search" 
+                                    onClick="@command('search')"/>
+                        </hlayout>
+
+                        <!-- Knowledge Bases Grid -->
+                        <grid model="@load(vm.knowledgeBases)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Name" sort="auto"/>
+                                <column label="Category"/>
+                                <column label="Last Updated"/>
+                                <column label="Status"/>
+                                <column label="Usage"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="kb">
+                                <row>
+                                    <label value="@load(kb.name)"/>
+                                    <label value="@load(kb.category)"/>
+                                    <label value="@load(kb.lastUpdated)"/>
+                                    <label value="@load(kb.status)" 
+                                           sclass="@load(kb.statusStyle)"/>
+                                    <progressmeter value="@load(kb.usagePercentage)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editKnowledgeBase', kb=kb)"/>
+                                        <button label="Version" 
+                                                onClick="@command('manageVersions', kb=kb)"/>
+                                        <button label="Delete" 
+                                                onClick="@command('deleteKnowledgeBase', kb=kb)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Prompt Templates Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <hlayout>
+                            <div width="70%">
+                                <!-- Templates List -->
+                                <listbox model="@load(vm.promptTemplates)" 
+                                        selectedItem="@bind(vm.selectedTemplate)">
+                                    <listhead>
+                                        <listheader label="Template Name"/>
+                                        <listheader label="Purpose"/>
+                                        <listheader label="Version"/>
+                                        <listheader label="Usage Count"/>
+                                        <listheader label="Actions"/>
+                                    </listhead>
+                                    <template name="model" var="template">
+                                        <listitem>
+                                            <listcell label="@load(template.name)"/>
+                                            <listcell label="@load(template.purpose)"/>
+                                            <listcell label="@load(template.version)"/>
+                                            <listcell label="@load(template.usageCount)"/>
+                                            <listcell>
+                                                <button label="Edit" 
+                                                        onClick="@command('editTemplate', template=template)"/>
+                                                <button label="Clone" 
+                                                        onClick="@command('cloneTemplate', template=template)"/>
+                                            </listcell>
+                                        </listitem>
+                                    </template>
+                                </listbox>
+                            </div>
+                            
+                            <!-- Template Preview -->
+                            <div width="30%" visible="@load(not empty vm.selectedTemplate)">
+                                <groupbox title="Template Preview">
+                                    <vlayout>
+                                        <label value="@load(vm.selectedTemplate.name)" 
+                                               style="font-weight: bold"/>
+                                        <textbox value="@load(vm.selectedTemplate.content)" 
+                                                rows="10" readonly="true"/>
+                                        <label value="Variables:"/>
+                                        <grid model="@load(vm.selectedTemplate.variables)">
+                                            <columns>
+                                                <column label="Name"/>
+                                                <column label="Type"/>
+                                                <column label="Required"/>
+                                            </columns>
+                                            <template name="model" var="var">
+                                                <row>
+                                                    <label value="@load(var.name)"/>
+                                                    <label value="@load(var.type)"/>
+                                                    <checkbox checked="@load(var.required)" 
+                                                             disabled="true"/>
+                                                </row>
+                                            </template>
+                                        </grid>
+                                    </vlayout>
+                                </groupbox>
+                            </div>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Best Practices Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.bestPractices)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Title"/>
+                                <column label="Category"/>
+                                <column label="Impact Level"/>
+                                <column label="Implementation Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="practice">
+                                <row>
+                                    <label value="@load(practice.title)"/>
+                                    <label value="@load(practice.category)"/>
+                                    <label value="@load(practice.impactLevel)" 
+                                           sclass="@load(practice.impactStyle)"/>
+                                    <progressmeter value="@load(practice.implementationProgress)"/>
+                                    <hlayout>
+                                        <button label="View" 
+                                                onClick="@command('viewPractice', practice=practice)"/>
+                                        <button label="Edit" 
+                                                onClick="@command('editPractice', practice=practice)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Documentation Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <tree model="@load(vm.documentationTree)" 
+                              selectedItem="@bind(vm.selectedDoc)">
+                            <template name="model" var="doc">
+                                <treeitem>
+                                    <treerow>
+                                        <treecell label="@load(doc.title)"/>
+                                    </treerow>
+                                </treeitem>
+                            </template>
+                        </tree>
+                        
+                        <div visible="@load(not empty vm.selectedDoc)" 
+                             sclass="doc-content">
+                            <html content="@load(vm.selectedDoc.content)"/>
+                        </div>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="kbEditorWindow" 
+                title="Knowledge Base Editor" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Knowledge Base Editor Content -->
+        </window>
+
+        <window id="templateEditorWindow" 
+                title="Template Editor" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Template Editor Content -->
+        </window>
+    </div>
+</zk>

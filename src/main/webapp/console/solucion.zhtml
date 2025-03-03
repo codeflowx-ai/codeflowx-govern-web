@@ -1,0 +1,131 @@
+<!doctype html>
+<html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:zk="zk" xmlns:z="zul" xmlns:c="client"
+	xmlns:b='http://www.google.com/2005/gml/b'
+	xmlns:data='http://www.google.com/2005/gml/data'
+	xmlns:expr='http://www.google.com/2005/gml/expr'
+	xmlns:og='http://opengraphprotocol.org/schema/'>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <title>Registro cuenta</title>
+
+    <!-- Favicon -->
+    <link href="img/favicon.png" rel="icon">
+    <link rel="canonical" href="">
+  
+
+    <!-- CSS Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- Estilos personalizados -->
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  
+  <body class="bd-back" style="background: url('img/bg-login5.jpg') center center no-repeat;  background-size: cover; background-position-y: center;">
+    
+  <main class="form-signin">
+    <div class="container">
+      <div class="row p-lr">
+
+        <div class="col-12 col-md-6 col-ls-6 mt-4 mb-4 login-section sombra">
+          <form id="equipos-form">
+            <img class="mt-4" src="img/lh-suinsit.png" alt="" width="50%" height="auto">
+           
+            <h1 class="mt-5 mb-3">¿Con qué solución quieres empezar?</h1>
+            <h5>Personaliza tu experiencia con Suinsit</h5>
+      
+              <div id="options-container">
+                <div class="option-button" data-value="Producción">Producción</div>
+                <div class="option-button" data-value="Finanzas">Finanzas</div>
+                <div class="option-button" data-value="Operaciones">Operaciones</div>
+                <div class="option-button" data-value="Fabricación">Fabricación</div>
+                <div class="option-button" data-value="Diseño de producto">Diseño de producto</div>
+                <div class="option-button" data-value="Recursos humanos y asuntos legales">Recursos humanos y asuntos legales</div>
+                <div class="option-button" data-value="Producción creativa">Producción creativa</div>
+                <div class="option-button" data-value="Ingeniería">Ingeniería</div>
+                <div class="option-button" data-value="Servicio al cliente">Servicio al cliente</div>
+                <div class="option-button" data-value="Marketing">Marketing</div>
+                <div class="option-button" data-value="Soporte de TI">Soporte de TI</div>
+                <div class="option-button" data-value="Ventas y gestión de cuentas">Ventas y gestión de cuentas</div>
+                <div class="option-button" data-value="Otros / Personal">Otros / Personal</div>
+              </div>
+              <input type="hidden" id="option-input" name="selected-options" id="selected-options">
+
+            <div class="d-flex align-items-center">
+              <div class="col-4 col-md-4 col-ls-4 me-3 bar-bg">
+                <div class="progress">
+                  <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+              </div>
+
+              <div class="col-4 col-md-4 col-ls-4 text-end">
+                <button class="btn btn-link mt-4" type="button">Saltar</button>
+              </div>
+
+              <div class="col-4 col-md-4 col-ls-4 text-center">
+                <button id="continue-btn" class="btn btn-primary mt-4" type="button">Continuar</button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+
+        <div class="col-12 col-md-6 col-lg-6 mt-4 mb-4 d-flex flex-column justify-content-center">
+
+          <div class="section-user">
+            <div class="section section-top">
+              <i class="fa-solid fa-user"></i><h4>Luisana Nieves</h4>
+            </div>
+        
+            <div class="section section-bottom">
+              <div id="selected-option-display" class="option-display">  </div>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+
+
+    
+  </main>
+
+  <script>
+    document.getElementById('continue-btn').addEventListener('click', function() {
+      var progressBar = document.getElementById('progress-bar');
+      var currentWidth = parseInt(progressBar.style.width, 10);
+      var newWidth = Math.min(currentWidth + 25, 100); 
+      progressBar.style.width = newWidth + '%';
+      progressBar.setAttribute('aria-valuenow', newWidth);
+    });
+
+
+
+
+    /*** Opciones equipo boton selected ***/
+  document.querySelectorAll('.option-button').forEach(button => {
+    button.addEventListener('click', function() {
+      document.querySelectorAll('.option-button').forEach(btn => btn.classList.remove('selected'));
+      this.classList.add('selected');
+      updateSelectedOption();
+    });
+  });
+
+  function updateSelectedOption() {
+      const selectedOption = document.querySelector('.option-button.selected').dataset.value;
+      document.getElementById('option-input').value = selectedOption;
+      const selectedOptionDisplay = document.getElementById('selected-option-display');
+      selectedOptionDisplay.textContent = selectedOption;
+      selectedOptionDisplay.classList.add('option-display');
+    }
+
+
+</script>
+    
+  </body>
+</html>

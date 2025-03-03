@@ -1,0 +1,75 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+			Código Cliente - Código Cliente
+			Empresa - Empresa
+			NIF - NIF
+			ciudad - ciudad
+				 <grid  	model="@load(vm.beans)" sizedByContent="true" span="true" sclass="table align-middle mb-0" >  
+							<columns sizable="true" menupopup="auto">
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('CODCLIENTE.label', 'Código Cliente'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CODCLIENTEAsc'])" sortDescending="@load(vm.comparators['CODCLIENTEDesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('EMPRESA.label', 'Empresa'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['EMPRESAAsc'])" sortDescending="@load(vm.comparators['EMPRESADesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('CIFNIF.label', 'NIF'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CIFNIFAsc'])" sortDescending="@load(vm.comparators['CIFNIFDesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('CIUDAD.label', 'ciudad'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CIUDADAsc'])" sortDescending="@load(vm.comparators['CIUDADDesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterempresas.zul')">
+							             <label  value="@load(item.codcliente) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.empresa) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.cifnif) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.ciudad) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masterempresas.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"   />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2"   />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

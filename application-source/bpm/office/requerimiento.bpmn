@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="requerimiento" name="Requerimiento Administrativo" isExecutable="true">
+    <endEvent id="endevent1" name="End"></endEvent>
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="usertask1" name="Notificar requerimiento" activiti:candidateGroups="CLIENTE" activiti:formKey="expedientes|formrequerimientocli.zul"></userTask>
+    <userTask id="usertask2" name="Revisar Notificación" activiti:candidateGroups="COMERCIAL,OPERADOR,ADMINISTRACION" activiti:dueDate="PT24H" activiti:formKey="expedientes|formrequerimiento.zul"></userTask>
+    <userTask id="usertask3" name="adjuntar documentación" activiti:candidateGroups="COMERCIAL,OPERADOR,ADMINISTRACION" activiti:formKey="confirm|¿Debe adjuntar el cliente documentación?"></userTask>
+    <serviceTask id="mailtask1" name="Notificación" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Nueva notificación de requerimiento]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+El cliente  ${var:get(CUSTOMER_NAME)} , ha notificado un requerimiento  del organismo   ${var:get(ORGANISMO) } del tipo ${var:get(TIPO) }
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Suinsit Platform]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINBC)}]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="mailtask2" name="Recordatorio" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Pendiente de revisar Notificación]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+Han pasado 24 Horas y no se ha tramitado la notificación de ${var:get(CUSTOMER_NAME)} , del organismo   ${var:get(ORGANISMO) } del tipo ${var:get(TIPO) }
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Team Suinsit]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="mailtask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="mailtask1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow5" sourceRef="usertask3" targetRef="exclusivegateway1"></sequenceFlow>
+    <boundaryEvent id="boundarytimer1" name="Timer" attachedToRef="usertask2" cancelActivity="false">
+      <timerEventDefinition>
+        <timeCycle>0 0 9 ? * MON-FRI * </timeCycle>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow6" sourceRef="boundarytimer1" targetRef="mailtask2"></sequenceFlow>
+    <userTask id="usertask4" name="Adjuntar Documentación" activiti:candidateGroups="CLIENTE" activiti:dueDate="PT48H" activiti:formKey="expedientes|formrequerimientocli2.zul"></userTask>
+    <userTask id="usertask5" name="Tramitar Requerimiento" activiti:candidateGroups="COMERCIAL,OPERADOR,ADMINISTRACION" activiti:dueDate="PT24H" activiti:formKey="expedientes|formrequerimiento.zul"></userTask>
+    <sequenceFlow id="flow8" name="No" sourceRef="exclusivegateway1" targetRef="usertask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(continuar) ==false}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="mailtask3" name="Recordatorio" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(CUSTOMER_USER_EMAIL)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Recordatorio adjuntar documentación]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:string><![CDATA[Hola,
+ var:get(CUSTOMER_NAME)}, tienes pendiente de adjuntar documentación.
+
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="mailtask4" name="Notificación" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[cliente pendiente de subir documentacion]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+ han pasado 36 Horas y ${var:get(CUSTOMER_NAME)},no  ha actualizado la documenatción pendiente de la notificación de  , del organismo   
+${var:get(ORGANISMO) } y del tipo ${var:get(TIPO) } .
+
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINBC)}]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <boundaryEvent id="boundarytimer3" name="Timer" attachedToRef="usertask4" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDate>PT36H</timeDate>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow9" sourceRef="boundarytimer3" targetRef="mailtask4"></sequenceFlow>
+    <serviceTask id="mailtask5" name="Notificación" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(CUSTOMER_USER_EMAIL)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Fin de tramitación]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola ${var:get(CUSTOMER_NAME)}
+La tramitaciónn de tu  requerimiento del ${var:get(ORGANISMO) } y del tipo ${var:get(TIPO) } , ha finalizado.
+
+Un saludo]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:string><![CDATA[mgonzalez@enartsystems.com]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow14" sourceRef="mailtask5" targetRef="endevent1"></sequenceFlow>
+    <serviceTask id="mailtask6" name="Notificación" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(CUSTOMER_USER_EMAIL)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Documentación pendiente de aportar]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola ${var:get(CUSTOMER_NAME)},
+Tienes documentación pendiente de adjuntar de la notificación de  , del organismo   ${var:get(ORGANISMO) } y del tipo ${var:get(TIPO) } .
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Team Suinsit]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow15" name="Si" sourceRef="exclusivegateway1" targetRef="mailtask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(continuar) ==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="mailtask6" targetRef="usertask4"></sequenceFlow>
+    <serviceTask id="mailtask7" name="Notificación" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Documentación Actualizada del Requerimiento]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+ var:get(CUSTOMER_NAME)}, ha actualizado la documenatción pendiente de la notificación de  , del organismo   ${var:get(ORGANISMO) } y del tipo ${var:get(TIPO) } .
+
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINBC)}]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow17" sourceRef="usertask4" targetRef="mailtask7"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="mailtask7" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow19" sourceRef="usertask5" targetRef="mailtask5"></sequenceFlow>
+    <boundaryEvent id="boundarytimer4" name="Timer" attachedToRef="usertask1" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDate>PT24H</timeDate>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow20" sourceRef="boundarytimer4" targetRef="endevent2"></sequenceFlow>
+    <boundaryEvent id="boundarytimer5" name="Timer" attachedToRef="usertask4" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDate>PT24H</timeDate>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow21" sourceRef="boundarytimer5" targetRef="mailtask3"></sequenceFlow>
+    <textAnnotation id="textannotation1">
+      <text>Inicia el cliente desde el portal</text>
+    </textAnnotation>
+    <association id="association1" sourceRef="textannotation1" targetRef="usertask1" associationDirection="None"></association>
+    <textAnnotation id="textannotation2">
+      <text>Notificación al despacho de un requerimiento</text>
+    </textAnnotation>
+    <association id="association2" sourceRef="textannotation2" targetRef="mailtask1" associationDirection="None"></association>
+    <textAnnotation id="textannotation3">
+      <text>Se envia recordatorío de lunes a viernes a las 9h,  sino se ha revisado</text>
+    </textAnnotation>
+    <association id="association3" sourceRef="textannotation3" targetRef="mailtask2" associationDirection="None"></association>
+    <textAnnotation id="textannotation4">
+      <text>Notifica al cliente que debe adjuntar documentación</text>
+    </textAnnotation>
+    <association id="association4" sourceRef="textannotation4" targetRef="mailtask6" associationDirection="None"></association>
+    <textAnnotation id="textannotation5">
+      <text>Personal del despacho debe revisar la tarea</text>
+    </textAnnotation>
+    <association id="association5" sourceRef="textannotation5" targetRef="usertask2" associationDirection="None"></association>
+    <textAnnotation id="textannotation6">
+      <text>Notifica al despacho que ha adjuntado documentación</text>
+    </textAnnotation>
+    <association id="association6" sourceRef="textannotation6" targetRef="mailtask7" associationDirection="None"></association>
+    <textAnnotation id="textannotation7">
+      <text>Recordatorio a las 24H si no se adjuntado documentación</text>
+    </textAnnotation>
+    <association id="association7" sourceRef="textannotation7" targetRef="mailtask3" associationDirection="None"></association>
+    <textAnnotation id="textannotation8">
+      <text>Notificación al despacho a las 36H  si el cliente no adjunto documentación</text>
+    </textAnnotation>
+    <association id="association8" sourceRef="textannotation8" targetRef="mailtask4" associationDirection="None"></association>
+    <textAnnotation id="textannotation9">
+      <text>Se registra en la adinistración la subsanación</text>
+    </textAnnotation>
+    <association id="association9" sourceRef="textannotation9" targetRef="usertask5" associationDirection="None"></association>
+    <textAnnotation id="textannotation10">
+      <text>Pregunta si el cliente debe de adjuntar documentos</text>
+    </textAnnotation>
+    <association id="association10" sourceRef="textannotation10" targetRef="usertask3" associationDirection="None"></association>
+    <textAnnotation id="textannotation11">
+      <text>Se notifica al cliente la tramitación del requermiento</text>
+    </textAnnotation>
+    <association id="association11" sourceRef="textannotation11" targetRef="mailtask5" associationDirection="None"></association>
+    <textAnnotation id="textannotation12">
+      <text>Se Inicia desde el portal del cliente</text>
+    </textAnnotation>
+    <association id="association12" sourceRef="textannotation12" targetRef="startevent1" associationDirection="None"></association>
+    <textAnnotation id="textannotation13">
+      <text>Sí en 24H el usuario no ha iniciado el proceso se cancela</text>
+    </textAnnotation>
+    <association id="association13" sourceRef="textannotation13" targetRef="boundarytimer4" associationDirection="None"></association>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_requerimiento">
+    <bpmndi:BPMNPlane bpmnElement="requerimiento" id="BPMNPlane_requerimiento">
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1290.0" y="207.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="112.0" y="235.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="240.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer4" id="BPMNShape_boundarytimer4">
+        <omgdc:Bounds height="30.0" width="30.0" x="278.0" y="272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="510.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer1" id="BPMNShape_boundarytimer1">
+        <omgdc:Bounds height="30.0" width="30.0" x="548.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="68.0" width="105.0" x="724.0" y="104.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask1" id="BPMNShape_mailtask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="352.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask2" id="BPMNShape_mailtask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="510.0" y="10.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="756.0" y="204.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="67.0" width="105.0" x="727.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer3" id="BPMNShape_boundarytimer3">
+        <omgdc:Bounds height="30.0" width="30.0" x="818.0" y="396.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer5" id="BPMNShape_boundarytimer5">
+        <omgdc:Bounds height="30.0" width="30.0" x="770.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
+        <omgdc:Bounds height="64.0" width="111.0" x="897.0" y="192.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask3" id="BPMNShape_mailtask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="770.0" y="510.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask4" id="BPMNShape_mailtask4">
+        <omgdc:Bounds height="55.0" width="105.0" x="900.0" y="382.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask5" id="BPMNShape_mailtask5">
+        <omgdc:Bounds height="55.0" width="105.0" x="1100.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask6" id="BPMNShape_mailtask6">
+        <omgdc:Bounds height="55.0" width="105.0" x="724.0" y="276.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask7" id="BPMNShape_mailtask7">
+        <omgdc:Bounds height="55.0" width="105.0" x="512.0" y="383.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="275.0" y="324.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50.0" width="100.0" x="390.0" y="279.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation2" id="BPMNShape_textannotation2">
+        <omgdc:Bounds height="50.0" width="100.0" x="260.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation3" id="BPMNShape_textannotation3">
+        <omgdc:Bounds height="58.0" width="118.0" x="673.0" y="13.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation4" id="BPMNShape_textannotation4">
+        <omgdc:Bounds height="50.0" width="100.0" x="600.0" y="272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation5" id="BPMNShape_textannotation5">
+        <omgdc:Bounds height="50.0" width="100.0" x="440.0" y="186.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation6" id="BPMNShape_textannotation6">
+        <omgdc:Bounds height="61.0" width="109.0" x="440.0" y="470.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation7" id="BPMNShape_textannotation7">
+        <omgdc:Bounds height="61.0" width="111.0" x="940.0" y="507.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation8" id="BPMNShape_textannotation8">
+        <omgdc:Bounds height="66.0" width="121.0" x="1040.0" y="383.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation9" id="BPMNShape_textannotation9">
+        <omgdc:Bounds height="50.0" width="100.0" x="930.0" y="113.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation10" id="BPMNShape_textannotation10">
+        <omgdc:Bounds height="60.0" width="114.0" x="847.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation11" id="BPMNShape_textannotation11">
+        <omgdc:Bounds height="65.0" width="115.0" x="1170.0" y="279.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation12" id="BPMNShape_textannotation12">
+        <omgdc:Bounds height="50.0" width="100.0" x="47.0" y="171.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation13" id="BPMNShape_textannotation13">
+        <omgdc:Bounds height="78.0" width="113.0" x="148.0" y="343.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="147.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="292.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="295.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="352.0" y="137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="457.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="137.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="615.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="724.0" y="138.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="776.0" y="172.0"></omgdi:waypoint>
+        <omgdi:waypoint x="776.0" y="204.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="563.0" y="100.0"></omgdi:waypoint>
+        <omgdi:waypoint x="562.0" y="65.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="796.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="897.0" y="224.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="14.0" x="792.0" y="204.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="848.0" y="411.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="409.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="1205.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1290.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="776.0" y="244.0"></omgdi:waypoint>
+        <omgdi:waypoint x="776.0" y="276.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="9.0" x="749.0" y="251.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="776.0" y="331.0"></omgdi:waypoint>
+        <omgdi:waypoint x="779.0" y="370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="727.0" y="403.0"></omgdi:waypoint>
+        <omgdi:waypoint x="617.0" y="410.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="564.0" y="383.0"></omgdi:waypoint>
+        <omgdi:waypoint x="562.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="1008.0" y="224.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="224.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="293.0" y="302.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="324.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="785.0" y="450.0"></omgdi:waypoint>
+        <omgdi:waypoint x="822.0" y="510.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association1" id="BPMNEdge_association1">
+        <omgdi:waypoint x="390.0" y="304.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="280.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association2" id="BPMNEdge_association2">
+        <omgdi:waypoint x="310.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="404.0" y="110.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association3" id="BPMNEdge_association3">
+        <omgdi:waypoint x="673.0" y="42.0"></omgdi:waypoint>
+        <omgdi:waypoint x="615.0" y="37.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association4" id="BPMNEdge_association4">
+        <omgdi:waypoint x="700.0" y="297.0"></omgdi:waypoint>
+        <omgdi:waypoint x="724.0" y="303.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association5" id="BPMNEdge_association5">
+        <omgdi:waypoint x="490.0" y="186.0"></omgdi:waypoint>
+        <omgdi:waypoint x="562.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association6" id="BPMNEdge_association6">
+        <omgdi:waypoint x="494.0" y="470.0"></omgdi:waypoint>
+        <omgdi:waypoint x="564.0" y="438.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association7" id="BPMNEdge_association7">
+        <omgdi:waypoint x="940.0" y="537.0"></omgdi:waypoint>
+        <omgdi:waypoint x="875.0" y="537.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association8" id="BPMNEdge_association8">
+        <omgdi:waypoint x="1040.0" y="416.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1005.0" y="409.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association9" id="BPMNEdge_association9">
+        <omgdi:waypoint x="980.0" y="163.0"></omgdi:waypoint>
+        <omgdi:waypoint x="952.0" y="192.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association10" id="BPMNEdge_association10">
+        <omgdi:waypoint x="904.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="776.0" y="104.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association11" id="BPMNEdge_association11">
+        <omgdi:waypoint x="1227.0" y="279.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1152.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association12" id="BPMNEdge_association12">
+        <omgdi:waypoint x="97.0" y="221.0"></omgdi:waypoint>
+        <omgdi:waypoint x="129.0" y="235.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association13" id="BPMNEdge_association13">
+        <omgdi:waypoint x="204.0" y="343.0"></omgdi:waypoint>
+        <omgdi:waypoint x="293.0" y="302.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

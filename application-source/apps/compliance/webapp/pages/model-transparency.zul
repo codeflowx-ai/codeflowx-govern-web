@@ -1,0 +1,216 @@
+<?page title="Model Transparency Reports" contentType="text/html;charset=UTF-8"?>
+<!-- <?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?> -->
+<zk>
+<!-- self="@define(content)"  -->
+    <div 
+         viewModel="@id('vm') @init('org.suinsit.apps.compliance.ModelTransparencyVM')">
+        
+        <hlayout sclass="transparency-header">
+            <div sclass="metric-box">
+                <label value="Models Documented"/>
+                <label value="@load(vm.modelsDocumented)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Documentation Coverage"/>
+                <label value="@load(vm.documentationCoverage)%" 
+                       sclass="@load(vm.coverageStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="High-Risk Models"/>
+                <label value="@load(vm.highRiskModels)"/>
+            </div>
+            <div sclass="actions-box">
+                <button label="New Documentation" 
+                        onClick="@command('createDocumentation')"
+                        sclass="primary"/>
+                <button label="Bulk Export" 
+                        onClick="@command('exportDocumentation')"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Model Documentation"/>
+                <tab label="Technical Specifications"/>
+                <tab label="Impact Assessment"/>
+                <tab label="Compliance Reports"/>
+            </tabs>
+            <tabpanels>
+                <!-- Model Documentation Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Documentation Grid -->
+                        <grid model="@load(vm.modelDocumentation)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Model Name"/>
+                                <column label="Version"/>
+                                <column label="Purpose"/>
+                                <column label="Risk Level"/>
+                                <column label="Documentation Status"/>
+                                <column label="Last Updated"/>
+                                <column label="Reviewed By"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="doc">
+                                <row>
+                                    <label value="@load(doc.modelName)"/>
+                                    <label value="@load(doc.version)"/>
+                                    <label value="@load(doc.purpose)"/>
+                                    <label value="@load(doc.riskLevel)" 
+                                           sclass="@load(doc.riskLevelStyle)"/>
+                                    <label value="@load(doc.status)" 
+                                           sclass="@load(doc.statusStyle)"/>
+                                    <label value="@load(doc.lastUpdated)"/>
+                                    <label value="@load(doc.reviewedBy)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editDocumentation', doc=doc)"/>
+                                        <button label="Review" 
+                                                onClick="@command('reviewDocumentation', doc=doc)"/>
+                                        <button label="Export" 
+                                                onClick="@command('exportSingleDoc', doc=doc)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Technical Specifications Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.technicalSpecs)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Model"/>
+                                <column label="Architecture"/>
+                                <column label="Training Data"/>
+                                <column label="Performance Metrics"/>
+                                <column label="Limitations"/>
+                                <column label="Dependencies"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="spec">
+                                <row>
+                                    <label value="@load(spec.modelName)"/>
+                                    <label value="@load(spec.architecture)"/>
+                                    <cell>
+                                        <vlayout>
+                                            <label value="Size: @load(spec.trainingDataSize)"/>
+                                            <label value="Source: @load(spec.dataSource)"/>
+                                        </vlayout>
+                                    </cell>
+                                    <cell>
+                                        <vlayout>
+                                            <label value="Accuracy: @load(spec.accuracy)%"/>
+                                            <label value="F1: @load(spec.f1Score)"/>
+                                        </vlayout>
+                                    </cell>
+                                    <label value="@load(spec.limitations)"/>
+                                    <label value="@load(spec.dependencies)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('viewTechDetails', spec=spec)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateTechSpecs', spec=spec)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Impact Assessment Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.impactAssessments)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Model"/>
+                                <column label="Impact Areas"/>
+                                <column label="Stakeholders"/>
+                                <column label="Risk Assessment"/>
+                                <column label="Mitigation Measures"/>
+                                <column label="Review Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="assessment">
+                                <row>
+                                    <label value="@load(assessment.modelName)"/>
+                                    <cell>
+                                        <forEach items="@load(assessment.impactAreas)" 
+                                                var="area">
+                                            <label value="@load(area)" 
+                                                   sclass="impact-tag"/>
+                                        </forEach>
+                                    </cell>
+                                    <label value="@load(assessment.stakeholders)"/>
+                                    <label value="@load(assessment.riskAssessment)" 
+                                           sclass="@load(assessment.riskStyle)"/>
+                                    <label value="@load(assessment.mitigationMeasures)"/>
+                                    <label value="@load(assessment.reviewStatus)" 
+                                           sclass="@load(assessment.statusStyle)"/>
+                                    <hlayout>
+                                        <button label="View" 
+                                                onClick="@command('viewImpactAssessment', assessment=assessment)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateImpactAssessment', assessment=assessment)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Compliance Reports Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.complianceReports)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Report Type"/>
+                                <column label="Models Covered"/>
+                                <column label="Reporting Period"/>
+                                <column label="Compliance Score"/>
+                                <column label="Issues Found"/>
+                                <column label="Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="report">
+                                <row>
+                                    <label value="@load(report.type)"/>
+                                    <label value="@load(report.modelsCovered)"/>
+                                    <label value="@load(report.period)"/>
+                                    <label value="@load(report.complianceScore)%" 
+                                           sclass="@load(report.scoreStyle)"/>
+                                    <label value="@load(report.issuesCount)"/>
+                                    <label value="@load(report.status)" 
+                                           sclass="@load(report.statusStyle)"/>
+                                    <hlayout>
+                                        <button label="View" 
+                                                onClick="@command('viewReport', report=report)"/>
+                                        <button label="Generate" 
+                                                onClick="@command('generateReport', report=report)"/>
+                                        <button label="Export" 
+                                                onClick="@command('exportReport', report=report)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Documentation Form Window -->
+        <window id="documentationFormWindow" 
+                title="Model Documentation" 
+                visible="false" 
+                mode="popup"
+                width="90%"
+                height="90%">
+            <!-- Documentation Form Content -->
+        </window>
+    </div>
+</zk>

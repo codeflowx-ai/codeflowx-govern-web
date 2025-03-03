@@ -1,0 +1,399 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="ragdocument" viewModel="@id('vm') @init('com.suinsit.nocode.semantic.ui.RagDocumentUI',pagina='ragdocument')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="ragdocument" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slmragdocument" />
+	   <custom-attributes namespace="suinless" />
+		<custom-attributes uid="94735" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('ragdocument.screen', 'Document RAG'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')"></a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+<div id="duBUpSWlcZ"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="duBUpSWlcZ-card" class="card  default" style="overflow:hidden;" >
+       <div id="duBUpSWlcZ-body" class="card-body ">
+        <div id="duBUpSWlcZ-row" class="form-group row ">
+
+<tabbox orient="top" mold="default" width="100%" maximalHeight="true" >
+     <tabs>
+                                 <tab label="Configuración" onCreate="@command('loadSubtableOnDemand',alias='subslrragdocuments')" />
+                 <tab label="Asistente" />      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+
+
+<div id="cTrkIYAOUG" style="overflow:auto;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="cTrkIYAOUG-row" class="row">
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('ASSISTANT'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ASSISTANT.label', 'Asistente'))"  />
+	   
+	    <textbox   tabindex="1" id="PBFyozwqsM" 
+	   placeholder="@load(vm.lang.getProperty('ASSISTANT.label', 'assistant'))" 
+	   value="@bind(vm.beanData.assistant) @save(vm.beanData.assistant, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('ASSISTANT'))" disabled="@load(vm.isEditable('ASSISTANT')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['PBFyozwqsM'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <div class="col-md-4  input-group" visible="@load(vm.isVisible('ALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+
+				
+
+  <div class="col-md-4  input-group" visible="@load(vm.isVisible('MODIF')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MODIF.label', 'Modificación'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.modif) @save(vm.beanData.modif, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+<h:div class="col-md-12  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idalmproject.label', 'Proyecto'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idalmproject" placeholder="@load(vm.lang.getProperty('idalmproject').label,'Proyecto')" model="@bind(vm.foreings['idalmproject'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idalmproject',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idalmproject)"  onCreate="@command('onCreateCombo',component=self,alias='idalmproject')" value="@bind(vm.beanData.idalmproject .proyectoalm)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proyectoalm)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idalmproject'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-6  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslprovider.label', 'Proveedor'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslprovider" placeholder="@load(vm.lang.getProperty('idslprovider').label,'Proveedor')" model="@bind(vm.foreings['idslprovider'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslprovider',item=self.selectedItem.value,changefk='idslesmodel',updatebean='true')"  		selectedItem="@load(vm.beanData.idslprovider)"  onCreate="@command('onCreateCombo',component=self,alias='idslprovider')" value="@bind(vm.beanData.idslprovider .provider)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.provider)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslprovider'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-6  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslesmodel.label', 'Modelo'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslesmodel" placeholder="@load(vm.lang.getProperty('idslesmodel').label,'Modelo')" model="@bind(vm.foreings['idslesmodel'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslesmodel',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idslesmodel)"  onCreate="@command('onCreateCombo',component=self,alias='idslesmodel',loadFkFrom='idslprovider')" value="@bind(vm.beanData.idslesmodel .model)" disabled="@bind(vm.beanData.idslprovider.idxslprovider eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.model)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslesmodel'])"/>
+
+  
+</h:div>
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('CHATBOT'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('CHATBOT.label', 'Use Chatbot'))"/>
+             <checkbox mold="switch" id="mTckAFcFai" value="@bind(vm.beanData.chatbot) @save(vm.beanData.chatbot, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('CHATBOT'))" disabled="@load(vm.isEditable('CHATBOT')?false:true)" checked="@bind(vm.beanData.chatbot) @save(vm.beanData.chatbot, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('INTERACTIVE'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('INTERACTIVE.label', 'Interactivo'))"/>
+             <checkbox mold="switch" id="IrufZsPdRb" value="@bind(vm.beanData.interactive) @save(vm.beanData.interactive, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('INTERACTIVE'))" disabled="@load(vm.isEditable('INTERACTIVE')?false:true)" checked="@bind(vm.beanData.interactive) @save(vm.beanData.interactive, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   input-grou" visible="@load(vm.isVisible('MULTIDIOMA'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MULTIDIOMA.label', 'Multi Idioma'))"/>
+             <checkbox mold="switch" id="iYqNihnRkt" value="@bind(vm.beanData.multidioma) @save(vm.beanData.multidioma, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('MULTIDIOMA'))" disabled="@load(vm.isEditable('MULTIDIOMA')?false:true)" checked="@bind(vm.beanData.multidioma) @save(vm.beanData.multidioma, before=('grabar'))"/>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+    <div class="col-md-9  input-group" visible="@load(vm.isVisible('MESSAGEFIN'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MESSAGEFIN.label', 'Mensaje Final'))"  />
+	   
+	    <textbox   tabindex="10" id="mtZUIcWxiF" 
+	   placeholder="@load(vm.lang.getProperty('MESSAGEFIN.label', 'Mensaje Final'))" 
+	   value="@bind(vm.beanData.messagefin) @save(vm.beanData.messagefin, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('MESSAGEFIN'))" disabled="@load(vm.isEditable('MESSAGEFIN')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['mtZUIcWxiF'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('MAXCONSULTAS'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXCONSULTAS.label', 'Maximo Preguntas'))"/>
+	
+	      <intbox   tabindex="11" id="JqLMSCwsTG"  placeholder="@load(vm.lang.getProperty('MAXCONSULTAS.label', 'Maximo Preguntas'))" sclass="  "  value="@bind(vm.beanData.maxconsultas) @save(vm.beanData.maxconsultas, before=('grabar')) @validator(vm.validator,max=30 ,min=1 ,oldValue=vm.beanDataCpy.maxconsultas)" visible="@load(vm.isVisible('MAXCONSULTAS'))" disabled="@load(vm.isEditable('MAXCONSULTAS')?false:true)" onChange="@command('onChangeInput',field='MAXCONSULTAS',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['JqLMSCwsTG'])"/>   
+    
+    </div>
+
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="vgNkIRhcXs" style="overflow:auto;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="vgNkIRhcXs-row" class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PROMPTERS.label', 'Systems Prompt'))"/>
+	  
+	      <textbox rows="12" cols="80" id="zIKDrsGylZ" multiline="true" placeholder="@load(vm.lang.getProperty('PROMPTERS.label', 'prompters'))" value="@bind(vm.beanData.prompters) @save(vm.beanData.prompters, before=('grabar')) "   visible="@load(vm.isVisible('PROMPTERS'))" disabled="@load(vm.isEditable('PROMPTERS')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['zIKDrsGylZ'])"/>
+	     
+</h:div>
+
+
+
+</div>
+</div>  
+
+
+
+  <div class="col-lg-12">
+ <a   tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom" class="waves-effect waves-success"
+		onClick="@command('appendRow',alias='subslrragdocuments' )" > Añadir </a>
+ </div>		
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="LkRwrNlrSm" height="400px" width="100%" 
+   model="@bind(vm.grid['subslrragdocuments']) @template(each.updatable ? 'modelWrite' : 'model')" 
+    onCreate="@command('onSubtableCreate',component=self,alias='subslrragdocuments',loadOnDemand='false'  )" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('DOCUMENT.label', 'DOCUMENT'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('INDEXED.label', 'INDEXED'))"   align="center" sclass="text-capitalize"/>
+     
+        <column align="center" />
+	 </columns>
+       <template name="model" var="item">
+      	 <row style="text-align:right;" >
+			         <a iconSclass="su-icon su-2x  s-icon-pluggin-read" onClick="@command('onDownload',field='DOCUMENT',entity=item) " label="@load(vm.getNameFile(item,'DOCUMENT'))"></a>  
+				     <label  value="@load(item.indexed) @converter(vm.fieldConverter)"></label>
+               <cell align="center">
+		           <a onClick="@command('editRow',alias='subslrragdocuments',item=item)"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="waves-effect waves-success m-2" />
+						<a
+						onClick="@command('removeSubtable',alias='subslrragdocuments',item=item )"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="waves-effect waves-danger m-2" />
+		 </cell> 
+       </row>
+   	</template>      <template name="modelWrite" var="item">
+      	 <row style="text-align:right;" >
+   
+    	                 
+			         <a iconSclass="su-icon su-2x  s-icon-pluggin-read" onClick="@command('onDownload',field='DOCUMENT',entity=item) " label="@load(vm.getNameFile(item,'DOCUMENT'))"></a>  
+               
+				         <checkbox  value="@bind(item.indexed) @save(item.indexed, before=('storeRow'))" mold="switch" onCheck="@command('onChecked',item=item,field='indexed',evento=event)" sclass="margin-field " checked="@load(item.indexed)"/>
+           		<cell align="center">
+  					<button onClick="@command('storeRow',alias='subslrragdocuments',item=item)"
+						iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" sclass="btn btn-square btn-outline-success m-2" />
+		            <space></space>
+		            <button
+						onClick="@command('cancelRow',alias='subslrragdocuments',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2" />
+                </cell> 
+       </row>
+   	</template>
+  </grid>
+  </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['ragdocument.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$ragdocument');
+  binder.command('doLoad');
+});
+</script>
+</zk>

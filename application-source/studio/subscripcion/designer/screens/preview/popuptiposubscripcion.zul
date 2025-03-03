@@ -1,0 +1,430 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="tiposubscripcion" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='tiposubscripcion')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popuptiposubscripcion" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.subscripcion.Subtiposub" />
+	   <custom-attributes namespace="subscripcion" />
+	      <custom-attributes uid="71271" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('tiposubscripcion.screen', 'Tipo de subscripción'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="tJRjDapDva" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="tJRjDapDva-row" class="row">
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('NOMBRE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Subscripcion'))"  />
+	   
+	    <textbox   tabindex="1" id="UTaSaliDFQ" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['UTaSaliDFQ'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('ALIAS'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ALIAS.label', 'Alias'))"  />
+	   
+	    <textbox   tabindex="2" id="941962" 
+	   placeholder="@load(vm.lang.getProperty('ALIAS.label', 'alias'))" 
+	   value="@bind(vm.beanData.alias) @save(vm.beanData.alias, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('ALIAS'))" disabled="@load(vm.isEditable('ALIAS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['941962'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('IDENTIFICADOR'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('IDENTIFICADOR.label', 'Identificador'))"  />
+	   
+	    <textbox   tabindex="3" id="88389" 
+	   placeholder="@load(vm.lang.getProperty('IDENTIFICADOR.label', 'Identificador'))" 
+	   value="@bind(vm.beanData.identificador) @save(vm.beanData.identificador, before=('grabar')) @validator(vm.unique, field='IDENTIFICADOR',required=true ,oldValue=vm.beanDataCpy.identificador)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('IDENTIFICADOR'))" disabled="@load(vm.isEditable('IDENTIFICADOR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['88389'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+ <div class="col-md-2   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="851091" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECALTA.label', 'Fec. Alta'))"/>
+	  
+	      <datebox     id="729553"  placeholder="@load(vm.lang.getProperty('FECALTA.label', 'fecalta'))" tabindex="5" value="@bind(vm.beanData.fecalta) @save(vm.beanData.fecalta, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECALTA'))" disabled="@load(vm.isEditable('FECALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['729553'])"/>   
+    
+      </div>
+
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECBAJA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECBAJA.label', 'Fec. baja'))"/>
+	  
+	      <datebox     id="937216"  placeholder="@load(vm.lang.getProperty('FECBAJA.label', 'fecbaja'))" tabindex="6" value="@bind(vm.beanData.fecbaja) @save(vm.beanData.fecbaja, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECBAJA'))" disabled="@load(vm.isEditable('FECBAJA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['937216'])"/>   
+    
+      </div>
+
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ILIMITEDDOCUMENT'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ILIMITEDDOCUMENT.label', 'Ilimitados Documentos'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="FaaGhKJQUb" value="@bind(vm.beanData.ilimiteddocument) @save(vm.beanData.ilimiteddocument, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ILIMITEDDOCUMENT'))" disabled="@load(vm.isEditable('ILIMITEDDOCUMENT')?false:true)" checked="@bind(vm.beanData.ilimiteddocument) @save(vm.beanData.ilimiteddocument, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ILIMITEDMODELS'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ILIMITEDMODELS.label', 'Ilimitados Modelos'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="VwDtEarkVX" value="@bind(vm.beanData.ilimitedmodels) @save(vm.beanData.ilimitedmodels, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ILIMITEDMODELS'))" disabled="@load(vm.isEditable('ILIMITEDMODELS')?false:true)" checked="@bind(vm.beanData.ilimitedmodels) @save(vm.beanData.ilimitedmodels, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ILIMITEDPROJECTIA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ILIMITEDPROJECTIA.label', 'Ilimitados Proyectos IA'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="eYPshQDxJa" value="@bind(vm.beanData.ilimitedprojectia) @save(vm.beanData.ilimitedprojectia, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ILIMITEDPROJECTIA'))" disabled="@load(vm.isEditable('ILIMITEDPROJECTIA')?false:true)" checked="@bind(vm.beanData.ilimitedprojectia) @save(vm.beanData.ilimitedprojectia, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ILIMITEDUSERS'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ILIMITEDUSERS.label', 'Ilimitados Usuarios'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="WVMQbIZpwy" value="@bind(vm.beanData.ilimitedusers) @save(vm.beanData.ilimitedusers, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ILIMITEDUSERS'))" disabled="@load(vm.isEditable('ILIMITEDUSERS')?false:true)" checked="@bind(vm.beanData.ilimitedusers) @save(vm.beanData.ilimitedusers, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ILIMITEDPROJECTS'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ILIMITEDPROJECTS.label', 'Ilimitados Proyectos Suincode'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="TuZJUEqdMT" value="@bind(vm.beanData.ilimitedprojects) @save(vm.beanData.ilimitedprojects, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ILIMITEDPROJECTS'))" disabled="@load(vm.isEditable('ILIMITEDPROJECTS')?false:true)" checked="@bind(vm.beanData.ilimitedprojects) @save(vm.beanData.ilimitedprojects, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+<tabbox orient="top" mold="default" width="100%" maximalHeight="true" >
+     <tabs>
+                 <tab label="Descripción" />      
+                                  <tab label="Funcionalidades"  onSelect="@command('loadSubtableOnDemand',alias='subsubrsubfun')"/>      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"/>
+	  
+	  <tbeditor id="pisSIBeqLx" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) " />
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+ <!-- d:data-bs-toggle="modal" d:data-bs-target="#statickIxJyPKzhA-->
+ <div class="col-lg-12">
+ <a  tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom"
+		onClick="@command('appendSubtable',alias='subsubrsubfun',body='body_kIxJyPKzhA',namespace='subscripcion',page='popuptipofuncionalidad.zul',close='btn_kIxJyPKzhA',win=WIN_kIxJyPKzhA)" 
+		disabled="@load(!vm.appendSubtable)" class="waves-effect waves-success">Añadir</a>
+ </div>
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="kIxJyPKzhA" height="400px" width="100%" 
+   model="@bind(vm.grid['subsubrsubfun']) " 
+    onCreate="@command('onSubtableCreate',component=self,alias='subsubrsubfun',body='body_kIxJyPKzhA',page='popuptipofuncionalidad.zul',win=WIN_kIxJyPKzhA,loadOnDemand='true')" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('FUNCIONALIDAD.label', 'FUNCIONALIDAD'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('LIMITE.label', 'LIMITE'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('ACTIVO.label', 'ACTIVO'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('OPCIONAL.label', 'OPCIONAL'))"   align="center" sclass="text-capitalize"/>
+     
+        <column align="center" />
+	 </columns>
+	   
+       <template name="model" var="item">
+      	 <row style="text-align:right;" >
+				     <label  value="@load(item.idsubfuncionalidad.funcionalidad) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.limite) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.idsubtiposub.activo) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.opcional) @converter(vm.fieldConverter)"></label>
+               <cell align="center">
+             <a 
+						onClick="@command('editSubtable',alias='subsubrsubfun',body='body_kIxJyPKzhA',namespace='subscripcion',page='popuptipofuncionalidad.zul',close='btn_kIxJyPKzhA',item=item,win=WIN_kIxJyPKzhA)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="waves-effect waves-success m-2" />
+                    
+						<a
+						onClick="@command('removeSubtable',alias='subsubrsubfun',item=item )"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="waves-effect waves-danger m-2" />
+		 </cell> 
+       </row>
+   	</template>
+  </grid>
+  </div>
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+</div>
+</div>  
+<div id="rvBOFndvBv" style="overflow:auto;" class=" default col-lg-4 col-xlg-4 col-md-4"  visible="false" >
+<div id="rvBOFndvBv-row" class="row">
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['tiposubscripcion.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <window id="WIN_kIxJyPKzhA" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="50%" height="70%">
+				<div id="body_kIxJyPKzhA" style="overflow: scroll;"></div>
+  </window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="statickIxJyPKzhA" tabindex="-1" aria-labelledby="examplekIxJyPKzhA" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="examplekIxJyPKzhA"></h:h5>
+                                <h:button id="btn_kIxJyPKzhA" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_kIxJyPKzhA"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+                  
+                 
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$tiposubscripcion');
+  binder.command('doLoad');
+});
+function loadtiposubscripcion(){
+  var binder = zkbind.$('$tiposubscripcion');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

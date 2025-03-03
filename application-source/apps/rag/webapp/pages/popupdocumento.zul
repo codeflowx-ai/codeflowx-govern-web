@@ -1,0 +1,277 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="documento" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='documento')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="documento" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.rag.Ragdocumento" />
+	   <custom-attributes namespace="rag" />
+	      <custom-attributes uid="44948" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('documento.screen', 'Documento'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="YVUMRLiYGy" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="YVUMRLiYGy-row" class="row">
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('NOMBRE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))"  />
+	   
+	    <textbox   tabindex="1" id="AiVdNtjMSQ" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['AiVdNtjMSQ'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('DESCRIPCION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"  />
+	   
+	    <textbox   tabindex="2" id="DWuOsFfWWf" 
+	   placeholder="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))" 
+	   value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DESCRIPCION'))" disabled="@load(vm.isEditable('DESCRIPCION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['DWuOsFfWWf'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+     <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))"/>
+ 
+
+
+ <combobox mold="rounded" disabled="false"  sclass="" id="ESTADO" model="@load(vm.getEnums('ESTADO'))" 
+selectedItem="@load(vm.beanData.estado)"  value="@load(vm.beanData.estado) @save(vm.beanData.estado, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['ESTADO'])"/>
+</h:div>
+
+
+
+
+
+				
+
+  <div class="col-md-4  input-group" visible="@load(vm.isVisible('FECHACREACION')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHACREACION.label', 'Fecha Creación'))"/>
+	  
+	      <datebox     id="ziGdUAwJGJ"  placeholder="@load(vm.lang.getProperty('FECHACREACION.label', 'Fecha Creación'))" tabindex="4" value="@bind(vm.beanData.fechacreacion) @save(vm.beanData.fechacreacion, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECHACREACION'))" disabled="@load(vm.isEditable('FECHACREACION')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['ziGdUAwJGJ'])"/>   
+    
+      </div>
+
+
+
+
+
+
+				
+
+  <div class="col-md-4  input-group" visible="@load(vm.isVisible('FECHAMODIFICACION')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHAMODIFICACION.label', 'Fecha Modificación'))"/>
+	  
+	      <datebox     id="QCuHopyTrx"  placeholder="@load(vm.lang.getProperty('FECHAMODIFICACION.label', 'Fecha Modificación'))" tabindex="5" value="@bind(vm.beanData.fechamodificacion) @save(vm.beanData.fechamodificacion, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECHAMODIFICACION'))" disabled="@load(vm.isEditable('FECHAMODIFICACION')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['QCuHopyTrx'])"/>   
+    
+      </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('HASH'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('HASH.label', 'Hash'))"  />
+	   
+	    <textbox   tabindex="6" id="pFecfekmZj" 
+	   placeholder="@load(vm.lang.getProperty('HASH.label', 'Hash'))" 
+	   value="@bind(vm.beanData.hash) @save(vm.beanData.hash, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('HASH'))" disabled="@load(vm.isEditable('HASH')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['pFecfekmZj'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+     <label sclass="text  form-label text-capitalize font-weight-normal text-danger" style="" value="@load(vm.lang.getProperty('TIPO.label', 'Tipo'))"/>
+ 
+
+
+ <combobox mold="rounded" disabled="false"  sclass="border-warning" id="TIPO" model="@load(vm.getEnums('TIPO'))" 
+selectedItem="@load(vm.beanData.tipo)"  value="@load(vm.beanData.tipo) @save(vm.beanData.tipo, before=('grabar'))  @validator(vm.validator,required=true ,oldValue=vm.bean.getFieldByAtribute('TIPO').value )">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['TIPO'])"/>
+</h:div>
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('RUTA'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('RUTA.label', 'Ruta'))"  />
+	   
+	    <textbox   tabindex="8" id="YGiPkTlAAp" 
+	   placeholder="@load(vm.lang.getProperty('RUTA.label', 'Ruta'))" 
+	   value="@bind(vm.beanData.ruta) @save(vm.beanData.ruta, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('RUTA'))" disabled="@load(vm.isEditable('RUTA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['YGiPkTlAAp'])"/>
+            
+	   
+    </div>   
+
+
+
+
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['documento.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$documento');
+  binder.command('doLoad');
+});
+function loaddocumento(){
+  var binder = zkbind.$('$documento');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

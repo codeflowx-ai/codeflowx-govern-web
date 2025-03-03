@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="altaempleado" name="Alta de Empleado" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="viewaltaempleado" name="Alta Empleado" activiti:candidateGroups="CLIENTE" activiti:formKey="portalemp|formaltaemploy.zul"></userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="viewaltaempleado"></sequenceFlow>
+    <serviceTask id="mailtask1" name="Notificacion" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINBC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:expression><![CDATA[Nuevo empleado de ${var:get(CUSTOMER_NAME)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+El cliente  ${var:get(CUSTOMER_NAME)} , ha notificadoel alta de un nuevo empleado
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Suinsit Platform]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow2" sourceRef="viewaltaempleado" targetRef="mailtask1"></sequenceFlow>
+    <userTask id="usertask1" name="Revisar Alta" activiti:candidateGroups="COMERCIAL,OPERADOR,ADMINISTRACION" activiti:formKey="portalemp|formrevisaemploy.zul"></userTask>
+    <sequenceFlow id="flow3" sourceRef="mailtask1" targetRef="usertask1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <userTask id="usertask2" name="¿Son correctos los datos?" activiti:formKey="confirm|¿Son correctos los datos?"></userTask>
+    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <serviceTask id="mailtask2" name="Confirmar" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(CUSTOMER_USER_EMAIL)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Alta empleado completada]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola ${var:get(CUSTOMER_NAME)},
+El alta de tu empleado a sido tramitada.]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <serviceTask id="mailtask3" name="Notificar" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(CUSTOMER_USER_EMAIL)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola ${var:get(CUSTOMER_NAME)} 
+Necesitamos ampliar información para el alta de su nuevo empleado.
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Suinsit Platform]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[Información Pendiente]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow6" name="Sí" sourceRef="exclusivegateway1" targetRef="mailtask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(continuar) ==true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="No" sourceRef="exclusivegateway1" targetRef="mailtask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${var:get(continuar) ==false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="mailtask2" targetRef="endevent1"></sequenceFlow>
+    <userTask id="usertask3" name="Revisar alta" activiti:candidateGroups="CLIENTE" activiti:formKey="portalemp|formrevisaemploycli.zul"></userTask>
+    <serviceTask id="mailtask4" name="Notificar" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:expression><![CDATA[${var:get(ADMIN)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="cc">
+          <activiti:expression><![CDATA[${var:get(ADMINCC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="bcc">
+          <activiti:expression><![CDATA[${var:get(ADMINBC)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:expression><![CDATA[revisado alta empleado de ${var:get(CUSTOMER_NAME)}]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[Hola,
+El cliente  ${var:get(CUSTOMER_NAME)} , ha revisado el alta de un nuevo empleado
+Por favor accede a tu bandeja de tarea para continuar con la tramitación.
+
+Suinsit Platform]]></activiti:expression>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <sequenceFlow id="flow9" sourceRef="mailtask3" targetRef="usertask3"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="usertask3" targetRef="mailtask4"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="mailtask4" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_altaempleado">
+    <bpmndi:BPMNPlane bpmnElement="altaempleado" id="BPMNPlane_altaempleado">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="920.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="viewaltaempleado" id="BPMNShape_viewaltaempleado">
+        <omgdc:Bounds height="55.0" width="105.0" x="200.0" y="179.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask1" id="BPMNShape_mailtask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="304.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="450.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="632.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="600.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask2" id="BPMNShape_mailtask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="740.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask3" id="BPMNShape_mailtask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="600.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="450.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailtask4" id="BPMNShape_mailtask4">
+        <omgdc:Bounds height="55.0" width="105.0" x="450.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="135.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="200.0" y="206.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="252.0" y="179.0"></omgdi:waypoint>
+        <omgdi:waypoint x="252.0" y="98.0"></omgdi:waypoint>
+        <omgdi:waypoint x="304.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="409.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="555.0" y="97.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="97.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="652.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="652.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="672.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="197.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="10.0" x="689.0" y="200.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="652.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="652.0" y="280.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="14.0" x="652.0" y="232.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="845.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="920.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="600.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="502.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="502.0" y="235.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="502.0" y="180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="502.0" y="125.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

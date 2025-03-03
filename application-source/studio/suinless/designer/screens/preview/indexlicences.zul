@@ -1,0 +1,212 @@
+
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('org.suinsit.nocode.web.FindEntityUI')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="licences" />
+	   <custom-attributes enviroment="preview" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slmlicence" />
+	   <custom-attributes namespace="suinless" />
+	   <custom-attributes uid="35267" />
+	   <custom-attributes tipo="SEARCH" />
+	  <custom-attributes paginaIndex="indexlicences.zul" />
+       <custom-attributes templateView="gridlicences.zul" />
+	   
+	   <h:div id="notificacion"></h:div>
+	   
+	   <div class="row  }" style="background-color:;">
+			<div class="col-12   " style="">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('LICENCES.screen', 'LICENCIAS'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    <label value="@load(vm.labelTotal)"></label>
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								LICENCIAS
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		 <div class="row">
+			<div class="col-lg-12">
+				<div class="card   " style="background-color:;">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							
+							 <button
+									iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom"
+									  class="btn  btn-outline-primary" 
+									 onClick="@command('addData')">
+										Nuevo LICENCIAS
+								</button>
+								<button
+									iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right"
+									  class="btn btn-success" 
+									 onClick="@command('grabar')">
+										Grabar
+								</button>
+						
+								</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+									<button class="btn btn-danger"
+										iconSclass="ri-filter-2-line me-1 align-bottom">
+										Filters
+									</button>
+								  						
+
+																
+									<button iconSclass="las la-file-alt"
+										type="button" id="dropdownMenuLink1"
+										d:data-bs-toggle="dropdown" d:aria-expanded="false"
+										class="btn btn-soft-dark waves effect waves-light" >
+									</button>
+	
+									<h:ul class="dropdown-menu"	aria-labelledby="dropdownMenuLink1">
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-pdf "
+												onClick="@command('report',type='pdf')">
+												Pdf
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-excel "
+												onClick="@command('report',type='excel')">
+												Excel
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-csv"
+												onClick="@command('report',type='CSV')">
+												Csv
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="las la-file-word "
+												onClick="@command('report',type='DOCX')">
+												Word
+											</a>
+										</h:li>  
+                                    
+                                        	
+									</h:ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<div class="col-xxl-12">
+				<div class="card" id="companyList">
+					<div class="card-header">
+						<div class="row g-2">
+							<div class="col-md-3">
+						    <div class="search-box">		
+			 </div> 
+			 </div>  	
+								
+							<div class="col-md-auto ms-auto">
+								<div
+									class="d-flex align-items-center gap-2">
+									<button tooltiptext="Find"
+										iconSclass="ri-search-line search-icon" sclass="btn"
+										onClick="@command('search')" />
+									<button tooltiptext="Clear"
+										label="Clear" sclass="btn" onClick="@command('clear')" />
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+							<div id="divTemplate" sclass="col-lg-12"></div>
+					</div>
+					<div class="card-footer">
+					<div class="row">
+					<div class="col-lg-2">
+							
+						</div>
+						
+						<div class="col-lg-6 align-items-start">
+						  <paging id="topagin"
+							pageSize="@load(vm.scroll.maxRows)"
+							totalSize="@load(vm.scroll.totalRows)" mold="os" width="100%"
+							 style="background-color:#FFF;" />
+						</div>
+						<div class="col-lg-2 align-items-start">
+							<combobox
+								selectedItem="@bind(vm.scroll.maxRows)"
+								value="@bind(vm.scroll.maxRows)" width="75px">
+								<comboitem label="30" value="30" />
+								<comboitem label="50" value="50" />
+								<comboitem label="100" value="100" />
+							</combobox>
+						</div>
+						
+					</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- row -->
+	
+	   <window id="WIN_showModal" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleModalLabel">
+						LICENCIAS
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_licences"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+	
+  <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+	  
+                <!--end add modal-->
+	</idspace>
+</zk>

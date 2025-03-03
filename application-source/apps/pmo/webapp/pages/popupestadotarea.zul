@@ -1,0 +1,210 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="estadotarea" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='estadotarea')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupestadotarea" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.pmo.Pmomestadotask" />
+	   <custom-attributes namespace="pmo" />
+	      <custom-attributes uid="74654" />
+	   <custom-attributes tipo="MASTER" />
+	   
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="nQXwSyZLTr" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="nQXwSyZLTr-row" class="row">
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('ESTADOTASK'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ESTADOTASK.label', 'Estado'))"  />
+	   </hbox>
+	    <textbox   tabindex="1" id="ywEhEiulDz" 
+	   placeholder="@load(vm.lang.getProperty('ESTADOTASK.label', 'Estado'))" 
+	   value="@bind(vm.beanData.estadotask) @save(vm.beanData.estadotask, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.estadotask)"  sclass="margin-field form-control  form-control border border-danger" 
+	   visible="@load(vm.isVisible('ESTADOTASK'))" disabled="@load(vm.isEditable('ESTADOTASK')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['ywEhEiulDz'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-8 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('RESUMEN'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('RESUMEN.label', 'Resumen'))"  />
+	   </hbox>
+	    <textbox   tabindex="2" id="SoAuiukolL" 
+	   placeholder="@load(vm.lang.getProperty('RESUMEN.label', 'Resumen'))" 
+	   value="@bind(vm.beanData.resumen) @save(vm.beanData.resumen, before=('grabar')) "  sclass="margin-field form-control  form-control border" 
+	   visible="@load(vm.isVisible('RESUMEN'))" disabled="@load(vm.isEditable('RESUMEN')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['SoAuiukolL'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-4 ">
+
+   <hbox spacing="3px">
+     <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('BGCOLOR.label', 'Color'))"/>
+ </hbox>
+
+
+ <combobox mold="rounded" disabled="false"  sclass="" id="BGCOLOR" model="@load(vm.getEnums('BGCOLOR'))" 
+selectedItem="@load(vm.beanData.bgcolor)"  value="@load(vm.beanData.bgcolor) @save(vm.beanData.bgcolor, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['BGCOLOR'])"/>
+</h:div>
+
+
+
+
+<h:div class="col-md-8 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idpmomtipotask.label', 'Tipo tarea'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idpmomtipotask" placeholder="@load(vm.lang.getProperty('idpmomtipotask').label,'Tipo tarea')" model="@bind(vm.foreings['idpmomtipotask'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idpmomtipotask',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idpmomtipotask)"  onCreate="@command('onCreateCombo',component=self,alias='idpmomtipotask')" value="@bind(vm.beanData.idpmomtipotask .tipotask)@save(vm.beanData.idpmomtipotask.tipotask, before=('grabar')) @validator(vm.validator,required=true)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.tipotask)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idpmomtipotask'])"/>
+<a sclass="btn" tooltiptext="add" iconSclass="fa-duotone fa-pen-to-square"  onClick="@command('appendForeingPopup',alias='idpmomtipotask',win=WIN_AcySgmVnMN,body='body_AcySgmVnMN',page='popuptipotarea.zul')"></a>
+
+<window id="WIN_AcySgmVnMN" mode="modal" visible="false" position="center,center" action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none" width="80%">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title"> Crear Tipo Tarea</h:h5>
+</div>
+<div class="modal-body" id="body_AcySgmVnMN"></div>
+<div class="modal-footer"></div>
+</div>
+</window>
+
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-6 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idbpmmproces.label', 'ID Proceso BPMN'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idbpmmproces" placeholder="@load(vm.lang.getProperty('idbpmmproces').label,'ID Proceso BPMN')" model="@bind(vm.foreings['idbpmmproces'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idbpmmproces',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idbpmmproces)"  onCreate="@command('onCreateCombo',component=self,alias='idbpmmproces')" value="@bind(vm.beanData.idbpmmproces .proceso)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proceso)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idbpmmproces'])"/>
+
+  
+</h:div>
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc">
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['estadotarea.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$estadotarea');
+  binder.command('doLoad');
+});
+function loadestadotarea(){
+  var binder = zkbind.$('$estadotarea');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

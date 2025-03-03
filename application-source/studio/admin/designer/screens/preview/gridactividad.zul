@@ -1,0 +1,52 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	  						 
+<div class="table">					 
+					
+				 <grid  width="100%" height="500px"	model="@load(vm.beans)" sclass="table align-middle mb-0" >  
+							<columns sizable="true" menupopup="auto">
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('APLICACION.label', 'Aplicacion'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['APLICACIONAsc'])" sortDescending="@load(vm.comparators['APLICACIONDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('USERNAME.label', 'User'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['USERNAMEAsc'])" sortDescending="@load(vm.comparators['USERNAMEDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ALTAAsc'])" sortDescending="@load(vm.comparators['ALTADesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('MODULO.label', 'Modulo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MODULOAsc'])" sortDescending="@load(vm.comparators['MODULODesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ACCION.label', 'Accion'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACCIONAsc'])" sortDescending="@load(vm.comparators['ACCIONDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PROCESS.label', 'Process'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROCESSAsc'])" sortDescending="@load(vm.comparators['PROCESSDesc'])"/>
+							       <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('TASK.label', 'Task'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TASKAsc'])" sortDescending="@load(vm.comparators['TASKDesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masteractividad.zul')">
+							          <label  value="@load(item.aplicacion) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.username) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.modulo) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.accion) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.process) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.task) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masteractividad.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"/>
+						<space></space>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

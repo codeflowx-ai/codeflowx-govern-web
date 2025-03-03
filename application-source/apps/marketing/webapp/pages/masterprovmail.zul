@@ -1,0 +1,299 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="provmail" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='provmail')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="provmail" />
+	<custom-attributes clase="org.suinsit.apps.marketing.Mktprovmail" />
+	   <custom-attributes namespace="marketing" />
+		<custom-attributes uid="6121" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('provmail.screen', 'Proveedor Mail'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Proveedor Mail
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='continuar')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='nuevo')">
+										Guardar y Nuevo
+									</button>
+								
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+<div id="LnersdNoxX"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="LnersdNoxX-card" class="card  shadow-xl" style="overflow:auto;" >
+       <div id="LnersdNoxX-body" class="card-body ">
+        <div id="LnersdNoxX-row" class="form-group row ">
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOMBRE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))"  />
+	   </hbox>
+	    <textbox   tabindex="1" id="423069" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.unique, field='NOMBRE',required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['423069'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+<h:div class="col-md-4 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmservicio.label', 'Servicio'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmservicio" placeholder="@load(vm.lang.getProperty('idmservicio').label,'Servicio')" model="@bind(vm.foreings['idmservicio'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmservicio',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idmservicio)"  onCreate="@command('onCreateCombo',component=self,alias='idmservicio')" value="@bind(vm.beanData.idmservicio .nombre)@save(vm.beanData.idmservicio.nombre, before=('grabar')) @validator(vm.validator,required=true)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmservicio'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('CORREO'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CORREO.label', 'email'))"  />
+	   </hbox>
+	    <textbox   tabindex="3" id="LYBdZDNSxf" 
+	   placeholder="@load(vm.lang.getProperty('CORREO.label', 'email'))" 
+	   value="@bind(vm.beanData.correo) @save(vm.beanData.correo, before=('grabar')) @validator(vm.validator,type='EMAIL' ,oldValue=vm.beanDataCpy.correo)"  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('CORREO'))" disabled="@load(vm.isEditable('CORREO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['LYBdZDNSxf'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('CLAVEAPI'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CLAVEAPI.label', 'Clave API'))"  />
+	   </hbox>
+	    <textbox   tabindex="4" id="39845" 
+	   placeholder="@load(vm.lang.getProperty('CLAVEAPI.label', 'Clave API'))" 
+	   value="@bind(vm.beanData.claveapi) @save(vm.beanData.claveapi, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('CLAVEAPI'))" disabled="@load(vm.isEditable('CLAVEAPI')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['39845'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('SECRET'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SECRET.label', 'Secret'))"  />
+	   </hbox>
+	    <textbox   tabindex="5" id="219137" 
+	   placeholder="@load(vm.lang.getProperty('SECRET.label', 'Secret'))" 
+	   value="@bind(vm.beanData.secret) @save(vm.beanData.secret, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('SECRET'))" disabled="@load(vm.isEditable('SECRET')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['219137'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-4 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('PASSWORD'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PASSWORD.label', 'Contraseña'))"  />
+	   </hbox>
+	    <textbox   tabindex="6" id="rsxrooNggc" 
+	   placeholder="@load(vm.lang.getProperty('PASSWORD.label', 'Contraseña'))" 
+	   value="@bind(vm.beanData.password) @save(vm.beanData.password, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('PASSWORD'))" disabled="@load(vm.isEditable('PASSWORD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['rsxrooNggc'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+   <h:div class="col-md-12">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('COMENTARIOS.label', 'Comentarios'))"/>
+	   </hbox>
+	      <textbox rows="4" cols="80" id="UQkEjcrjej" multiline="true" placeholder="@load(vm.lang.getProperty('COMENTARIOS.label', 'Ninguno'))" value="@bind(vm.beanData.comentarios) @save(vm.beanData.comentarios, before=('grabar')) "  sclass="form-control  form-control" visible="@load(vm.isVisible('COMENTARIOS'))" disabled="@load(vm.isEditable('COMENTARIOS')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['UQkEjcrjej'])"/>
+	     
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+
+<div id="jPSOJxFurd" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="jPSOJxFurd-row" class="row">
+</div>
+</div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['provmail.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+
+
+
+
+
+
+                  
+                 
+
+                  
+<window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$provmail');
+  binder.command('doLoad');
+});
+</script>
+</zk>

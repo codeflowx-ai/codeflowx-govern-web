@@ -1,0 +1,184 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="poppropiedad" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='poppropiedad')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="poppropiedad" />
+	  
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="FJohptwpXK" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="FJohptwpXK-row" class="row">
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOMBRE'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="616903" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.unique, field='NOMBRE',required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['616903'])"/>
+    </h:div>   
+
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal text-danger" style="" value="@load(vm.lang.getProperty('TIPO.label', 'Tipo'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="border-warning" id="TIPO" model="@load(vm.getEnums('TIPO'))" 
+selectedItem="@load(vm.beanData.tipo)"  value="@load(vm.beanData.tipo) @save(vm.beanData.tipo, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.bean.getFieldByAtribute('TIPO').value )">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['TIPO'])"/>
+</h:div>
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('MAPPEAR'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MAPPEAR.label', 'Atributo asociado'))"  />
+	   </hbox>
+	   <textbox   tabindex="3" id="294537" 
+	   placeholder="@load(vm.lang.getProperty('MAPPEAR.label', 'Atributo asociado'))" 
+	   value="@bind(vm.beanData.mappear) @save(vm.beanData.mappear, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.mappear)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('MAPPEAR'))" disabled="@load(vm.isEditable('MAPPEAR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['294537'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('IDPROVEEDOR'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'IDProveedor'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="4" id="81712" 
+	   placeholder="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'IDProveedor'))" 
+	   value="@bind(vm.beanData.idproveedor) @save(vm.beanData.idproveedor, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('IDPROVEEDOR'))" disabled="@load(vm.isEditable('IDPROVEEDOR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['81712'])"/>
+    </h:div>   
+
+
+
+
+<h:div class="col-md-12 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmktprovmail.label', 'Proveedor'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_PEJDUqXJGL" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmktprovmail" placeholder="@load(vm.lang.getProperty('idmktprovmail').label,'Proveedor')" model="@bind(vm.foreings['idmktprovmail'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmktprovmail',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idmktprovmail)"  onCreate="@command('onCreateCombo',component=self,alias='idmktprovmail')" value="@bind(vm.beanData.idmktprovmail .nombre)@save(vm.beanData.idmktprovmail.nombre, before=('grabar')) @validator(vm.validator,required=true)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmktprovmail'])"/>
+   <popup id="pop_PEJDUqXJGL" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmktprovmail.helptext', 'idmktprovmail'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['poppropiedad.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$poppropiedad');
+  binder.command('doLoad');
+});
+function loadpoppropiedad(){
+  var binder = zkbind.$('$poppropiedad');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

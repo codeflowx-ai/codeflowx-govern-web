@@ -1,0 +1,87 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PROJECT.label', 'Proyecto'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROJECTAsc'])" sortDescending="@load(vm.comparators['PROJECTDesc'])"  visible="@load(vm.isVisible('PROJECT'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ALTAAsc'])" sortDescending="@load(vm.comparators['ALTADesc'])"  visible="@load(vm.isVisible('ALTA'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('REFERENCIA.label', 'Referencia'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['REFERENCIAAsc'])" sortDescending="@load(vm.comparators['REFERENCIADesc'])"  visible="@load(vm.isVisible('REFERENCIA'))"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Estados.label', 'Estados'))" align="center"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('TOTUSER.label', 'Total Usuarios'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TOTUSERAsc'])" sortDescending="@load(vm.comparators['TOTUSERDesc'])"  visible="@load(vm.isVisible('TOTUSER'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('TOTCUSTOMERS.label', 'Total Customers'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TOTCUSTOMERSAsc'])" sortDescending="@load(vm.comparators['TOTCUSTOMERSDesc'])"  visible="@load(vm.isVisible('TOTCUSTOMERS'))"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('K8s Cloud.label', 'K8s Cloud'))" align="center"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterproject.zul')">
+							             <label  value="@load(item.project) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.referencia) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+                                   <cell align="center">
+                                              <label style="font-size:12px;" sclass="@load(vm.concat('fw-bolder badge rounded-pill ',item.idatlestados.bgcolor))" value="@load(item.idatlestados.estado) @converter(vm.fieldConverter)"></label>   
+                                   </cell> 
+							             <label  value="@load(item.totuser) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.totcustomers) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+                                   <cell align="center">
+                                          <label  value="@load(item.idatlkubecloud.cluster) @converter(vm.fieldConverter)"></label>
+                                   </cell> 
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masterproject.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

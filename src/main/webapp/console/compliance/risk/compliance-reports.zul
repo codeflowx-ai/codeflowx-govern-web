@@ -1,0 +1,156 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+    
+    <idspace viewModel="@id('vm') @init('com.suinsit.compliance.web.ComplianceReportsUI')">
+        <custom-attributes namespace="compliance" />
+        
+        <div class="container-fluid">
+            <!-- Filtros -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <h:label>Sector</h:label>
+                        <combobox model="@load(vm.sectors)" 
+                                 selectedItem="@bind(vm.selectedSector)"
+                                 onSelect="@command('onSectorSelect')"
+                                 class="form-control">
+                            <template name="model">
+                                <comboitem label="@load(each.name)" />
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <h:label>Periodo</h:label>
+                        <combobox model="@load(vm.periods)" 
+                                 selectedItem="@bind(vm.selectedPeriod)"
+                                 onSelect="@command('refreshData')"
+                                 class="form-control">
+                            <template name="model">
+                                <comboitem label="@load(each)" />
+                            </template>
+                        </combobox>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <h:button class="btn btn-primary mt-4" 
+                             onClick="@command('refreshData')">
+                        Actualizar
+                    </h:button>
+                    <h:button class="btn btn-secondary mt-4" 
+                             onClick="@command('exportReport')">
+                        Exportar
+                    </h:button>
+                </div>
+            </div>
+
+            <!-- KPIs -->
+            <div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h5 class="card-title">Tasa de Cumplimiento</h5>
+                <h2 class="card-text">@load(vm.summaryStats.avgScore)%</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <h5 class="card-title">Empresas Evaluadas</h5>
+                <h2 class="card-text">@load(vm.summaryStats.totalCompanies)</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <h5 class="card-title">Formularios Activos</h5>
+                <h2 class="card-text">@load(vm.summaryStats.totalForms)</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <h5 class="card-title">Respuestas Pendientes</h5>
+                <h2 class="card-text">@load(vm.summaryStats.evidenceRequired)</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- Gráficos -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Cumplimiento por Sector</h5>
+                            <charts id="sectorChart" 
+                                   type="column"
+                                   model="@load(vm.sectorComplianceModel)"
+                                   height="300px"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Tendencia de Respuestas</h5>
+                            <charts id="trendChart" 
+                                   type="line"
+                                   model="@load(vm.answerTrendModel)"
+                                   height="300px"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabla de Resumen -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Resumen por Formulario</h5>
+                            <grid model="@load(vm.formStats)" 
+                                  mold="paging" 
+                                  pageSize="10">
+                                <columns>
+                                    <column label="Formulario" />
+                                    <column label="Sector" />
+                                    <column label="Empresas" align="center"/>
+                                    <column label="Cumplimiento" align="center"/>
+                                    <column label="Preguntas" align="center"/>
+                                    <column label="Evidencias" align="center"/>
+                                    <column label="Última Actividad" align="center"/>
+                                </columns>
+                                <template name="model" var="stat">
+                                    <row>
+                                        <cell>${stat.formTitle}</cell>
+                                        <cell>${stat.sectorName}</cell>
+                                        <cell>${stat.totalCompanies}</cell>
+                                        <cell>
+                                            <label sclass="${stat.avgScore >= 80 ? 'badge badge-success' : 
+                                                          stat.avgScore >= 60 ? 'badge badge-warning' : 
+                                                          'badge badge-danger'}">
+                                                ${stat.avgScore}%
+                                            </label>
+                                        </cell>
+                                        <cell>${stat.totalQuestions}</cell>
+                                        <cell>${stat.approvedAnswers}/${stat.totalAnswers}</cell>
+                                        <cell>${stat.formattedLastActivity}</cell>
+                                    </row>
+                                </template>
+                            </grid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>

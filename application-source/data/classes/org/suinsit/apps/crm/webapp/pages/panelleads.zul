@@ -1,0 +1,26 @@
+<panel border="normal" hflex="1" sclass="kanbantask">
+            <toolbar align="end">
+             
+			<toolbarbutton 
+				iconSclass="icon-pencil7" sclass="btn-outline-secondary"
+				d:data-bs-toggle="modal"  onClick="@command('onEdit',parent=self.parent.parent,popup=modalDialog)"/>
+			<toolbarbutton 
+				iconSclass="icon-trash" sclass="btn-outline-warning" onClick="@command('onRemove',parent=self.parent.parent)"/>
+		
+</toolbar>
+	   <custom-attributes value="${item2}" scope="component"/>
+	   <custom-attributes estado="${item1}" scope="component"/>
+		<panelchildren >
+			<div class="row">
+	     <div class="col-md-auto">
+	        <html content="@load(item.getFieldByAtribute('DESCRIPCION').value)"></html>
+	      </div>  
+		       <h:div class="col-md-auto">
+           <hbox spacing="3px">
+	          <label sclass="fs-6 text-capitalize" value="@load(vm.lang.getProperty('FECTSTART.label', 'Fecha prevista'))"/>
+	         </hbox>
+	        <label  value="@load(item2.data.getFieldByAtribute('FECTSTART').value) @converter(vm.fieldConverter)"></label>
+	        </h:div>
+			</div>
+		</panelchildren>
+	</panel>

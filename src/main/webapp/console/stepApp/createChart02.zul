@@ -1,0 +1,34 @@
+<zk xmlns:h="native">
+	<div class="card">
+		<div class="card-body">
+			<div sclass="row">
+				<div sclass="col-md-6">
+					<radiogroup id="sv1"
+						onCheck="@command('selectChart',item=self.selectedItem.value) " />
+				</div>
+			</div>
+			<div sclass="row">
+				<forEach items="@init(vm.charts)" var="item">
+					<div sclass="col-lg-2">
+						<vbox spacing="2px" align="center">
+							<image src="${item.image}"
+								style="object-fit: cover;" width="180px" height="95px">
+							</image>
+							<radio label="${item.label}"
+								class="text-indigo font-weight-bold font-size-lg text-uppercase"
+								radiogroup="sv1" value="${item}" checked="@load(vm.charBean.label eq item.label)"/>
+						</vbox>
+					</div>
+				</forEach>
+			</div>
+		</div>
+		<div class="card-footer">
+		<button zclass="pull-left"
+								sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill" onClick="@command('back')" iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" label="Anterior" />
+					<button zclass="pull-right" sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"  onClick="@command('nextConfig')" label="Siguiente" />
+		
+			
+		</div>
+	</div>
+</zk>
+

@@ -1,0 +1,536 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="popcompaia" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',env='preview',pagina='popcompaia')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popcompaia" />
+<custom-attributes clase="org.suinsit.apps.facturacin.Erpempresa" />
+	   <custom-attributes namespace="facturacin" />
+	   <custom-attributes enviroment="preview" />
+	        <custom-attributes uid="94920" />
+	   <custom-attributes tipo="MASTER" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="GNNrfCbPPh" style="overflow:auto;" class=" col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="GNNrfCbPPh-row" class="row">
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOMBRE'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre Compañia'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="zsDRdYbAze" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre Compañia'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.unique, field='NOMBRE',required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['zsDRdYbAze'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('CIF'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CIF.label', 'CIF/IVA'))"  />
+	   </hbox>
+	   <textbox   tabindex="2" id="LrlPIjIqGV" 
+	   placeholder="@load(vm.lang.getProperty('CIF.label', 'CIF/IVA'))" 
+	   value="@bind(vm.beanData.cif) @save(vm.beanData.cif, before=('grabar')) @validator(vm.unique, field='CIF',required=true ,oldValue=vm.beanDataCpy.cif)"  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('CIF'))" disabled="@load(vm.isEditable('CIF')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['LrlPIjIqGV'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('DIRECCION'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DIRECCION.label', 'Dirección'))"  />
+	   </hbox>
+	   <textbox   tabindex="3" id="OKpQXJiiwj" 
+	   placeholder="@load(vm.lang.getProperty('DIRECCION.label', 'Dirección'))" 
+	   value="@bind(vm.beanData.direccion) @save(vm.beanData.direccion, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.direccion)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('DIRECCION'))" disabled="@load(vm.isEditable('DIRECCION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['OKpQXJiiwj'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmpais.label', 'Pais'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_orJwHdLpfE" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmpais" placeholder="@load(vm.lang.getProperty('idmpais').label,'Pais')" model="@bind(vm.foreings['idmpais'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmpais',item=self.selectedItem.value,changefk='idmprovincia',updatebean='true')"  		selectedItem="@load(vm.beanData.idmpais)"  onCreate="@command('onCreateCombo',component=self,alias='idmpais')" value="@bind(vm.beanData.idmpais .nombre)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmpais'])"/>
+   <popup id="pop_orJwHdLpfE" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmpais.helptext', 'idmpais'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+<h:div class="col-md-6 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmprovincia.label', 'Provincia'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_jwMwvJXXNI" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmprovincia" placeholder="@load(vm.lang.getProperty('idmprovincia').label,'Provincia')" model="@bind(vm.foreings['idmprovincia'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmprovincia',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmprovincia)"  onCreate="@command('onCreateCombo',component=self,alias='idmprovincia',loadFkFrom='idmpais')" value="@bind(vm.beanData.idmprovincia .provincia)" disabled="@bind(vm.beanData.idmpais.idx eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.provincia)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmprovincia'])"/>
+   <popup id="pop_jwMwvJXXNI" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmprovincia.helptext', 'idmprovincia'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('CIUDAD'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CIUDAD.label', 'Ciudad'))"  />
+	   </hbox>
+	   <textbox   tabindex="6" id="956124" 
+	   placeholder="@load(vm.lang.getProperty('CIUDAD.label', 'Ciudad'))" 
+	   value="@bind(vm.beanData.ciudad) @save(vm.beanData.ciudad, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.ciudad)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('CIUDAD'))" disabled="@load(vm.isEditable('CIUDAD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['956124'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('CODPOSTAL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CODPOSTAL.label', 'Cod. Postal'))"  />
+	   </hbox>
+	   <textbox   tabindex="7" id="821793" 
+	   placeholder="@load(vm.lang.getProperty('CODPOSTAL.label', 'Cod. Postal'))" 
+	   value="@bind(vm.beanData.codpostal) @save(vm.beanData.codpostal, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.codpostal)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('CODPOSTAL'))" disabled="@load(vm.isEditable('CODPOSTAL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['821793'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('RESIDENTE.label', 'Residente'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="RESIDENTE" model="@load(vm.getEnums('RESIDENTE'))" 
+selectedItem="@load(vm.beanData.residente)"  value="@load(vm.beanData.residente) @save(vm.beanData.residente, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['RESIDENTE'])"/>
+</h:div>
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('SITIOWEB'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SITIOWEB.label', 'Sitio web'))"  />
+	   </hbox>
+	   <textbox   tabindex="9" id="451050" 
+	   placeholder="@load(vm.lang.getProperty('SITIOWEB.label', 'sitioweb'))" 
+	   value="@bind(vm.beanData.sitioweb) @save(vm.beanData.sitioweb, before=('grabar')) @validator(vm.validator,type='URL' ,oldValue=vm.beanDataCpy.sitioweb)"  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('SITIOWEB'))" disabled="@load(vm.isEditable('SITIOWEB')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['451050'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('EMAIL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('EMAIL.label', 'Email'))"  />
+	   </hbox>
+	   <textbox   tabindex="10" id="754362" 
+	   placeholder="@load(vm.lang.getProperty('EMAIL.label', 'Email'))" 
+	   value="@bind(vm.beanData.email) @save(vm.beanData.email, before=('grabar')) @validator(vm.validator,required=true ,type='EMAIL' ,oldValue=vm.beanDataCpy.email)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('EMAIL'))" disabled="@load(vm.isEditable('EMAIL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['754362'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('TELEFONO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('TELEFONO.label', 'Teléfono'))"  />
+	   </hbox>
+	   <textbox   tabindex="11" id="WreVKiMMeK" 
+	   placeholder="@load(vm.lang.getProperty('TELEFONO.label', 'telefono'))" 
+	   value="@bind(vm.beanData.telefono) @save(vm.beanData.telefono, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('TELEFONO'))" disabled="@load(vm.isEditable('TELEFONO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['WreVKiMMeK'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('MOVIL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MOVIL.label', 'Movil'))"  />
+	   </hbox>
+	   <textbox   tabindex="12" id="487977" 
+	   placeholder="@load(vm.lang.getProperty('MOVIL.label', 'movil'))" 
+	   value="@bind(vm.beanData.movil) @save(vm.beanData.movil, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('MOVIL'))" disabled="@load(vm.isEditable('MOVIL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['487977'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('REGISTRO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('REGISTRO.label', 'Registro'))"  />
+	   </hbox>
+	   <textbox   tabindex="13" id="936422" 
+	   placeholder="@load(vm.lang.getProperty('REGISTRO.label', 'Registro'))" 
+	   value="@bind(vm.beanData.registro) @save(vm.beanData.registro, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('REGISTRO'))" disabled="@load(vm.isEditable('REGISTRO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['936422'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('SHEET'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SHEET.label', 'Hoja'))"  />
+	   </hbox>
+	   <textbox   tabindex="14" id="EOOVQnmwqf" 
+	   placeholder="@load(vm.lang.getProperty('SHEET.label', 'Hoja'))" 
+	   value="@bind(vm.beanData.sheet) @save(vm.beanData.sheet, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('SHEET'))" disabled="@load(vm.isEditable('SHEET')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['EOOVQnmwqf'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('FOLIO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('FOLIO.label', 'Folio'))"  />
+	   </hbox>
+	   <textbox   tabindex="15" id="962732" 
+	   placeholder="@load(vm.lang.getProperty('FOLIO.label', 'Folio'))" 
+	   value="@bind(vm.beanData.folio) @save(vm.beanData.folio, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('FOLIO'))" disabled="@load(vm.isEditable('FOLIO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['962732'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-6 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('VOLUMEN'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VOLUMEN.label', 'Volumen'))"  />
+	   </hbox>
+	   <textbox   tabindex="16" id="863801" 
+	   placeholder="@load(vm.lang.getProperty('VOLUMEN.label', 'Volumen'))" 
+	   value="@bind(vm.beanData.volumen) @save(vm.beanData.volumen, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('VOLUMEN'))" disabled="@load(vm.isEditable('VOLUMEN')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['863801'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('RETENCION'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('RETENCION.label', 'Retención IRPF'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_RETENCION" />
+	   </hbox>
+	      <decimalbox   tabindex="17" id="dFQFbJPcLg"  placeholder="@load(vm.lang.getProperty('RETENCION.label', 'Retención IRPF'))"  value="@bind(vm.beanData.retencion) @save(vm.beanData.retencion, before=('grabar')) "  format="###,###,##0.00" sclass="margin-field form-control  form-control" visible="@load(vm.isVisible('RETENCION'))" disabled="@load(vm.isEditable('RETENCION')?false:true)" onChange="@command('onChangeInput',field='RETENCION',evento=event,componente=self,calculate=true)" />
+           <label sclass="text-danger" value="@load(vmsgs['dFQFbJPcLg'])"/>   
+    </h:div>
+
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('RECARGO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('RECARGO.label', 'Recargo Equivalencia'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_RECARGO" />
+	   </hbox>
+	      <decimalbox   tabindex="18" id="vqXDxJOLwN"  placeholder="@load(vm.lang.getProperty('RECARGO.label', 'Recargo Equivalencia'))"  value="@bind(vm.beanData.recargo) @save(vm.beanData.recargo, before=('grabar')) "  format="###,###,##0.00" sclass="margin-field form-control  form-control" visible="@load(vm.isVisible('RECARGO'))" disabled="@load(vm.isEditable('RECARGO')?false:true)" onChange="@command('onChangeInput',field='RECARGO',evento=event,componente=self,calculate=true)" />
+           <label sclass="text-danger" value="@load(vmsgs['vqXDxJOLwN'])"/>   
+    </h:div>
+
+
+
+
+</div>
+</div>  
+<div id="qwGlJxfovr" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="qwGlJxfovr-row" class="row">
+
+<h:div class="col-md-12">
+<hbox spacing="3px">
+	    <label value="@load(vm.lang['LOGTIPO.label'])"/>
+</hbox>
+
+      <h:div class="image-cropper-container" style="width:100%;  height:100%;" >
+     <image id="LOGTIPO" sclass="image-download" content="@load(vm.loadImage('LOGTIPO'))" width="100%" height="100%"/>
+   </h:div>
+     <dropupload maxsize="2048" detection="browser" anchor="${LOGTIPO}" content="Drag your image here (max 2048KB)"
+	 onUpload="@command('onUploadImagen', file=event.media,field='LOGTIPO')" />
+   
+ 
+
+</h:div>
+
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+							       <button
+									iconSclass="mdi mdi-alpha-h-circle-outline me-1 align-bottom"
+									  class="btn btn-light add-btn" 
+									 onClick="WIN_HELP.setVisible(true)">
+									 Ayuda
+								</button>
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" disabled="true">
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " disabled="false">
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" disabled="true">
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['popcompañia.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                  
+                 
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+                               <html content="@load(vm.helpBean.texto)"/>
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$popcompaia');
+  binder.command('doLoad');
+});
+function loadpopcompaia(){
+  var binder = zkbind.$('$popcompaia');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

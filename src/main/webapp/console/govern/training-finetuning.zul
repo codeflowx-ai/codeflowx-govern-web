@@ -1,0 +1,293 @@
+<?page title="Training & Fine-tuning" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.training.TrainingFinetuningVM')">
+        
+        <!-- Training Overview -->
+        <hlayout sclass="training-header">
+            <div sclass="metric-box">
+                <label value="Active Training Jobs"/>
+                <label value="@load(vm.activeJobs)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Models Fine-tuned"/>
+                <label value="@load(vm.fineTunedModels)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Average Performance Gain"/>
+                <label value="@load(vm.avgPerformanceGain)%"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Dataset Quality"/>
+                <label value="@load(vm.datasetQuality)%" 
+                       sclass="@load(vm.datasetQualityStyle)"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Dataset Management"/>
+                <tab label="Training Jobs"/>
+                <tab label="Model Evaluation"/>
+                <tab label="Fine-tuning Results"/>
+            </tabs>
+            <tabpanels>
+                <!-- Dataset Management Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Dataset Upload -->
+                        <groupbox title="Dataset Upload">
+                            <vlayout>
+                                <button label="Upload Dataset" 
+                                        upload="true,maxsize=100000"
+                                        onUpload="@command('uploadDataset')"/>
+                                <button label="Import from Source" 
+                                        onClick="@command('showImportDialog')"/>
+                            </vlayout>
+                        </groupbox>
+
+                        <!-- Datasets Grid -->
+                        <grid model="@load(vm.datasets)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Dataset Name"/>
+                                <column label="Type"/>
+                                <column label="Size"/>
+                                <column label="Quality Score"/>
+                                <column label="Status"/>
+                                <column label="Last Validated"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="dataset">
+                                <row>
+                                    <label value="@load(dataset.name)"/>
+                                    <label value="@load(dataset.type)"/>
+                                    <label value="@load(dataset.size)"/>
+                                    <label value="@load(dataset.qualityScore)%" 
+                                           sclass="@load(dataset.qualityScoreStyle)"/>
+                                    <label value="@load(dataset.status)" 
+                                           sclass="@load(dataset.statusStyle)"/>
+                                    <label value="@load(dataset.lastValidated)"/>
+                                    <hlayout>
+                                        <button label="Validate" 
+                                                onClick="@command('validateDataset', dataset=dataset)"/>
+                                        <button label="Analyze" 
+                                                onClick="@command('analyzeDataset', dataset=dataset)"/>
+                                        <button label="Preview" 
+                                                onClick="@command('previewDataset', dataset=dataset)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Training Jobs Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Job Controls -->
+                        <hlayout>
+                            <button label="New Training Job" 
+                                    onClick="@command('createTrainingJob')"/>
+                            <button label="Schedule Job" 
+                                    onClick="@command('scheduleJob')"/>
+                        </hlayout>
+
+                        <!-- Training Jobs Grid -->
+                        <grid model="@load(vm.trainingJobs)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Job ID"/>
+                                <column label="Model"/>
+                                <column label="Dataset"/>
+                                <column label="Status"/>
+                                <column label="Progress"/>
+                                <column label="Metrics"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="job">
+                                <row>
+                                    <label value="@load(job.id)"/>
+                                    <label value="@load(job.modelName)"/>
+                                    <label value="@load(job.datasetName)"/>
+                                    <label value="@load(job.status)" 
+                                           sclass="@load(job.statusStyle)"/>
+                                    <vlayout>
+                                        <progressmeter value="@load(job.progress)"/>
+                                        <label value="@load(job.progressText)"/>
+                                    </vlayout>
+                                    <vlayout>
+                                        <label value="Loss: @load(job.metrics.loss)"/>
+                                        <label value="Accuracy: @load(job.metrics.accuracy)%"/>
+                                    </vlayout>
+                                    <hlayout>
+                                        <button label="Monitor" 
+                                                onClick="@command('monitorJob', job=job)"/>
+                                        <button label="Stop" visible="@load(job.canStop)"
+                                                onClick="@command('stopJob', job=job)"/>
+                                        <button label="Logs" 
+                                                onClick="@command('viewJobLogs', job=job)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Training Metrics Charts -->
+                        <hlayout>
+                            <charts id="trainingProgressChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Training Progress"
+                                   model="@load(vm.trainingProgressData)"/>
+                            
+                            <charts id="lossChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Loss Curves"
+                                   model="@load(vm.lossCurvesData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Model Evaluation Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Model Selection -->
+                        <hlayout>
+                            <combobox model="@load(vm.fineTunedModels)" 
+                                     selectedItem="@bind(vm.selectedModel)"
+                                     onChange="@command('loadModelEvaluation')"/>
+                            <button label="Compare Models" 
+                                    onClick="@command('compareModels')"/>
+                        </hlayout>
+
+                        <!-- Evaluation Metrics -->
+                        <grid model="@load(vm.evaluationMetrics)" 
+                              visible="@load(not empty vm.selectedModel)">
+                            <columns>
+                                <column label="Metric"/>
+                                <column label="Base Model"/>
+                                <column label="Fine-tuned Model"/>
+                                <column label="Improvement"/>
+                                <column label="Status"/>
+                            </columns>
+                            <template name="model" var="metric">
+                                <row>
+                                    <label value="@load(metric.name)"/>
+                                    <label value="@load(metric.baseValue)"/>
+                                    <label value="@load(metric.fineTunedValue)"/>
+                                    <label value="@load(metric.improvement)" 
+                                           sclass="@load(metric.improvementStyle)"/>
+                                    <label value="@load(metric.status)" 
+                                           sclass="@load(metric.statusStyle)"/>
+                                </row>
+                            </template>
+                        </grid>
+
+                        <!-- Performance Visualization -->
+                        <hlayout>
+                            <charts id="performanceComparisonChart" 
+                                   type="radar"
+                                   height="400px"
+                                   title="Performance Comparison"
+                                   model="@load(vm.performanceComparisonData)"/>
+                            
+                            <charts id="confusionMatrixChart" 
+                                   type="heatmap"
+                                   height="400px"
+                                   title="Confusion Matrix"
+                                   model="@load(vm.confusionMatrixData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Fine-tuning Results Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Results Summary -->
+                        <hlayout>
+                            <charts id="resultsOverviewChart" 
+                                   type="column"
+                                   height="300px"
+                                   title="Fine-tuning Results Overview"
+                                   model="@load(vm.resultsOverviewData)"/>
+                            
+                            <charts id="modelComparisonChart" 
+                                   type="scatter"
+                                   height="300px"
+                                   title="Model Comparison"
+                                   model="@load(vm.modelComparisonData)"/>
+                        </hlayout>
+
+                        <!-- Detailed Results -->
+                        <grid model="@load(vm.fineTuningResults)">
+                            <columns>
+                                <column label="Model Version"/>
+                                <column label="Training Date"/>
+                                <column label="Dataset Used"/>
+                                <column label="Performance Metrics"/>
+                                <column label="Resource Usage"/>
+                                <column label="Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="result">
+                                <row>
+                                    <label value="@load(result.modelVersion)"/>
+                                    <label value="@load(result.trainingDate)"/>
+                                    <label value="@load(result.datasetName)"/>
+                                    <vlayout>
+                                        <label value="Accuracy: @load(result.metrics.accuracy)%"/>
+                                        <label value="F1 Score: @load(result.metrics.f1Score)"/>
+                                    </vlayout>
+                                    <vlayout>
+                                        <label value="GPU Hours: @load(result.resources.gpuHours)"/>
+                                        <label value="Cost: $@load(result.resources.cost)"/>
+                                    </vlayout>
+                                    <label value="@load(result.status)" 
+                                           sclass="@load(result.statusStyle)"/>
+                                    <hlayout>
+                                        <button label="Deploy" 
+                                                onClick="@command('deployModel', result=result)"/>
+                                        <button label="Export" 
+                                                onClick="@command('exportResults', result=result)"/>
+                                        <button label="Compare" 
+                                                onClick="@command('compareResults', result=result)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="datasetPreviewWindow" 
+                title="Dataset Preview" 
+                visible="false" 
+                mode="modal"
+                width="80%"
+                height="600px">
+            <!-- Dataset Preview Content -->
+        </window>
+
+        <window id="jobMonitorWindow" 
+                title="Training Job Monitor" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="80%">
+            <!-- Job Monitor Content -->
+        </window>
+
+        <window id="modelComparisonWindow" 
+                title="Model Comparison" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="80%">
+            <!-- Model Comparison Content -->
+        </window>
+    </div>
+</zk>

@@ -1,0 +1,329 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="usuarios" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',env='preview',pagina='usuarios')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="usuarios" />
+<custom-attributes clase="org.suinsit.apps.admin.Ssousuario" />
+	   <custom-attributes namespace="admin" />
+	   <custom-attributes enviroment="preview" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="HIHSIqCxem" style="overflow:auto;" class=" col-lg-2 col-xlg-2 col-md-2"  visible="true" >
+<div id="HIHSIqCxem-row" class="row">
+
+<h:div class="col-md-12">
+<hbox spacing="3px">
+	    <label value="@load(vm.lang['AVATAR.label'])"/>
+</hbox>
+
+      <h:div class="image-cropper-container" style="width:100px;  height:100px;" >
+     <image id="AVATAR" sclass="image-download" content="@load(vm.loadImage('AVATAR'))" width="100%" height="100%"/>
+   </h:div>
+     <dropupload maxsize="1024" detection="browser" anchor="${AVATAR}" content="Drag your image here (max 1024KB)"
+	 onUpload="@command('onUploadImagen', file=event.media,field='AVATAR')" />
+   
+ 
+
+</h:div>
+
+
+
+
+</div>
+</div>  <div id="yFJwzgjESB"   visible="true"  class="col-lg-5 col-xlg-5 col-md-5">
+  <div id="yFJwzgjESB-card" class="card  shadow-lg" style="overflow:auto;" >
+       <div id="yFJwzgjESB-body" class="card-body ">
+        <div id="yFJwzgjESB-row" class="form-group row ">
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('USUARIO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('USUARIO.label', 'Usuario'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="905384" 
+	   placeholder="@load(vm.lang.getProperty('USUARIO.label', 'Usuario'))" 
+	   value="@bind(vm.beanData.usuario) @save(vm.beanData.usuario, before=('grabar')) @validator(vm.unique, field='USUARIO',required=true ,oldValue=vm.beanDataCpy.usuario)"  sclass="margin-field form-control  form-control    border-danger" 
+	   visible="@load(vm.isVisible('USUARIO'))" disabled="@load(vm.isEditable('USUARIO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['905384'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+      <h:div class="col-md-12 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('PASSWORD'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('PASSWORD.label', 'password'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_PASSWORD" />
+	   </hbox>
+       <textbox   tabindex="2" type="password"  id="36683" placeholder="@load(vm.lang.getProperty('PASSWORD.label', 'password'))" value="@bind(vm.beanData.password) @save(vm.beanData.password, before=('grabar')) "  sclass="margin-field form-control  form-control form-control-sm       border-danger" visible="@load(vm.isVisible('PASSWORD'))" disabled="@load(vm.isEditable('PASSWORD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['36683'])"/>
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('EMAIL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('EMAIL.label', 'Email'))"  />
+	   </hbox>
+	   <textbox   tabindex="3" id="688462" 
+	   placeholder="@load(vm.lang.getProperty('EMAIL.label', 'Email'))" 
+	   value="@bind(vm.beanData.email) @save(vm.beanData.email, before=('grabar')) @validator(vm.unique, field='EMAIL',required=true ,oldValue=vm.beanDataCpy.email)"  sclass="margin-field form-control  form-control    border-danger" 
+	   visible="@load(vm.isVisible('EMAIL'))" disabled="@load(vm.isEditable('EMAIL')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['688462'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOMBRE'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('NOMBRE.label', 'nombre'))"  />
+	   </hbox>
+	   <textbox   tabindex="4" id="996576" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="margin-field form-control  form-control    border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['996576'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('APELLIDOS'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('APELLIDOS.label', 'apellidos'))"  />
+	   </hbox>
+	   <textbox   tabindex="5" id="433831" 
+	   placeholder="@load(vm.lang.getProperty('APELLIDOS.label', 'apellidos'))" 
+	   value="@bind(vm.beanData.apellidos) @save(vm.beanData.apellidos, before=('grabar')) "  sclass="margin-field form-control  form-control   " 
+	   visible="@load(vm.isVisible('APELLIDOS'))" disabled="@load(vm.isEditable('APELLIDOS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['433831'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('TIPOUSUARIO.label', 'Tipo de Usuario'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="TIPOUSUARIO" model="@load(vm.getEnums('TIPOUSUARIO'))" 
+selectedItem="@load(vm.beanData.tipousuario)"  value="@load(vm.beanData.tipousuario) @save(vm.beanData.tipousuario, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['TIPOUSUARIO'])"/>
+</h:div>
+
+
+
+
+
+				
+
+
+    <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ALTA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('ALTA.label', 'Fecha Alta'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_ALTA" />
+	   </hbox>
+	      <datebox  readonly="true"   buttonVisible="false"  id="MquMSWDUfd"  placeholder="@load(vm.lang.getProperty('ALTA.label', 'Fecha Alta'))" tabindex="7" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('ALTA'))" disabled="@load(vm.isEditable('ALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['MquMSWDUfd'])"/>   
+    
+      </h:div>
+
+
+
+
+
+
+ <h:div class="col-md-12 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('LOCKED'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('LOCKED.label', 'Usuario Bloqueado'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="eYGYqEanXm" value="@bind(vm.beanData.locked) @save(vm.beanData.locked, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('LOCKED'))" disabled="@load(vm.isEditable('LOCKED')?false:true)" checked="@bind(vm.beanData.locked) @save(vm.beanData.locked, before=('grabar'))"/>
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+<div id="mdMXJgwPUe"   visible="true"  class="col-lg-5 col-xlg-5 col-md-5">
+  <div id="mdMXJgwPUe-card" class="card  shadow-xl" style="overflow:auto;" >
+       <div id="mdMXJgwPUe-body" class="card-body ">
+        <div id="mdMXJgwPUe-row" class="form-group row ">
+
+<div class="col-md-6">
+ <h:div class="col-md-6">
+ <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="Roles"  />
+   
+    </h:div>
+   
+
+<listbox  checkmark="true"  model="@load(vm.foreings['idssorol'])" height="300px" onCreate="@command('onSubtableCreate',alias='subssoruserol',loadOnDemand='true')" ><listhead><listheader label="rol"></listheader></listhead> <template name="model" var="item"><listitem value="@load(item)"><listcell label="@load(item.rol)"></listcell></listitem></template></listbox>
+</div>
+
+
+
+<div class="col-md-6">
+ <h:div class="col-md-6">
+ <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="Aplicaciones"  />
+   
+    </h:div>
+   
+
+<listbox  checkmark="true"  model="@load(vm.foreings['idssoaplicacion'])" height="300px" onCreate="@command('onSubtableCreate',alias='subssoruserapp',loadOnDemand='true')" ><listhead><listheader label=""></listheader></listhead> <template name="model" var="item"><listitem value="@load(item)"><listcell label="@load(item.aplicacion)"></listcell></listitem></template></listbox>
+</div>
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+<div id="mifTIFhBpc" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="mifTIFhBpc-row" class="row">
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" disabled="true">
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " disabled="false">
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" disabled="true">
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['Usuarios.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+                  
+                 
+
+
+
+
+
+
+
+
+
+                  
+                 
+
+
+
+                  
+                 
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$usuarios');
+  binder.command('doLoad');
+});
+function loadusuarios(){
+  var binder = zkbind.$('$usuarios');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

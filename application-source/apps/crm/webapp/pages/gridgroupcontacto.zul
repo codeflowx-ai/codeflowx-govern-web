@@ -1,0 +1,49 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('NOMBRE.label', 'nombre'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('APELLIDOS.label', 'apellidos'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['APELLIDOSAsc'])" sortDescending="@load(vm.comparators['APELLIDOSDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('DEPARTAMENTO.label', 'Departamento'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DEPARTAMENTOAsc'])" sortDescending="@load(vm.comparators['DEPARTAMENTODesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('EMPRESA.label', 'Empresa'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['EMPRESAAsc'])" sortDescending="@load(vm.comparators['EMPRESADesc'])"/>
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('NOMBRE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('APELLIDOS').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('DEPARTAMENTO').value) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.getFieldByAtribute('empresa').value) @converter(vm.fieldConverter)"></label>
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='mastercontacto.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

@@ -1,0 +1,98 @@
+logging:
+ root: ${ROOT_LOG}
+s3:
+ accessKey: ${S3_ACCESSKEY} 
+ secretkey: ${S3_SECRETKEY}
+ endpointurl: ${S3_ENDPOINT}
+ region: ${S3_REGION}
+ backet: ${S3_BUCKET}
+ 
+suinsit:
+  sts:
+   accessKey: E11ZBZTP0CIQBYXS2N2JWREW
+   secretKey: PMQKD0DQLTP7YFWFSN2XPEFV
+   host: https://api.rotadis.suinsitlabs.net
+   endpoints: 
+     validate: /security/tokens/validate
+     autorize: /security/authenticate/autorize
+     encode: /security/tokens/encode
+     decode: /security/tokens/decode
+     decrypt: /security/v1/cipher/decrypt
+     encrypt: /security/v1/cipher/encrypt
+  mail:
+   proveedor: mailjet
+   clave:
+     api: 65efe0802e4428cc1a8f20a1b9010a31
+     secret: 293e9c6fe6b556d38b0e8c09ac65f9e3
+   email:
+     support: soporte@suinsit.cloud
+     name: Soporte Suinsit      
+  application:
+     server:
+       host: ${SUINSIT_SERVER_HOST}
+     product: ${SUINSIT_PRODUCT}
+     name: ${SUINSIT_APPLICATION}
+     version: 1.0.0
+     customer:
+        name: ${SUINSIT_CUSTOMER_NAME}
+        uid:  ${SUINSIT_CUSTOMER_UID}
+        label: ${SUINSIT_CUSTOMER_LABEL}
+        namespace: ${SUINSIT_NAMESPACE}
+     platform:
+        architectures: ${SUINSIT_PLATFORM_ARCHITECTURES}
+        home: ${SUINSIT_PLATFORM_HOME}
+        projects: ${SUINSIT_PLATFORM_PROJECTS}
+        datasource:
+            url: ${SUINSIT_PLATFORM_BBDD_URL}
+            username: ${SUINSIT_PLATFORM_BBDD_USERNAME}
+            password: ${SUINSIT_BBDD_PLATFORM_PASSWORD}
+            password_repmng: ${SUINSIT_BBDD_PLATFORM_PASSWORD_REPMGR}
+            driver-class-name: org.postgresql.Driver
+            hikari:
+              auto-commit: true
+              connection-timeout: 100000
+              idle-timeout: 600000
+              max-lifetime: 900000
+              maximum-pool-size: 40
+              minimum-idle: 10
+              pool-name: SUINSIT_PLATFORM_DS_0
+              
+     pathHome : ${SUINSIT_HOME}
+     pathArchitecture: ${SUINSIT_SERVER_HOST}
+     pathStudio: ${SUINSIT_STUDIO}
+     pathRoot: ${SUINSIT_ROOT}
+     pathDeploy: ${SUNSIT_DEPLOY}
+     pathSource: ${SUINSIT_HOME}/data/sources
+     pathClasses: ${SUINSIT_HOME}/data/classes
+     pltaformHome: ${SUINSIT_PLATFORM_HOME}
+     pltaformProject: ${SUINSIT_PLATFORM_PROJECTS}
+     pltaformArchitectures: ${SUINSIT_PLATFORM_ARCHITECTURES}
+     enviroment: ${SUINSIT_ENVIROMENT}
+     mode: ${SUINSIT_MODE}     
+server:  
+  port: 8080
+spring:
+  datasource:
+    url: ${SUINSIT_BBDD_URL}
+    username: ${SUINSIT_BBDD_USERNAME}
+    password: ${SUINSIT_BBDD_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 100000
+      idle-timeout: 600000
+      max-lifetime: 90000
+      maximum-pool-size: 40
+      minimum-idle: 10
+      pool-name: SUINSIT_DS_0
+  cloud:
+   config:
+    enabled: false
+  codec:
+    max-in-memory-size: 25MB 
+  rabbitmq:
+    dynamic: true
+    host: ${AMQ_HOST}
+    port: ${AMQ_PORT}
+    username: ${AMQ_USER}
+    password: ${AMQ_PASSWORD}      

@@ -1,0 +1,218 @@
+<?page title="AI Compliance Registry" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.compliance.AIComplianceRegistryVM')">
+        
+        <!-- AI Systems Registry -->
+        <vlayout>
+            <hlayout sclass="header-actions">
+                <button label="Register New AI System" 
+                        onClick="@command('showRegistrationForm')"
+                        sclass="primary"/>
+                <button label="Import Registry" 
+                        onClick="@command('importRegistry')"/>
+                <button label="Export Report" 
+                        onClick="@command('exportComplianceReport')"/>
+            </hlayout>
+
+            <tabbox>
+                <tabs>
+                    <tab label="AI Systems"/>
+                    <tab label="Risk Assessments"/>
+                    <tab label="Documentation"/>
+                    <tab label="Compliance Status"/>
+                </tabs>
+                <tabpanels>
+                    <!-- AI Systems Panel -->
+                    <tabpanel>
+                        <listbox model="@load(vm.aiSystems)" 
+                                mold="paging" pageSize="10">
+                            <listhead>
+                                <listheader label="System Name"/>
+                                <listheader label="Risk Level"/>
+                                <listheader label="Purpose"/>
+                                <listheader label="Data Sources"/>
+                                <listheader label="Last Assessment"/>
+                                <listheader label="Compliance Status"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="system">
+                                <listitem>
+                                    <listcell label="@load(system.name)"/>
+                                    <listcell>
+                                        <label value="@load(system.riskLevel)" 
+                                               sclass="@load(system.riskLevelStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(system.purpose)"/>
+                                    <listcell label="@load(system.dataSources)"/>
+                                    <listcell label="@load(system.lastAssessment)"/>
+                                    <listcell>
+                                        <label value="@load(system.complianceStatus)" 
+                                               sclass="@load(system.complianceStatusStyle)"/>
+                                    </listcell>
+                                    <listcell>
+                                        <button label="Details" 
+                                                onClick="@command('showSystemDetails', system=system)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateSystem', system=system)"/>
+                                        <button label="Assessment" 
+                                                onClick="@command('startAssessment', system=system)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </tabpanel>
+
+                    <!-- Risk Assessments Panel -->
+                    <tabpanel>
+                        <grid model="@load(vm.riskAssessments)">
+                            <columns>
+                                <column label="Assessment Date"/>
+                                <column label="System"/>
+                                <column label="Risk Level"/>
+                                <column label="Key Findings"/>
+                                <column label="Mitigation Status"/>
+                                <column label="Next Review"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="assessment">
+                                <row>
+                                    <label value="@load(assessment.date)"/>
+                                    <label value="@load(assessment.systemName)"/>
+                                    <label value="@load(assessment.riskLevel)" 
+                                           sclass="@load(assessment.riskLevelStyle)"/>
+                                    <label value="@load(assessment.findings)"/>
+                                    <label value="@load(assessment.mitigationStatus)"/>
+                                    <label value="@load(assessment.nextReview)"/>
+                                    <hlayout>
+                                        <button label="View Report" 
+                                                onClick="@command('viewAssessmentReport', assessment=assessment)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateAssessment', assessment=assessment)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </tabpanel>
+
+                    <!-- Documentation Panel -->
+                    <tabpanel>
+                        <vlayout>
+                            <grid model="@load(vm.documentation)">
+                                <columns>
+                                    <column label="Document Type"/>
+                                    <column label="System"/>
+                                    <column label="Last Updated"/>
+                                    <column label="Status"/>
+                                    <column label="Verified By"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="doc">
+                                    <row>
+                                        <label value="@load(doc.type)"/>
+                                        <label value="@load(doc.systemName)"/>
+                                        <label value="@load(doc.lastUpdated)"/>
+                                        <label value="@load(doc.status)" 
+                                               sclass="@load(doc.statusStyle)"/>
+                                        <label value="@load(doc.verifiedBy)"/>
+                                        <hlayout>
+                                            <button label="View" 
+                                                    onClick="@command('viewDocument', doc=doc)"/>
+                                            <button label="Update" 
+                                                    onClick="@command('updateDocument', doc=doc)"/>
+                                            <button label="Export" 
+                                                    onClick="@command('exportDocument', doc=doc)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </vlayout>
+                    </tabpanel>
+                </tabpanels>
+            </tabbox>
+        </vlayout>
+
+        <!-- Modal Windows -->
+        <window id="systemRegistrationWindow" 
+                title="AI System Registration" 
+                visible="false" 
+                mode="modal"
+                width="80%"
+                height="80%">
+            <vlayout>
+                <!-- System Information -->
+                <groupbox title="Basic Information">
+                    <grid>
+                        <rows>
+                            <row>
+                                <label value="System Name"/>
+                                <textbox value="@bind(vm.newSystem.name)"/>
+                            </row>
+                            <row>
+                                <label value="Purpose"/>
+                                <textbox value="@bind(vm.newSystem.purpose)" 
+                                        rows="3"/>
+                            </row>
+                            <row>
+                                <label value="Risk Level"/>
+                                <combobox selectedItem="@bind(vm.newSystem.riskLevel)">
+                                    <comboitem label="High"/>
+                                    <comboitem label="Medium"/>
+                                    <comboitem label="Low"/>
+                                </combobox>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+
+                <!-- Data Sources -->
+                <groupbox title="Data Sources">
+                    <grid model="@load(vm.newSystem.dataSources)">
+                        <columns>
+                            <column label="Source"/>
+                            <column label="Type"/>
+                            <column label="Privacy Level"/>
+                            <column label="Actions"/>
+                        </columns>
+                        <template name="model" var="source">
+                            <row>
+                                <textbox value="@bind(source.name)"/>
+                                <combobox selectedItem="@bind(source.type)"/>
+                                <combobox selectedItem="@bind(source.privacyLevel)"/>
+                                <button label="Remove" 
+                                        onClick="@command('removeDataSource', source=source)"/>
+                            </row>
+                        </template>
+                    </grid>
+                    <button label="Add Data Source" 
+                            onClick="@command('addDataSource')"/>
+                </groupbox>
+
+                <!-- Compliance Questionnaire -->
+                <groupbox title="Compliance Questionnaire">
+                    <grid model="@load(vm.complianceQuestions)">
+                        <columns>
+                            <column label="Question"/>
+                            <column label="Response"/>
+                            <column label="Evidence"/>
+                        </columns>
+                        <template name="model" var="question">
+                            <row>
+                                <label value="@load(question.text)"/>
+                                <combobox selectedItem="@bind(question.response)"/>
+                                <textbox value="@bind(question.evidence)" 
+                                        rows="2"/>
+                            </row>
+                        </template>
+                    </grid>
+                </groupbox>
+
+                <hlayout>
+                    <button label="Save" onClick="@command('saveSystem')"/>
+                    <button label="Cancel" onClick="@command('cancelRegistration')"/>
+                </hlayout>
+            </vlayout>
+        </window>
+    </div>
+</zk>

@@ -1,0 +1,423 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="procesos" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',env='preview',pagina='procesos')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="procesos" />
+<custom-attributes clase="org.suinsit.apps.bpmn.Bpmmproces" />
+	   <custom-attributes namespace="bpmn" />
+	   <custom-attributes enviroment="preview" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+<div id="AdzjDGdijV"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="AdzjDGdijV-card" class="card  shadow-xl" style="overflow:auto;" >
+       <div id="AdzjDGdijV-body" class="card-body ">
+        <div id="AdzjDGdijV-row" class="form-group row ">
+
+
+				
+
+
+   
+    <h:div class="col-md-4 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('PROCESO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROCESO.label', 'Proceso'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="921063" 
+	   placeholder="@load(vm.lang.getProperty('PROCESO.label', 'Nombre del proceso'))" 
+	   value="@bind(vm.beanData.proceso) @save(vm.beanData.proceso, before=('grabar')) @validator(vm.unique, field='PROCESO',required=true ,oldValue=vm.beanDataCpy.proceso)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('PROCESO'))" disabled="@load(vm.isEditable('PROCESO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['921063'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-4 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('KEYPROCESS'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('KEYPROCESS.label', 'Key Process'))"  />
+	   </hbox>
+	   <textbox   tabindex="2" id="831200" 
+	   placeholder="@load(vm.lang.getProperty('KEYPROCESS.label', ''))" 
+	   value="@bind(vm.beanData.keyprocess) @save(vm.beanData.keyprocess, before=('grabar')) @validator(vm.unique, field='KEYPROCESS',required=true ,oldValue=vm.beanDataCpy.keyprocess)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('KEYPROCESS'))" disabled="@load(vm.isEditable('KEYPROCESS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['831200'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-4 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('VERSION'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VERSION.label', 'Versión'))"  />
+	   </hbox>
+	   <textbox   tabindex="3" id="dgzkdWcQzr" 
+	   placeholder="@load(vm.lang.getProperty('VERSION.label', 'version'))" 
+	   value="@bind(vm.beanData.version) @save(vm.beanData.version, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('VERSION'))" disabled="@load(vm.isEditable('VERSION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['dgzkdWcQzr'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+<tabbox orient="top" mold="default" >
+     <tabs>
+                 <tab label="Definición" />      
+                                  <tab label="Emails"  onSelect="@command('loadSubtableOnDemand',alias='subbpmnemail')"/>      
+                 <tab label="Diagrama BPMN" />      
+                                  <tab label="Plantillas Emails"  onSelect="@command('loadSubtableOnDemand',alias='subbpmntemplate')"/>      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-8">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción abreviada'))"/>
+	   </hbox>
+	  <tbeditor id="RUjWSMNJqp" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) " />
+</h:div>
+
+
+
+
+
+
+<h:div class="col-md-4">
+       <hbox spacing="3px" >
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DEFINICION.label', 'definicion'))"  />
+	   </hbox>
+	   <vbox>
+	   <a iconSclass="ri-inbox-archive-fill" onClick="@command('onDownload',field='DEFINICION') " label="@load(vm.getNameFile('DEFINICION'))"></a>
+	   <button	iconSclass="ri-inbox-unarchive-line" sclass="btn" upload="true,maxsize=-1" onUpload="@command('onUploadFile', file=event.media,field='DEFINICION')" />
+       </vbox>
+</h:div>   
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+
+<div class="col-lg-2">
+ <div class="col-lg-1">
+ <!--d:data-bs-toggle="modal" d:data-bs-target="#staticrKfjxqWuAy"-->
+ <button label="Añadir" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square" 
+		onClick="@command('appendSubtable',alias='subbpmnemail',body='body_rKfjxqWuAy',page='popuppopconfigemails.zul',close='btn_rKfjxqWuAy',win=WIN_rKfjxqWuAy)" 
+		disabled="@load(!vm.appendSubtable)" class="btn"/>
+ </div>
+  	<space></space>
+ </div>		
+ 
+ <div class="table-responsive "
+ 
+    onCreate="@command('onSubtableCreate',component=self,alias='subbpmnemail',body='body_rKfjxqWuAy',page='popuppopconfigemails.zul',win=WIN_rKfjxqWuAy,loadOnDemand='true')" >
+  
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('GRUPO.label', 'GRUPO'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('EMAILS.label', 'EMAILS'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('DESCRIPCION.label', 'DESCRIPCION'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subbpmnemail'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.grupo) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.emails) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <html><![CDATA[${item.descripcion}]]></html>
+              </h:td>
+        <h:td>
+            
+                   <a d:data-bs-toggle="modal" d:data-bs-target="#staticrKfjxqWuAy" 
+						onClick="@command('editSubtable',alias='subbpmnemail',body='body_rKfjxqWuAy',page='popuppopconfigemails.zul',close='btn_rKfjxqWuAy',item=item,win=WIN_rKfjxqWuAy)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+		                 <space></space>
+						<a
+						onClick="@command('removeSubtable',alias='subbpmnemail',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						 />
+           </h:td> 
+            
+           
+         </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<h:div class="col-md-12">
+<hbox spacing="3px">
+	    <label value="@load(vm.lang['IMAGE.label'])"/>
+</hbox>
+
+      <h:div class="image-cropper-container" style="width:100%;  height:100%;" >
+     <image id="IMAGE" sclass="image-download" content="@load(vm.loadImage('IMAGE'))" width="100%" height="100%"/>
+   </h:div>
+     <dropupload maxsize="2048" detection="browser" anchor="${IMAGE}" content="Drag your image here (max 2048KB)"
+	 onUpload="@command('onUploadImagen', file=event.media,field='IMAGE')" />
+   
+ 
+
+</h:div>
+
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+
+<div class="col-lg-2">
+ <div class="col-lg-1">
+ <!--d:data-bs-toggle="modal" d:data-bs-target="#staticOosKmLaroQ"-->
+ <button label="Añadir" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square" 
+		onClick="@command('appendSubtable',alias='subbpmntemplate',body='body_OosKmLaroQ',page='popuptemplateemail.zul',close='btn_OosKmLaroQ',win=WIN_OosKmLaroQ)" 
+		disabled="@load(!vm.appendSubtable)" class="btn"/>
+ </div>
+  	<space></space>
+ </div>		
+ 
+ <div class="table-responsive "
+ 
+    onCreate="@command('onSubtableCreate',component=self,alias='subbpmntemplate',body='body_OosKmLaroQ',page='popuptemplateemail.zul',win=WIN_OosKmLaroQ,loadOnDemand='false')" >
+  
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IDTASK.label', 'IDTASK'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('SUBJECT.label', 'SUBJECT'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('SENDFROM.label', 'SENDFROM'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subbpmntemplate'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.idtask) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.subject) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.sendfrom) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+            
+                   <a d:data-bs-toggle="modal" d:data-bs-target="#staticOosKmLaroQ" 
+						onClick="@command('editSubtable',alias='subbpmntemplate',body='body_OosKmLaroQ',page='popuptemplateemail.zul',close='btn_OosKmLaroQ',item=item,win=WIN_OosKmLaroQ)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+		                 <space></space>
+						<a
+						onClick="@command('removeSubtable',alias='subbpmntemplate',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						 />
+           </h:td> 
+            
+           
+         </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+<div id="FrxgqWnYjX" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="FrxgqWnYjX-row" class="row">
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" disabled="true">
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " disabled="false">
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" disabled="true">
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['procesos.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+  
+  <window id="WIN_rKfjxqWuAy" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="examplerKfjxqWuAy">
+						
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_rKfjxqWuAy"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticrKfjxqWuAy" tabindex="-1" aria-labelledby="examplerKfjxqWuAy" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="examplerKfjxqWuAy"></h:h5>
+                                <h:button id="btn_rKfjxqWuAy" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_rKfjxqWuAy"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+
+
+  
+  <window id="WIN_OosKmLaroQ" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleOosKmLaroQ">
+						
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_OosKmLaroQ"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticOosKmLaroQ" tabindex="-1" aria-labelledby="exampleOosKmLaroQ" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleOosKmLaroQ"></h:h5>
+                                <h:button id="btn_OosKmLaroQ" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_OosKmLaroQ"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+                  
+                 
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$procesos');
+  binder.command('doLoad');
+});
+function loadprocesos(){
+  var binder = zkbind.$('$procesos');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

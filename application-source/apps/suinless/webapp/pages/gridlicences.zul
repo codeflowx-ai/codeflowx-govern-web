@@ -1,0 +1,73 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="table-responsive table-card">					 
+			
+				    <grid  	model="@load(vm.beans) @template(each.updatable ? 'modelWrite' : 'model')"  sclass="table align-middle mb-0" >  
+							<columns >
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('LICENCE.label', 'Licencia'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripcion'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('COMMERCIAL.label', 'Es Comercial'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('OPENSOURCE.label', 'Es Open source'))" align="center"   />
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PERSONAL.label', 'Es Propietaria'))" align="center"   />
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+      <template name="model" var="item">
+      <row>
+       				     <label  value="@load(item.licence) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.descripcion) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.commercial) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.opensource) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.personal) @converter(vm.fieldConverter)"></label>
+          <cell align="center"  class="d-flex">
+                 <div class="edit">
+		           <a onClick="@command('editItem',item=item)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+				</div>		
+							<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger"   />
+						</div>
+		                </cell> 
+       </row>
+   	</template>      <template name="modelWrite" var="item">
+      	 <row style="text-align:right;" >
+   				          <textbox  sclass="margin-field form-control  form-control   "  value="@bind(item.licence)   @save(item.licence, before=('saveItem'))" ></textbox>
+				          <textbox  sclass="margin-field form-control  form-control   "  value="@bind(item.descripcion)   @save(item.descripcion, before=('saveItem'))" ></textbox>
+				         <checkbox  mold="default" value="@bind(item.commercial) @save(item.commercial, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.commercial)"/>
+				         <checkbox  mold="default" value="@bind(item.opensource) @save(item.opensource, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.opensource)"/>
+				         <checkbox  mold="default" value="@bind(item.personal) @save(item.personal, before=('saveItem'))"  sclass="margin-field " checked="@bind(item.personal)"/>
+
+           		<cell align="center"  class="d-flex">
+           		 <div class="edit">
+  					<a onClick="@command('saveItem',item=item)"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"  />
+		           </div>
+		           <div class="delete">
+		            <a
+						onClick="@command('cancelItem',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger"  />
+						</div>
+                </cell> 
+       </row>
+   	</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

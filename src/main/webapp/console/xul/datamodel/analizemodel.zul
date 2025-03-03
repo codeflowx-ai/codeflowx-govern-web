@@ -1,0 +1,164 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace>
+		<nodom
+			form="@id('fx')  @load(vm.bean) @save(vm.bean,before={'action'})"
+			validationMessages="@id('vmsgs')"
+			viewModel="@id('vm') @init('io.artfacto.baranwu.reverse.ui.AnalizeUI')"
+			apply="org.zkoss.bind.BindComposer">
+
+			<div class="row page-titles">
+				<div class="col-md-5 align-self-center">
+					<h:h4 class="text-themecolor">
+						Data Model Audit
+					</h:h4>
+				</div>
+				<div class="col-md-7 align-self-center text-right">
+					<div
+						class="d-flex justify-content-end align-items-center">
+						<hbox spacing="15px">
+							<h:ol class="breadcrumb">
+								<h:li class="breadcrumb-item">
+									<h:a href="javascript:void(0)">
+										Data model
+									</h:a>
+								</h:li>
+								<h:li class="breadcrumb-item active">
+									Data Model Audit
+								</h:li>
+							</h:ol>
+						</hbox>
+					</div>
+				</div>
+			</div>
+			<div id="notificacion"></div>
+			<div class="row">
+				<h:div class="col-lg-4">
+					<h:div class="card">
+						<h:div class="card-body">
+							<h:div class="form-group row">
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox id="pk" sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Primary keys" value="@bind(fx.anPrimaryKey)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Referential integrity" value="@bind(fx.anForeingkey)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Indexes" value="@bind(fx.anIndex)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Standardization" value="@bind(fx.anFormal)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Tables" value="@bind(fx.anTables)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Views" value="@bind(fx.anViews)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Procedures" value="@bind(fx.anProcedure)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+									<h:div class="input-group">
+										<checkbox  sclass="check" d:data-checkbox="icheckbox_line-blue" d:data-label="Functions" value="@bind(fx.anFunction)" />
+									</h:div>
+								</h:div>
+								<h:div class="col-sm-9">
+								 <h:label for="mf" class="col-sm-3 control-label">Max. Fields*</h:label>
+									<h:div class="input-group">
+										<intbox id="mf"  value="@bind(fx.maxFields) @validator(vm.validator,min=5,max=vm.bean.maxFields,required=true)" placeholder="Max. Fields" width="50px" />
+										 <space />
+                                                  <h:a class="mytooltip" href="javascript:void(0)"> <h:i class="far fa-question-circle"></h:i><h:span class="tooltip-content3">Maximum number of fields in the tables</h:span> </h:a>
+									</h:div>
+									 <label class="text-danger font-weight-bold" value="@load(vmsgs['mf'])" />
+								</h:div>
+								<h:div class="col-sm-9">
+								 <h:label for="mfl" class="col-sm-3 control-label">Max. Lenght Fields*</h:label>
+									<h:div class="input-group">
+										<intbox id="mfl"  value="@bind(fx.maxlenghtField) @validator(vm.validator,min=5,max=vm.bean.maxlenghtField,required=true)" placeholder="Max. Fields" width="50px" />
+										 <space />
+                                                  <h:a class="mytooltip" href="javascript:void(0)"> <h:i class="far fa-question-circle"></h:i><h:span class="tooltip-content3">Maximum field name length</h:span> </h:a>
+									</h:div>
+									 <label class="text-danger font-weight-bold" value="@load(vmsgs['mfl'])" />
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+				<h:div class="col-lg-4">
+					<h:div class="card">
+					 <h:div class="card-header">
+					 Ayuda
+					 </h:div>
+						<h:div class="card-body">
+						<h:h4 class="card-title">¿Como se realiza la auditoria?</h:h4>
+						
+								<html>
+									<p class="card-text">
+										Desde esta pantalla podrá
+										generar automáticamente un nuevo
+										proyecto. para ello dispones de
+										dos opciones:
+									</p>
+									<p class="card-text">
+										<ul>
+											<li>
+												Importar un documento de
+												tipo
+												<strong>word</strong>
+												, con sus requisitos
+												siguiendo la
+												<strong>
+													plantilla
+												</strong>
+												que se facilita para tal
+												fin.
+											</li>
+											<li>
+												Puede cumplimentar
+												manualmente esta
+												pantalla, introduciendo
+												la información
+												solicitada para tal
+												efecto.
+											</li>
+										</ul>
+									</p>
+
+								</html>
+							
+						</h:div>
+						</h:div>
+						</h:div>
+						
+			</div>
+
+
+
+
+
+
+
+		</nodom>
+
+
+
+
+	</idspace>
+</zk>

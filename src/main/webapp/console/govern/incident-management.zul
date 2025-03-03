@@ -1,0 +1,182 @@
+<?page title="Incident Management" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.incident.IncidentManagementVM')">
+        
+        <!-- Incident Overview -->
+        <hlayout sclass="incident-header">
+            <div sclass="metric-box critical">
+                <label value="Critical Incidents"/>
+                <label value="@load(vm.criticalIncidents)" 
+                       sclass="@load(vm.criticalStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Open Incidents"/>
+                <label value="@load(vm.openIncidents)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="MTTR"/>
+                <label value="@load(vm.mttr) min"/>
+            </div>
+            <button label="Create Incident" 
+                    sclass="create-incident"
+                    onClick="@command('createNewIncident')"/>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Active Incidents"/>
+                <tab label="Incident Analysis"/>
+                <tab label="Auto-Resolution"/>
+                <tab label="Reports"/>
+            </tabs>
+            <tabpanels>
+                <!-- Active Incidents Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Incident Filter -->
+                        <hlayout sclass="filter-container">
+                            <textbox value="@bind(vm.searchFilter)" 
+                                    placeholder="Search incidents..."/>
+                            <combobox model="@load(vm.severityLevels)" 
+                                    selectedItem="@bind(vm.selectedSeverity)"/>
+                            <combobox model="@load(vm.statusTypes)" 
+                                    selectedItem="@bind(vm.selectedStatus)"/>
+                            <button label="Apply Filters" 
+                                    onClick="@command('applyFilters')"/>
+                        </hlayout>
+
+                        <listbox model="@load(vm.activeIncidents)" 
+                                mold="paging" pageSize="10">
+                            <listhead>
+                                <listheader label="ID"/>
+                                <listheader label="Title"/>
+                                <listheader label="Severity"/>
+                                <listheader label="Status"/>
+                                <listheader label="Created"/>
+                                <listheader label="Model"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="incident">
+                                <listitem>
+                                    <listcell label="@load(incident.id)"/>
+                                    <listcell label="@load(incident.title)"/>
+                                    <listcell>
+                                        <label value="@load(incident.severity)" 
+                                               sclass="@load(incident.severityStyle)"/>
+                                    </listcell>
+                                    <listcell>
+                                        <label value="@load(incident.status)" 
+                                               sclass="@load(incident.statusStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(incident.createdDate)"/>
+                                    <listcell label="@load(incident.modelName)"/>
+                                    <listcell>
+                                        <button label="Resolve" 
+                                                onClick="@command('resolveIncident', incident=incident)"/>
+                                        <button label="Escalate" 
+                                                onClick="@command('escalateIncident', incident=incident)"/>
+                                        <button label="Details" 
+                                                onClick="@command('showIncidentDetails', incident=incident)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Incident Analysis Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <charts id="incidentTrendsChart" 
+                               type="line"
+                               height="300px"
+                               title="Incident Trends"
+                               model="@load(vm.incidentTrendsData)"/>
+                        
+                        <hlayout>
+                            <groupbox title="Root Cause Analysis" width="50%">
+                                <charts id="rootCauseChart" 
+                                       type="pie"
+                                       height="250px"
+                                       model="@load(vm.rootCauseData)"/>
+                            </groupbox>
+                            
+                            <groupbox title="Impact Analysis" width="50%">
+                                <charts id="impactChart" 
+                                       type="bar"
+                                       height="250px"
+                                       model="@load(vm.impactData)"/>
+                            </groupbox>
+                        </hlayout>
+
+                        <!-- Patterns and Insights -->
+                        <groupbox title="Patterns and Insights">
+                            <listbox model="@load(vm.incidentInsights)">
+                                <listhead>
+                                    <listheader label="Pattern"/>
+                                    <listheader label="Frequency"/>
+                                    <listheader label="Impact"/>
+                                    <listheader label="Recommendation"/>
+                                </listhead>
+                                <template name="model" var="insight">
+                                    <listitem>
+                                        <listcell label="@load(insight.pattern)"/>
+                                        <listcell label="@load(insight.frequency)"/>
+                                        <listcell label="@load(insight.impact)"/>
+                                        <listcell label="@load(insight.recommendation)"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Auto-Resolution Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <groupbox title="Auto-Resolution Rules">
+                            <listbox model="@load(vm.autoResolutionRules)">
+                                <listhead>
+                                    <listheader label="Rule Name"/>
+                                    <listheader label="Condition"/>
+                                    <listheader label="Action"/>
+                                    <listheader label="Success Rate"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="rule">
+                                    <listitem>
+                                        <listcell label="@load(rule.name)"/>
+                                        <listcell label="@load(rule.condition)"/>
+                                        <listcell label="@load(rule.action)"/>
+                                        <listcell label="@load(rule.successRate)%"/>
+                                        <listcell>
+                                            <label value="@load(rule.status)" 
+                                                   sclass="@load(rule.statusStyle)"/>
+                                        </listcell>
+                                        <listcell>
+                                            <button label="Edit" 
+                                                    onClick="@command('editRule', rule=rule)"/>
+                                            <button label="Toggle" 
+                                                    onClick="@command('toggleRule', rule=rule)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Incident Details Window (Pop-up) -->
+        <window id="incidentDetailsWindow" 
+                visible="@load(vm.showDetails)"
+                mode="modal"
+                closable="true">
+            <!-- Incident details content -->
+        </window>
+    </div>
+</zk>

@@ -1,0 +1,55 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('DATABASE.label', 'database'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DATABASEAsc'])" sortDescending="@load(vm.comparators['DATABASEDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('URLPATERN.label', 'urlpatern'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['URLPATERNAsc'])" sortDescending="@load(vm.comparators['URLPATERNDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('REVERSE.label', 'reverse'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['REVERSEAsc'])" sortDescending="@load(vm.comparators['REVERSEDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('CLOUD.label', 'cloud'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CLOUDAsc'])" sortDescending="@load(vm.comparators['CLOUDDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ACTIVO.label', 'activo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVOAsc'])" sortDescending="@load(vm.comparators['ACTIVODesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="50%" height="50%" />
+							         <label  value="@load(item.getFieldByAtribute('DATABASE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('URLPATERN').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('REVERSE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('CLOUD').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('ACTIVO').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterbasedatos.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

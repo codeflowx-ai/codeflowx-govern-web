@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Control Center Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .control-center-container { padding: 20px; background: #f8f9fa; }
+        .chart-container { 
+            background: white; 
+            padding: 15px; 
+            margin: 10px; 
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .incident-critical { background-color: #ffe6e6; }
+        .incident-high { background-color: #fff3e6; }
+        .incident-medium { background-color: #f0f9ff; }
+        .incident-low { background-color: #f0fff0; }
+        .audit-list { border: none; }
+        .refresh-button { margin: 10px; }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.ControlCenterViewModel')"
+         sclass="control-center-container">
+        
+        <!-- Realtime Metrics Section -->
+        <div sclass="chart-container">
+            <charts id="realtimeMetricsChart"
+                   model="@bind(vm.realtimeMetricsChart)"
+                   height="300px"/>
+        </div>
+        
+        <!-- Compliance and Incidents Section -->
+        <hlayout>
+            <div sclass="chart-container" width="45%">
+                <charts id="complianceChart"
+                       model="@bind(vm.complianceChart)"
+                       height="300px"/>
+            </div>
+            
+            <div sclass="chart-container" width="45%">
+                <caption label="Active Incidents"/>
+                <listbox model="@bind(vm.incidentsList)"
+                        emptyMessage="No active incidents"
+                        sclass="audit-list">
+                    <listhead>
+                        <listheader label="Severity" width="100px"/>
+                        <listheader label="Model" width="150px"/>
+                        <listheader label="Description"/>
+                        <listheader label="Actions" width="150px"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem sclass="incident-${each.severity.toLowerCase()}">
+                            <listcell label="@load(each.severity)"/>
+                            <listcell label="@load(each.model_name)"/>
+                            <listcell label="@load(each.description)"/>
+                            <listcell>
+                                <button label="Resolve"
+                                        onClick="@command('updateIncidentStatus', 
+                                                incident=each, status='RESOLVED')"
+                                        visible="@load(each.status ne 'RESOLVED')"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </div>
+        </hlayout>
+        
+        <!-- Audit Log Section -->
+        <div sclass="chart-container">
+            <caption label="Audit Log"/>
+            <listbox model="@bind(vm.auditLogList)"
+                     emptyMessage="No audit records"
+                     sclass="audit-list"
+                     height="300px">
+                <listhead>
+                    <listheader label="Date" width="150px"/>
+                    <listheader label="User" width="120px"/>
+                    <listheader label="Action" width="120px"/>
+                    <listheader label="Details"/>
+                </listhead>
+                <template name="model">
+                    <listitem>
+                        <listcell label="@load(each.auditdate)"/>
+                        <listcell label="@load(each.userid)"/>
+                        <listcell label="@load(each.actiontype)"/>
+                        <listcell label="@load(each.action_details)"/>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+        
+        <button label="Refresh Dashboard"
+                sclass="refresh-button"
+                onClick="@command('refreshControlCenter')"/>
+    </div>
+</zk>

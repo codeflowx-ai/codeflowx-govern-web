@@ -1,0 +1,7 @@
+/*CREATE USER suinsit;
+CREATE DATABASE suinsit;
+#GRANT ALL PRIVILEGES ON DATABASE suinsit TO suinsit;*/
+CREATE USER flowable;
+CREATE DATABASE flowable;
+GRANT ALL PRIVILEGES ON DATABASE flowable TO flowable;
+ALTER SYSTEM SET max_connections TO '2000';

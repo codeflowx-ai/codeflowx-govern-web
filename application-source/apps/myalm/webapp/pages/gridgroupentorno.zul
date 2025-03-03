@@ -1,0 +1,56 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('ENVIROMENT.label', 'enviroment'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ENVIROMENTAsc'])" sortDescending="@load(vm.comparators['ENVIROMENTDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('DEVELOPMENT.label', 'development'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DEVELOPMENTAsc'])" sortDescending="@load(vm.comparators['DEVELOPMENTDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('PRODUCTION.label', 'production'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRODUCTIONAsc'])" sortDescending="@load(vm.comparators['PRODUCTIONDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('TESTING.label', 'testing'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TESTINGAsc'])" sortDescending="@load(vm.comparators['TESTINGDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('PRODUCTION.label', 'production'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PRODUCTIONAsc'])" sortDescending="@load(vm.comparators['PRODUCTIONDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('PREFIX.label', 'Prefix'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PREFIXAsc'])" sortDescending="@load(vm.comparators['PREFIXDesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('ENVIROMENT').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('DEVELOPMENT').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('PRODUCTION').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('TESTING').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('PRODUCTION').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('PREFIX').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterentorno.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

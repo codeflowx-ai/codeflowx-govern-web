@@ -1,0 +1,301 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="apykey" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='apykey')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="apykey" />
+	<custom-attributes clase="org.suinsit.apps.admin.Ssoapikey" />
+	   <custom-attributes namespace="admin" />
+		<custom-attributes uid="38094" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('apykey.screen', 'APi Keys'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')"></a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+<div id="lPRJEmbExW"   visible="false"  class="col-lg-8 col-xlg-8 col-md-8">
+  <div id="lPRJEmbExW-card" class="card  default shadow-xl" style="overflow:auto;" >
+       <div id="lPRJEmbExW-body" class="card-body ">
+        <div id="lPRJEmbExW-row" class="form-group row ">
+
+
+				
+
+    <div class="col-md-6  input-group" visible="@load(vm.isVisible('ALIAS'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ALIAS.label', 'Alias'))"  />
+	   
+	    <textbox   tabindex="1" id="24230" 
+	   placeholder="@load(vm.lang.getProperty('ALIAS.label', 'Alias de la apikey'))" 
+	   value="@bind(vm.beanData.alias) @save(vm.beanData.alias, before=('grabar')) @validator(vm.unique, field='ALIAS',required=true ,oldValue=vm.beanDataCpy.alias)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('ALIAS'))" disabled="@load(vm.isEditable('ALIAS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['24230'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <div class="col-md-6  input-group" visible="@load(vm.isVisible('ALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	  
+	      <datebox     id="997997"  placeholder="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" tabindex="2" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.alta)"   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('ALTA'))" disabled="@load(vm.isEditable('ALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['997997'])"/>   
+    
+      </div>
+
+
+
+
+
+
+ <div class="col-md-4   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVE'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ACTIVE.label', 'Activo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="JmPeKAJQUl" value="@bind(vm.beanData.active) @save(vm.beanData.active, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVE'))" disabled="@load(vm.isEditable('ACTIVE')?false:true)" checked="@bind(vm.beanData.active) @save(vm.beanData.active, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-4   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('READONLY'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('READONLY.label', 'Solo Lectura'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="ZCIOSrpCbW" value="@bind(vm.beanData.readonly) @save(vm.beanData.readonly, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('READONLY'))" disabled="@load(vm.isEditable('READONLY')?false:true)" checked="@bind(vm.beanData.readonly) @save(vm.beanData.readonly, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+ <div class="col-md-4  input-group" visible="@load(vm.isVisible('EXPIRED'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="" value="@load(vm.lang.getProperty('EXPIRED.label', 'Fecha Expiración'))"/>
+	   
+	<datebox     id="qHotGxTmJZ" cols="20"  tabindex="5" value="@bind(vm.beanData.expired) @save(vm.beanData.expired, before=('grabar')) "   format="dd/MM/yy HH:mm" placeholder="@load(vm.lang.getProperty('EXPIRED.label', 'Fecha Expiración'))" 
+    visible="@load(vm.isVisible('EXPIRED'))" disabled="@load(vm.isEditable('EXPIRED')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['qHotGxTmJZ'])"/>   
+    
+  </div>
+
+
+
+
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"/>
+	  
+	  <tbeditor id="aTINZnySCW" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) " />
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+<div id="yWeTkMzDAj"   visible="false"  class="col-lg-4 col-xlg-4 col-md-4">
+  <div id="yWeTkMzDAj-card" class="card  default shadow-xl" style="overflow:auto;" >
+       <div id="yWeTkMzDAj-body" class="card-body ">
+        <div id="yWeTkMzDAj-row" class="form-group row ">
+
+
+				
+
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('ACCESKEY'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ACCESKEY.label', 'Access key'))"  />
+	   
+	    <textbox   tabindex="1" id="HeSdcQDEKx" 
+	   placeholder="@load(vm.lang.getProperty('ACCESKEY.label', 'Access key'))" 
+	   value="@bind(vm.beanData.acceskey) @save(vm.beanData.acceskey, before=('grabar')) @validator(vm.unique, field='ACCESKEY',required=true ,oldValue=vm.beanDataCpy.acceskey)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('ACCESKEY'))" disabled="@load(vm.isEditable('ACCESKEY')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['HeSdcQDEKx'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('SECRETKEY'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SECRETKEY.label', 'Secret key'))"  />
+	   
+	    <textbox   tabindex="2" id="631432" 
+	   placeholder="@load(vm.lang.getProperty('SECRETKEY.label', 'Secret key'))" 
+	   value="@bind(vm.beanData.secretkey) @save(vm.beanData.secretkey, before=('grabar')) @validator(vm.unique, field='SECRETKEY',required=true ,oldValue=vm.beanDataCpy.secretkey)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('SECRETKEY'))" disabled="@load(vm.isEditable('SECRETKEY')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['631432'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <!-- sclass="margin-field" -->
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('CODIGO'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style=" font-size:28px; color: #3300FF;" value="@load(vm.lang.getProperty('CODIGO.label', 'Código'))"/>
+	   
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style=" font-size:28px; color: #3300FF;" value="@load(vm.beanData.codigo)"  />
+  </div>
+
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['apykey.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$apykey');
+  binder.command('doLoad');
+});
+</script>
+</zk>

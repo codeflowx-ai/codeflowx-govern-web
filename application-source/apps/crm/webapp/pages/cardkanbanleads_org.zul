@@ -1,0 +1,143 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="card">
+	
+	<div class="tasks-board mb-3" id="kanbanboard" >
+		<forEach items="@bind(vm.etapas)" var="item1" varStatus="st">
+			<div class="card card-light tasks-list">
+			
+				<div class="d-flex mb-3 align-middle">
+					<div class="flex-grow-1  align-middle"
+						style="height:40px;">
+						<h:h6
+							class="fs-14 text-uppercase  fw-semibold mb-0">
+							${item1.etapa}
+							<label
+								class="badge bg-success align-middle ms-1 totaltask-badge"
+								value="@bind(vm.resume[item1.etapa].totalItems)" />
+
+						</h:h6>
+					</div>
+
+				</div>
+				<!-- style=" overflow-y: scroll;top: 0; left: 0; height:100%;" -->
+				<h:div data-simplebar="" class=" tasks-wrapper px-3 mx-n3" >
+						
+										<div
+											id="unassigned-task-${st.index}" class=" tasks"
+											droppable="true"
+											onDrop="@command('onDragged', event=event,etapa=item1)">
+											<forEach
+												items="@bind(vm.tasks[item1.etapa])" var="item2">
+												<div
+													class="card tasks-box " draggable="true">
+													<custom-attributes
+														value="${item2}" scope="component" />
+													<custom-attributes
+														etapa="${item1}" scope="component" />
+													<div
+														class="card-body">
+														<div
+															class="d-flex mb-2">
+															<h:h6
+																class="fs-16 mb-0 flex-grow-1 text-truncate task-title">
+																<a
+																	class="link-dark d-block"
+																	onClick="@command('editData',item=item2,page='masterformoportunidad.zul')">
+																	${item2.oportunidad
+																	}
+																</a>
+															</h:h6>
+															<div
+																class="dropdown">
+																<h:a
+																	href="javascript:void(0);" class="text-muted"
+																	data-bs-toggle="dropdown" aria-expanded="false">
+																	<h:i
+																		class="ri-more-fill">
+																	</h:i>
+																</h:a>
+																<h:ul
+																	class="dropdown-menu"
+																	aria-labelledby="dropdownMenuLink2"
+																	style="z-index:9999;">
+																	<h:li>
+																		<a
+																			class="dropdown-item"
+																			onClick="@command('editData',item=item2,page='masterformoportunidad.zul')"
+																			iconSclass="ri-edit-2-line align-bottom me-2 text-muted">
+																			Editar
+																		</a>
+																	</h:li>
+																	<h:li>
+																		<a
+																			onClick="@command('onDeleteTasks',item=item2,task=item1.etapa)"
+																			class="dropdown-item"
+																			iconSclass="ri-delete-bin-5-line align-bottom me-2 text-muted">
+																			Borrar
+																		</a>
+																	</h:li>
+																</h:ul>
+															</div>
+														</div>
+
+														<!--                         </div> -->
+														<!--                          <div class="card-footer border-top-dashed"> -->
+														<div
+															class="d-flex">
+															<div
+																class="flex-grow-1">
+																<h:h6
+																	class="text-muted mb-0">
+																	Probabilidad
+																	<label
+																		value="@load(item2.probabilidad) @converter(vm.fieldConverter,format='##0.00')">
+																	</label>
+																</h:h6>
+																<h:h6
+																	class="text-muted mb-0">
+																	Importe
+																	<label
+																		value="@load(item2.importeprev) @converter(vm.fieldConverter,type='CURRENCY')">
+																	</label>
+																</h:h6>
+																<h:h6
+																	class="text-muted mb-0">
+																	Fecha
+																	Prevista
+																	<label
+																		value="@load(item2.fectstart) @converter(vm.fieldConverter)">
+																	</label>
+																</h:h6>
+															</div>
+														</div>
+													</div>
+												</div>
+											</forEach>
+
+
+										</div>
+									
+						
+				</h:div>
+				<div class="my-3">
+					<div class="card-footer border-top-dashed">
+						<h:h6 class="text-muted mb-0">
+							Total
+							<label
+								value="@bind(vm.resume[item1.etapa].totalImporte) @converter(vm.fieldConverter,type='CURRENCY')">
+							</label>
+						</h:h6>
+					</div>
+				</div>
+
+			</div>
+
+		</forEach>
+	</div>
+	</div>
+</zk>

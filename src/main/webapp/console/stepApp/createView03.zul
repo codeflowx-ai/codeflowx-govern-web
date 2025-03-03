@@ -1,0 +1,288 @@
+<zk xmlns:h="native">
+	<div class="row">
+		<h:div class="card border-1 border-indigo col-lg-12">
+			<div class="card">
+				<div
+					class="card-header header-elements-inline bg-indigo">
+					<h:h6 class="card-title">
+						${labels.views.create.criteria}
+					</h:h6>
+				</div>
+				<div class="card-body">
+					<div class="row">
+						<div class="col-md-1">
+							<div sclass="form-group">
+								<listbox mold="select"
+									selectedItem="@bind(vm.andor)" >
+									<listitem
+										label="${labels.views.eval.AND}" value="AND">
+									</listitem>
+									<listitem
+										label="${labels.views.eval.OR}" value="OR">
+									</listitem>
+								</listbox>
+							</div>
+						</div>
+						<if test="@load(vm.bean.entidades.size()>1)">
+							<div class="col-md-2">
+								<div sclass="form-group">
+									<label value="Select entity"></label>
+									<listbox mold="select"
+										model="@load(vm.bean.entidades)"
+										onSelect="@command('onSelectLeftEntityCrt',item=self.selectedItem.value)"
+										visible="@load(vm.bean.entidades.size()>1)">
+										<template name="model"
+											var="item">
+											<listitem value="${item}"
+												label="${item.name }" />
+										</template>
+									</listbox>
+								</div>
+							</div>
+						</if>
+
+
+						<div class="col-md-2">
+							<div sclass="form-group">
+								<label value="Select field"></label>
+								<listbox mold="select"
+									model="@load(vm.attsLeftCrt)"
+									selectedItem="@bind(vm.criteria.field)"
+									onSelect="@command('selectField',field=self.selectedItem.value)">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.atribute}" />
+									</template>
+								</listbox>
+							</div>
+						</div>
+						<div class="col-md-1">
+							<div sclass="form-group">
+								<label value="Select Condition"></label>
+								<listbox mold="select"
+									selectedItem="@bind(vm.evaluation)"
+									onSelect="@command('selectEvaluation',item=self.selectedItem.value)"
+									visible="@load(vm.showEval)" model="@load(vm.evals)">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.label}" />
+									</template>
+								</listbox>
+							</div>
+						</div>
+						<div class="col-md-1">
+							<div sclass="form-group">
+								<listbox mold="select"
+									selectedItem="@bind(vm.tipoValor)" visible="@load(vm.showEval)"
+									onSelect="@command('selectTipoValue',tipo=self.selectedItem.value)">
+									<listitem
+										label="${labels.views.eval.value}" value="VALUE">
+									</listitem>
+									<listitem
+										label="${labels.views.eval.field}" value="FIELD"
+										visible="@load(vm.bean.entidades.size()>1)">
+									</listitem>
+								</listbox>
+							</div>
+						</div>
+						<div class="col-md-4">
+							<div sclass="form-group">
+								<label value="Select entity"
+									visible="@load(vm.bean.entidades.size() ge 1 and vm.showfield eq 'fieldend') ">
+								</label>
+								<listbox mold="select"
+									model="@load(vm.bean.entidades)"
+									onSelect="@command('onSelectRightEntityCrt',item=self.selectedItem.value)"
+									visible="@load(vm.bean.entidades.size() ge 1 and vm.showfield eq 'fieldend') ">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.name }" />
+									</template>
+								</listbox>
+								<listbox mold="select"
+									model="@load(vm.attsRightCrt)" id="fieldend"
+									selectedItem="@bind(vm.criteria.fieldEnd)"
+									visible="@load(vm.showfield eq 'fieldend')">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.atribute}" />
+									</template>
+								</listbox>
+								<space></space>
+								<label value="AND"
+									visible="@load(vm.showfield eq 'fieldend' and vm.between)"
+									sclass="text-teal">
+								</label>
+								<label value="Select entity"
+									visible="@load(vm.bean.entidades.size() ge 1 and vm.showfield eq 'fieldend' and vm.between) ">
+								</label>
+								<listbox mold="select"
+									model="@load(vm.bean.entidades)"
+									onSelect="@command('onSelectRight2EntityCrt',item=self.selectedItem.value)"
+									visible="@load(vm.bean.entidades.size() ge 1 and vm.showfield eq 'fieldend' and vm.between)  ">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.name }" />
+									</template>
+								</listbox>
+								<listbox mold="select"
+									model="@load(vm.attsRight2Crt)" id="fieldend2"
+									selectedItem="@bind(vm.criteria.fieldEnd2)"
+									visible="@load(vm.bean.entidades.size() ge 1 and vm.showfield eq 'fieldend' and vm.between)">
+									<template name="model" var="item">
+										<listitem value="${item}"
+											label="${item.atribute}" />
+									</template>
+								</listbox>
+								<textbox
+									value="@bind(vm.criteria.sValue)"
+									visible="@load(vm.showfield eq 'textField')">
+								</textbox>
+								<checkbox
+									checked="@bind(vm.criteria.booleanValue)"
+									value="@bind(vm.criteria.booleanValue)"
+									visible="@load(vm.showfield eq 'checkField')">
+								</checkbox>
+							</div>
+						</div>
+						<div class="col-md-1">
+						
+						 <button
+												onClick="@command('addCriteria',form=fx)"
+												tooltiptext="Append Criteria"
+												iconSclass="mdi mdi-data-matrix-plus fs-2x"
+												sclass="btn btn-outline-success waves-effect waves-light shadow-none" />
+<!-- 						<button zclass="pull-right" sclass="btn btn-success btn-label waves-effect waves-light rounded-pill" iconSclass="mdi mdi-database-arrow-down-outline label-icon align-middle rounded-pill fs-16 me-2"   -->
+<!-- 			onClick="@command('addCriteria',form=fx)" label="Append" /> -->
+<!-- 							<a sclass="list-icons-item" -->
+<!-- 								tooltiptext="add Criteria" -->
+<!-- 								iconSclass="icon-database-add icon-2x" -->
+<!-- 								onClick="@command('addCriteria',form=fx)"> -->
+<!-- 							</a> -->
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-12">
+							<div sclass="form-group">
+								<hbox spacing="3px"
+									visible="@load(vm.showfield eq 'dateField' )">
+									<datebox
+										value="@bind(vm.criteria.dateValue)"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)"
+										disabled="@load(vm.criteria.dateSystem)">
+									</datebox>
+
+									<checkbox label="Date Time System?"
+										checked="@bind(vm.criteria.dateSystem)"
+										value="@bind(vm.criteria.dateSystem)">
+									</checkbox>
+									<space></space>
+									<label value="+/- Day System"></label>
+									<space></space>
+									<intbox
+										value="@bind(vm.criteria.peridoDate)" width="30px">
+									</intbox>
+									<label value="AND"
+										sclass="text-teal"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)" />
+
+									<datebox
+										value="@bind(vm.criteria.dateValue2)"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)"
+										disabled="@load(vm.criteria.dateSystem2)">
+									</datebox>
+									<checkbox label="Date Time System?"
+										checked="@bind(vm.criteria.dateSystem2)"
+										value="@bind(vm.criteria.dateSystem2)"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)">
+									</checkbox>
+									<space></space>
+									<label value="+/- Day System"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)">
+									</label>
+									<space></space>
+									<intbox
+										value="@bind(vm.criteria.periodoDate2)"
+										visible="@load(vm.showfield eq 'dateField' and vm.between)"
+										width="30px">
+									</intbox>
+
+								</hbox>
+								<hbox spacing="3px"
+									visible="@load(vm.showfield eq 'integerField' )">
+									<intbox
+										value="@bind(vm.criteria.iValue)"
+										visible="@load(vm.showfield eq 'integerField' )">
+									</intbox>
+									<label value="AND"
+										sclass="text-teal"
+										visible="@load(vm.showfield eq 'integerField' and vm.between )" />
+									<intbox
+										value="@bind(vm.criteria.iValue2)"
+										visible="@load(vm.showfield eq 'integerField' and vm.between )">
+									</intbox>
+								</hbox>
+								<hbox spacing="3px"
+									visible="@load(vm.showfield eq 'doubleField' )">
+									<doublebox
+										value="@bind(vm.criteria.doubleValue)"
+										visible="@load(vm.showfield eq 'doubleField' )">
+									</doublebox>
+									<label value="AND"
+										sclass="text-teal"
+										visible="@load(vm.showfield eq 'doubleField' and vm.between)" />
+									<doublebox
+										value="@bind(vm.criteria.doubleValue2)"
+										visible="@load(vm.showfield eq 'doubleField' and vm.between)">
+									</doublebox>
+								</hbox>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div sclass="col-md-12">
+							<grid height="200px"
+								model="@load(vm.bean.criterias)">
+								<columns>
+									<column label="Criteria"
+										width="90%" />
+									<column label=" " />
+								</columns>
+								<rows>
+									<template name="model" var="item">
+										<row value="@bind(item)">
+											<label
+												value="@load(item.labelSQL)" />
+												<button
+												onClick="@command('removeCriteria',item=item)"
+												tooltiptext="Remove criteria"
+												iconSclass="bx bx-trash fs-2x"
+												sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />	
+<!-- 											<a -->
+<!-- 												onClick="@command('removeCriteria',item=item)" -->
+<!-- 												tooltiptext="${labels.MddMentity.remove}" -->
+<!-- 												iconSclass="mdi mdi-database-remove" -->
+<!-- 												sclass="btn btn-outline bg-danger text-primary-800 btn-icon ml-2 legitRipple" /> -->
+
+										</row>
+									</template>
+								</rows>
+							</grid>
+						</div>
+					</div>
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-left"
+								sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill" 
+								onClick="@command('back')" iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" label="Anterior" />
+	
+									<button zclass="pull-right" sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"  
+			onClick="@command('addFields',form=fx)" label="Siguiente" />
+					
+
+				</div>
+			</div>
+		</h:div>
+		<h:div class="card col-lg-3"></h:div>
+	</div>
+</zk>

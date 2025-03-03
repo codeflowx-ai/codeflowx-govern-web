@@ -1,0 +1,310 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="pipeline" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='pipeline')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="pipeline" />
+	  <custom-attributes enviroment="preview" />
+			<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('Pipeline.screen', 'Pipeline'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Pipeline
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('store')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('storeNew')">
+										Guardar y Nuevo
+									</button>
+												
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div class="card">
+							<h:div class="card-body">
+		     <div class="row">
+
+<h:div style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4">
+<h:div class="row">
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('PIPELINE'))">
+	    <label id="lbPIPELINE" sclass="form-label text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PIPELINE.label', 'Pipeline'))"  />
+	   </hbox>
+	   <textbox  tabindex="1" id="PIPELINE" placeholder="@load(vm.lang.getProperty('PIPELINE.label', 'Pipeline'))" value="@bind(vm.beanData.pipeline) @save(vm.beanData.pipeline, before=('store')) @validator(vm.unique, field='PIPELINE',required=true ,oldValue=vm.beanDataCpy.pipeline)"  sclass="form-control  form-control    border-danger" visible="@load(vm.isVisible('PIPELINE'))" disabled="@load(vm.isEditable('PIPELINE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['PIPELINE'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-12">
+
+   <hbox spacing="3px">
+     <label sclass="form-label    font-weight-normal" style="   " value="@load(vm.lang.getProperty('MODULO.label', 'Objecto'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="MODULO" model="@load(vm.form.getFieldByAtribute('MODULO').getFieldPropsBeanByID('txValues').enums)" 
+selectedItem="@load(vm.beanData.modulo)"  value="@load(vm.beanData.modulo) @save(vm.beanData.modulo, before=('store')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['MODULO'])"/>
+</h:div>
+
+
+
+</h:div>
+</h:div>  
+
+
+
+<h:div style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4">
+<h:div class="row">
+
+ <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('DEFECTO'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DEFECTO.label', 'Principal'))"/>
+	   </hbox>
+ <checkbox mold="default" id="519473" value="@bind(vm.beanData.defecto) @save(vm.beanData.defecto, before=('store'))" sclass="" visible="@load(vm.isVisible('DEFECTO'))" disabled="@load(vm.isEditable('DEFECTO')?false:true)" checked="@bind(vm.beanData.defecto) @save(vm.beanData.defecto, before=('store'))"/>
+</h:div>
+
+
+
+
+ <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ORDENASC'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ORDENASC.label', 'Ordenar ascendentemente'))"/>
+	    <a iconSclass="mdi mdi-information-outline" popup="pop_511816" />
+	   </hbox>
+ <checkbox mold="default" id="511816" value="@bind(vm.beanData.ordenasc) @save(vm.beanData.ordenasc, before=('store'))" sclass="" visible="@load(vm.isVisible('ORDENASC'))" disabled="@load(vm.isEditable('ORDENASC')?false:true)" checked="@bind(vm.beanData.ordenasc) @save(vm.beanData.ordenasc, before=('store'))"/>
+</h:div>
+<popup id="pop_511816" width="200px">
+	  <vbox>  
+	  <fragment exps="@load(vm.lang.getProperty('ORDENASC.helptext', ''))" >
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+
+
+
+
+
+
+
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('MAXREG'))">
+	    <label id="lbMAXREG" sclass="form-label text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXREG.label', 'Max. Registros'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_MAXREG" />
+	   </hbox>
+    <intbox tabindex="3" id="MAXREG"  placeholder="@load(vm.lang.getProperty('MAXREG.label', 'Max. Registros'))" sclass="form-control text-dark"  value="@bind(vm.beanData.maxreg) @save(vm.beanData.maxreg, before=('store')) " visible="@load(vm.isVisible('MAXREG'))" disabled="@load(vm.isEditable('MAXREG')?false:true)" onChange="@command('onChangeInput',field='MAXREG',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['MAXREG'])"/>
+    </h:div>
+   <popup id="pop_MAXREG" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Help</caption>
+            <fragment exps="@load(vm.lang.getProperty('MAXREG.helptext', vm.form.getFieldByAtribute('MAXREG').getFieldPropsBeanByID('Helptext').value))" >
+	    	   <![CDATA[
+                <span textContent='@load(exps)'></span>
+	    	   ]]>        
+	        </fragment>
+        </groupbox>
+ </popup>
+
+
+
+
+</h:div>
+</h:div>  
+
+
+
+<h:div style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4">
+<h:div class="row">
+  <div class="col-lg-1">
+ <button label="+ Etapa" tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-pen-to-square"
+		onClick="@command('appendRow',alias='subcrmetapa')" />
+ </div>		
+ 
+ <div class="col-lg-12">		
+  <grid id="subcrmetapa" height="200px" width="100%" 
+   model="@bind(vm.subtables['subcrmetapa']) @template(each.updatable ? 'modelWrite' : 'model')" 
+    
+    onCreate="@command('onSubtableCreate',component=self,alias='subcrmetapa')" >
+  
+	  <columns sizable="true">
+   
+        <column label="@load(vm.lang.getProperty('ETAPA.label', 'Etapa'))" align="center"/>
+   
+        <column label="@load(vm.lang.getProperty('ORDEN.label', 'orden'))" align="center"/>
+   
+        <column label="@load(vm.lang.getProperty('PORCENTAJE.label', 'Porcentaje (%)'))" align="center"/>
+   
+        <column label="@load(vm.lang.getProperty('COLOR.label', 'color'))" align="center"/>
+   
+        <column align="center" />
+	 </columns>
+      <template name="model" var="item">
+      	<row style="text-align:right;">
+    	  				     <label  value="@load(item.getFieldByAtribute('ETAPA').value) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.getFieldByAtribute('ORDEN').value) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.getFieldByAtribute('PORCENTAJE').value) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.getFieldByAtribute('COLOR').value) @converter(vm.fieldConverter)"></label>
+               <cell align="center">
+		           <a onClick="@command('editRow',alias='subcrmetapa',item=item)"
+						iconSclass="fa-duotone fa-pen-to-square" sclass="btn btn-outline-secondary" />
+		                 <space></space> 
+						<button
+						onClick="@command('removeSubtable',alias='subcrmetapa',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn" />
+		                </cell> 
+       </row>
+   	</template>      <template name="modelWrite" var="item">
+      	<row style="text-align:right;">
+    	  				     <textbox  value="@bind(item.getFieldByAtribute('ETAPA').value)" ></textbox>
+				     <textbox  value="@bind(item.getFieldByAtribute('ORDEN').value)" ></textbox>
+				        <decimalbox value="@bind(item.getFieldByAtribute('PORCENTAJE').value)"></decimalbox>
+				     <textbox  value="@bind(item.getFieldByAtribute('COLOR').value)" ></textbox>
+           		<cell align="center">
+  					<a onClick="@command('storeRow',alias='subcrmetapa',item=item)"
+						iconSclass="su-icon su-icon-save" sclass="btn btn-outline-secondary" />
+		            <space></space>
+		            <button
+						onClick="@command('cancelRow',alias='subcrmetapa',item=item)"
+						iconSclass="s-icon s-icon-delete2"
+						sclass="btn btn-outline-warning" />
+                </cell> 
+       </row>
+   	</template>
+  </grid>
+  </div>
+
+
+
+</h:div>
+</h:div>  
+
+
+
+<h:div style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12">
+<h:div class="row">
+</h:div>
+</h:div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['Pipeline.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                  
+
+
+
+                  
+                  
+
+
+
+
+                  
+                  
+
+
+                  
+                  
+
+                  
+
+ </idspace>
+ <script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$pipeline');
+  binder.command('doLoad');
+});
+</script>
+</zk>

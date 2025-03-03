@@ -1,0 +1,269 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace id="facturaclte" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='facturaclte')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="facturaclte" />
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('facturaclte.screen', 'Facturas Servicios'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Facturas Servicios
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+
+<div id="ZrExaxaaQY"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="ZrExaxaaQY-card" class="card  shadow-lg" style="overflow:auto;" >
+       <div id="ZrExaxaaQY-body" class="card-body ">
+        <div id="ZrExaxaaQY-row" class="form-group row ">
+
+
+
+
+
+  
+    <h:div class="col-md-4 border-field">
+    <hbox spacing="3px" visible="@load(vm.isVisible('FACTURA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('FACTURA.label', ''))"/>
+	   </hbox>
+       <label sclass="margin-field fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.factura)"  />
+    </h:div>
+
+
+
+
+
+
+
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('FECHAFACT'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHAFACT.label', 'Fecha Factura'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_FECHAFACT" />
+	   </hbox>
+    <datebox  readonly="true"   buttonVisible="false"  id="6777"  placeholder="@load(vm.lang.getProperty('FECHAFACT.label', 'Fecha Factura'))" tabindex="2" value="@bind(vm.beanData.fechafact) @save(vm.beanData.fechafact, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECHAFACT'))" disabled="@load(vm.isEditable('FECHAFACT')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['6777'])"/>
+      </h:div>
+
+
+
+
+
+
+
+
+
+  <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('TOTAL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('TOTAL.label', 'Total'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_TOTAL" />
+	   </hbox>
+    <decimalbox  readonly="true"  tabindex="3" id="917887" onCreate="" placeholder="@load(vm.lang.getProperty('TOTAL.label', 'Total'))"   
+    value="@bind(vm.beanData.total) @save(vm.beanData.total, before=('grabar')) "  format="###,###,###,###,##0.00€"  sclass="margin-field form-control  form-control" visible="@load(vm.isVisible('TOTAL'))" disabled="@load(vm.isEditable('TOTAL')?false:true)" onChange="@command('onChangeInput',field='TOTAL',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['917887'])"/>
+    </h:div>
+
+
+
+
+
+
+
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('VENCIMIENTO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('VENCIMIENTO.label', 'Vencimiento'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_VENCIMIENTO" />
+	   </hbox>
+    <datebox  readonly="true"   buttonVisible="false"  id="129869"  placeholder="@load(vm.lang.getProperty('VENCIMIENTO.label', 'Vencimiento'))" tabindex="4" value="@bind(vm.beanData.vencimiento) @save(vm.beanData.vencimiento, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('VENCIMIENTO'))" disabled="@load(vm.isEditable('VENCIMIENTO')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['129869'])"/>
+      </h:div>
+
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-4 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('FORMADEPAGO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('FORMADEPAGO.label', 'Forma de Pago'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="5" id="481879" 
+	   placeholder="@load(vm.lang.getProperty('FORMADEPAGO.label', 'Forma de Pago'))" 
+	   value="@bind(vm.beanData.iderpformapago.formadepago) @save(vm.beanData.iderpformapago.formadepago, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('FORMADEPAGO'))" disabled="@load(vm.isEditable('FORMADEPAGO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['481879'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-4 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('ESTADO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))"  />
+	   </hbox>
+	   <textbox  readonly="true"  tabindex="6" id="779238" 
+	   placeholder="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))" 
+	   value="@bind(vm.beanData.iderpmestado.estado) @save(vm.beanData.iderpmestado.estado, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('ESTADO'))" disabled="@load(vm.isEditable('ESTADO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['779238'])"/>
+    </h:div>   
+
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+
+<div id="uClyRzawvb" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="uClyRzawvb-row" class="row">
+
+<h:div class="col-md-12 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('SERIE.label', 'Serie'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_588352" />
+   </hbox>
+<combobox model="@load(vm.getEnums('SERIE'))" selectedItem=" @load(vm.beanData.serie) "   value="@load(vm.beanData.serie) @save(vm.beanData.serie, before=('grabar'))    " >
+<template name="model" var="item"><comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/></template></combobox>
+
+   <popup id="pop_588352" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('SERIE.helptext', 'Serie'))">
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+</div>
+</div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['facturaclte.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+
+
+
+
+
+                  
+                 
+
+
+                  
+
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$facturaclte');
+  binder.command('doLoad');
+});
+</script>
+</zk>

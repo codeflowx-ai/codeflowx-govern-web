@@ -1,0 +1,81 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('NAME.label', 'Nombre'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NAMEAsc'])" sortDescending="@load(vm.comparators['NAMEDesc'])"  visible="@load(vm.isVisible('NAME'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVOAsc'])" sortDescending="@load(vm.comparators['ACTIVODesc'])"  visible="@load(vm.isVisible('ACTIVO'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('DESCRIBE.label', 'Breve descripción'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DESCRIBEAsc'])" sortDescending="@load(vm.comparators['DESCRIBEDesc'])"  visible="@load(vm.isVisible('DESCRIBE'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('GLOBALCHAT.label', 'Todos los chat'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['GLOBALCHATAsc'])" sortDescending="@load(vm.comparators['GLOBALCHATDesc'])"  visible="@load(vm.isVisible('GLOBALCHAT'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('MEDIATIC.label', 'Reglas Mediaticas'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MEDIATICAsc'])" sortDescending="@load(vm.comparators['MEDIATICDesc'])"  visible="@load(vm.isVisible('MEDIATIC'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('FILTERPROMPT.label', 'Filtro de proteccion'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FILTERPROMPTAsc'])" sortDescending="@load(vm.comparators['FILTERPROMPTDesc'])"  visible="@load(vm.isVisible('FILTERPROMPT'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='mastersecureprompt.zul')">
+							             <label  value="@load(item.name) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.activo) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.describe) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.globalchat) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.mediatic) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.filterprompt) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='mastersecureprompt.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

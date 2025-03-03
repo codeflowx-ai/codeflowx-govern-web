@@ -1,0 +1,226 @@
+<?page title="Regulatory Requirements Tracker" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.compliance.RegulatoryRequirementsVM')">
+        
+        <hlayout sclass="regulatory-header">
+            <div sclass="metric-box">
+                <label value="Compliance Rate"/>
+                <label value="@load(vm.complianceRate)%" 
+                       sclass="@load(vm.complianceRateStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Pending Actions"/>
+                <label value="@load(vm.pendingActions)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Upcoming Deadlines"/>
+                <label value="@load(vm.upcomingDeadlines)"/>
+            </div>
+            <div sclass="actions-box">
+                <button label="Add Requirement" 
+                        onClick="@command('addRequirement')"
+                        sclass="primary"/>
+                <button label="Generate Report" 
+                        onClick="@command('generateComplianceReport')"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="AI Act Requirements"/>
+                <tab label="GDPR Requirements"/>
+                <tab label="Industry Standards"/>
+                <tab label="Action Items"/>
+            </tabs>
+            <tabpanels>
+                <!-- AI Act Requirements Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Filters -->
+                        <hlayout sclass="filter-container">
+                            <combobox model="@load(vm.riskLevels)" 
+                                     selectedItem="@bind(vm.selectedRiskLevel)"
+                                     placeholder="Risk Level"/>
+                            <combobox model="@load(vm.complianceStatuses)" 
+                                     selectedItem="@bind(vm.selectedStatus)"
+                                     placeholder="Status"/>
+                            <textbox value="@bind(vm.searchTerm)" 
+                                    placeholder="Search requirements..."/>
+                            <button label="Apply Filters" 
+                                    onClick="@command('applyFilters')"/>
+                        </hlayout>
+
+                        <!-- Requirements Grid -->
+                        <grid model="@load(vm.aiActRequirements)" 
+                              mold="paging" pageSize="15">
+                            <columns>
+                                <column label="Article"/>
+                                <column label="Requirement"/>
+                                <column label="Risk Level"/>
+                                <column label="Status"/>
+                                <column label="Implementation"/>
+                                <column label="Due Date"/>
+                                <column label="Evidence"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="req">
+                                <row>
+                                    <label value="@load(req.article)"/>
+                                    <label value="@load(req.description)"/>
+                                    <label value="@load(req.riskLevel)" 
+                                           sclass="@load(req.riskLevelStyle)"/>
+                                    <label value="@load(req.status)" 
+                                           sclass="@load(req.statusStyle)"/>
+                                    <progressmeter value="@load(req.implementationProgress)"/>
+                                    <label value="@load(req.dueDate)"/>
+                                    <button label="View Evidence" 
+                                            onClick="@command('viewEvidence', req=req)"/>
+                                    <hlayout>
+                                        <button label="Update" 
+                                                onClick="@command('updateRequirement', req=req)"/>
+                                        <button label="Track" 
+                                                onClick="@command('trackRequirement', req=req)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- GDPR Requirements Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.gdprRequirements)" 
+                              mold="paging" pageSize="15">
+                            <columns>
+                                <column label="Article"/>
+                                <column label="Requirement"/>
+                                <column label="Applicability"/>
+                                <column label="Status"/>
+                                <column label="Controls"/>
+                                <column label="Last Review"/>
+                                <column label="Next Review"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="req">
+                                <row>
+                                    <label value="@load(req.article)"/>
+                                    <label value="@load(req.description)"/>
+                                    <label value="@load(req.applicability)"/>
+                                    <label value="@load(req.status)" 
+                                           sclass="@load(req.statusStyle)"/>
+                                    <label value="@load(req.controls)"/>
+                                    <label value="@load(req.lastReview)"/>
+                                    <label value="@load(req.nextReview)"/>
+                                    <hlayout>
+                                        <button label="Review" 
+                                                onClick="@command('reviewRequirement', req=req)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateGDPRRequirement', req=req)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Industry Standards Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.industryStandards)" 
+                              mold="paging" pageSize="15">
+                            <columns>
+                                <column label="Standard"/>
+                                <column label="Version"/>
+                                <column label="Category"/>
+                                <column label="Requirements"/>
+                                <column label="Compliance Level"/>
+                                <column label="Certification"/>
+                                <column label="Expiry"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="std">
+                                <row>
+                                    <label value="@load(std.name)"/>
+                                    <label value="@load(std.version)"/>
+                                    <label value="@load(std.category)"/>
+                                    <label value="@load(std.requirementsCount)"/>
+                                    <label value="@load(std.complianceLevel)" 
+                                           sclass="@load(std.complianceLevelStyle)"/>
+                                    <label value="@load(std.certificationStatus)"/>
+                                    <label value="@load(std.expiryDate)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('viewStandardDetails', std=std)"/>
+                                        <button label="Update" 
+                                                onClick="@command('updateStandard', std=std)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Action Items Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.actionItems)" 
+                              mold="paging" pageSize="20">
+                            <columns>
+                                <column label="Action"/>
+                                <column label="Related To"/>
+                                <column label="Priority"/>
+                                <column label="Assigned To"/>
+                                <column label="Due Date"/>
+                                <column label="Status"/>
+                                <column label="Progress"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="action">
+                                <row>
+                                    <label value="@load(action.description)"/>
+                                    <label value="@load(action.relatedTo)"/>
+                                    <label value="@load(action.priority)" 
+                                           sclass="@load(action.priorityStyle)"/>
+                                    <label value="@load(action.assignedTo)"/>
+                                    <label value="@load(action.dueDate)"/>
+                                    <label value="@load(action.status)" 
+                                           sclass="@load(action.statusStyle)"/>
+                                    <progressmeter value="@load(action.progress)"/>
+                                    <hlayout>
+                                        <button label="Update" 
+                                                onClick="@command('updateAction', action=action)"/>
+                                        <button label="Complete" 
+                                                visible="@load(action.canComplete)"
+                                                onClick="@command('completeAction', action=action)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="requirementDetailsWindow" 
+                title="Requirement Details" 
+                visible="false" 
+                mode="modal"
+                width="80%"
+                height="80%">
+            <!-- Requirement Details Form -->
+        </window>
+
+        <window id="evidenceWindow" 
+                title="Compliance Evidence" 
+                visible="false" 
+                mode="modal"
+                width="70%"
+                height="70%">
+            <!-- Evidence Details -->
+        </window>
+    </div>
+</zk>

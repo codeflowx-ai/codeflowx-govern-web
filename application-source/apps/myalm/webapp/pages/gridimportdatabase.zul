@@ -1,0 +1,88 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+			
+			
+			
+			
+			
+				 <grid  	model="@load(vm.beans)"  sclass="table align-middle mb-0" >  
+							<columns sizable="true" >
+						
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('NOMBRE.label', 'Referencia'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])"  visible="@load(vm.isVisible('NOMBRE'))"/>
+						
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Base Datos.label', 'Base Datos'))" align="center"/>
+						
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('URLJDBC.label', 'JDBC'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['URLJDBCAsc'])" sortDescending="@load(vm.comparators['URLJDBCDesc'])"  visible="@load(vm.isVisible('URLJDBC'))"/>
+						
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Proyecto.label', 'Proyecto'))" align="center"/>
+						
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PREFIX.label', 'Prefix'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PREFIXAsc'])" sortDescending="@load(vm.comparators['PREFIXDesc'])"  visible="@load(vm.isVisible('PREFIX'))"/>
+ 							      <column  label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='importdatabase.zul')">
+						
+							             <label  value="@load(item.nombre) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idalmdatabase.database) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							             <label  value="@load(item.urljdbc) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+						
+                                   <cell align="center">
+                                          <label  value="@load(item.idalmproject.proyectoalm) @converter(vm.fieldConverter)"></label>
+                                        
+                                      
+                                    <space></space>
+                                   </cell> 
+						
+							             <label  value="@load(item.prefix) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							
+                  			
+                  		<cell align="center">
+							<a
+						onClick="@command('editData',item=item,page='importdatabase.zul')"
+						iconSclass="fa-duotone fa-pen-to-square  fa-xl"    />
+						<space></space>
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						  />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

@@ -1,0 +1,243 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="clazzservice" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='clazzservice')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="clazzservice" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Slclazzservice" />
+	   <custom-attributes namespace="suinless" />
+		<custom-attributes uid="15779" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('clazzservice.screen', 'Clase de servicio'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')">
+										
+									</a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+
+<div id="dvEHUDEClJ" style="overflow:hidden;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="dvEHUDEClJ-row" class="row">
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('NOMBRE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))"  />
+	   
+	    <textbox   tabindex="1" id="597883" 
+	   placeholder="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" 
+	   value="@bind(vm.beanData.nombre) @save(vm.beanData.nombre, before=('grabar')) @validator(vm.unique, field='NOMBRE',required=true ,oldValue=vm.beanDataCpy.nombre)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('NOMBRE'))" disabled="@load(vm.isEditable('NOMBRE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['597883'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-5  input-group" visible="@load(vm.isVisible('CLAZZ'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CLAZZ.label', 'Clase'))"  />
+	   
+	    <textbox   tabindex="2" id="FejAHPtTAh" 
+	   placeholder="@load(vm.lang.getProperty('CLAZZ.label', 'Clase'))" 
+	   value="@bind(vm.beanData.clazz) @save(vm.beanData.clazz, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('CLAZZ'))" disabled="@load(vm.isEditable('CLAZZ')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['FejAHPtTAh'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('VERSION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VERSION.label', 'Versión'))"  />
+	   
+	    <textbox   tabindex="3" id="AfYNCUsxTb" 
+	   placeholder="@load(vm.lang.getProperty('VERSION.label', 'Versión'))" 
+	   value="@bind(vm.beanData.version) @save(vm.beanData.version, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('VERSION'))" disabled="@load(vm.isEditable('VERSION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['AfYNCUsxTb'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+ <div class="col-md-2   input-grou" visible="@load(vm.isVisible('EVALUATION'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('EVALUATION.label', 'Evaluación prompt'))"/>
+ <checkbox mold="switch" id="HcjfvjFwgo" value="@bind(vm.beanData.evaluation) @save(vm.beanData.evaluation, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('EVALUATION'))" disabled="@load(vm.isEditable('EVALUATION')?false:true)" checked="@bind(vm.beanData.evaluation) @save(vm.beanData.evaluation, before=('grabar'))"/>
+</div>
+
+
+
+
+
+ <div class="col-md-2   input-grou" visible="@load(vm.isVisible('EXECUTION'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('EXECUTION.label', 'Ejecución resultado'))"/>
+ <checkbox mold="switch" id="HojTAuaRCQ" value="@bind(vm.beanData.execution) @save(vm.beanData.execution, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('EXECUTION'))" disabled="@load(vm.isEditable('EXECUTION')?false:true)" checked="@bind(vm.beanData.execution) @save(vm.beanData.execution, before=('grabar'))"/>
+</div>
+
+
+
+
+
+ <div class="col-md-2   input-grou" visible="@load(vm.isVisible('ORIGIN'))">
+ 	    <label sclass="form-check-label font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ORIGIN.label', 'Ejecuatr Origen usuario'))"/>
+ <checkbox mold="switch" id="SiQeIgHtWd" value="@bind(vm.beanData.origin) @save(vm.beanData.origin, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ORIGIN'))" disabled="@load(vm.isEditable('ORIGIN')?false:true)" checked="@bind(vm.beanData.origin) @save(vm.beanData.origin, before=('grabar'))"/>
+</div>
+
+
+
+
+
+				
+
+    <div class="col-md-6  input-group" visible="@load(vm.isVisible('ENDPOINT'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ENDPOINT.label', 'Endpoint'))"  />
+	   
+	    <textbox   tabindex="7" id="755683" 
+	   placeholder="@load(vm.lang.getProperty('ENDPOINT.label', 'Endpoint'))" 
+	   value="@bind(vm.beanData.endpoint) @save(vm.beanData.endpoint, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('ENDPOINT'))" disabled="@load(vm.isEditable('ENDPOINT')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['755683'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPTION.label', 'Descripción'))"/>
+	  
+	  <tbeditor id="tJqvvTkjij" value="@bind(vm.beanData.description) @save(vm.beanData.description, before=('grabar')) " />
+</h:div>
+
+
+
+</div>
+</div>  
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['clazzservice.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$clazzservice');
+  binder.command('doLoad');
+});
+</script>
+</zk>

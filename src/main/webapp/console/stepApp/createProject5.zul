@@ -1,0 +1,186 @@
+<zk xmlns:h="native">
+	<div sclass="row">
+		<h:div class="col-md-3 ">
+			<hbox spacing="3px">
+				<label
+					sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+					style="  " value="Proyecto" />
+			</hbox>
+			<label
+				sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+				style="  " value="@bind(vm.almproject.proyectoalm)" />
+		</h:div>
+		<h:div class="col-md-3 ">
+			<!-- sclass="margin-field" -->
+			<hbox spacing="3px">
+				<label
+					sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+					style="  " value="Namespace" />
+			</hbox>
+			<label
+				sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+				style="  " value="@bind(vm.almproject.namespace)" />
+
+		</h:div>
+		<h:div class="col-md-3 ">
+			<!-- sclass="margin-field" -->
+			<hbox spacing="10px">
+				<label
+					sclass="text form-label  text-capitalize  font-weight-bold align-text-middle"
+					style="  " value="Solution Clone " />
+
+			</hbox>
+			<label
+				sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+				style="  " value="@load(vm.solution.solucion)" />
+
+		</h:div>
+		<h:div class="col-md-3 ">
+			<!-- sclass="margin-field" -->
+			<hbox spacing="10px">
+				<label
+					sclass="text form-label  text-capitalize  font-weight-bold align-text-middle"
+					style="  " value="Project Clone " />
+
+			</hbox>
+			<label
+				sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+				style="  " value="@load(vm.almprojectClone.proyectoalm)" />
+
+		</h:div>
+	</div>
+	<space></space>
+	<div sclass="row">
+		<div sclass="col-lg-4">
+			<vbox spacing="10px">
+				<div sclass="col-lg-12">
+					<listbox model="@load(vm.clouds)"
+						selectedItem="@bind(vm.kubeCloud)" checkmark="true" height="400px"
+						onSelect="@command('selectCloud',item=self.selectedItem.value)">
+						<listhead>
+							<listheader label="Cluster" sort="auto" />
+							<listheader label="Version" sort="auto" />
+							<listheader label="Región" sort="auto" />
+						</listhead>
+						<template name="model" var="item">
+							<listitem value="${item}">
+								<listcell label="${item.cluster}"></listcell>
+								<listcell
+									label="${item.versionkbube}">
+								</listcell>
+								<listcell label="${item.region}">
+								</listcell>
+							</listitem>
+						</template>
+					</listbox>
+				</div>
+			</vbox>
+		</div>
+
+		<div sclass="col-lg-4">
+			<div sclass="row">
+				<h:div class="col-md-6 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Cluster" />
+					</hbox>
+					<label
+						sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+						style="  " value="@load(vm.kubeCloud.cluster)" />
+
+				</h:div>
+				<h:div class="col-md-3 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Versión" />
+					</hbox>
+					<label
+						sclass="text form-label  font-weight-normal align-text-middle"
+						style="  " value="@load(vm.kubeCloud.versionkbube)" />
+
+				</h:div>
+				<h:div class="col-md-3 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Región" />
+					</hbox>
+					<label
+						sclass="text form-label  font-weight-normal align-text-middle"
+						style="  " value="@load(vm.kubeCloud.region)" />
+
+				</h:div>
+			</div>
+			<div sclass="row">
+			
+			<h:div class="col-md-4 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Namespace K8s" />
+					</hbox>
+					<textbox tabindex="3" id="341367"
+						placeholder="namespace"
+						value="@bind(vm.almrclusters.namespace) @save(vm.almrclusters.namespace, before=('next')) @validator(vm.unique, required=true)"
+						sclass="margin-field form-control  form-control border border-warning" />
+					<label sclass="text-danger"
+						value="@load(vmsgs['341367'])" />
+
+				</h:div>
+				<h:div class="col-md-4 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Dominio DNS" />
+					</hbox>
+					<textbox tabindex="3" id="34136711"
+						placeholder="dominio"
+						value="@bind(vm.almrclusters.dominio) @save(vm.almrclusters.dominio, before=('next')) @validator(vm.unique, required=true)"
+						sclass="margin-field form-control  form-control border border-warning" />
+					<label sclass="text-danger"
+						value="@load(vmsgs['34136711'])" />
+
+				</h:div>
+				<h:div class="col-md-4 ">
+					<!-- sclass="margin-field" -->
+					<hbox spacing="3px">
+						<label
+							sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+							style="  " value="Subdominio proyecto" />
+					</hbox>
+					<textbox tabindex="3" id="34136722"
+						placeholder="subdomino"
+						value="@bind(vm.almrclusters.subdominio) @save(vm.almrclusters.subdominio, before=('next')) @validator(vm.unique, required=true)"
+						sclass="margin-field form-control  form-control border border-warning" />
+					<label sclass="text-danger"
+						value="@load(vmsgs['34136722'])" />
+
+				</h:div>
+			
+			</div>
+
+		</div>
+		<div sclass="col-lg-4">
+
+		</div>
+
+	</div>
+	<div class="card-footer">
+		<button zclass="pull-left"
+			sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill"
+			onClick="@command('back')"
+			iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"
+			label="Anterior" />
+		<button zclass="pull-right"
+			sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+			iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"
+			onClick="@command('next')" label="Siguiente" />
+	</div>
+</zk>

@@ -1,0 +1,138 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="estadocbo" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='estadocbo')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="estadocbo" />
+<custom-attributes clase="org.suinsit.apps.facturacin.Erpmestadocbo" />
+	   <custom-attributes namespace="facturacin" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="BosQUhsPBM" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="BosQUhsPBM-row" class="row">
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('ESTADO'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="923826" 
+	   placeholder="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))" 
+	   value="@bind(vm.beanData.estado) @save(vm.beanData.estado, before=('grabar')) @validator(vm.unique, field='ESTADO',required=true ,oldValue=vm.beanDataCpy.estado)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('ESTADO'))" disabled="@load(vm.isEditable('ESTADO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['923826'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-6 border-field">
+
+   <hbox spacing="3px">
+     <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('BGCOLOR.label', 'Color de fondo'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="BGCOLOR" model="@load(vm.getEnums('BGCOLOR'))" 
+selectedItem="@load(vm.beanData.bgcolor)"  value="@load(vm.beanData.bgcolor) @save(vm.beanData.bgcolor, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['BGCOLOR'])"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-6 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('COBPARCIAL'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('COBPARCIAL.label', 'Es un cobro parcial'))"/>
+	   </hbox>
+ <checkbox mold="default" id="dkACKVXJsH" value="@bind(vm.beanData.cobparcial) @save(vm.beanData.cobparcial, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('COBPARCIAL'))" disabled="@load(vm.isEditable('COBPARCIAL')?false:true)" checked="@bind(vm.beanData.cobparcial) @save(vm.beanData.cobparcial, before=('grabar'))"/>
+</h:div>
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['estadocbo.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$estadocbo');
+  binder.command('doLoad');
+});
+function loadestadocbo(){
+  var binder = zkbind.$('$estadocbo');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

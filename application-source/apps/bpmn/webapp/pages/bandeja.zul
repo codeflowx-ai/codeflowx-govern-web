@@ -1,0 +1,256 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<style >
+	.z-auxhead{
+	background:#FFF !important;
+	}
+	.z-auxheader{
+	 background:#FFF !important;
+	 border:0px solid #FFF !important;
+	 border-bottom: 1px solid #BCBCBC;
+	}
+	.z-column-content{
+	 font-size: 14px;
+	}
+	.z-column{
+	 border-top: 1px solid #BCBCBC;
+	}
+	</style>
+	
+	<idspace id="bandeja" viewModel="@id('vm') @init('com.suinsit.applications.bpmn.BandejaUI',pagina='fichaje')" validationMessages="@id('vmsgs')">
+		<h:div id="notificacion"></h:div>
+		 <custom-attributes mode="application" />
+		<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+						<h:h4 class="mb-sm-0">Bandeja de Tareas</h:h4>
+					</vbox>
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									Dashboard
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Tareas
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xxl-12">
+				<div class="card">
+				<tabbox>
+					<tabs>
+						<tab label="Mis Tareas Abiertas" />
+						<tab label="Tareas No Asignadas" />
+						<tab label="Otras Tareas Asignadas" />
+						<tab label="Tareas Asignadas a clientes" />
+					</tabs>
+					<tabpanels>
+						<tabpanel>
+						<grid model="@load(vm.opentasks)" mold="paging" pageSize="25" height="600px" width="100%">
+							<auxhead>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" >
+								<combobox><comboitem label="Alta"/><comboitem label="Media"/><comboitem label="Baja"/></combobox>
+								</auxheader>
+								<auxheader colspan="2" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" />
+								
+							</auxhead>
+							<columns>
+								<column label="Proceso" />
+								<column label="Tarea" />
+								<column label="Descripción" width="30%"/>
+								<column label="Prioridad" />
+								<column label="Fecha Alta" />
+								<column label="Fecha Fin" />
+								<column label="" />
+							</columns>
+							<rows>
+								<template name="model" var="item">
+							     <row>
+								  <label value="@load(item.processName) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.name) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.description) @converter(vm.fieldConverter)" ></label>
+								  <label value="@load(item.priority) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.createTime ) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.dueDate) @converter(vm.fieldConverter)"></label>
+								  <cell>
+								   
+								   <a iconSclass="bx bx-user-x" onClick="@command('uclaimTask',task=item)" tooltiptext="Liberar"></a>
+								   <a iconSclass="bx bx-edit" onClick="@command('executeTask',task=item)" tooltiptext="Ejecutar"></a>
+								  
+								  </cell>
+								</row>
+							   </template>
+							</rows>
+						</grid>
+
+
+						</tabpanel>
+						<tabpanel>
+						<grid model="@load(vm.uclaimtasks)" mold="paging" pageSize="25" height="600px" width="100%">
+							<auxhead>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" >
+								<combobox><comboitem label="Alta"/><comboitem label="Media"/><comboitem label="Baja"/></combobox>
+								</auxheader>
+								<auxheader colspan="2" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" />
+								
+							</auxhead>
+							<columns>
+								<column label="Proceso" />
+								<column label="Tarea" />
+								<column label="Descripción" width="30%"/>
+								<column label="Prioridad" />
+								<column label="Fecha Alta" />
+								<column label="Fecha Fin" />
+								
+								<column label="" />
+							</columns>
+							<rows>
+							   <template name="model" var="item">
+							     <row>
+								  <label value="@load(item.processName) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.name) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.description) @converter(vm.fieldConverter)" ></label>
+								  <label value="@load(item.priority) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.createTime ) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.dueDate) @converter(vm.fieldConverter)"></label>
+								  <cell >
+								   <a iconSclass="bx bx-user-check" onClick="@command('assignmeTask',task=item)" tooltiptext="Asignarme"></a>
+								   <a iconSclass="bx bx-edit" onClick="@command('executeTask',task=item)" tooltiptext="Ejecutar"></a>
+								  </cell>
+								</row>
+							   </template>
+								
+							</rows>
+						</grid>
+
+
+						</tabpanel>
+						<tabpanel>
+						<grid model="@load(vm.claimtasks)" mold="paging" pageSize="25" height="600px" width="100%">
+							<auxhead>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" >
+								<combobox><comboitem label="Alta"/><comboitem label="Media"/><comboitem label="Baja"/></combobox>
+								</auxheader>
+								<auxheader colspan="2" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" />
+							</auxhead>
+							<columns>
+								<column label="Proceso" />
+								<column label="Tarea" />
+								<column label="Titulo" />
+								<column label="Prioridad" />
+								<column label="Fecha Alta" />
+								<column label="Fecha Fin" />
+								<column label="Propietario" />
+								<column label="" />
+							</columns>
+							<rows>
+								<template name="model" var="item">
+							     <row>
+								  <label value="@load(item.processName) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.name) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.name) @converter(vm.fieldConverter)" ></label>
+								  <label value="@load(item.priority) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.createTime ) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.dueDate) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.assignee) @converter(vm.fieldConverter)"></label>
+								  <cell >
+								   <a iconSclass="bx bx-user-x" onClick="@command('uclaimTask',task=item)" tooltiptext="Liberar"></a>
+								   <a iconSclass="bx bx-user-check" onClick="@command('assignmeTask',task=item)" tooltiptext="Asignarme"></a>
+								   <a iconSclass="bx bx-edit" onClick="@command('executeTask',task=item)" tooltiptext="Ejecutar"></a>
+								  </cell>
+								</row>
+							   </template>
+							</rows>
+						</grid>
+						</tabpanel>
+						<tabpanel>
+						
+						<grid model="@load(vm.customertasks)" mold="paging" pageSize="25" height="600px" width="100%">
+							<auxhead>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" >
+								<textbox />
+								</auxheader>
+								<auxheader colspan="1" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" >
+								<combobox><comboitem label="Alta"/><comboitem label="Media"/><comboitem label="Baja"/></combobox>
+								</auxheader>
+								<auxheader colspan="2" rowspan="1" />
+								<auxheader colspan="1" rowspan="1" />
+								
+							</auxhead>
+							<columns>
+								<column label="Cliente" />
+								<column label="Tarea" />
+								<column label="Descripción" width="30%"/>
+								<column label="Prioridad" />
+								<column label="Fecha Alta" />
+								<column label="Fecha Fin" />
+								
+								<column label="" />
+							</columns>
+							<rows>
+							   <template name="model" var="item">
+							     <row>
+								  <label value="@load(item.varsProcess['CUSTOMER_NAME']) "></label>
+								  <label value="@load(item.name) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.description) @converter(vm.fieldConverter)" ></label>
+								  <label value="@load(item.priority) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.createTime ) @converter(vm.fieldConverter)"></label>
+								  <label value="@load(item.dueDate) @converter(vm.fieldConverter)"></label>
+								  <cell >
+								   <a iconSclass="bx bx-user-check" onClick="@command('assignmeTask',task=item)" tooltiptext="Asignarme"></a>
+								   <a iconSclass="bx bx-edit" onClick="@command('executeTask',task=item)" tooltiptext="Ejecutar"></a>
+								  </cell>
+								</row>
+							   </template>
+								
+							</rows>
+						</grid>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

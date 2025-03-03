@@ -1,0 +1,435 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="mapping" extends="div" class="com.enartsystems.designer.commons.mapping.MappingFields"?>
+<?component name="services" extends="div" class="com.enartsystems.designer.commons.mapping.CallServices"?>
+<?component name="listfields" extends="div" class="com.enartsystems.designer.commons.mapping.ListFieldsFind"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<style>
+		.vertical-scrollable.row { position: absolute; top: 120px;
+		bottom: 100px; left: 180px; width: 100%; overflow-y: scroll;
+		height:90%; } .col-sm-8 { color: white; font-size: 24px;
+		padding-bottom: 20px; padding-top: 18px; }
+		.col-sm-8:nth-child(2n+1) { background: green; }
+		.col-sm-8:nth-child(2n+2) { background: black; }
+	</style>
+	<div sclass="col-lg-12">
+
+
+		<!-- 		<hbox id="toolbar2" spacing="5px" align="start" -->
+		<!-- 			style="margin-top: 7px;margin-bottom: 5px;"> -->
+		<!-- 		</hbox> -->
+		<nodom
+			viewModel="@id('vm') @init('com.enartsystems.designer.ViewModelDesigner')">
+			<div class="card">
+				<div class="card-header">
+					<div
+						class="d-flex align-items-center flex-wrap gap-2">
+						<div class="flex-grow-1">
+							<button
+								iconSclass="mdi mdi-content-save label-icon align-middle fs-16 me-2"
+								onClick="@command('onSave')"
+								sclass="btn btn-label btn-info waves-effect waves-light"
+								tooltiptext="Save">
+								Save
+							</button>
+							<button
+								iconSclass="mdi mdi-motion-play label-icon align-middle fs-16 me-2"
+								onClick="@command('onSaveAndPublish')"
+								sclass="btn btn-label btn-primary waves-effect waves-light"
+								tooltiptext="Save and Publish">
+								Save and Publish
+							</button>
+						</div>
+						<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								<!-- 									<button -->
+								<!-- 										tooltiptext="Create template" -->
+								<!-- 										iconSclass="mdi mdi-content-save-cog label-icon align-middle fs-16 me-2" -->
+								<!-- 										onClick="@command('store')" -->
+								<!-- 										sclass="btn btn-label btn-dark waves-effect waves-light"> -->
+								<!-- 										Create template -->
+								<!-- 	
+									</button> -->
+								<button tooltiptext="Duplicate Screen"
+									iconSclass="mdi mdi-content-save-move label-icon align-middle fs-16 me-2"
+									onClick="@command('duplicate',win=WIN_SWEzeslYlw)"
+									sclass="btn btn-label btn-dark waves-effect waves-light">
+									Duplicate
+								</button>
+								<!-- 									<button -->
+								<!-- 										tooltiptext="Create widgget" -->
+								<!-- 										iconSclass="mdi mdi-content-save-all label-icon align-middle fs-16 me-2" -->
+								<!-- 										onClick="@command('store')" -->
+								<!-- 										sclass="btn btn-label btn-dark waves-effect waves-light"> -->
+								<!-- 										Widgget -->
+								<!-- 									</button> -->
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<window id="WIN_SWEzeslYlw" mode="modal" visible="false"
+				position="center,center" action="show: slideDown;hide: slideUp"
+				sclass="z-messagebox-window" border="none" width="40%">
+				<div class="modal-content border-0">
+					<div class="modal-header bg-soft-info p-3">
+						<h:h5 class="modal-title"
+							id="staticiderpseriesLabel">
+							Duplicate Screen
+						</h:h5>
+					</div>
+					<div class="modal-body" id="body_SWEzeslYlw">
+						<div class="row">
+							<div class="col-lg-10">
+								<grid style="align:top:scroll:auto"
+									width="90%">
+									<rows>
+										<row>
+											<label value="UID"></label>
+											<label
+												value="@load(vm.screenDesingDuplicate.uid)" />
+										</row>
+										<row>
+											<label
+												value="Nombre Pantalla">
+											</label>
+											<textbox
+												value="@bind(vm.screenDesingDuplicate.nameScreen)"
+												constraint="no empty" width="99%"/>
+										</row>
+										<row>
+											<label value="Titulo">
+											</label>
+											<textbox
+												value="@bind(vm.screenDesingDuplicate.title)"
+												constraint="no empty" width="99%"/>
+										</row>
+										<row>
+											<label
+												value="Nombre página">
+											</label>
+											<textbox
+												value="@bind(vm.screenDesingDuplicate.pageName)"
+												constraint="no empty" width="99%"/>
+
+										</row>
+										<row>
+											<label
+												value="Descripción">
+											</label>
+											<textbox multiline="true"
+												rows="5"
+												value="@bind(vm.screenDesingDuplicate.descripcion)" width="99%"/>
+
+										</row>
+									</rows>
+								</grid>
+							</div>
+
+						</div>
+
+
+					</div>
+					<div class="modal-footer">
+						<button
+							iconSclass="mdi mdi-motion-play label-icon align-middle fs-16 me-2"
+							onClick="@command('onDuplicateCancel')"
+							sclass="btn btn-label btn-danger waves-effect waves-light"
+							tooltiptext="Cancel">
+							Cancel
+						</button>
+						<button
+							iconSclass="mdi mdi-motion-play label-icon align-middle fs-16 me-2"
+							onClick="@command('onSaveDuplicate')"
+							sclass="btn btn-label btn-primary waves-effect waves-light"
+							tooltiptext="Save">
+							Save Duplicate
+						</button>
+					</div>
+				</div>
+			</window>
+			<tabbox>
+				<tabs>
+					<!-- 					<tab id="idData" label="Data Binding" /> -->
+					<tab id="ids" label="Designer"
+						image="img/icons/svg/web-design.svg" />
+					<tab id="tbpreview" label="Preview"
+						onClick="@command('onPreview')" image="img/icons/svg/preview.svg" />
+					<tab id="tbcomponent" label="Help-Component"
+						image="img/icons/svg/apoyo.svg" disabled="true" />
+					<tab id="tblogs" label="logs"
+						onSelect="@command('onLoadLogs')" image="img/icons/svg/log.svg"
+						disabled="false" />
+					<tab id="ttraslate" label="Traslate"
+						image="img/icons/svg/log.svg" />
+				</tabs>
+				<tabpanels>
+
+					<tabpanel sclass="overflow-auto">
+						<div sclass="row ">
+							<div height="750px" id="vComponents"
+								sclass="overflow-auto col-lg-1 border border-gray">
+								<!-- 								<div id="vComponents"  -->
+								<!-- 									sclass="border border-gray overflow-auto" /> -->
+
+							</div>
+							<div
+								sclass="col-lg-8 col-xlg-8 col-md-8 overflow-auto">
+								<tabbox>
+									<tabs>
+
+										<tab
+											label="Diseñador de pantalla" iconSclass="icon wb-desktop" />
+										<tab id="pageprops"
+											label="Propiedades de Pantalla"
+											iconSclass="icon glyphicon glyphicon-cog" />
+										<tab id="context"
+											label="Campos en Lista"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="card"
+											label="Campos en Tarjeta"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="search"
+											label="Campos de Busqueda"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="filters"
+											label="Filtros Avanzados"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+
+										<tab id="listados"
+											label="Campos Listados"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="tbmapping"
+											label="Asociar Valores" />
+										<tab id="tbservices"
+											label="Ejecutar Servicios" />
+									</tabs>
+									<tabpanels>
+
+										<tabpanel>
+											<div sclass="row">
+												<div id="drawingpane"
+													sclass="col-lg-12 col-xlg-12 col-md-12 overflow-auto">
+												</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<div class="row">
+												<div class="col-lg-9">
+													<grid
+														style="align:top:scroll:auto" id="propiedadesPage"
+														width="90%" height="750px">
+														<columns>
+															<column
+																label="Property" width="25%" />
+															<column
+																label="Value" width="75%" />
+														</columns>
+														<rows>
+															<row></row>
+															<row></row>
+															<row></row>
+														</rows>
+													</grid>
+
+												</div>
+												<div class="col-lg-3">
+													<grid
+														style="align:top:scroll:auto" width="90%">
+														<rows>
+															<row>
+																<label
+																	value="UID">
+																</label>
+																<label
+																	value="@load(vm.screenDesing.uid)" />
+															</row>
+															<row>
+																<label
+																	value="Nombre Pantalla">
+																</label>
+																<textbox
+																	value="@bind(vm.screenDesing.nameScreen)" />
+															</row>
+															<row>
+																<label
+																	value="Titulo">
+																</label>
+																<textbox
+																	value="@bind(vm.screenDesing.title)" />
+															</row>
+															<row>
+																<label
+																	value="Nombre página">
+																</label>
+																<textbox
+																	value="@bind(vm.screenDesing.pageName)" />
+
+															</row>
+															<row>
+																<label
+																	value="Descripción">
+																</label>
+																<textbox
+																	multiline="true" rows="5"
+																	value="@bind(vm.screenDesing.descripcion)" />
+
+															</row>
+														</rows>
+													</grid>
+												</div>
+											</div>
+
+										</tabpanel>
+										<tabpanel>
+											<!-- list screen -->
+											<div class="row">
+												<div
+													sclass="col-lg-8">
+													<listfields
+														id="listList">
+													</listfields>
+												</div>
+											</div>
+
+										</tabpanel>
+										<tabpanel>
+											<!-- list card -->
+											<div class="row">
+												<div
+													sclass="col-lg-8">
+													<listfields
+														id="cardList">
+													</listfields>
+												</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<!-- list search -->
+											<div class="row">
+												<div
+													sclass="col-lg-8">
+													<listfields
+														id="searchList">
+													</listfields>
+												</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<!-- list filtros -->
+											<div class="row">
+												<div
+													sclass="col-lg-8">
+													<listfields
+														id="filtersList">
+													</listfields>
+												</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<!-- list listados -->
+											<div class="row">
+												<div
+													sclass="col-lg-8">
+													<listfields
+														id="listadosList">
+													</listfields>
+												</div>
+											</div>
+
+										</tabpanel>
+										<tabpanel>
+											<mapping id="mapping"></mapping>
+										</tabpanel>
+										<tabpanel>
+											<services id="services"></services>
+										</tabpanel>
+
+									</tabpanels>
+								</tabbox>
+							</div>
+							<div sclass="col-lg-3">
+								<tabbox>
+									<tabs>
+										<tab id="props"
+											label="Properties" />
+										<tab label="Data" />
+
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<grid style="align:top"
+												id="propiedades" width="99%" height="850px">
+												<columns>
+													<column
+														label="Property" width="25%" />
+													<column
+														label="Value" width="75%" />
+												</columns>
+												<rows>
+													<row></row>
+													<row></row>
+													<row></row>
+												</rows>
+											</grid>
+										</tabpanel>
+										<tabpanel>
+											<tree width="99%"
+												id="treeentidades" height="850px">
+												<treecols>
+													<treecol
+														label="Data Model" />
+												</treecols>
+											</tree>
+										</tabpanel>
+
+									</tabpanels>
+								</tabbox>
+							</div>
+
+						</div>
+
+
+					</tabpanel>
+
+					<tabpanel id="tbprevio">
+						<iframe id="include" src="" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel id="tbcompon">
+						<iframe id="includecomp"
+							src="/peview/mylescrm/help/index.zhtml" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel>
+						<div sclass="col-lg-12 col-xlg-12 col-md-12">
+							<grid model="@load(vm.logVersion)"
+								height="900px" width="100%">
+								<columns>
+									<column label="logs" width="100%" />
+								</columns>
+								<rows>
+									<template name="model">
+										<row>
+											<label value="@load(each)" />
+										</row>
+									</template>
+								</rows>
+							</grid>
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</nodom>
+	</div>
+</zk>

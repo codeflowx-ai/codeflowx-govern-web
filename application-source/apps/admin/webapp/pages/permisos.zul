@@ -1,0 +1,129 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace
+		viewModel="@id('vm') @init('com.suinsit.webapp.nocode.PermisosUI')">
+		<space></space>
+		<custom-attributes pagina="misausencias" />
+		<custom-attributes paginaIndex="indexmisausencias.zul" />
+		<custom-attributes templateView="cardmisausencias.zul" />
+		<h:div id="notificacion"></h:div>
+		<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<h:h4 class="mb-sm-0">Permisos</h:h4>
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu}
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Permisos
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-xxl-1"></div>
+			<div class="col-xxl-10">
+				<div class="card" id="companyList">
+					<div class="card-header">
+						<div class="row g-2">
+							<div class="col-md-3">
+								<div class="search-box"></div>
+							</div>
+
+							<div class="col-md-auto ms-auto">
+
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+					<div class="row">
+					  <div sclass="col-lg-3">
+							<div class="mb-2">
+								Seleccione Aplicación
+							</div>
+							<div class="mb-2">
+								<combobox id="idaplicacion"
+									mold="rounded" autodrop="true" model="@load(vm.applications)"
+									onSelect="@command('onSelectApp',item=self.selectedItem.value)">
+									<template name="model" var="item">
+										<comboitem value="${item}"
+											label="${item.projectBase.txname}">
+										</comboitem>
+									</template>
+								</combobox>
+							</div>
+							<div class="mb-2">Seleccione Menú</div>
+							<div class="mb-2">
+								<combobox id="idmenu" mold="rounded"
+									autodrop="true" model="@load(vm.menus)"
+									onSelect="@command('editMenuRoot',item=self.selectedItem.value)">
+									<template name="model" var="item">
+										<comboitem value="${item}"
+											label="${item.name}">
+										</comboitem>
+									</template>
+								</combobox>
+							</div>
+						</div>
+						<div sclass="col-lg-3">
+							<div class="table-responsive ">
+								<grid width="100%" height="500px" model="@load(vm.items)"
+									sclass="table align-middle table-bordered table-hover table-nowrap">
+									<columns sizable="true">
+											<column label="Opción"
+												width="">
+											</column>
+										    <column label="Accion" align="center" />
+									</columns>
+									<template name="model" var="item">
+									   <row	style="text-align:center;">
+									     <cell><label value="@load(item.name)"></label></cell>
+									     <cell>
+									     <button onClick="@command('permisos',item=item)" iconSclass="fa-duotone fa-pen-to-square fa-xl" />
+									     </cell>
+									   </row>
+									</template>	
+								</grid>
+							</div>
+
+						</div>
+						<div sclass="col-lg-3">
+						    <div class="mb-2">
+						     <div sclass="col-lg-3">Permisos de <label value="@load(vm.item.name)"></label></div>
+						     <div sclass="col-lg-3">
+						      <button onClick="@command('save')" iconSclass="s-icon s-icon-save" sclass="btn" />
+						     </div>
+						     </div>
+						    <div class="mb-2">
+							<listbox checkmark="true"  model="@bind(vm.roles)" height="300px" >
+							<listhead>
+							<listheader label="rol"></listheader>
+							</listhead> 
+							<template name="model" var="item">
+							<listitem value="@load(item)">
+							<listcell label="@load(item.rol)">
+							</listcell></listitem>
+							</template>
+							</listbox>
+                            </div>
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- row -->
+
+
+	</idspace>
+</zk>

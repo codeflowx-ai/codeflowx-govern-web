@@ -1,0 +1,109 @@
+<!-- alert-management.zul -->
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+    
+    <div viewModel="@id('vm') @init('com.suinsit.compliance.web.AlertManagementVM')"
+         class="container-fluid">
+        
+        <!-- Header Section -->
+        <div class="row mb-4">
+            <div class="col">
+                <h:h2>Gestión de Alertas</h:h2>
+            </div>
+            <div class="col-auto">
+                <button class="btn btn-primary" 
+                        onClick="@command('refreshAlerts')">
+                    <i class="fas fa-sync"></i> Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <combobox model="@load(vm.severityOptions)" 
+                         selectedItem="@bind(vm.selectedSeverity)"
+                         onChange="@command('filterAlerts')"
+                         class="form-select"
+                         placeholder="Severidad">
+                    <template name="model">
+                        <comboitem label="@load(each)" />
+                    </template>
+                </combobox>
+            </div>
+            <div class="col-md-3">
+                <combobox model="@load(vm.statusOptions)" 
+                         selectedItem="@bind(vm.selectedStatus)"
+                         onChange="@command('filterAlerts')"
+                         class="form-select"
+                         placeholder="Estado">
+                    <template name="model">
+                        <comboitem label="@load(each)" />
+                    </template>
+                </combobox>
+            </div>
+        </div>
+
+        <!-- Alerts Grid -->
+        <div class="row">
+            <div class="col">
+                <grid model="@load(vm.alerts)" 
+                      mold="paging" 
+                      pageSize="10"
+                      class="table table-hover">
+                    <columns>
+                        <column label="Severidad" align="center" width="100px"/>
+                        <column label="Estado" align="center" width="120px"/>
+                        <column label="Título" />
+                        <column label="Creada" width="150px"/>
+                        <column label="Acciones" align="center" width="200px"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.severity)" 
+                                   sclass="severity-badge severity-@load(each.severity.toLowerCase())"/>
+                            <label value="@load(each.status)" 
+                                   sclass="status-badge status-@load(each.status.toLowerCase())"/>
+                            <label value="@load(each.title)" />
+                            <label value="@load(each.createdAt) @converter('formattedDateTime')" />
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-primary"
+                                        onClick="@command('viewDetails', alert=each)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success"
+                                        onClick="@command('acknowledgeAlert', alert=each)"
+                                        visible="@load(each.status eq 'NEW')">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-info"
+                                        onClick="@command('showCorrelations', alert=each)">
+                                    <i class="fas fa-project-diagram"></i>
+                                </button>
+                            </div>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+        </div>
+
+        <!-- Alert Details Modal -->
+        <window id="detailsModal" visible="false" 
+                mode="modal" class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h:h5 class="modal-title">Detalles de Alerta</h:h5>
+                    <button type="button" class="btn-close" 
+                            onClick="@command('closeDetails')"/>
+                </div>
+                <div class="modal-body">
+                    <!-- Alert details content -->
+                </div>
+            </div>
+        </window>
+    </div>
+</zk>

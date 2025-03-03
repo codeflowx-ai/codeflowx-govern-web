@@ -1,0 +1,291 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="catalogo" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='catalogo')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="catalogo" />
+	  <custom-attributes enviroment="preview" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+<h:div style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12">
+<h:div class="row">
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('CATALOGO'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('CATALOGO.label', 'Catalogo'))"  />
+	    <a iconSclass="mdi mdi-information-outline" popup="pop_CATALOGO" />
+	   </hbox>
+	   <textbox  tabindex="1" id="CATALOGO" placeholder="@load(vm.lang.getProperty('CATALOGO.label', 'Catalogo'))" value="@bind(vm.beanData.catalogo) @save(vm.beanData.catalogo, before=('store')) @validator(vm.unique, field='CATALOGO',required=true ,oldValue=vm.beanDataCpy.catalogo)"  sclass="form-control  form-control form-control-sm       border-danger" visible="@load(vm.isVisible('CATALOGO'))" disabled="@load(vm.isEditable('CATALOGO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['CATALOGO'])"/>
+    </h:div>   
+   <popup id="pop_CATALOGO" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Help</caption>
+            <fragment exps="@load(vm.lang.getProperty('CATALOGO.helptext', vm.form.getFieldByAtribute('CATALOGO').getFieldPropsBeanByID('Helptext').value))" >
+	    	   <![CDATA[
+                <span textContent='@load(exps)'></span>
+	    	   ]]>        
+	        </fragment>
+        </groupbox>
+ </popup>
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('CARPETA'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('CARPETA.label', 'Carpeta'))"  />
+	    <a iconSclass="mdi mdi-information-outline" popup="pop_CARPETA" />
+	   </hbox>
+	   <textbox  tabindex="2" id="CARPETA" placeholder="@load(vm.lang.getProperty('CARPETA.label', 'Nombre de la carpeta '))" value="@bind(vm.beanData.carpeta) @save(vm.beanData.carpeta, before=('store')) "  sclass="form-control  form-control form-control-sm      " visible="@load(vm.isVisible('CARPETA'))" disabled="@load(vm.isEditable('CARPETA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['CARPETA'])"/>
+    </h:div>   
+   <popup id="pop_CARPETA" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Help</caption>
+            <fragment exps="@load(vm.lang.getProperty('CARPETA.helptext', vm.form.getFieldByAtribute('CARPETA').getFieldPropsBeanByID('Helptext').value))" >
+	    	   <![CDATA[
+                <span textContent='@load(exps)'></span>
+	    	   ]]>        
+	        </fragment>
+        </groupbox>
+ </popup>
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('RUTA'))">
+	    <label sclass="form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('RUTA.label', 'Ruta'))"  />
+	   </hbox>
+	   <textbox  tabindex="3" id="RUTA" placeholder="@load(vm.lang.getProperty('RUTA.label', 'Ruta / URl / Path'))" value="@bind(vm.beanData.ruta) @save(vm.beanData.ruta, before=('store')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.ruta)"  sclass="form-control  form-control form-control-sm       border-danger" visible="@load(vm.isVisible('RUTA'))" disabled="@load(vm.isEditable('RUTA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['RUTA'])"/>
+    </h:div>   
+
+
+
+
+
+<h:div class="col-md-6">
+
+   <hbox spacing="3px">
+     <label sclass="form-label font-weight-normal" style="" value="@load(vm.lang.getProperty('AGRUPAR.label', 'Agrupar Documentos'))"/>
+ </hbox>
+
+ <combobox mold="rounded" sclass="" id="AGRUPAR" model="@load(vm.getEnums('AGRUPAR'))" 
+selectedItem="@load(vm.beanData.agrupar)"  value="@load(vm.beanData.agrupar) @save(vm.beanData.agrupar, before=('store')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['AGRUPAR'])"/>
+</h:div>
+
+
+
+<h:div class="col-md-6">
+   <hbox spacing="3px">
+    <label sclass="form-label font-weight-normal" style="" value="@load(vm.lang.getProperty('idmmodulo.label', 'Modulo/Objeto'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_vLzGjkvjbi" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmmodulo" placeholder="@load(vm.lang.getProperty('idmmodulo').label,'Modulo/Objeto')" model="@bind(vm.foreings['idmmodulo'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmmodulo',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmmodulo)"  onCreate="@command('onCreateCombo',component=self,alias='idmmodulo')" value="@bind(vm.beanData.idmmodulo .modulo)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.modulo)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmmodulo'])"/>
+   <popup id="pop_vLzGjkvjbi" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmmodulo.helptext', 'idmmodulo'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+ <h:div class="col-md-1">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ACTIVO'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('ACTIVO.label', 'Activar'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="817643" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('store'))" sclass="" visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('store'))"/>
+</h:div>
+
+
+
+
+ <h:div class="col-md-2">
+       <hbox spacing="3px" visible="@load(vm.isVisible('NOTIFICAR'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('NOTIFICAR.label', 'Notificar Usuarios'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="496423" value="@bind(vm.beanData.notificar) @save(vm.beanData.notificar, before=('store'))" sclass="" visible="@load(vm.isVisible('NOTIFICAR'))" disabled="@load(vm.isEditable('NOTIFICAR')?false:true)" checked="@bind(vm.beanData.notificar) @save(vm.beanData.notificar, before=('store'))"/>
+</h:div>
+
+
+
+
+ <h:div class="col-md-3">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ACCESOCLI'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('ACCESOCLI.label', 'Acceso a cliente'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="473273" value="@bind(vm.beanData.accesocli) @save(vm.beanData.accesocli, before=('store'))" sclass="" visible="@load(vm.isVisible('ACCESOCLI'))" disabled="@load(vm.isEditable('ACCESOCLI')?false:true)" checked="@bind(vm.beanData.accesocli) @save(vm.beanData.accesocli, before=('store'))"/>
+</h:div>
+
+
+
+
+ <h:div class="col-md-3">
+       <hbox spacing="3px" visible="@load(vm.isVisible('GROUPCLIENT'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('GROUPCLIENT.label', 'Carpeta de cliente'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="120142" value="@bind(vm.beanData.groupclient) @save(vm.beanData.groupclient, before=('store'))" sclass="" visible="@load(vm.isVisible('GROUPCLIENT'))" disabled="@load(vm.isEditable('GROUPCLIENT')?false:true)" checked="@bind(vm.beanData.groupclient) @save(vm.beanData.groupclient, before=('store'))"/>
+</h:div>
+
+
+
+
+ <h:div class="col-md-3">
+       <hbox spacing="3px" visible="@load(vm.isVisible('GROUPUSER'))" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('GROUPUSER.label', 'Carpeta de usuarios'))"/>
+	   </hbox>
+ <checkbox mold="switch" id="397522" value="@bind(vm.beanData.groupuser) @save(vm.beanData.groupuser, before=('store'))" sclass="" visible="@load(vm.isVisible('GROUPUSER'))" disabled="@load(vm.isEditable('GROUPUSER')?false:true)" checked="@bind(vm.beanData.groupuser) @save(vm.beanData.groupuser, before=('store'))"/>
+</h:div>
+
+
+
+ 
+ <div class="col-lg-12">		
+  <grid id="subdoctipodocum" height="400px" width="100%" 
+   model="@bind(vm.grid['subdoctipodocum']) " 
+    onCreate="@command('onSubtableCreate',component=self,alias='subdoctipodocum')" >
+      <auxhead  sclass="bg-soft-light" >
+             <auxheader  colspan="1" rowspan="1" >
+				     <textbox width="100%" value="@bind(vm.beans['subdoctipodocum'].tipodocumento)" ></textbox>
+                
+                
+                
+             </auxheader>
+             <auxheader  colspan="1" rowspan="1" >
+				         <checkbox value="@bind(vm.beans['subdoctipodocum'].subcarpeta)" checked="@bind(vm.beans['subdoctipodocum'].subcarpeta)"/> 
+                
+                
+                
+             </auxheader>
+        <auxheader  colspan="1" rowspan="1" >
+<button label="añadir" onClick="@command('appendRowForm',alias='subdoctipodocum')" />
+</auxheader>    
+     </auxhead>
+      
+           
+ 
+  
+  
+  
+  
+  
+	  <columns sizable="true">
+   
+      
+	   
+        <column label="@load(vm.lang.getProperty('TIPODOCUMENTO.label', 'Tipo de documento'))" align="center" sclass="text-capitalize"/>
+   
+      
+	   
+        <column label="@load(vm.lang.getProperty('SUBCARPETA.label', 'Subcarpeta'))" align="center" sclass="text-capitalize"/>
+        <column align="center" />
+	 </columns>
+      <template name="model" var="item">
+      	<row style="text-align:right;">
+    	  				     <label  value="@load(item.tipodocumento) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.subcarpeta) @converter(vm.fieldConverter)"></label>
+               <cell align="center">
+						<button
+						onClick="@command('removeSubtable',alias='subdoctipodocum',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn" />
+		                </cell> 
+       </row>
+   	</template>
+  </grid>
+  </div>
+
+
+
+</h:div>
+</h:div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('store')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('storeNew')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['Catalogo.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$catalogo');
+  binder.command('doLoad');
+});
+function loadcatalogo(){
+  var binder = zkbind.$('$catalogo');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

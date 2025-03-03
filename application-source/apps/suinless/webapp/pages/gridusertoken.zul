@@ -1,0 +1,71 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('FECHA.label', 'Fecha'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECHAAsc'])" sortDescending="@load(vm.comparators['FECHADesc'])"  visible="@load(vm.isVisible('FECHA'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('INTOKEN.label', 'Token IN'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['INTOKENAsc'])" sortDescending="@load(vm.comparators['INTOKENDesc'])"  visible="@load(vm.isVisible('INTOKEN'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('OUTTOKEN.label', 'Token Out'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['OUTTOKENAsc'])" sortDescending="@load(vm.comparators['OUTTOKENDesc'])"  visible="@load(vm.isVisible('OUTTOKEN'))"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Modelo.label', 'Modelo'))" align="center"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Proyecto.label', 'Proyecto'))" align="center"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterusertoken.zul')">
+							             <label  value="@load(item.fecha) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.intoken) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.outtoken) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+                                   
+                                          <label  value="@load(item.idslesmodel.model) @converter(vm.fieldConverter)"></label>
+                                   
+                                   
+                                          <label  value="@load(item.idalmproject.proyectoalm) @converter(vm.fieldConverter)"></label>
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masterusertoken.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

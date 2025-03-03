@@ -1,0 +1,47 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('ROL.label', 'rol'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ROLAsc'])" sortDescending="@load(vm.comparators['ROLDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('SYSTEM.label', 'De sistemas'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SYSTEMAsc'])" sortDescending="@load(vm.comparators['SYSTEMDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('BAJA.label', 'Baja'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['BAJAAsc'])" sortDescending="@load(vm.comparators['BAJADesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('ROL').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('SYSTEM').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('BAJA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterrol.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

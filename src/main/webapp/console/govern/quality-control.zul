@@ -1,0 +1,105 @@
+<?page title="Quality Control Dashboard" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.quality.QualityControlVM')">
+        
+        <!-- KPI Summary -->
+        <hlayout sclass="kpi-container">
+            <div sclass="kpi-box">
+                <label value="Overall Quality"/>
+                <label value="@load(vm.overallQuality)%"
+                       sclass="@load(vm.qualityScoreStyle)"/>
+            </div>
+            <div sclass="kpi-box">
+                <label value="Tests Passed"/>
+                <label value="@load(vm.testsPassed)/@load(vm.totalTests)"/>
+            </div>
+            <div sclass="kpi-box">
+                <label value="Bias Score"/>
+                <label value="@load(vm.biasScore)"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Model Testing"/>
+                <tab label="Prompt Validation"/>
+                <tab label="Output Analysis"/>
+            </tabs>
+            <tabpanels>
+                <!-- Model Testing Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <listbox model="@load(vm.testResults)" 
+                                mold="paging" pageSize="10">
+                            <listhead>
+                                <listheader label="Test Case"/>
+                                <listheader label="Model"/>
+                                <listheader label="Status"/>
+                                <listheader label="Score"/>
+                                <listheader label="Last Run"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="test">
+                                <listitem>
+                                    <listcell label="@load(test.name)"/>
+                                    <listcell label="@load(test.modelName)"/>
+                                    <listcell>
+                                        <label value="@load(test.status)" 
+                                               sclass="@load(test.statusStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(test.score)%"/>
+                                    <listcell label="@load(test.lastRun)"/>
+                                    <listcell>
+                                        <button label="Run Test" 
+                                                onClick="@command('runTest', test=test)"/>
+                                        <button label="Details" 
+                                                onClick="@command('showTestDetails', test=test)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+
+                        <!-- Quality Trends Chart -->
+                        <charts id="qualityTrends" 
+                               type="line"
+                               title="Quality Trends"
+                               model="@load(vm.qualityTrendsData)"/>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Prompt Validation Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <textbox rows="4" 
+                                width="100%" 
+                                placeholder="Enter prompt to validate..."
+                                value="@bind(vm.currentPrompt)"/>
+                        <button label="Validate Prompt" 
+                                onClick="@command('validatePrompt')"/>
+                        
+                        <listbox model="@load(vm.promptValidationResults)"
+                                visible="@load(not empty vm.promptValidationResults)">
+                            <listhead>
+                                <listheader label="Check"/>
+                                <listheader label="Result"/>
+                                <listheader label="Suggestion"/>
+                            </listhead>
+                            <template name="model" var="result">
+                                <listitem>
+                                    <listcell label="@load(result.checkName)"/>
+                                    <listcell>
+                                        <label value="@load(result.status)" 
+                                               sclass="@load(result.statusStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(result.suggestion)"/>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </div>
+</zk>

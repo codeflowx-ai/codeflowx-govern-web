@@ -1,0 +1,288 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="ragproject" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='ragproject')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupragproject" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.rag.Ragproyecto" />
+	   <custom-attributes namespace="rag" />
+	      <custom-attributes uid="54466" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('ragproject.screen', 'Proyecto Rag'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="NRjQhEqgLk" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="NRjQhEqgLk-row" class="row">
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('PROJECTCODE'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROJECTCODE.label', 'Código Proyecto'))"  />
+	   
+	    <textbox   tabindex="1" id="BzcamQkqCU" 
+	   placeholder="@load(vm.lang.getProperty('PROJECTCODE.label', 'Código Proyecto'))" 
+	   value="@bind(vm.beanData.projectcode) @save(vm.beanData.projectcode, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.projectcode)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('PROJECTCODE'))" disabled="@load(vm.isEditable('PROJECTCODE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['BzcamQkqCU'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('PROJECTNAME'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROJECTNAME.label', 'Nombre Proyecto'))"  />
+	   
+	    <textbox   tabindex="2" id="QgSclHFfcQ" 
+	   placeholder="@load(vm.lang.getProperty('PROJECTNAME.label', 'Nombre Proyecto'))" 
+	   value="@bind(vm.beanData.projectname) @save(vm.beanData.projectname, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.projectname)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('PROJECTNAME'))" disabled="@load(vm.isEditable('PROJECTNAME')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['QgSclHFfcQ'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+
+<h:div class="col-md-3  input-group">
+     <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('ESTADO.label', 'Estado'))"/>
+ 
+
+
+ <combobox mold="rounded" disabled="false"  sclass="" id="ESTADO" model="@load(vm.getEnums('ESTADO'))" 
+selectedItem="@load(vm.beanData.estado)"  value="@load(vm.beanData.estado) @save(vm.beanData.estado, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['ESTADO'])"/>
+</h:div>
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECHACREACION')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHACREACION.label', 'Fecha Creación'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.fechacreacion) @save(vm.beanData.fechacreacion, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-5  input-group" visible="@load(vm.isVisible('DESCRIPTION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESCRIPTION.label', 'Descripción'))"  />
+	   
+	    <textbox   tabindex="5" id="MYHVDLgpJP" 
+	   placeholder="@load(vm.lang.getProperty('DESCRIPTION.label', 'Descripción'))" 
+	   value="@bind(vm.beanData.description) @save(vm.beanData.description, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DESCRIPTION'))" disabled="@load(vm.isEditable('DESCRIPTION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['MYHVDLgpJP'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECHAMODIFICACION')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHAMODIFICACION.label', 'Fecha Modificación'))"/>
+	  
+	      <datebox     id="SthASmZzwD"  placeholder="@load(vm.lang.getProperty('FECHAMODIFICACION.label', 'Fecha Modificación'))" tabindex="6" value="@bind(vm.beanData.fechamodificacion) @save(vm.beanData.fechamodificacion, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECHAMODIFICACION'))" disabled="@load(vm.isEditable('FECHAMODIFICACION')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['SthASmZzwD'])"/>   
+    
+      </div>
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idxcrmempresa.label', 'CRMEMPRESA'))"/>
+   
+<h:div class="col-md-12">
+<div >
+<a  iconSclass="fa-duotone fa-magnifying-glass-waveform"  onClick="@command('findComboForeing',win=searchsEDPIXZrFw,alias='idxcrmempresa',input=tboxsEDPIXZrFw) " /><a  iconSclass="fa-duotone fa-pen-to-square"   d:data-bs-toggle="modal" d:data-bs-target="#viewsEDPIXZrFw" onClick="@command('editForeing',win=WIN_sEDPIXZrFw,alias='idxcrmempresa',body='body_sEDPIXZrFw',page='popuppopempresas.zul',close='btn_sEDPIXZrFw')" ></a>
+<window id="WIN_sEDPIXZrFw" mode="modal" visible="false" position="center,center" action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none" width="80%">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title"> Editar Empresas</h:h5>
+</div>
+<div class="modal-body" id="body_sEDPIXZrFw"></div>
+<div class="modal-footer"></div>
+</div>
+</window>
+<a  iconSclass="fa-duotone fa-broom-wide"  onClick="@command('clearForeing',alias='idxcrmempresa')">	</a>
+</div>
+</h:div>
+<h:div class="mb-2">
+<textbox id="tboxsEDPIXZrFw"  placeholder="" value="@bind(vm.beanData.idxcrmempresa.empresa) @save(vm.beanData.idxcrmempresa.empresa, before=('grabar'))  " 
+ onClick="@command('onChangeFindTextForeing',alias='idxcrmempresa',att='empresa',event=event,idcp='cbsEDPIXZrFw')" onChange="@command('onChangeFindTextForeing',alias='idxcrmempresa',att='empresa',event=event,idcp='cbsEDPIXZrFw')"  sclass="form-control  bg-light border-0" />
+<combobox id="cbsEDPIXZrFw" mold="rounded" autodrop="true" visible="false" model="@load(vm.foreings['idxcrmempresa'])" onSelect="@command('onSelectTextForeing',item=self.selectedItem.value,updatebean='false',alias='idxcrmempresa',hidde=self)" width="85%">
+<template name="model" var="item"><comboitem value="${item}" label="${item.empresa}"></comboitem>
+</template></combobox>
+<label sclass="text-danger" value="@load(vmsgs['tboxsEDPIXZrFw'])"/></h:div>
+<window id="searchsEDPIXZrFw" mode="modal" visible="false">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title" id="examplessEDPIXZrFw">Empresas</h:h5>
+<a id="btn_SsEDPIXZrFw" class="btn-close"  onClick="searchsEDPIXZrFw.visible=false" ></a>
+</div><div class="modal-body">
+<div sclass="mb-2">
+<textbox sclass="form-control  bg-light border-0" placeholder="introduzca criterios..." onOK="@command('onChangeFindForeing',alias='idxcrmempresa',att='empresa,',input=self)" onChange="@command('onChangeFindForeing',alias='idxcrmempresa',att='empresa,',event=event)"/>
+</div><div sclass="mb-2">
+<listbox height="400px" mold="paging" pageSize="20" pagingPosition="bottom" model="@bind(vm.foreings['idxcrmempresa'])" onSelect="@command('onSelectForeingPopup', alias='idxcrmempresa',item=self.selectedItem.value,hidde=searchsEDPIXZrFw,updatebean='false' )">
+<listhead>
+<listheader label="@load(vm.lang.getProperty('EMPRESA.label','Empresa'))"  />
+</listhead>
+<template name="model" var="item">
+<listitem value="@load(item)">
+<listcell label="@load(item.empresa)" />
+</listitem></template></listbox>
+</div></div></div></div></window>
+
+
+  
+</h:div>
+
+
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['ragproject.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$ragproject');
+  binder.command('doLoad');
+});
+function loadragproject(){
+  var binder = zkbind.$('$ragproject');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

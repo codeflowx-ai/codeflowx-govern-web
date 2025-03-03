@@ -1,0 +1,111 @@
+suinsit:
+  application:
+     name: ${SUINSIT_APPLICATION}
+     version: 2.0.10
+     micros:
+       security:
+         baseUrl: http://localhost:9010/
+         token: false
+         paths:
+           authenticate: authenticate/autorize
+           encode: tokens/encode
+           decode: tokens/decode
+           validate: tokens/validate
+           getUsuario: tokens/usuario
+           usuario: tokens/usuario
+           encrypt: cipher/encrypt
+           decrypt: cipher/decrypt
+  app-uid:
+  mail:
+   proveedor: mailjet
+   clave:
+     api: 65efe0802e4428cc1a8f20a1b9010a31
+     secret: 293e9c6fe6b556d38b0e8c09ac65f9e3
+   email:
+     support: soporte@suinsit.cloud
+     name: Soporte Suinsit
+  gateway:
+   description:
+   client:
+      connect-timeout: 1200000
+      response-timeout: 120000
+   autoregister:
+      enable: true
+      only-registry: true
+   security:
+      enabled: true
+      whitelist: /security/authenticate/autorize,/webjars/**,/v3/**,/swagger-ui-custom.html/**,/swagger-ui/**,/api-doc/**,/version,/status,/actuator/**
+      sanitization:
+       enabled: true
+       sanitizePatterns:
+        deny:
+          CUSTOM_DENY: \$\{
+          XSS_CUSTOM: ^(.*([;{]+|(<.*>)|([<script>]*(.*?)</script>)|(!\[CDATA\[.*\]\])|(((eval|expression)\s*\()[\\]*(.*?)[\\]*)|((javascript|vbscript|http):)|((alert|onload)(\(|=)(.*?))|(\Q<!--\E|\Q-->\E)|(String.fromCharCode\s*\(|url\s*\(|expression\s*\(|eval\s*\()|(src[\r\n]*=[\r\n]*[\\]*(\'(.*?)[\\]*\')|(\"(.*?)[\\]*\")))).*$
+          LDAP_CUSTOM: ^(.*([\";<>!|]+)).*$
+          SQL_CUSTOM: ^(.*((;)|(#)|((DELETE|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|UPDATE( +ALL){0,1}|HAVING|ORDER BY|GROUP BY))\s)).*$
+        allow:
+          HEADER_AUTHENTICATION_CUSTOM: (Bearer|Basic) [a-zA-Z0-9-_+=/ ]+|(^[a-zA-Z0-9\\-_]+?\\.[a-zA-Z0-9\\-_]+?\\.([a-zA-Z0-9\\-_]+))$
+       headers:
+        default:
+          - CUSTOM_DENY
+        Authorization:
+          - HEADER_AUTHENTICATION_CUSTOM
+       queryString:
+        default:
+          - SQL_CUSTOM
+          - XSS_CUSTOM
+          - LDAP_CUSTOM
+       pathVariable:
+        default:
+          - SQL_CUSTOM
+          - XSS_CUSTOM
+          - LDAP_CUSTOM
+       body:
+        JSON:
+          - SQL_CUSTOM
+          - XSS_CUSTOM
+          - LDAP_CUSTOM
+        OTHER:
+          - SQL_CUSTOM
+          - XSS_CUSTOM
+          - LDAP_CUSTOM
+          - CUSTOM_DENY
+spring:
+  cloud:
+    gateway:
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*,localhost,127.0.0.1, ${CORS-ORIGINS}" 
+            allowedHeaders: "*,localhost,127.0.0.1"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            exposedHeaders: Autorization,X-Suinsit-Head
+            allowCredentials: false
+            maxAge: 3600
+            
+      routes:
+      - id: autorizacion
+        metadata:
+           name: mic-suinsit-security
+           description: Servicio para la autentificacion
+           uri-documentation: https://localhost:9005/webjars/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
+        uri: http://localhost:9010
+        predicates:
+        - Path=/security/**
+        filters:
+        - StripPrefix=1
+
+      - id: suninless
+        metadata:
+           name: mic-suinsit-suinless
+           description: micro de seguridad y autentificacion
+           uri-documentation: https://localhost:9005/webjars/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config
+        uri: http://localhost:9003
+        predicates:
+        - Path=/suinless/**
+        filters:
+        - StripPrefix=1  

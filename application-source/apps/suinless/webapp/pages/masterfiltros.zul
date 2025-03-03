@@ -1,0 +1,509 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="filtros" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='filtros')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="filtros" />
+	<custom-attributes clase="org.suinsit.apps.suinless.Almfilterproject" />
+	   <custom-attributes namespace="suinless" />
+		<custom-attributes uid="70183" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+	  	<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-3">
+						<div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('filtros.screen', 'Filtros de proteccion'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+             </div>
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</div>
+	                  	     <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">
+								    <a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-paintbrush-fine label-icon align-middle fs-16 me-2" onClick="@command('clear')">
+									</a>
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='continuar')"></a>
+									<a
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right label-icon align-middle fs-16 me-2" onClick="@command('grabar',action='nuevo')">
+										
+									</a>
+	  	                            </div>
+	  	                     </div>
+	  	              </div>
+	  	          </div><!--header-->
+	  	          <div class="card-body">
+		              <div class="row">
+
+
+<div id="ndcMRQkpWk"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="ndcMRQkpWk-card" class="card  default shadow-lg" style="overflow:hidden;" >
+       <div id="ndcMRQkpWk-body" class="card-body ">
+        <div id="ndcMRQkpWk-row" class="form-group row ">
+
+
+				
+
+  <!-- sclass="margin-field" -->
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('SERIE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-bolder align-text-middle " style=" font-size:18px;" value="@load(vm.lang.getProperty('SERIE.label', ''))"/>
+	   
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-bolder align-text-middle" style=" font-size:18px;" value="@load(vm.beanData.serie)"  />
+  </div>
+
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('ALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', ''))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+<h:div class="col-md-3  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idalmproject.label', 'Proyecto ALM'))"/>
+   
+<h:div class="col-md-12">
+<div >
+<a  iconSclass="fa-duotone fa-magnifying-glass-waveform"  onClick="@command('findComboForeing',win=searchCTgYIJgYyv,alias='idalmproject',input=tboxCTgYIJgYyv) " /><a  iconSclass="fa-duotone fa-broom-wide"  onClick="@command('clearForeing',alias='idalmproject')">	</a>
+</div>
+</h:div>
+<h:div class="mb-2">
+<textbox id="tboxCTgYIJgYyv"  placeholder="" value="@bind(vm.beanData.idalmproject.proyectoalm) @save(vm.beanData.idalmproject.proyectoalm, before=('grabar'))  " 
+ onClick="@command('onChangeFindTextForeing',alias='idalmproject',att='proyectoalm',event=event,idcp='cbCTgYIJgYyv')" onChange="@command('onChangeFindTextForeing',alias='idalmproject',att='proyectoalm',event=event,idcp='cbCTgYIJgYyv')"  sclass="form-control  bg-light border-0" />
+<combobox id="cbCTgYIJgYyv" mold="rounded" autodrop="true" visible="false" model="@load(vm.foreings['idalmproject'])" onSelect="@command('onSelectTextForeing',item=self.selectedItem.value,updatebean='true',alias='idalmproject',hidde=self)" width="85%">
+<template name="model" var="item"><comboitem value="${item}" label="${item.proyectoalm}"></comboitem>
+</template></combobox>
+<label sclass="text-danger" value="@load(vmsgs['tboxCTgYIJgYyv'])"/></h:div>
+<window id="searchCTgYIJgYyv" mode="modal" visible="false">
+<div class="modal-dialog modal-dialog-centered modal-lg">
+<div class="modal-content border-0">
+<div class="modal-header bg-soft-info p-3">
+<h:h5 class="modal-title" id="examplesCTgYIJgYyv">Proyecto ALM</h:h5>
+<a id="btn_SCTgYIJgYyv" class="btn-close"  onClick="searchCTgYIJgYyv.visible=false" ></a>
+</div><div class="modal-body">
+<div sclass="mb-2">
+<textbox sclass="form-control  bg-light border-0" placeholder="introduzca criterios..." onOK="@command('onChangeFindForeing',alias='idalmproject',att='proyectoalm,',input=self)" onChange="@command('onChangeFindForeing',alias='idalmproject',att='proyectoalm,',event=event)"/>
+</div><div sclass="mb-2">
+<listbox height="400px" mold="paging" pageSize="20" pagingPosition="bottom" model="@bind(vm.foreings['idalmproject'])" onSelect="@command('onSelectForeingPopup', alias='idalmproject',item=self.selectedItem.value,hidde=searchCTgYIJgYyv,updatebean='true' )">
+<listhead>
+<listheader label="@load(vm.lang.getProperty('PROYECTOALM.label','PROYECTOALM'))"  />
+</listhead>
+<template name="model" var="item">
+<listitem value="@load(item)">
+<listcell label="@load(item.proyectoalm)" />
+</listitem></template></listbox>
+</div></div></div></div></window>
+
+
+  
+</h:div>
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('PROYECTO'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROYECTO.label', ''))"  />
+	   
+	    <textbox  readonly="true"  tabindex="4" id="riXZPdRzoj" 
+	   placeholder="@load(vm.lang.getProperty('PROYECTO.label', ''))" 
+	   value="@bind(vm.beanData.proyecto) @save(vm.beanData.proyecto, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('PROYECTO'))" disabled="@load(vm.isEditable('PROYECTO')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['riXZPdRzoj'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+
+<div id="eZhvTlrqda" style="overflow:hidden;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="eZhvTlrqda-row" class="row">
+
+
+<h:div class="col-md-12">
+<label sclass="form-labelbadge  badge bg-secondary font-weight-bolder text-end" value="Acciones" style=" color:#EEEEEE; Font-Size:14px;"/>
+</h:div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="910792" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('AUDITAR'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('AUDITAR.label', 'Auditar'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="892742" value="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('AUDITAR'))" disabled="@load(vm.isEditable('AUDITAR')?false:true)" checked="@bind(vm.beanData.auditar) @save(vm.beanData.auditar, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('SUGERIRALTERNATIVO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SUGERIRALTERNATIVO.label', 'Sugerir texto alternativo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="yntHCQvvox" value="@bind(vm.beanData.sugeriralternativo) @save(vm.beanData.sugeriralternativo, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('SUGERIRALTERNATIVO'))" disabled="@load(vm.isEditable('SUGERIRALTERNATIVO')?false:true)" checked="@bind(vm.beanData.sugeriralternativo) @save(vm.beanData.sugeriralternativo, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ENVIO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ENVIO.label', 'Envio mensaje'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="hkrbbIOhSH" value="@bind(vm.beanData.envio) @save(vm.beanData.envio, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ENVIO'))" disabled="@load(vm.isEditable('ENVIO')?false:true)" checked="@bind(vm.beanData.envio) @save(vm.beanData.envio, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('MOSTRARERROR'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MOSTRARERROR.label', 'Mostrar Error'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="297679" value="@bind(vm.beanData.mostrarerror) @save(vm.beanData.mostrarerror, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('MOSTRARERROR'))" disabled="@load(vm.isEditable('MOSTRARERROR')?false:true)" checked="@bind(vm.beanData.mostrarerror) @save(vm.beanData.mostrarerror, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('RESPUESTA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('RESPUESTA.label', 'Respuesta del mensaje'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="RINIAhfujd" value="@bind(vm.beanData.respuesta) @save(vm.beanData.respuesta, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('RESPUESTA'))" disabled="@load(vm.isEditable('RESPUESTA')?false:true)" checked="@bind(vm.beanData.respuesta) @save(vm.beanData.respuesta, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('GUARDARMENSAJE'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('GUARDARMENSAJE.label', 'Guardar Mensaje'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="274417" value="@bind(vm.beanData.guardarmensaje) @save(vm.beanData.guardarmensaje, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('GUARDARMENSAJE'))" disabled="@load(vm.isEditable('GUARDARMENSAJE')?false:true)" checked="@bind(vm.beanData.guardarmensaje) @save(vm.beanData.guardarmensaje, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="TEyURTlQBo" style="overflow:hidden;" class=" default col-lg-6 col-xlg-6 col-md-6"  visible="true" >
+<div id="TEyURTlQBo-row" class="row">
+
+
+<h:div class="col-md-12">
+<label sclass="form-labelbadge  badge bg-danger font-weight-normal text-end" value="Limitar los contenidos de tipo" style=" Font-Size:14px;"/>
+</h:div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('BLASFEMIA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('BLASFEMIA.label', 'Blasfemia'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="101124" value="@bind(vm.beanData.blasfemia) @save(vm.beanData.blasfemia, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('BLASFEMIA'))" disabled="@load(vm.isEditable('BLASFEMIA')?false:true)" checked="@bind(vm.beanData.blasfemia) @save(vm.beanData.blasfemia, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ARMAS'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ARMAS.label', 'Armas'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="449144" value="@bind(vm.beanData.armas) @save(vm.beanData.armas, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ARMAS'))" disabled="@load(vm.isEditable('ARMAS')?false:true)" checked="@bind(vm.beanData.armas) @save(vm.beanData.armas, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('MALACONDUCTA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('MALACONDUCTA.label', 'Mala Conducta'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="159101" value="@bind(vm.beanData.malaconducta) @save(vm.beanData.malaconducta, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('MALACONDUCTA'))" disabled="@load(vm.isEditable('MALACONDUCTA')?false:true)" checked="@bind(vm.beanData.malaconducta) @save(vm.beanData.malaconducta, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('DISCRIMINACION'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DISCRIMINACION.label', 'Discriminación'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="VDbyAxuqvw" value="@bind(vm.beanData.discriminacion) @save(vm.beanData.discriminacion, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('DISCRIMINACION'))" disabled="@load(vm.isEditable('DISCRIMINACION')?false:true)" checked="@bind(vm.beanData.discriminacion) @save(vm.beanData.discriminacion, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ODIO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ODIO.label', 'Odio'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="48543" value="@bind(vm.beanData.odio) @save(vm.beanData.odio, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ODIO'))" disabled="@load(vm.isEditable('ODIO')?false:true)" checked="@bind(vm.beanData.odio) @save(vm.beanData.odio, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-6   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('SEXUAL'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('SEXUAL.label', 'Sexual'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="383215" value="@bind(vm.beanData.sexual) @save(vm.beanData.sexual, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('SEXUAL'))" disabled="@load(vm.isEditable('SEXUAL')?false:true)" checked="@bind(vm.beanData.sexual) @save(vm.beanData.sexual, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('VIOLENCIA'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VIOLENCIA.label', 'Violencia'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="switch" id="870018" value="@bind(vm.beanData.violencia) @save(vm.beanData.violencia, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('VIOLENCIA'))" disabled="@load(vm.isEditable('VIOLENCIA')?false:true)" checked="@bind(vm.beanData.violencia) @save(vm.beanData.violencia, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+</div>
+</div>  
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+               </div>      
+	  	          
+	  	          </div>
+			 </div>
+			 </div>
+		 </div>
+		  <fragment exps="@load(vm.lang['filtros.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		 <window id="WIN_HELP"  visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script  >
+zk.afterMount(function() {
+ var binder = zkbind.$('$filtros');
+  binder.command('doLoad');
+});
+</script>
+</zk>

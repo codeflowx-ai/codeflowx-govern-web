@@ -1,0 +1,365 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace id="nuevoprojecto" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='nuevoprojecto')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="nuevoprojecto" />
+	  <custom-attributes msgform="Proyecto enviado" />
+	  <custom-attributes type="form" />
+<custom-attributes clase="org.suinsit.apps.myalm.Almproject" />
+	   <custom-attributes namespace="myalm" />
+	    <custom-attributes enviroment="preview" />
+	     <custom-attributes uid="38538" />
+	
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('nuevoprojecto.screen', 'Nuevo Projecto'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Nuevo Projecto
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							
+						 <div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+								    <button class="btn btn-secondary"
+										iconSclass="s-icon s-icon-clear" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="s-icon s-icon-save me-1 align-bottom" onClick="@command('grabar')">
+										Guardar
+									</button>
+								</div>
+							</div>
+							
+						</div>
+						<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+                             </div>
+                          </div>    		
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div class="card">
+							<h:div class="card-body">
+		     <div class="row">
+
+
+<div id="rHUjjlVrGG"   visible="true"  class="col-lg-4 col-xlg-4 col-md-4">
+  <div id="rHUjjlVrGG-card" class="card  default" style="overflow:auto;" >
+       <div id="rHUjjlVrGG-body" class="card-body ">
+        <div id="rHUjjlVrGG-row" class="form-group row ">
+
+
+				
+
+  <!-- sclass="margin-field" -->
+     <h:div class="col-md-12 ">
+    <hbox spacing="3px" visible="@load(vm.isVisible('ALMCODE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="  " value="@load(vm.lang.getProperty('ALMCODE.label', 'Código'))"/>
+	   </hbox>
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.almcode)"  />
+    </h:div>
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-12 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('UUID'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('UUID.label', 'UUID'))"  />
+	   </hbox>
+	    <textbox  readonly="true"  tabindex="2" id="545448" 
+	   placeholder="@load(vm.lang.getProperty('UUID.label', 'uuid'))" 
+	   value="@bind(vm.beanData.uuid) @save(vm.beanData.uuid, before=('grabar')) "  sclass="margin-field form-control  form-control border" 
+	   visible="@load(vm.isVisible('UUID'))" disabled="@load(vm.isEditable('UUID')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['545448'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-12 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('PROYECTOALM'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('PROYECTOALM.label', 'Proyecto'))"  />
+	   </hbox>
+	    <textbox   tabindex="3" id="BqSKSuUzQe" 
+	   placeholder="@load(vm.lang.getProperty('PROYECTOALM.label', 'proyectoalm'))" 
+	   value="@bind(vm.beanData.proyectoalm) @save(vm.beanData.proyectoalm, before=('grabar')) @validator(vm.unique, field='PROYECTOALM',required=true ,oldValue=vm.beanDataCpy.proyectoalm)"  sclass="margin-field form-control  form-control border border-danger" 
+	   visible="@load(vm.isVisible('PROYECTOALM'))" disabled="@load(vm.isEditable('PROYECTOALM')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['BqSKSuUzQe'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-12 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('NAMESPACE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('NAMESPACE.label', 'Namespace'))"  />
+	   </hbox>
+	    <textbox   tabindex="4" id="341366" 
+	   placeholder="@load(vm.lang.getProperty('NAMESPACE.label', 'namespace'))" 
+	   value="@bind(vm.beanData.namespace) @save(vm.beanData.namespace, before=('grabar')) @validator(vm.unique, field='NAMESPACE',required=true ,oldValue=vm.beanDataCpy.namespace)"  sclass="margin-field form-control  form-control border border-danger" 
+	   visible="@load(vm.isVisible('NAMESPACE'))" disabled="@load(vm.isEditable('NAMESPACE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['341366'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+   <h:div class="col-md-12">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"/>
+	   </hbox>
+	  <tbeditor id="lBbXSusylR" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) " />
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+<div id="sDvyAkKpkk"   visible="true"  class="col-lg-4 col-xlg-4 col-md-4">
+  <div id="sDvyAkKpkk-card" class="card  default" style="overflow:auto;" >
+       <div id="sDvyAkKpkk-body" class="card-body ">
+        <div id="sDvyAkKpkk-row" class="form-group row ">
+
+<h:div class="col-md-12 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idarqmarchitecture.label', 'Arquitectura'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idarqmarchitecture" placeholder="@load(vm.lang.getProperty('idarqmarchitecture').label,'Arquitectura')" model="@bind(vm.foreings['idarqmarchitecture'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idarqmarchitecture',item=self.selectedItem.value,changefk='idarqsolucion',updatebean='true')"  		selectedItem="@load(vm.beanData.idarqmarchitecture)"  onCreate="@command('onCreateCombo',component=self,alias='idarqmarchitecture')" value="@bind(vm.beanData.idarqmarchitecture .arquitectura)@save(vm.beanData.idarqmarchitecture.arquitectura, before=('grabar')) @validator(vm.validator,required=true)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.arquitectura)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idarqmarchitecture'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-12 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idarqsolucion.label', 'Solución'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idarqsolucion" placeholder="@load(vm.lang.getProperty('idarqsolucion').label,'Solución')" model="@bind(vm.foreings['idarqsolucion'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idarqsolucion',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idarqsolucion)"  onCreate="@command('onCreateCombo',component=self,alias='idarqsolucion',loadFkFrom='idarqmarchitecture')" value="@bind(vm.beanData.idarqsolucion .solucion)@save(vm.beanData.idarqsolucion.solucion, before=('grabar')) @validator(vm.validator,required=true)" disabled="@bind(vm.beanData.idarqmarchitecture.idxarqmarchitecture eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.solucion)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idarqsolucion'])"/>
+
+  
+</h:div>
+
+
+
+   <h:div class="col-md-12">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DESCAMPLIA.label', ''))"/>
+	   </hbox>
+	      <textbox rows="4" cols="80" id="vDOiMZXTga" multiline="true" placeholder="@load(vm.lang.getProperty('DESCAMPLIA.label', ''))" value="@bind(vm.beanData.idarqsolucion.descamplia) @save(vm.beanData.idarqsolucion.descamplia, before=('grabar')) "  sclass="form-control  form-control border" visible="@load(vm.isVisible('DESCAMPLIA'))" disabled="@load(vm.isEditable('DESCAMPLIA')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['vDOiMZXTga'])"/>
+	     
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+<div id="FUELyZgOQh"   visible="true"  class="col-lg-4 col-xlg-4 col-md-4">
+  <div id="FUELyZgOQh-card" class="card  default" style="overflow:auto;" >
+       <div id="FUELyZgOQh-body" class="card-body ">
+        <div id="FUELyZgOQh-row" class="form-group row ">
+
+<h:div class="col-md-12 ">
+   <hbox spacing="3px" sclass="margin-field">
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmempresa.label', 'Cliente'))"/>
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idcrmempresa" placeholder="@load(vm.lang.getProperty('idcrmempresa').label,'Cliente')" model="@bind(vm.foreings['idcrmempresa'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idcrmempresa',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idcrmempresa)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmempresa')" value="@bind(vm.beanData.idcrmempresa .empresa)@save(vm.beanData.idcrmempresa.empresa, before=('grabar')) @validator(vm.validator,required=true)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.empresa)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idcrmempresa'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+  <!-- sclass="margin-field" -->
+     <h:div class="col-md-12 ">
+    <hbox spacing="3px" visible="@load(vm.isVisible('CODCLIENTE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="  " value="@load(vm.lang.getProperty('CODCLIENTE.label', 'Cod Cliente'))"/>
+	   </hbox>
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.codcliente)"  />
+    </h:div>
+
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+
+<div id="LDqpjcSPGC" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="false" >
+<div id="LDqpjcSPGC-row" class="row">
+</div>
+</div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['nuevoprojecto.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+
+
+
+
+                  
+                 
+
+
+
+
+                  
+                 
+
+
+
+                  
+                 
+
+                  
+<window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$nuevoprojecto');
+  binder.command('doLoad');
+});
+</script>
+</zk>

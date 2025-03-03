@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="AI Governance Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .dashboard-tile {
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+            background: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .alert-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #e74c3c;
+        }
+    </style>
+
+    <div viewModel="@id('vm') @init('com.suinsit.apps.suinless.viewmodel.DashboardViewModel')"
+         height="100%" width="100%" style="padding: 20px;">
+        
+        <!-- KPIs Section -->
+        <hlayout spacing="20px" style="margin-bottom: 20px;">
+            <div sclass="dashboard-tile" width="200px">
+                <label value="Total Models" />
+                <label sclass="kpi-value" 
+                       value="@load(vm.kpis['total_models'])" />
+            </div>
+            <div sclass="dashboard-tile" width="200px">
+                <label value="Avg Accuracy" />
+                <label sclass="kpi-value" 
+                       value="@load(vm.kpis['avg_accuracy'])+'%'" />
+            </div>
+            <div sclass="dashboard-tile" width="200px">
+                <label value="Total Tokens" />
+                <label sclass="kpi-value" 
+                       value="@load(vm.kpis['total_tokens'])" />
+            </div>
+            <div sclass="dashboard-tile" width="200px">
+                <label value="Avg Latency" />
+                <label sclass="kpi-value" 
+                       value="@load(vm.kpis['avg_latency'])+'ms'" />
+            </div>
+        </hlayout>
+
+        <!-- Charts Section -->
+   <hlayout spacing="20px" style="margin-bottom: 20px;">
+    <div sclass="dashboard-tile" width="60%">
+        <charts id="performanceChart" 
+                model="@bind(vm.performanceChart)"
+                height="400px"/>
+    </div>
+    <div sclass="dashboard-tile" width="35%">
+        <charts id="statusChart" 
+                model="@bind(vm.statusChart)"
+                height="400px"/>
+    </div>
+</hlayout>
+
+        <!-- Alerts Section -->
+        <div sclass="dashboard-tile">
+            <label value="Critical Alerts" style="font-size: 18px; margin-bottom: 10px;"/>
+            <listbox model="@load(vm.alertsList)" 
+                     emptyMessage="No critical alerts"
+                     style="border: none;">
+                <template name="model">
+                    <listitem sclass="alert-item">
+                        <listcell>
+                            <vlayout>
+                                <label value="@load(each['model_name'])" 
+                                       style="font-weight: bold;"/>
+                                <label value="@load(each['alert_type'])" />
+                                <label value="@load(each['alert_date'])" />
+                            </vlayout>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+
+        <!-- Refresh Button -->
+        <button label="Refresh Dashboard" 
+                onClick="@command('refreshDashboard')"
+                style="margin-top: 20px;" />
+    </div>
+</zk>

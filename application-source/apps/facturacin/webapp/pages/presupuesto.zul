@@ -1,0 +1,847 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<idspace id="presupuesto"
+		binder="@init(queueName='frontqueue',queueScope='group')"
+		apply="org.zkoss.bind.BindComposer"
+		viewModel="@id('vm') @init('com.suinsit.applications.erp.PresupuestoUI',pagina='presupuesto')"
+		validationMessages="@id('vmsgs')">
+		<custom-attributes pagina="presupuesto" />
+		<custom-attributes reloadPage="presupuesto.zul" />
+		<h:div id="notificacion"></h:div>
+		<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+						<fragment
+							exps="@load(vm.lang.getProperty('presupuesto.screen', 'Presupuestos'))">
+
+
+
+							
+							<![CDATA[ <h4 class="mb-sm-0"
+							textContent='@load(exps)'></h4> ]]>
+							
+							
+							
+							
+					</fragment>
+
+					</vbox>
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu}
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Presupuestos
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<button onClick="@command('toSearch')"
+									class="btn btn-light">
+									Volver
+								</button>
+								<button
+									iconSclass="bx bx-printer me-1 align-bottom"
+									onClick="@command('print')" class="btn ">
+									Imprimir
+								</button>
+
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+									<button class="btn btn-secondary"
+										visible="@bind(vm.showButton('save-borrador'))"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right"
+										onClick="@command('store',accion='save-borrador')">
+										Guardar Borrador
+									</button>
+									<button class="btn btn-info"
+										onClick="@command('store',accion='duplicate-presupuesto')"
+										visible="@bind(vm.showButton('duplicate-presupuesto'))">
+										Duplicar Presupuesto
+									</button>
+									<button class="btn btn-secondary"
+										visible="@bind(vm.showButton('save-pedido'))"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right"
+										onClick="@command('store',accion='save-pedido')">
+										Guardar Pedido
+									</button>
+									<button class="btn btn-success"
+										onClick="@command('store',accion='create-pedido')"
+										visible="@bind(vm.showButton('create-pedido'))">
+										Crear Pedido
+									</button>
+									<button class="btn btn-success"
+										onClick="@command('store',accion='factura')"
+										visible="@bind(vm.showButton('create-factura'))">
+										Crear Factura
+									</button>
+									<button class="btn"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right"
+										onClick="@command('store',accion='create-presupuesto')"
+										visible="@bind(vm.showButton('create-presupuesto'))">
+										Crear Presupuesto
+									</button>
+									<button class="btn"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right"
+										onClick="@command('store',accion='save-presupuesto')"
+										visible="@bind(vm.showButton('save-presupuesto'))">
+										Guardar Presupuesto
+									</button>
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+		</div>
+		<div class="row">
+
+			<h:div class="col-lg-12">
+				<h:div
+					class="card ribbon-box border shadow-none mb-lg-0 right"
+					style="overflow:autoscroll;">
+					<h:div class="card-body">
+						<h:span
+							class="ribbon ribbon-info round-shape">
+							<h:span>
+								${vm.beanData.iderpmestado.estado}
+							</h:span>
+						</h:span>
+						<div class="row">
+
+							<h:div style="overflow:auto;"
+								class=" col-lg-4 col-xlg-4 col-md-4">
+								<h:div class="row">
+									<h:div class="col-md-12">
+										<label
+											sclass="fs-4  text-capitalize  font-weight-bold align-text-middle"
+											style="  " value="@load(vm.beanData.presupuesto)" />
+									</h:div>
+
+
+
+
+									<h:div class="col-md-6">
+										<hbox spacing="3px">
+											<label
+												sclass="form-label font-weight-normal" style=""
+												value="@load(vm.lang.getProperty('idcompany.label', 'Compañia'))" />
+											<a
+												iconSclass="mdi mdi-information-outline"
+												popup="pop_ReooVOMYeL" />
+										</hbox>
+										<combobox
+											disabled="@load(vm.disabled())" mold="rounded"
+											autodrop="true" sclass="bg-light border-0" id="idcompany"
+											placeholder="@load(vm.lang.getProperty('idcompany').label,'Compañia')"
+											model="@bind(vm.foreings['idcompany'])" buttonVisible="true"
+											onSelect="@command('onSelectForeing', alias='idcompany',item=self.selectedItem.value)"
+											selectedItem="@load(vm.beanData.idcompany)"
+											onCreate="@command('onCreateCombo',component=self,alias='idcompany')"
+											value="@bind(vm.beanData.idcompany .nombre)@save(vm.beanData.idcompany.nombre, before=('store')) @validator(vm.validator,required=true)">
+											<template name="model"
+												var="item">
+												<comboitem
+													value="@load(item)" label="@load(item.nombre)" />
+											</template>
+										</combobox>
+										<label sclass="text-danger"
+											value="@load(vmsgs['idcompany'])" />
+										<popup id="pop_ReooVOMYeL"
+											width="200px">
+											<vbox>
+												<fragment
+													exps="@load(vm.lang.getProperty('idcompany.helptext', 'idcompany'))">
+
+
+
+
+													
+													<![CDATA[ <span
+													textContent='@load(exps)'></span>
+													]]>
+													
+													
+													
+													        
+	  </fragment>
+											</vbox>
+										</popup>
+									</h:div>
+
+
+									<h:div class="col-md-6">
+										<hbox spacing="3px">
+											<label
+												sclass="form-label font-weight-normal" style=""
+												value="@load(vm.lang.getProperty('iderpcomercial.label', 'Comercial'))" />
+											<a
+												iconSclass="mdi mdi-information-outline"
+												popup="pop_CiooemGRYJ" />
+										</hbox>
+										<combobox mold="rounded"
+											autodrop="true" id="iderpcomercial"
+											placeholder="@load(vm.lang.getProperty('iderpcomercial').label,'Comercial')"
+											model="@bind(vm.foreings['iderpcomercial'])"
+											buttonVisible="true"
+											onSelect="@command('onSelectForeing', alias='iderpcomercial',item=self.selectedItem.value)"
+											selectedItem="@load(vm.beanData.iderpcomercial)"
+											onCreate="@command('onCreateCombo',component=self,alias='iderpcomercial')"
+											value="@bind(vm.beanData.iderpcomercial .nombre)">
+											<template name="model"
+												var="item">
+												<comboitem
+													value="@load(item)" label="@load(item.nombre)" />
+											</template>
+										</combobox>
+										<label sclass="text-danger"
+											value="@load(vmsgs['iderpcomercial'])" />
+										<popup id="pop_CiooemGRYJ"
+											width="200px">
+											<vbox>
+												<fragment
+													exps="@load(vm.lang.getProperty('iderpcomercial.helptext', 'iderpcomercial'))">
+
+
+
+
+													
+													<![CDATA[ <span
+													textContent='@load(exps)'></span>
+													]]>
+													
+													
+													
+													        
+	  </fragment>
+											</vbox>
+										</popup>
+									</h:div>
+
+
+
+
+								</h:div>
+							</h:div>
+
+
+
+							<h:div style="overflow:auto;"
+								class=" col-lg-4 col-xlg-4 col-md-4">
+								<h:div class="row">
+									<h:div class="col-md-6">
+										<hbox spacing="3px"
+											visible="@load(vm.isVisible('FECHA'))">
+											<label
+												sclass="form-label  text-capitalize  font-weight-normal align-text-middle"
+												style=""
+												value="@load(vm.lang.getProperty('FECHA.label', 'fecha'))" />
+											<a
+												iconSclass="su-icon su-icon-question" popup="pop_FECHA" />
+										</hbox>
+										<datebox id="FECHA"
+											placeholder="@load(vm.lang.getProperty('FECHA.label', 'fecha'))"
+											tabindex="1"
+											value="@bind(vm.beanData.fecha) @save(vm.beanData.fecha, before=('store')) "
+											format="dd/MM/yyyy" visible="@load(vm.isVisible('FECHA'))"
+											disabled="@load(vm.disabled())" />
+										<label sclass="text-danger"
+											value="@load(vmsgs['FECHA'])" />
+									</h:div>
+									<h:div class="col-md-6">
+										<hbox spacing="3px"
+											visible="@load(vm.isVisible('FECHAENTREGA'))">
+											<label
+												sclass="form-label  text-capitalize  font-weight-normal align-text-middle"
+												style=""
+												value="@load(vm.lang.getProperty('FECHAENTREGA.label', 'fecha entrega'))" />
+											<a
+												iconSclass="su-icon su-icon-question"
+												popup="pop_FECHAENTREGA" />
+										</hbox>
+										<datebox id="FECHAENTREGA"
+											placeholder="@load(vm.lang.getProperty('FECHAENTREGA.label', 'fecha entrega'))"
+											tabindex="2"
+											value="@bind(vm.beanData.fechaentrega) @save(vm.beanData.fechaentrega, before=('store')) "
+											format="dd/MM/yyyy"
+											visible="@load(vm.isVisible('FECHAENTREGA'))" />
+										<label sclass="text-danger"
+											value="@load(vmsgs['FECHAENTREGA'])" />
+									</h:div>
+
+								</h:div>
+								<h:div class="col-md-6">
+									<hbox spacing="3px">
+										<label
+											sclass="form-label font-weight-normal" style=""
+											value="@load(vm.lang.getProperty('iderpformapago.label', 'Forma de Pago'))" />
+										<a
+											iconSclass="mdi mdi-information-outline"
+											popup="pop_dANqDDLANr" />
+									</hbox>
+									<combobox mold="rounded"
+										autodrop="true" id="iderpformapago"
+										placeholder="@load(vm.lang.getProperty('iderpformapago').label,'Forma de Pago')"
+										model="@bind(vm.foreings['iderpformapago'])"
+										buttonVisible="true"
+										onSelect="@command('onSelectForeing', alias='iderpformapago',item=self.selectedItem.value)"
+										selectedItem="@load(vm.beanData.iderpformapago)"
+										onCreate="@command('onCreateCombo',component=self,alias='iderpformapago')"
+										value="@bind(vm.beanData.iderpformapago .formadepago)">
+										<template name="model"
+											var="item">
+											<comboitem
+												value="@load(item)" label="@load(item.formadepago)" />
+										</template>
+									</combobox>
+									<label sclass="text-danger"
+										value="@load(vmsgs['iderpformapago'])" />
+									<popup id="pop_dANqDDLANr"
+										width="200px">
+										<vbox>
+											<fragment
+												exps="@load(vm.lang.getProperty('iderpformapago.helptext', 'iderpformapago'))">
+
+
+
+
+												
+												<![CDATA[ <span
+												textContent='@load(exps)'></span>
+												]]>
+												
+												
+												
+												        
+	  </fragment>
+										</vbox>
+									</popup>
+								</h:div>
+							</h:div>
+
+
+
+							<h:div style="overflow:auto;"
+								class=" col-lg-4 col-xlg-4 col-md-4">
+								<h:div class="row">
+									<h:div class="col-md-12">
+										<label
+											sclass="form-label font-weight-normal" style=""
+											value="@load(vm.lang.getProperty('idcliente.label', 'Cliente'))" />
+										<div
+											visible="@load(vm.disabled()?false:true)">
+											<button
+												disabled="@load(vm.disabled())"
+												iconSclass="fa-duotone fa-magnifying-glass-waveform"
+												sclass="btn btn-icon" d:data-bs-toggle="modal"
+												d:data-bs-target="#empresa">
+											</button>
+											<button
+												iconSclass="fa-duotone fa-arrow-up-right-from-square" sclass="btn btn-icon"
+												d:data-bs-toggle="modal" d:data-bs-target="#viewdtoOIxfTms"
+												onClick="@command('editForeing',win=WIN_dtoOIxfTms,alias='idcliente',body='body_dtoOIxfTms',page='popuppopempresas.zul',close='btn_dtoOIxfTms')">
+											</button>
+											<!--  	 <button disabled="@load(vm.disabled())" iconSclass="fa-duotone fa-arrow-up-right-from-square" sclass="btn btn-icon"  d:data-bs-toggle="modal" d:data-bs-target="#viewempresa" -->
+											<!--  	 onClick="@command('editForeing',alias='idcliente',body=body_viewempresa,page='popuppopempresas.zul',close='btn_viewempresa')" ></button> -->
+											<button
+												disabled="@load(vm.disabled())"
+												iconSclass="fa-duotone fa-paintbrush-fine" sclass="btn btn-icon"
+												onClick="@command('clearForeing',alias='idcliente')">
+											</button>
+										</div>
+
+
+									</h:div>
+									<h:div class="mb-2">
+										<textbox id="tboxidcliente"
+											disabled="@load(vm.disabled())"
+											placeholder="Introduce el nombre de la empresa"
+											value="@bind(vm.beanData.idcliente.empresa) @save(vm.beanData.idcliente.empresa, before=('store')) @validator(vm.validator,required=true)"
+											onChange="@command('onChangeFindTextForeing',alias='idcliente',att='empresa',event=event)"
+											onOK="@command('onChangeFindTextForeing',alias='idcliente',att='empresa',event=event)"
+											sclass="form-control  bg-light border-0" />
+										<combobox id="idcliente"
+											mold="rounded" autodrop="true" visible="false"
+											model="@load(vm.foreings['idcliente'])"
+											onSelect="@command('onSelectTextForeing',item=self.selectedItem.value,alias='idcliente',hidde=self,updatebean='true')"
+											width="85%">
+											<template name="model"
+												var="item">
+												<comboitem
+													value="${item}" label="${item.empresa}">
+												</comboitem>
+											</template>
+										</combobox>
+										<label sclass="text-danger"
+											value="@load(vmsgs['tboxidcliente'])" />
+									</h:div>
+									<h:div class="col-md-12">
+										<hbox spacing="5px">
+											<textbox
+												placeholder="CIF NIF"
+												value="@bind(vm.beanData.idcliente.cifnif)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+											<textbox
+												placeholder="Dirección"
+												value="@bind(vm.beanData.idcliente.direccion)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+											<textbox
+												placeholder="Población/Ciudad"
+												value="@bind(vm.beanData.idcliente.ciudad)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+										</hbox>
+									</h:div>
+									<h:div class="col-md-12">
+										<hbox spacing="5px">
+											<textbox
+												placeholder="Provincia"
+												value="@bind(vm.beanData.idcliente.idmprovincia.provincia)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+											<textbox
+												placeholder="Cod. Postal"
+												value="@bind(vm.beanData.idcliente.codpostal)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+											<textbox
+												placeholder="Tlfno."
+												value="@bind(vm.beanData.idcliente.telefono)"
+												sclass="form-control  bg-light border-0" disabled="true" />
+										</hbox>
+									</h:div>
+									<h:div class="md-2">
+										<hbox spacing="3px"
+											visible="@load(vm.isVisible('REFCLIENTE'))">
+											<label
+												sclass="form-label  text-capitalize  font-weight-bold align-text-middle"
+												style="  "
+												value="@load(vm.lang.getProperty('REFCLIENTE.label', 'Referencia Cliente'))" />
+										</hbox>
+										<textbox tabindex="2"
+											id="REFCLIENTE"
+											placeholder="@load(vm.lang.getProperty('REFCLIENTE.label', 'Referencia Cliente'))"
+											value="@bind(vm.beanData.refcliente) @save(vm.beanData.refcliente, before=('store')) "
+											sclass="form-control  bg-light border-0"
+											visible="@load(vm.isVisible('REFCLIENTE'))" />
+										<label sclass="text-danger"
+											value="@load(vmsgs['REFCLIENTE'])" />
+									</h:div>
+								</h:div>
+							</h:div>
+
+
+
+							<h:div style="overflow:auto;"
+								class=" col-lg-12 col-xlg-12 col-md-12">
+								<h:div class="card-body p-4">
+									<tabbox orient="top"
+										mold="default">
+										<tabs>
+											<tab
+												label="Lineas de pedido" />
+										</tabs>
+										<tabpanels>
+											<tabpanel>
+												<div class="row">
+
+													<div
+														class="table-responsive "
+														onCreate="@command('onSubtableCreate',component=self,alias='suberprlineapedido')">
+														<h:table
+															class="invoice-table table table--borderless table-nowrap mb-0">
+															<h:thead
+																class="table-light">
+																<h:tr>
+																	<h:td
+																		colspan="8">
+																		<a
+																			label="Añadir Producto"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='row')"
+																			class="btn" />
+																		<a
+																			label="Añadir Seccion"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='seccion')"
+																			class="btn" />
+																		<a
+																			label="Añadir Nota"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='nota')"
+																			class="btn" />
+																	</h:td>
+																</h:tr>
+															</h:thead>
+														</h:table>
+														<grid id="linea"
+															sclass="invoice-table table table--borderless table-nowrap mb-0"
+															width="100%"
+															model="@bind(vm.grid['suberprlineapedido'])">
+															<columns
+																sclass="table-light">
+																<column
+																	label="#" sclass="text-center" style="width:30px;" />
+																<column
+																	label="@load(vm.lang.getProperty('PRODUCTO.label', 'Producto'))"
+																	sclass="text-capitalize font-weight-bold " width="15%" />
+																<column
+																	label="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"
+																	sclass="text-capitalize font-weight-bold" width="45%" />
+																<column
+																	label="@load(vm.lang.getProperty('UNIDADES.label', 'Unidades'))"
+																	sclass="text-capitalize font-weight-bold" width="8%" />
+																<column
+																	label="@load(vm.lang.getProperty('PRECIOUNITARIO.label', 'Precio Unitario'))"
+																	sclass="text-capitalize font-weight-bold" width="10%" />
+																<column
+																	label="@load(vm.lang.getProperty('IMPUESTOS.label', 'Impuestos'))"
+																	sclass="text-capitalize font-weight-bold" width="8%" />
+																<column
+																	label="@load(vm.lang.getProperty('SUBTOTAL.label', 'Sub Total'))"
+																	sclass="text-capitalize font-weight-bold" width="8%" />
+																<column
+																	label="" style="width:30px;">
+																</column>
+															</columns>
+
+														</grid>
+
+														<h:table
+															class="invoice-table table table--borderless table-nowrap mb-0">
+
+															<h:tbody>
+																<h:tr>
+																	<h:td
+																		colspan="8">
+																		<a
+																			label="Añadir Producto"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='row')"
+																			class="btn" />
+																		<a
+																			label="Añadir Seccion"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='seccion')"
+																			class="btn" />
+																		<a
+																			label="Añadir Nota"
+																			onClick="@command('appendRow2',alias='suberprlineapedido',template='nota')"
+																			class="btn" />
+																	</h:td>
+																</h:tr>
+																<h:tr
+																	class="border-top border-top-dashed mt-2">
+																	<h:td
+																		colspan="4">
+
+																		<hbox
+																			spacing="3px">
+																			<label
+																				sclass="form-label font-weight-normal align-text-middle"
+																				style=""
+																				value="@load(vm.lang.getProperty('CONDICIONES.label', 'Condiciones'))" />
+																		</hbox>
+																		<textbox
+																			rows="4" cols="80" id="496068" multiline="true"
+																			placeholder="@load(vm.lang.getProperty('CONDICIONES.label', 'Condiciones'))"
+																			value="@bind(vm.beanData.condiciones) @save(vm.beanData.condiciones, before=('store')) "
+																			sclass="form-control  bg-light border-0"
+																			visible="@load(vm.isVisible('CONDICIONES'))" />
+																		<label
+																			sclass="text-danger" value="@load(vmsgs['496068'])" />
+
+																	</h:td>
+																	<h:td
+																		colspan="3">
+																		<h:table
+																			class="table table-borderless table-sm table-nowrap align-middle mb-0">
+																			<h:tbody>
+																				<h:tr>
+																					<h:th
+																						scope="row">
+																						<label
+																							sclass="text-capitalize  align-text-middle"
+																							style="font-weight:600;"
+																							value="@load(vm.lang.getProperty('SUBTOTAL.label', 'SubTotal'))" />
+																					</h:th>
+																					<h:td
+																						class="bg-light border-0"
+																						style="width:150px;text-align:right;">
+																						<label
+																							id="lbsubtotal"
+																							style="text-align:right;font-weight:600;"
+																							value="@load(vm.beanData.subtotal) @converter(vm.fieldConverter,type='CURRENCY')">
+																						</label>
+																					</h:td>
+
+																				</h:tr>
+																				<h:tr>
+																					<h:th
+																						scope="row">
+																						<label
+																							sclass="text-capitalize  align-text-middle"
+																							style="font-weight:600;"
+																							value="@load(vm.lang.getProperty('IMPUESTOS.label', 'Impuestos'))" />
+																					</h:th>
+																					<h:td
+																						class="bg-light border-0"
+																						style="width:150px;text-align:right;">
+																						<label
+																							id="lbimpuestos"
+																							style="text-align:right;font-weight:600;"
+																							value="@load(vm.beanData.impuestos) @converter(vm.fieldConverter,type='CURRENCY')">
+																						</label>
+																					</h:td>
+																				</h:tr>
+																				<h:tr>
+																					<h:th
+																						scope="row">
+																						<label
+																							sclass="text-capitalize  align-text-middle"
+																							style="font-weight:600;"
+																							value="@load(vm.lang.getProperty('RECARGOEQ.label', 'Recargo Eq.'))" />
+																					</h:th>
+																					<h:td
+																						class="bg-light border-0"
+																						style="width:150px;text-align:right;">
+																						<label
+																							id="lbrecargo"
+																							style="text-align:right;font-weight:600;"
+																							value="@load(vm.beanData.importrecargo) @converter(vm.fieldConverter,type='CURRENCY')">
+																						</label>
+																					</h:td>
+																				</h:tr>
+																				<h:tr>
+																					<h:th
+																						scope="row">
+																						<label
+																							sclass="text-capitalize  align-text-middle"
+																							style="font-weight:600;"
+																							value="@load(vm.lang.getProperty('RETENCION.label', 'Retencion IRPF'))" />
+																					</h:th>
+																					<h:td
+																						class="bg-light border-0"
+																						style="width:150px;text-align:right;">
+																						<label
+																							id="lbretencion"
+																							style="text-align:right;font-weight:600;"
+																							value="@load(vm.beanData.importreten) @converter(vm.fieldConverter,type='CURRENCY')">
+																						</label>
+																					</h:td>
+																				</h:tr>
+																				<h:tr>
+																					<h:th
+																						scope="row">
+																						<label
+																							sclass="text-capitalize  align-text-middle"
+																							style="font-weight:600;"
+																							value="@load(vm.lang.getProperty('TOTAL.label', 'Total'))" />
+																					</h:th>
+																					<h:td
+																						class="bg-light border-0"
+																						style="width:150px;text-align:right;">
+																						<label
+																							id="lbtotal"
+																							style="text-align:right;font-weight:600;"
+																							value="@load(vm.beanData.total) @converter(vm.fieldConverter,type='CURRENCY')">
+																						</label>
+																					</h:td>
+																				</h:tr>
+																			</h:tbody>
+																		</h:table>
+																	</h:td>
+																</h:tr>
+															</h:tbody>
+														</h:table>
+													</div>
+
+
+
+												</div>
+											</tabpanel>
+										</tabpanels>
+									</tabbox>
+
+
+
+
+								</h:div>
+							</h:div>
+
+
+						</div>
+					</h:div>
+
+				</h:div>
+			</h:div>
+		</div>
+		<fragment exps="@load(vm.lang['presupuesto.screen'])">
+
+
+
+			
+			<![CDATA[ <div id="modal_iconified" class="modal fade"
+			tabindex="-1" style="z-index: 99999;"> <div
+			class="modal-dialog"> <div class="modal-content"> <div
+			class="modal-header"> <h5 class="modal-title"><span
+			textContent='@load(exps)'></span></h5> </div> <div
+			class="modal-body"> <h6 class="font-weight-semibold"><i
+			class="icon-law mr-2"></i>Texto de ayuda pantalla</h6> <span
+			textContent='@load(exps)'></span> </div> <div
+			class="modal-footer"> <button class="btn btn-link"
+			data-dismiss="modal"><i class="icon-cross2 font-size-base
+			mr-1"></i> Close</button> </div> </div> </div> </div> ]]>
+			
+			
+			
+			
+				</fragment>
+
+		<window id="WIN_dtoOIxfTms" mode="modal" visible="false"
+			position="center,center" action="show: slideDown;hide: slideUp"
+			sclass="z-messagebox-window" border="none" width="80%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Crear / Editar Cliente
+					</h:h5>
+				</div>
+				<div class="modal-body" id="body_dtoOIxfTms"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+		<!-- right offcanvas -->
+		<h:div class="offcanvas offcanvas-end" tabindex="-1"
+			id="offcanvasRight" aria-labelledby="offcanvasRightLabel">
+			<h:div class="offcanvas-header">
+				<h:h5 id="offcanvasRightLabel">Offcanvas Right</h:h5>
+				<h:button type="button" class="btn-close text-reset"
+					data-bs-dismiss="offcanvas" aria-label="Close">
+				</h:button>
+			</h:div>
+			<h:div class="offcanvas-body">
+
+
+			</h:div>
+
+		</h:div>
+
+
+
+
+		<!-- 		<window id="searchProducto" mode="modal" visible="false" -->
+		<!-- 			position="center,center" action="show: slideDown;hide: slideUp" -->
+		<!-- 			sclass="z-messagebox-window" border="none"  title="Buscar producto" > -->
+		<!-- 				<div class="modal-dialog modal-dialog-centered modal-lg"> -->
+		<!-- 						<div class="modal-body" id="body_producto"> -->
+
+		<!-- 						</div> -->
+		<!-- 				</div> -->
+		<!-- 		</window> -->
+
+
+		<div id="viewproducto" visible="false">
+		  <div class="modal-body" id="body_viewproduct">
+		  </div>
+		</div>
+		<div id="searchProducto" visible="false">
+		  <div class="modal-body" id="body_producto">
+		  </div>
+		</div>
+		
+
+		<h:div class="modal fade" id="viewempresa"
+			aria-labelledby="exampleempresa" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content border-0">
+					<div class="modal-header bg-soft-info p-3">
+						<h:h5 class="modal-title" id="exampleempresa">
+							Cliente
+						</h:h5>
+						<h:button id="btn_viewempresa" type="button"
+							class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+						</h:button>
+					</div>
+					<div class="modal-body" id="body_viewempresa">
+
+
+					</div>
+				</div>
+			</div>
+
+		</h:div>
+		<h:div class="modal fade" id="empresa"
+			aria-labelledby="exampleempresa" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg">
+				<div class="modal-content border-0">
+					<div class="modal-header bg-soft-info p-3">
+						<h:h5 class="modal-title"
+							id="examplesempresa">
+							Buscar Empresa
+						</h:h5>
+						<h:button id="btn_empresa" type="button"
+							class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+						</h:button>
+					</div>
+					<div class="modal-body" id="body_empresa">
+						<div sclass="mb-2">
+							<textbox
+								sclass="form-control  bg-light border-0"
+								placeholder="cifnif,empresa,correo..."
+								onChange="@command('onChangeFindForeing',alias='idcliente',att='cifnif,empresa,correo',event=event)" />
+						</div>
+						<div sclass="mb-2">
+							<listbox height="400px" mold="paging"
+								pageSize="20" pagingPosition="bottom"
+								model="@bind(vm.foreings['idcliente'])"
+								onSelect="@command('onSelectForeingPopup', alias='idcliente',item=self.selectedItem.value,close='btn_empresa' )">
+								<listhead>
+									<listheader
+										label="@load(vm.lang.getProperty('CIFNIF.label','NIF'))" />
+									<listheader
+										label="@load(vm.lang.getProperty('EMPRESA.label','Empresa'))" />
+									<listheader
+										label="@load(vm.lang.getProperty('CORREO.label','Correo'))" />
+								</listhead>
+								<template name="model" var="item">
+									<listitem value="@load(item)">
+										<listcell
+											label="@load(item.cifnif)" />
+										<listcell
+											label="@load(item.empresa)" />
+										<listcell
+											label="@load(item.correo)" />
+									</listitem>
+								</template>
+							</listbox>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</h:div>
+	</idspace>
+	<script type="text/javascript">
+		zk.afterMount(function() { var binder =
+		zkbind.$('$presupuesto'); binder.command('doLoad'); }); function
+		reloadBean(){ var binder = zkbind.$('$presupuesto');
+		binder.command('doReload');
+
+		}
+	</script>
+</zk>

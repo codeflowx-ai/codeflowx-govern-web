@@ -1,0 +1,161 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+		<nodom
+			viewModel="@id('vm') @init('com.suinsit.nocode.suinless.ui.MultimediaTrainingUI',pagina='promp')"
+			validationMessages="@id('vmsgs')">
+			<custom-attributes pagina="promp" />
+			<custom-attributes
+				clase="org.suinsit.apps.suinless.Slespromp" />
+			<custom-attributes namespace="suinless" />
+			<custom-attributes uid="21116" />
+			<custom-attributes tipo="MASTER" />
+			<custom-attributes msgform="Proyecto enviado" />
+			<custom-attributes type="form" />
+			<div class="row">
+				<div class="leka-drawer-filters">
+					<div class="row leka-drawer-flex">
+						<div
+							class="col-md-10 col-lg-10 leka-drawer-txt">
+
+							<div class="left tittle-principal">
+								<h:h2 class="mb-sm-0">Leka Media</h:h2>
+							</div>
+
+							<label class="txt-mkt">
+								LEKA te permite dar vida a tus ideas:
+								compara y genera imágenes y videos con
+								los mejores modelos de IA en una sola
+								plataforma.
+							</label>
+						</div>
+
+						<div
+							class="col-md-2 col-lg-2 leka-drawer-options">
+							<button class="btn btn-primary"
+								iconSclass="fa-duotone fa-solid fa-play" label="Run" onClick="@command('runMessageImage')" />
+						</div>
+					</div>
+				</div>
+
+
+				<div class="col-lg-12 s-bot mb-5">
+
+					<div class="row">
+						<div class="col-8 mb-8">
+							<div class="card" height="100%">
+
+								<div class="row" height="100%">
+									<div class="col-12 mb-12">
+										<div
+											class="card cards-mkt-sf">
+											<hlayout spacing="10px"
+												style="margin-bottom:20px;">
+												<vlayout class="mkt"
+													style="padding:20px; ">
+													<label
+														class="subtt-mkt">
+														Generador Imagen
+													</label>
+
+													<grid>
+														<rows>
+															<row>	
+															 						
+																<hlayout id="response">
+																	<image
+																		src="img/im1.jpg" class="img-generator" />
+
+																</hlayout>
+																<hlayout id="response2">
+																	<image
+																		src="img/im2.jpg" class="img-generator" />
+
+																</hlayout>
+																<hlayout id="response3">
+																	<image
+																		src="img/im3.jpg" class="img-generator" />
+
+																</hlayout>
+															</row>
+														</rows>
+													</grid>
+													<hlayout  style="margin-top:20px;">
+										                <textbox placeholder="Puesta de sol en playa tropical" width="100vh" style="margin-top: 58px;" value="@bind(vm.message)" multiline="true"></textbox>
+										            </hlayout>
+												</vlayout>
+											</hlayout>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="row">
+								<div class="col-3 mb-4">
+									<label
+										class="pad-0 leka-label-ftr">
+										Modelo
+									</label>
+									<listbox model="@bind(vm.models)"
+										visible="true"
+										onSelect="@command('selectModel',item=self.selectedItem.value)"
+										selectedItem="@load(vm.omodelo)" value="@bind(vm.model)"
+										height="500px;" width="400px;" mold="paging">
+										<auxhead>
+											<auxheader colspan="4">
+												Modelos
+											</auxheader>
+										</auxhead>
+										<listhead>
+
+											<listheader
+												label="Fabricante" width="100px" />
+											<listheader label="Modelo"
+												width="100px" />
+											<listheader label="Image"
+												width="80px" />
+											<listheader label="video"
+												width="80px" />
+										</listhead>
+										<template name="model"
+											var="item">
+											<listitem
+												value="@load(item)">
+												<listcell>
+													<image
+														content="@load(vm.getImage(item,'avatar'))" width="70%"
+														height="70%">
+													</image>
+												</listcell>
+												<listcell
+													label="@load(item.alias) " />
+												<listcell
+													label="@load(item.image) @converter(vm.fieldConverter)" />
+												<listcell
+													label="@load(item.video) @converter(vm.fieldConverter)" />
+
+											</listitem>
+
+										</template>
+									</listbox>
+
+
+								</div>
+
+
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</nodom>
+	</div>
+
+
+</zk>

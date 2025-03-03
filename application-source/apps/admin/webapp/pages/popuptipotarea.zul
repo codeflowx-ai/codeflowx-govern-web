@@ -1,0 +1,149 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="tipotarea" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='tipotarea')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="tipotarea" />
+<custom-attributes clase="org.suinsit.apps.admin.Mtipotask" />
+	   <custom-attributes namespace="admin" />
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="KOHyyFvjJW" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="KOHyyFvjJW-row" class="row">
+</div>
+</div>  
+<div id="oLmZuYOkoi" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="oLmZuYOkoi-row" class="row">
+</div>
+</div>  
+<div id="hxGbSZDSeN" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="hxGbSZDSeN-row" class="row">
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('TIPOTAREA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('TIPOTAREA.label', 'Tipo de Tarea'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="jrnXSPBLGp" 
+	   placeholder="@load(vm.lang.getProperty('TIPOTAREA.label', 'Tipo de Tarea'))" 
+	   value="@bind(vm.beanData.tipotarea) @save(vm.beanData.tipotarea, before=('grabar')) @validator(vm.unique, field='TIPOTAREA',required=true ,oldValue=vm.beanDataCpy.tipotarea)"  sclass="margin-field form-control  form-control form-control-sm border border-primary    border-danger" 
+	   visible="@load(vm.isVisible('TIPOTAREA'))" disabled="@load(vm.isEditable('TIPOTAREA')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['jrnXSPBLGp'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('COLOR'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style=" Font-Size:16px;" value="@load(vm.lang.getProperty('COLOR.label', 'color'))"  />
+	   </hbox>
+	   <textbox   tabindex="2" id="728278" 
+	   placeholder="@load(vm.lang.getProperty('COLOR.label', 'color'))" 
+	   value="@bind(vm.beanData.color) @save(vm.beanData.color, before=('grabar')) "  sclass="margin-field form-control  form-control text-dark" 
+	   visible="@load(vm.isVisible('COLOR'))" disabled="@load(vm.isEditable('COLOR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['728278'])"/>
+	   
+    </h:div>   
+
+
+
+
+</div>
+</div>  
+<div id="nGlVKYgXbA" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="nGlVKYgXbA-row" class="row">
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['Tipo tarea.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+                  
+                 
+
+                  
+                 
+
+
+
+                  
+                 
+
+                  
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$tipotarea');
+  binder.command('doLoad');
+});
+function loadtipotarea(){
+  var binder = zkbind.$('$tipotarea');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

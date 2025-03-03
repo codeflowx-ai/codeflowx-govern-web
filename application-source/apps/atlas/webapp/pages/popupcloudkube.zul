@@ -1,0 +1,644 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="cloudkube" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='cloudkube')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupcloudkube" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.atlas.Atlkubecloud" />
+	   <custom-attributes namespace="atlas" />
+	      <custom-attributes uid="46789" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('cloudkube.screen', 'Cloud Kubernetes'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+<div id="peDZHigocB"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="peDZHigocB-card" class="card  default shadow-xl" style="overflow:auto;" >
+       <div id="peDZHigocB-body" class="card-body ">
+        <div id="peDZHigocB-row" class="form-group row ">
+
+<tabbox orient="top" mold="default" >
+     <tabs>
+                 <tab label="Proyecto" />      
+                                  <tab label="Nodos"  onSelect="@command('loadSubtableOnDemand',alias='subatlnode')"/>      
+                                  <tab label="Load Balancer"  onSelect="@command('loadSubtableOnDemand',alias='subatlbalancer')"/>      
+                                  <tab label="Almacenamiento"  onSelect="@command('loadSubtableOnDemand',alias='subatlstorage')"/>      
+                                  <tab label="Proyectos"  onSelect="@command('loadSubtableOnDemand',alias='subatlproject')"/>      
+                 <tab label="Kube" />      
+                 <tab label="Componentes Infraestructura" />      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+
+				
+
+  <!-- sclass="margin-field" -->
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('REFERENCIA'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="  " value="@load(vm.lang.getProperty('REFERENCIA.label', 'Referencia'))"/>
+	   
+       <label sclass="margin-field text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.beanData.referencia)"  />
+  </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('CLUSTER'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('CLUSTER.label', 'Cluster'))"  />
+	   
+	    <textbox   tabindex="0" id="264110" 
+	   placeholder="@load(vm.lang.getProperty('CLUSTER.label', 'cluster'))" 
+	   value="@bind(vm.beanData.cluster) @save(vm.beanData.cluster, before=('grabar')) @validator(vm.unique, field='CLUSTER',required=true ,oldValue=vm.beanDataCpy.cluster)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('CLUSTER'))" disabled="@load(vm.isEditable('CLUSTER')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['264110'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('IDPROVEEDOR'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'ID Proveedor'))"  />
+	   
+	    <textbox   tabindex="0" id="546503" 
+	   placeholder="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'idproveedor'))" 
+	   value="@bind(vm.beanData.idproveedor) @save(vm.beanData.idproveedor, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('IDPROVEEDOR'))" disabled="@load(vm.isEditable('IDPROVEEDOR')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['546503'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('REGION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('REGION.label', 'Region'))"  />
+	   
+	    <textbox   tabindex="0" id="442652" 
+	   placeholder="@load(vm.lang.getProperty('REGION.label', 'region'))" 
+	   value="@bind(vm.beanData.region) @save(vm.beanData.region, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('REGION'))" disabled="@load(vm.isEditable('REGION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['442652'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('ALIAS'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ALIAS.label', 'Alias'))"  />
+	   
+	    <textbox   tabindex="0" id="631269" 
+	   placeholder="@load(vm.lang.getProperty('ALIAS.label', 'alias'))" 
+	   value="@bind(vm.beanData.alias) @save(vm.beanData.alias, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('ALIAS'))" disabled="@load(vm.isEditable('ALIAS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['631269'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlproveedor.label', 'Proveedor'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idatlproveedor" placeholder="@load(vm.lang.getProperty('idatlproveedor').label,'Proveedor')" model="@bind(vm.foreings['idatlproveedor'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idatlproveedor',item=self.selectedItem.value,changefk='idatlcloudproject',updatebean='false')"  		selectedItem="@load(vm.beanData.idatlproveedor)"  onCreate="@command('onCreateCombo',component=self,alias='idatlproveedor')" value="@bind(vm.beanData.idatlproveedor .proveedor)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proveedor)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlproveedor'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+ <div class="col-md-4  input-group" visible="@load(vm.isVisible('CTEESTIMADO'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('CTEESTIMADO.label', 'Coste Estimado'))"/>
+	   
+   <decimalbox   tabindex="0" id="dVmyukrXSa" onCreate="" placeholder="@load(vm.lang.getProperty('CTEESTIMADO.label', 'cteestimado'))"   
+    value="@bind(vm.beanData.cteestimado) @save(vm.beanData.cteestimado, before=('grabar')) "  format="###,###,###,###,##0.00€"  sclass="  " visible="@load(vm.isVisible('CTEESTIMADO'))" disabled="@load(vm.isEditable('CTEESTIMADO')?false:true)" onChange="@command('onChangeInput',field='CTEESTIMADO',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['dVmyukrXSa'])"/>
+ 
+  </div>
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlcloudproject.label', 'Cloud'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idatlcloudproject" placeholder="@load(vm.lang.getProperty('idatlcloudproject').label,'Cloud')" model="@bind(vm.foreings['idatlcloudproject'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idatlcloudproject',item=self.selectedItem.value,changefk='idatlproject',updatebean='false')"  		selectedItem="@load(vm.beanData.idatlcloudproject)"  onCreate="@command('onCreateCombo',component=self,alias='idatlcloudproject',loadFkFrom='idatlproveedor')" value="@bind(vm.beanData.idatlcloudproject .proyecto)" disabled="@bind(vm.beanData.idatlproveedor.idxatlproveedor eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proyecto)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlcloudproject'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmempresa.label', 'Cliente'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idcrmempresa" placeholder="@load(vm.lang.getProperty('idcrmempresa').label,'Cliente')" model="@bind(vm.foreings['idcrmempresa'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idcrmempresa',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idcrmempresa)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmempresa')" value="@bind(vm.beanData.idcrmempresa .empresa)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.empresa)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idcrmempresa'])"/>
+
+  
+</h:div>
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<div class="col-lg-12">
+ <div class="col-lg-12">
+ 
+ <a  tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom"
+		onClick="@command('appendSubtable',alias='subatlnode',body='body_owMXbOYnMm',namespace='atlas',page='popuppopnodo.zul',close='btn_owMXbOYnMm',win=WIN_owMXbOYnMm)" 
+		disabled="@load(!vm.appendSubtable)" class="waves-effect waves-success">Añadir</a>
+ </div>
+ </div>		
+  <div class="table-responsive "
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlnode',body='body_owMXbOYnMm',page='popuppopnodo.zul',win=WIN_owMXbOYnMm,loadOnDemand='true')" >
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('NODO.label', 'NODO'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IMPORTEMES.label', 'IMPORTEMES'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('VCPU.label', 'VCPU'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('MEMORIA.label', 'MEMORIA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('DISCO.label', 'DISCO'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('ALTA.label', 'ALTA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subatlnode'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.nodo) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				        <label sclass="" value="@load(item.importemes) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.vcpu) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.memoria) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.disco) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+                   <a 
+						onClick="@command('editSubtable',alias='subatlnode',body='body_owMXbOYnMm',namespace='atlas',page='popuppopnodo.zul',close='btn_owMXbOYnMm',item=item,win=WIN_owMXbOYnMm)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="waves-effect waves-success m-2" />
+						<a
+						onClick="@command('removeSubtable',alias='subatlnode',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" sclass="waves-effect waves-danger  m-2"
+						 />
+           </h:td> 
+          </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<div class="col-lg-12">
+ <div class="col-lg-12">
+ 
+ <a  tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom"
+		onClick="@command('appendSubtable',alias='subatlbalancer',body='body_fGJYEZdRtU',namespace='atlas',page='popuploadbalancer.zul',close='btn_fGJYEZdRtU',win=WIN_fGJYEZdRtU)" 
+		disabled="@load(!vm.appendSubtable)" class="waves-effect waves-success">Añadir</a>
+ </div>
+ </div>		
+  <div class="table-responsive "
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlbalancer',body='body_fGJYEZdRtU',page='popuploadbalancer.zul',win=WIN_fGJYEZdRtU,loadOnDemand='true')" >
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('BALANCER.label', 'BALANCER'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('ANCHOBANDA.label', 'ANCHOBANDA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IPPUBLICA.label', 'IPPUBLICA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IMPORTEMES.label', 'IMPORTEMES'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subatlbalancer'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.balancer) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.anchobanda) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.ippublica) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				        <label sclass="" value="@load(item.importemes) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+                   <a 
+						onClick="@command('editSubtable',alias='subatlbalancer',body='body_fGJYEZdRtU',namespace='atlas',page='popuploadbalancer.zul',close='btn_fGJYEZdRtU',item=item,win=WIN_fGJYEZdRtU)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="waves-effect waves-success m-2" />
+						<a
+						onClick="@command('removeSubtable',alias='subatlbalancer',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" sclass="waves-effect waves-danger  m-2"
+						 />
+           </h:td> 
+          </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<div class="col-lg-12">
+ <div class="col-lg-12">
+ 
+ <a  tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom"
+		onClick="@command('appendSubtable',alias='subatlstorage',body='body_uZeYBoUbyR',namespace='atlas',page='popupstorage.zul',close='btn_uZeYBoUbyR',win=WIN_uZeYBoUbyR)" 
+		disabled="@load(!vm.appendSubtable)" class="waves-effect waves-success">Añadir</a>
+ </div>
+ </div>		
+  <div class="table-responsive "
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlstorage',body='body_uZeYBoUbyR',page='popupstorage.zul',win=WIN_uZeYBoUbyR,loadOnDemand='true')" >
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('STORAGE.label', 'STORAGE'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('ALTA.label', 'ALTA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('CAPACIDAD.label', 'CAPACIDAD'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('PRECIO.label', 'PRECIO'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('IDPROVEEDOR.label', 'IDPROVEEDOR'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subatlstorage'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label  value="@load(item.storage) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.capacidad) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				        <label sclass="" value="@load(item.precio) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.idproveedor) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+                   <a 
+						onClick="@command('editSubtable',alias='subatlstorage',body='body_uZeYBoUbyR',namespace='atlas',page='popupstorage.zul',close='btn_uZeYBoUbyR',item=item,win=WIN_uZeYBoUbyR)"
+						 iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="waves-effect waves-success m-2" />
+						<a
+						onClick="@command('removeSubtable',alias='subatlstorage',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" sclass="waves-effect waves-danger  m-2"
+						 />
+           </h:td> 
+          </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<div class="col-lg-12">
+ </div>		
+  <div class="table-responsive "
+    onCreate="@command('onSubtableCreate',component=self,alias='subatlproject',loadOnDemand='true')" >
+   <h:table class="table align-middle table-bordered table-hover table-nowrap">
+      <h:thead class="table-light">
+        <h:tr>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('PROJECT.label', 'PROJECT'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('ALTA.label', 'ALTA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('BAJA.label', 'BAJA'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('TOTUSER.label', 'TOTUSER'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('USERSAPP.label', 'USERSAPP'))" sclass="text-capitalize font-weight-bold"/></h:th>
+       <h:th scope="col" class="text-center" ><label value="@load(vm.lang.getProperty('TOTCUSTOMERS.label', 'TOTCUSTOMERS'))" sclass="text-capitalize font-weight-bold"/></h:th>
+    <h:th></h:th>
+        </h:tr>
+      </h:thead>
+      <h:tbody>
+       <forEach items="@bind(vm.grid['subatlproject'])" var="item">
+         <h:tr>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.project) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.alta) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.baja) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.totuser) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.usersapp) @converter(vm.fieldConverter)"></label>
+              </h:td>
+            <h:td class="text-center">
+				     <label sclass="" value="@load(item.totcustomers) @converter(vm.fieldConverter)"></label>
+              </h:td>
+        <h:td>
+           </h:td> 
+          </h:tr>
+       </forEach>
+      </h:tbody>
+   </h:table> 
+ </div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('KUBECONFIG.label', 'KubeConfig'))"/>
+	  
+	      <textbox rows="10" cols="100" id="tsIXflWqoG" multiline="true" placeholder="@load(vm.lang.getProperty('KUBECONFIG.label', 'kubeconfig'))" value="@bind(vm.beanData.kubeconfig) @save(vm.beanData.kubeconfig, before=('grabar')) "   visible="@load(vm.isVisible('KUBECONFIG'))" disabled="@load(vm.isEditable('KUBECONFIG')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['tsIXflWqoG'])"/>
+	     
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+<div class="col-md-6">
+ <h:div class="col-md-6">
+ <label sclass=" font-weight-normal align-text-middle" style="" value="Componentes"  />
+   
+    </h:div>
+   
+
+<listbox  checkmark="true"  model="@load(vm.foreings['idatlcomponent'])" height="500px" onCreate="@command('onSubtableCreate',alias='subatlrkubecomponent',loadOnDemand='true')" ><listhead><listheader label="Componente"></listheader><listheader label="Descripcion"></listheader></listhead> <template name="model" var="item"><listitem value="@load(item)"><listcell label="@load(item.componente)"></listcell><listcell label="@load(item.descripcion)"></listcell></listitem></template></listbox>
+</div>
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+<div id="WoUjHwcQln" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="false" >
+<div id="WoUjHwcQln-row" class="row">
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['cloudkube.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+
+
+
+
+  <window id="WIN_owMXbOYnMm" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%" height="70%">
+				<div id="body_owMXbOYnMm" style="overflow: scroll;"></div>
+  </window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticowMXbOYnMm" tabindex="-1" aria-labelledby="exampleowMXbOYnMm" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleowMXbOYnMm">Nodos</h:h5>
+                                <h:button id="btn_owMXbOYnMm" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_owMXbOYnMm"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+
+  <window id="WIN_fGJYEZdRtU" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%" height="70%">
+				<div id="body_fGJYEZdRtU" style="overflow: scroll;"></div>
+  </window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticfGJYEZdRtU" tabindex="-1" aria-labelledby="examplefGJYEZdRtU" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="examplefGJYEZdRtU">Load balancer</h:h5>
+                                <h:button id="btn_fGJYEZdRtU" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_fGJYEZdRtU"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+
+  <window id="WIN_uZeYBoUbyR" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%" height="70%">
+				<div id="body_uZeYBoUbyR" style="overflow: scroll;"></div>
+  </window>
+  
+  
+ <!-- 
+  <h:div class="modal fade" id="staticuZeYBoUbyR" tabindex="-1" aria-labelledby="exampleuZeYBoUbyR" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-soft-info p-3">
+                                <h:h5 class="modal-title" id="exampleuZeYBoUbyR">Almacenamiento</h:h5>
+                                <h:button id="btn_uZeYBoUbyR" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></h:button>
+                            </div>
+                            <div class="modal-body" id="body_uZeYBoUbyR"></div>
+                        </div>
+                    </div>
+                  </h:div> 
+  -->                
+
+
+
+                  
+                 
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$cloudkube');
+  binder.command('doLoad');
+});
+function loadcloudkube(){
+  var binder = zkbind.$('$cloudkube');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,288 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- Dragula css -->
+	<h:link rel="stylesheet"
+		href="../assets/libs/dragula/dragula.min.css" />
+
+	<!-- Layout config Js -->
+	<script src="../assets/js/layout.js"></script>
+	<idspace id="leads"
+		viewModel="@id('vm')@init('org.suinsit.nocode.web.KanbanUI')"
+		validationMessages="@id('vmsgs')">
+		<custom-attributes pagina="leads" />
+		<custom-attributes paginaIndex="kanbanleads.zul" />
+		<custom-attributes templateView="cardkanbanleads.zul" />
+		<custom-attributes query="org.suinsit.apps.crm.Crmvleads" />
+<!-- 		<custom-attributes pipeline="CRMVPIPELINELEAD" /> -->
+		<custom-attributes pipeline="org.suinsit.apps.crm.Crmpipeline" />
+		<custom-attributes etapa="org.suinsit.apps.crm.Crmvetapalead" />
+		<custom-attributes templateView="cardkanbanleads.zul" />
+		<custom-attributes entityEdit="org.suinsit.apps.crm.Crmoportunidad" />
+		<h:div id="notificacion"></h:div>
+		<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+						<fragment
+							exps="@load(vm.lang.getProperty('Leads.screen', 'Leads'))">
+							
+							<![CDATA[ <h4 class="mb-sm-0"
+							textContent='@load(exps)'></h4> ]]>
+							
+					</fragment>
+						<label value="@load(vm.labelTotal)"></label>
+					</vbox>
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu}
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Leads-----
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+
+<!-- 								<button -->
+<!-- 									iconSclass="fa-duotone fa-grid-2-plus" -->
+<!-- 									class="btn btn-outline-primary m-2" d:data-bs-dismiss="modal" -->
+<!-- 									d:data-bs-toggle="modal" d:data-bs-target="#showModal" -->
+<!-- 									onClick="@command('addPopup',body=body_leads,page='popupoportunidad.zul',close='close-modal')"> -->
+<!-- 									Leads -->
+<!-- 								</button> -->
+								
+								<button
+									iconSclass="fa-duotone fa-grid-2-plus"
+									class="btn btn-outline-primary m-2" 
+									
+									onClick="@command('addPopup',win=WIN_showModal,body='body_leads',page='popupoportunidad.zul',close='close-modal')">
+									Leads
+								</button>
+<!-- 						<a sclass="" tooltiptext="add" iconSclass="fa-duotone fa-arrow-up-right-from-square"   -->
+<!-- onClick="@command('appendForeingPopup',alias='idcrmempresa',win=WIN_BjTlWIUgrT,body='body_BjTlWIUgrT',page='popuppopempresas.zul')"></a> -->
+								
+								
+								Pipeline
+								<combobox model="@load(vm.pipelines)"
+									onSelect="@command('onSelectPileline',item=self.selectedItem.value)"
+									value="@bind(vm.pipelineBean)"
+									selectedItem="@bind(vm.pipelineBean)">
+									<template name="model">
+										<comboitem value="${each}"
+											label="${each.pipeline }" />
+									</template>
+								</combobox>
+
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+
+									
+
+
+									<button
+										class="btn btn-soft-success">
+										Import
+									</button>
+
+
+									<button iconSclass="fa-duotone fa-circle-ellipsis-vertical"
+										type="button" id="dropdownMenuLink1"
+										d:data-bs-toggle="dropdown" d:aria-expanded="false"
+										class="btn btn-soft-info">
+									</button>
+
+									<h:ul class="dropdown-menu"
+										aria-labelledby="dropdownMenuLink1">
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-pdf "
+												onClick="@command('report',type='pdf')">
+												Pdf
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-xls"
+												onClick="@command('report',type='excel')">
+												Excel
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-csv"
+												onClick="@command('report',type='CSV')">
+												Csv
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-file-doc"
+												onClick="@command('report',type='DOCX')">
+												Word
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="su-icon su-2x s-icon-funnel"
+												onClick="@command('changeChart',chart='funnel')">
+												Funnel Chart
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="mdi su-2x mdi-chart-bar"
+												onClick="@command('changeChart',chart='bar')">
+												Bar Chart
+											</a>
+										</h:li>
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="mdi su-2x mdi-chart-pie"
+												onClick="@command('changeChart',chart='pie')">
+												Pie Chart
+											</a>
+										</h:li>
+
+
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-chart-tree-map"
+												onClick="@command('changeView',view='cardkanbanleads.zul')">
+												Card
+											</a>
+										</h:li>
+
+
+										<h:li>
+											<a class="dropdown-item"
+												iconSclass="fa-duotone fa-list"
+												onClick="@command('changeView',view='gridkanbanleads.zul')">
+												List
+											</a>
+										</h:li>
+
+									</h:ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<div class="col-xxl-12">
+				<div class="card" id="companyList">
+					<div class="card-header">
+						<div class="row g-2">
+							<div class="col-md-3">
+								<div class="search-box">
+									<textbox onOK="@command('search')"
+										placeholder="buscar por  oportunidad" value="@bind(vm.search)"
+										sclass="form-control search">
+									</textbox>
+
+								</div>
+							</div>
+
+
+
+
+							<div class="col-md-auto ms-auto">
+								<div
+									class="d-flex align-items-center gap-2">
+									<button tooltiptext="Find"
+										iconSclass="fa-duotone fa-magnifying-glass-waveform" sclass="btn"
+										onClick="@command('search')" />
+									<button tooltiptext="Clear"
+										sclass="btn btn-outline-dark m-2"  iconSclass="fa-duotone fa-broom-wide" onClick="@command('clear')" />
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!-- row -->
+		<div sclass="row">
+			<div id="divTemplate" sclass="col-lg-12" hflex="1"></div>
+
+		</div>
+
+		<window id="WIN_showModal" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none" width="80%" >
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title"
+						id="exampleModalLabel">
+						Leads
+					</h:h5>
+
+				</div>
+				<div class="modal-body" id="body_leads"></div>
+				<div class="modal-footer"></div>
+			</div>
+		</window>
+<!-- 		<h:div class="modal fade" id="showModal" tabindex="-1" -->
+<!-- 			aria-labelledby="exampleModalLabel" aria-hidden="true"> -->
+<!-- 			<div class="modal-dialog modal-dialog-centered modal-lg"> -->
+<!-- 				<div class="modal-content border-0"> -->
+<!-- 					<div class="modal-header bg-soft-info p-3"> -->
+<!-- 						<h:h5 class="modal-title" -->
+<!-- 							id="exampleModalLabel"> -->
+<!-- 							Leads -->
+<!-- 						</h:h5> -->
+<!-- 						<h:button type="button" class="btn-close" -->
+<!-- 							data-bs-dismiss="modal" aria-label="Close" id="close-modal"> -->
+<!-- 						</h:button> -->
+<!-- 					</div> -->
+<!-- 					<div class="modal-body" id="body_leads"></div> -->
+
+<!-- 				</div> -->
+<!-- 			</div> -->
+<!-- 		</h:div> -->
+
+		<!-- Toggle Between Modals -->
+
+	</idspace>
+	<script type="text/javascript">
+		zk.afterMount(function() { var binder = zkbind.$('$leads');
+		binder.command('doLoad'); });
+	</script>
+
+
+
+
+
+
+
+
+
+
+
+	<!-- dragula init js -->
+	<script src="../assets/libs/dragula/dragula.min.js"></script>
+
+	<!-- dom autoscroll -->
+	<script
+		src="../assets/libs/dom-autoscroller/dom-autoscroller.min.js">
+	</script>
+
+	<!--taks-kanban-->
+	<script src="../assets/js/pages/tasks-kanban.init.js"></script>
+</zk>

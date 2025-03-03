@@ -1,0 +1,56 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('NOMBRE.label', 'Nombre'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ALTAAsc'])" sortDescending="@load(vm.comparators['ALTADesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('OPENAPI.label', 'Open Api'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['OPENAPIAsc'])" sortDescending="@load(vm.comparators['OPENAPIDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('SWAGGER.label', 'Swagger'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SWAGGERAsc'])" sortDescending="@load(vm.comparators['SWAGGERDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('WSDL.label', 'Wsdl'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['WSDLAsc'])" sortDescending="@load(vm.comparators['WSDLDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('JSON.label', 'Json'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['JSONAsc'])" sortDescending="@load(vm.comparators['JSONDesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('NOMBRE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('ALTA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('OPENAPI').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('SWAGGER').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('WSDL').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('JSON').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterimportapi.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

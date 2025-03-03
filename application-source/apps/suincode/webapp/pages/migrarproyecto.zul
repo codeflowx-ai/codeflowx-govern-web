@@ -1,0 +1,51 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="stepbar" templateURI="stepApp/shadow_elements/step_bar/stepbar.zul"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<style src="stepApp/shadow_elements/step_bar/stepbar.css" />
+	<space></space>
+	<div class="row">
+		<div class="col-12">
+			<div
+				class="page-title-box d-sm-flex align-items-center justify-content-between">
+				<h:h4 class="mb-sm-0">
+					Migrar un proyecto a otra tecnología
+				</h:h4>
+				
+			</div>
+		</div>
+	</div>
+
+	<space></space>
+	<div class="row">
+	<nodom
+		viewModel="@id('vm') @init('com.suinsit.webapp.wizzars.octopus.WizzarMigrarProject')"	validationMessages="@id('vmsgs')" >
+		<div id="rootDiv" class="col-xl-12">
+			<div class="card border border-opacity-75">
+				
+				<div class="card-body">
+					<stepbar stepBarModel="@init(vm.stepBarModel)"
+						gotoStepCommand="gotoStep" />
+
+					<div style="padding: 0 57px; margin-top: 16px;">
+						<label sclass="page-title"
+							value="@load(vm.stepBarModel.current.label)" />
+						<div style="margin-top: 26px;"
+							sclass="stepbar-content">
+							<apply
+								templateURI="@load(vm.stepBarModel.current.uri)"
+								step="@load(vm.stepBarModel.current)" />
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</nodom>
+	</div>
+
+
+	
+</zk>

@@ -1,0 +1,196 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="flowpromp" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='flowpromp')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupflowpromp" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.suinless.Slerprompflow" />
+	   <custom-attributes namespace="suinless" />
+	      <custom-attributes uid="5458" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('flowpromp.screen', 'Prompt relacionados'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+<div id="gVgPqoeErg"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="gVgPqoeErg-card" class="card  default" style="overflow:hidden;" >
+       <div id="gVgPqoeErg-body" class="card-body ">
+        <div id="gVgPqoeErg-row" class="form-group row ">
+
+
+				
+
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('DESCRIPCION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción Funcional'))"  />
+	   
+	    <textbox   tabindex="1" id="wBwZzsNnSn" 
+	   placeholder="@load(vm.lang.getProperty('DESCRIPCION.label', 'Introduce una breve descripción funcional'))" 
+	   value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('DESCRIPCION'))" disabled="@load(vm.isEditable('DESCRIPCION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['wBwZzsNnSn'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+    <div class="col-md-4  input-group" visible="@load(vm.isVisible('ORDEN'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ORDEN.label', 'Orden'))"/>
+	
+	      <decimalbox   tabindex="2" id="686462"  placeholder="@load(vm.lang.getProperty('ORDEN.label', 'Orden'))"  value="@bind(vm.beanData.orden) @save(vm.beanData.orden, before=('grabar')) "  format="###,###,##0.00" 
+	      sclass="   " visible="@load(vm.isVisible('ORDEN'))" disabled="@load(vm.isEditable('ORDEN')?false:true)" onChange="@command('onChangeInput',field='ORDEN',evento=event,componente=self,calculate=true)" />
+           <label sclass="text-danger" value="@load(vmsgs['686462'])"/>   
+    </div>
+
+
+
+
+
+
+ <div class="col-md-4   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('EVALPREVIUS'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('EVALPREVIUS.label', 'Evaluar Resultado Anterior'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="uRErJCtmqb" value="@bind(vm.beanData.evalprevius) @save(vm.beanData.evalprevius, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('EVALPREVIUS'))" disabled="@load(vm.isEditable('EVALPREVIUS')?false:true)" checked="@bind(vm.beanData.evalprevius) @save(vm.beanData.evalprevius, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idslesprompchild.label', 'Promp A ejecutar'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idslesprompchild" placeholder="@load(vm.lang.getProperty('idslesprompchild').label,'Promp A ejecutar')" model="@bind(vm.foreings['idslesprompchild'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idslesprompchild',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idslesprompchild)"  onCreate="@command('onCreateCombo',component=self,alias='idslesprompchild')" value="@bind(vm.beanData.idslesprompchild .nombre)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idslesprompchild'])"/>
+
+  
+</h:div>
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['flowpromp.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$flowpromp');
+  binder.command('doLoad');
+});
+function loadflowpromp(){
+  var binder = zkbind.$('$flowpromp');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,69 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+			
+				 <grid  	model="@load(vm.beans)" sizedByContent="true" span="true" sclass="table align-middle mb-0" >  
+							<columns sizable="true" menupopup="auto">
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('NOMBRE.label', 'Servicio'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVOAsc'])" sortDescending="@load(vm.comparators['ACTIVODesc'])"/>
+						
+							
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PROVEEDOR.label', 'Proveedor'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROVEEDORAsc'])" sortDescending="@load(vm.comparators['PROVEEDORDesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterintegracionsdk.zul')">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="50%" height="50%" />
+							             <label  value="@load(item.nombre) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.activo) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.proveedor) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masterintegracionsdk.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"   />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2"   />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

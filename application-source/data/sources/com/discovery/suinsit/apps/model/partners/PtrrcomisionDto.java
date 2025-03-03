@@ -1,0 +1,67 @@
+package com.discovery.suinsit.apps.model.partners;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import javax.validation.constraints.Size;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.enartframework.nocode.annotacion.Entidad;
+
+@Data
+@NoArgsConstructor
+@Entidad (
+	type = "TABLE",
+	namespace = "partners",
+	name = "PTRRCOMISION" 
+)
+@Schema (
+	name = "" 
+)
+public class PtrrcomisionDto { 
+
+	@JsonProperty (
+		value = "" 
+	)
+	@Schema (
+		description = "",
+		example = "" 
+	)
+	private LocalDate fin;
+	@JsonProperty (
+		value = "" 
+	)
+	@Schema (
+		maxLength = 16,
+		description = "",
+		example = "" 
+	)
+	@Size (
+		min = 0,
+		max = 16 
+	)
+	private BigDecimal importe;
+	@JsonProperty (
+		value = "" 
+	)
+	@Schema (
+		description = "",
+		example = "" 
+	)
+	private LocalDate inicio;
+	@JsonProperty (
+		value = "" 
+	)
+	@Schema (
+		maxLength = 16,
+		description = "",
+		example = "" 
+	)
+	@Size (
+		min = 0,
+		max = 16 
+	)
+	private BigDecimal percent; 
+
+}

@@ -1,0 +1,88 @@
+
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+ 
+		<forEach items="@load(vm.beans)" var="item">
+			<div class="col-sm-2 col-xl-2">
+				<div class="card border card-border-dark  ">
+					<div class="card-header">
+						<div class="d-flex align-items-center">
+						  <div class="flex-grow-1">
+                                <h:h6 class="card-title">${item.nombre} </h:h6>   
+						  </div>
+						  <div class="flex-shrink-0">
+						  
+						      <h:ul class="list-inline card-toolbar-menu d-flex align-items-center mb-0">
+					     <h:li class="list-inline-item">
+					     <button
+						onClick="@command('editData',item=item,page='mastertemplates.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"  />
+					     			  </h:li>   			     
+								     <h:li class="list-inline-item">
+								      <button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn"  />
+								     </h:li>
+						      </h:ul>
+						 
+						  </div> 
+						</div>	
+					</div>
+
+
+    
+     
+    
+     
+    
+     
+    
+     
+<div class="card-body border-top-0">
+  	<div class="row">
+	  <div class="col-lg-6">
+	      <div class="row">
+          
+               <div class="col-md-12 col-xl-12">
+                    <image sclass="" content="@load(vm.getImage(item,'AVATAR'))" width="100%" height="100%" />
+			   </div>
+          
+          
+          
+          </div>                     
+	  </div>  
+	  <div class="col-lg-6">
+	      <div class="row">
+      
+	                
+    
+      
+               <h:div class="col-md-auto">
+             <hbox spacing="3px">
+	          <label sclass="fs-6 text-capitalize" value="@load(vm.lang.getProperty('Arquitectura.label', 'Arquitectura'))"/>
+	         </hbox>
+	         <hbox spacing="2px">
+ 	             <label  value="@load(item.idarqmarchitecture.arquitectura) @converter(vm.fieldConverter)"></label>
+              </hbox>
+             </h:div> 
+    
+      
+	     <div class="col-md-auto">
+	        <html content="@load(item.descripcion)"></html>
+	      </div>  
+    
+     </div>
+   </div>
+		</div>
+	
+					</div>
+				</div>
+			</div>
+		</forEach>
+	</div>
+</zk>

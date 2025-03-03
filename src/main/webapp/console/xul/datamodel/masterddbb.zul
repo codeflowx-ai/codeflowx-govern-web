@@ -1,0 +1,208 @@
+<?page title="New Metamodel" contentType="text/html;charset=UTF-8"?>
+
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+    <idspace>
+        <nodom form="@id('fx') @load(vm.bean) @save(vm.bean,before={'action','store'})"
+               viewModel="@id('vm') @init('io.artfacto.baranwu.reverse.ui.MasterDataBaseUI')"
+               validationMessages="@id('vmsgs')">
+            <div sclass="row page-titles">
+                <div sclass="col-sm-12 col-md-5 align-self-center">
+                    <h:h4 class="text-themecolor"></h:h4>
+                </div>
+                <div sclass="col-sm-12 col-md-7 align-self-center text-right">
+                    <div sclass="d-flex justify-content-end align-items-center">
+                        <hbox spacing="15px">
+                            <h:ol class="breadcrumb">
+                                <h:li class="breadcrumb-item">
+                                    <h:a href="javascript:void(0)">Metamodel</h:a>
+                                </h:li>
+                                <h:li class="breadcrumb-item">
+                                    <a onClick="@command('toSearch')" label="Models"></a>
+                                </h:li>
+                                <h:li class="breadcrumb-item active">New</h:li>
+                            </h:ol>
+                            <hbox id="controls" spacing="8px"/>
+                        </hbox>
+                    </div>
+                </div>
+            </div>
+            <div id="notificacion" />
+            <h:div class="row">
+                <h:div class="offset-md-1 offset-lg-2 col-sm-12 col-md-10 col-lg-8 card-panel text-dark">
+                    <h:div class="card-header bg-primary text-white font-weight-bold">New metamodel</h:div>
+                    <h:div class="card-body bg-light">
+                        <h:form>
+                            <h:div class="form-row">
+                                <h:div class="col col-sm-12 col-md-6 form-group">
+                                    <h:label for="nameInput">Nombre</h:label>
+                                    <textbox sclass="form-control form-control-sm" id="nameInput" placeholder="Connection name ..." constraint="no empty" value="@bind(vm.bean.coname)" />
+                                </h:div>
+                                <h:div class="col col-sm-12 col-md-6 form-group">
+                                    <h:label for="providerInput">Provider</h:label>
+                                    <combobox sclass="form-control form-control-sm" id="providerInput" readonly="true" disabled="@load(vm.bean.idxdatasource gt 0)"  placeholder="Select a provider..." constraint="no empty" model="@load(vm.proveedores)" selectedItem="@bind(vm.bean.idproveedor)" onSelect="@command('selectProvider')">
+                                        <template name="model">
+                                            <comboitem label="@load(each.coname)" value="@load(each)" />
+                                        </template>
+                                    </combobox>
+                                </h:div>
+                            </h:div>
+                            <div sclass="form-row" id="divWsForm" visible="false">
+                                <listbox width="100%" nonselectableTags="" model="@bind(vm.wsDefinitionRows)">
+                                    <auxhead>
+                                        <auxheader colspan="2">
+                                            <label>Webservices</label>
+                                        </auxheader>
+                                        <auxheader>
+                                            <h:div class="form-row">
+                                                <button sclass="col-sm-12 form-control form-control-sm" label="Add" onClick="@command('addWsDefinitionRow')"/>
+                                            </h:div>
+                                        </auxheader>
+                                    </auxhead>
+                                    <listhead>
+                                        <listheader label="Since" width="200px" />
+                                        <listheader label="File" />
+                                        <listheader label="" width="80px" />
+                                    </listhead>
+                                    <template name="model" var="item">
+                                        <listitem>
+                                            <listcell>
+                                                <h:div class="col">
+                                                    <combobox sclass="col-sm-12 form-control form-control-sm" readonly="true" placeholder="Select a type..." constraint="no empty" selectedItem="@bind(item.type)" onSelect="@command('updateWsDefinitionRowType', item=item)">
+                                                        <comboitem label="File" value="FILE" />
+                                                        <comboitem label="Url" value="URL" />
+                                                    </combobox>
+                                                </h:div>
+                                            </listcell>
+                                            <listcell>
+                                                <div sclass="col col-sm-12 form-group ${!item.pathEditable ? 'col-md-8':'col-md-12'}">
+                                                    <textbox sclass="form-control form-control-sm" placeholder="${item.pathEditable ? 'URL...' : 'File...'}" value="@bind(item.path)" disabled="${!item.pathEditable}"/>
+                                                </div>
+                                                <div sclass="col col-sm-12 col-md-4 form-group" visible="${!item.pathEditable}">
+                                                    <button sclass="form-control form-control-sm" label="Search"
+                                                            upload="true,multiple=${vm.bean.idproveedor.coname.equals('WSDL') ? 'true' : 'false,accept=application/json'}"
+                                                            onUpload="@command('uploadWsFile', files=event.medias, item=item)"/>
+                                                </div>
+                                            </listcell>
+                                            <listcell>
+                                                <button sclass="form-control form-control-sm" label="Delete" hflex="1" onClick="@command('removeWsDefinitionRow', item=item)" />
+                                            </listcell>
+                                        </listitem>
+                                    </template>
+                                </listbox>
+                            </div>
+                            <div sclass="form-row" id="divDatabaseForm" visible="false">
+                                <h:div class="col col-sm-12 col-md-6 col-lg-4 form-group">
+                                    <h:label>User</h:label>
+                                    <textbox sclass="form-control form-control-sm" placeholder="User" value="@bind(vm.bean.txuser)" constraint="no empty" />
+                                </h:div>
+                                <h:div class="col col-sm-12 col-md-6 col-lg-4 form-group">
+                                    <h:label>Password</h:label>
+                                    <textbox sclass="form-control form-control-sm" placeholder="Password" value="@bind(vm.bean.txpassword)" type="password" constraint="no empty" />
+                                </h:div>
+                                <h:div class="col col-sm-12 col-md-6 col-lg-4 form-group">
+                                    <h:label>Schema</h:label>
+                                    <textbox sclass="form-control form-control-sm" placeholder="Schema" value="@bind(vm.bean.txschema)" constraint="no empty" />
+                                </h:div>
+                                <h:div class="col col-sm-12 col-md-6 col-lg-4 form-group">
+                                    <h:label>Prefix</h:label>
+                                    <textbox sclass="form-control form-control-sm" placeholder="Prefix" value="@bind(vm.bean.txprefix)" />
+                                </h:div>
+                                <h:div sclass="col col-sm-12 col-md-6 col-lg-4 form-group">
+                                    <h:label>URL Connection</h:label>
+                                    <textbox sclass="form-control form-control-sm" placeholder="URL Connection" value="@bind(vm.bean.txurl)" constraint="no empty" />
+                                </h:div>
+                            </div>
+                            <div sclass="form-row" id="divCopyForm" visible="false">
+                                <listbox width="100%" nonselectableTags="" model="@bind(vm.copyBookRows)">
+                                    <auxhead>
+                                        <auxheader colspan="2">
+                                            <label>Copybooks</label>
+                                        </auxheader>
+                                        <auxheader>
+                                            <h:div class="form-row">
+                                                <button sclass="col-sm-12 form-control form-control-sm" label="Add" onClick="@command('addCopyBookRow')"/>
+                                            </h:div>
+                                        </auxheader>
+                                    </auxhead>
+                                    <listhead>
+                                        <listheader label="Input"/>
+                                        <listheader label="Output" />
+                                        <listheader label="" width="80px" />
+                                    </listhead>
+                                    <template name="model" var="item">
+                                        <listitem>
+                                            <listcell>
+                                                <div sclass="col col-sm-12 form-group col-md-8">
+                                                    <textbox sclass="form-control form-control-sm" placeholder="File..." value="@bind(item.inputFile)" disabled="true"/>
+                                                </div>
+                                                <div sclass="col col-sm-12 col-md-4 form-group">
+                                                    <button sclass="form-control form-control-sm" label="Search"
+                                                            upload="true"
+                                                            onUpload="@command('uploadCopyBookFile', file=event.media, item=item, isInput=true)"/>
+                                                </div>
+                                            </listcell>
+                                            <listcell>
+                                                <div sclass="col col-sm-12 form-group col-md-8">
+                                                    <textbox sclass="form-control form-control-sm" placeholder="File..." value="@bind(item.outputFile)" disabled="true"/>
+                                                </div>
+                                                <div sclass="col col-sm-12 col-md-4 form-group">
+                                                    <button sclass="form-control form-control-sm" label="Search"
+                                                            upload="true"
+                                                            onUpload="@command('uploadCopyBookFile', file=event.media, item=item, isInput=false)"/>
+                                                </div>
+                                            </listcell>
+                                            <listcell>
+                                                <button sclass="form-control form-control-sm" label="Delete" hflex="1" onClick="@command('removeCopyBookRow', item=item)" />
+                                            </listcell>
+                                        </listitem>
+                                    </template>
+                                </listbox>
+                            </div>
+                        </h:form>
+                    </h:div>
+                    <div id="divPaths" visible="false">
+                      <listbox id="listboxPaths" height="490px" emptyMessage="There are no entities that show" mold="paging" pageSize="20" checkmark="true" multiple="true" model="@bind(vm.entidades)" >
+                            <listhead>
+                                <listheader label="Service"  />
+                                <listheader label="Path"  />
+                                <listheader label="Operation"  />
+                                <listheader label="Method"  />
+                                <listheader label="Entity"  />
+                            </listhead>
+                            <template name="model" var="item">
+                                <listitem value="@bind(item)" selected="@save(item.selected)">
+                                    <listcell label="@load(item.txservice)"></listcell>
+                                    <listcell label="@load(item.dspackagename)"></listcell>
+                                    <listcell label="@load(item.txnamesql)"></listcell>
+                                    <listcell label="@load(item.txType)"></listcell>
+                                    <listcell label="@load(item.coentityname)"></listcell>                                   
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </div>
+                    <div id="divEntities" visible="false">
+                        <listbox id="listboxEntidades" height="490px" emptyMessage="There are no entities that show" mold="paging" pageSize="20" checkmark="true" multiple="true" model="@bind(vm.entidades)" >
+                            <listhead>
+                                <listheader label="${labels.imp.row_name}"  />
+                                <listheader label="${labels.imp.row_entidad}"  />
+                                <listheader label="${labels.imp.row_tipo}"  />
+                                <listheader label="${labels.imp.row_comment}"  />
+                            </listhead>
+                            <template name="model" var="item">
+                                <listitem value="@bind(item)" selected="@save(item.selected)">
+                                    <listcell label="@load(item.coentityname)"></listcell>
+                                    <listcell label="@load(item.txnamesql)"></listcell>
+                                    <listcell label="@load(item.idtypeobject.txcode)"></listcell>
+                                    <listcell label="@load(item.error?item.msgError:item.dscomment)" sclass="@load(item.error?'color:red;':'')"></listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </div>
+                </h:div>
+            </h:div>
+        </nodom>
+    </idspace>
+</zk>

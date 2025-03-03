@@ -1,0 +1,236 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="subscripcion" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='subscripcion')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupsubscripcion" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.subscripcion.Subsubscripcion" />
+	   <custom-attributes namespace="subscripcion" />
+	      <custom-attributes uid="3558" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('Subscripcion.screen', 'Subscripcion'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="KgJOHMcrhh" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="KgJOHMcrhh-row" class="row">
+
+<h:div class="col-md-3  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idsubtiposub.label', 'Subscripción'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idsubtiposub" placeholder="@load(vm.lang.getProperty('idsubtiposub').label,'Subscripción')" model="@bind(vm.foreings['idsubtiposub'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idsubtiposub',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idsubtiposub)"  onCreate="@command('onCreateCombo',component=self,alias='idsubtiposub')" value="@bind(vm.beanData.idsubtiposub .nombre)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.nombre)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idsubtiposub'])"/>
+
+  
+</h:div>
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('TOKENLIMITS'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('TOKENLIMITS.label', 'Limite Tokens'))"/>
+	
+	      <intbox   tabindex="2" id="qZARYnBEoQ"  placeholder="@load(vm.lang.getProperty('TOKENLIMITS.label', 'Limite Tokens'))" sclass="  "  value="@bind(vm.beanData.tokenlimits) @save(vm.beanData.tokenlimits, before=('grabar')) " visible="@load(vm.isVisible('TOKENLIMITS'))" disabled="@load(vm.isEditable('TOKENLIMITS')?false:true)" onChange="@command('onChangeInput',field='TOKENLIMITS',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['qZARYnBEoQ'])"/>   
+    
+    </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('USERLIMITS'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('USERLIMITS.label', 'Limite de usuarios'))"/>
+	
+	      <intbox   tabindex="3" id="ZTQGdcxPuO"  placeholder="@load(vm.lang.getProperty('USERLIMITS.label', 'Limite de usuarios'))" sclass="  "  value="@bind(vm.beanData.userlimits) @save(vm.beanData.userlimits, before=('grabar')) " visible="@load(vm.isVisible('USERLIMITS'))" disabled="@load(vm.isEditable('USERLIMITS')?false:true)" onChange="@command('onChangeInput',field='USERLIMITS',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['ZTQGdcxPuO'])"/>   
+    
+    </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-3  input-group" visible="@load(vm.isVisible('PROJECTLIMITS'))" >
+    
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PROJECTLIMITS.label', 'Limite Projectos'))"/>
+	
+	      <intbox   tabindex="4" id="HUmkUwNJlY"  placeholder="@load(vm.lang.getProperty('PROJECTLIMITS.label', 'Limite Projectos'))" sclass="  "  value="@bind(vm.beanData.projectlimits) @save(vm.beanData.projectlimits, before=('grabar')) " visible="@load(vm.isVisible('PROJECTLIMITS'))" disabled="@load(vm.isEditable('PROJECTLIMITS')?false:true)" onChange="@command('onChangeInput',field='PROJECTLIMITS',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['HUmkUwNJlY'])"/>   
+    
+    </div>
+
+
+
+
+
+
+ <div class="col-md-3   leka-filters leka-d-flex  input-grou" visible="@load(vm.isVisible('ACTIVO'))">
+ <div
+															class="col-md-6">
+ 	    <label sclass="form-check-label l align-text-middle p-0 font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ACTIVO.label', 'Activo'))"/>
+ 	    </div>
+	      <div
+															class="col-md-6">
+             <checkbox mold="default" id="80944" value="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))" sclass=" " visible="@load(vm.isVisible('ACTIVO'))" disabled="@load(vm.isEditable('ACTIVO')?false:true)" checked="@bind(vm.beanData.activo) @save(vm.beanData.activo, before=('grabar'))"/>
+             </div>	      
+	     
+ 
+</div>
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECALTA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECALTA.label', 'Fec. Alta'))"/>
+	  
+	      <datebox     id="947806"  placeholder="@load(vm.lang.getProperty('FECALTA.label', 'Fec. Alta'))" tabindex="6" value="@bind(vm.beanData.fecalta) @save(vm.beanData.fecalta, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECALTA'))" disabled="@load(vm.isEditable('FECALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['947806'])"/>   
+    
+      </div>
+
+
+
+
+
+
+				
+
+  <div class="col-md-3  input-group" visible="@load(vm.isVisible('FECBAJA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECBAJA.label', 'Fec. Baja'))"/>
+	  
+	      <datebox     id="166696"  placeholder="@load(vm.lang.getProperty('FECBAJA.label', 'Fec. Baja'))" tabindex="7" value="@bind(vm.beanData.fecbaja) @save(vm.beanData.fecbaja, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECBAJA'))" disabled="@load(vm.isEditable('FECBAJA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['166696'])"/>   
+    
+      </div>
+
+
+
+
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['Subscripcion.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$subscripcion');
+  binder.command('doLoad');
+});
+function loadsubscripcion(){
+  var binder = zkbind.$('$subscripcion');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

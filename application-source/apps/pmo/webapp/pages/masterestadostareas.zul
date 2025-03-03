@@ -1,0 +1,227 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace id="estadostareas" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='estadostareas')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="estadostareas" />
+<custom-attributes clase="org.suinsit.apps.pmo.Pmomestadotask" />
+	   <custom-attributes namespace="pmo" />
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('EstadosTareas.screen', 'Estados de tareas'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Estados de tareas
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='continuar')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='nuevo')">
+										Guardar y Nuevo
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+
+<div id="znQZqXzewV" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="znQZqXzewV-row" class="row">
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('ESTADOTASK'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('ESTADOTASK.label', 'Estado'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="FDCMUAeKmc" 
+	   placeholder="@load(vm.lang.getProperty('ESTADOTASK.label', 'estadotask'))" 
+	   value="@bind(vm.beanData.estadotask) @save(vm.beanData.estadotask, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.estadotask)"  sclass="margin-field form-control  form-control border-danger" 
+	   visible="@load(vm.isVisible('ESTADOTASK'))" disabled="@load(vm.isEditable('ESTADOTASK')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['FDCMUAeKmc'])"/>
+	   
+    </h:div>   
+
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="QBLnYVkqfA" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="QBLnYVkqfA-row" class="row">
+
+<h:div class="col-md-12 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idpmomtipotask.label', 'Tipo tarea'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_mVcJmDyeOJ" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idpmomtipotask" placeholder="@load(vm.lang.getProperty('idpmomtipotask').label,'Tipo tarea')" model="@bind(vm.foreings['idpmomtipotask'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idpmomtipotask',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idpmomtipotask)"  onCreate="@command('onCreateCombo',component=self,alias='idpmomtipotask')" value="@bind(vm.beanData.idpmomtipotask .tipotask)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.tipotask)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idpmomtipotask'])"/>
+   <popup id="pop_mVcJmDyeOJ" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idpmomtipotask.helptext', 'idpmomtipotask'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+				
+
+
+   
+    <h:div class="col-md-12 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('RESUMEN'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('RESUMEN.label', 'Resumen'))"  />
+	   </hbox>
+	   <textbox   tabindex="2" id="621070" 
+	   placeholder="@load(vm.lang.getProperty('RESUMEN.label', 'Resumen'))" 
+	   value="@bind(vm.beanData.resumen) @save(vm.beanData.resumen, before=('grabar')) "  sclass="margin-field form-control  form-control" 
+	   visible="@load(vm.isVisible('RESUMEN'))" disabled="@load(vm.isEditable('RESUMEN')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['621070'])"/>
+	   
+    </h:div>   
+
+
+
+
+</div>
+</div>  
+
+
+
+
+
+<div id="TOJXAjsSRz" style="overflow:auto;" class=" col-lg-4 col-xlg-4 col-md-4"  visible="true" >
+<div id="TOJXAjsSRz-row" class="row">
+</div>
+</div>  
+
+
+
+
+
+<div id="FkqfAoJEFX" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="FkqfAoJEFX-row" class="row">
+</div>
+</div>  
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['EstadosTareas.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+                  
+                 
+
+
+
+                  
+                 
+
+                  
+                 
+
+                  
+
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$estadostareas');
+  binder.command('doLoad');
+});
+</script>
+</zk>

@@ -1,0 +1,91 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])"  visible="@load(vm.isVisible('AVATAR'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('ALIAS.label', 'Alias'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ALIASAsc'])" sortDescending="@load(vm.comparators['ALIASDesc'])"  visible="@load(vm.isVisible('ALIAS'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('RELEASE.label', 'Release'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['RELEASEAsc'])" sortDescending="@load(vm.comparators['RELEASEDesc'])"  visible="@load(vm.isVisible('RELEASE'))"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Proveedor.label', 'Proveedor'))" align="center"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Tipo Modelo.label', 'Tipo Modelo'))" align="center"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Categoría.label', 'Categoría'))" align="center"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('USERAG.label', 'userag'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['USERAGAsc'])" sortDescending="@load(vm.comparators['USERAGDesc'])"  visible="@load(vm.isVisible('USERAG'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('MAXTOKENS.label', 'maxtokens'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MAXTOKENSAsc'])" sortDescending="@load(vm.comparators['MAXTOKENSDesc'])"  visible="@load(vm.isVisible('MAXTOKENS'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='mastermodel.zul')">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="70%" height="70%" />
+							             <label  value="@load(item.alias) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.release) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+                                   
+                                          <label  value="@load(item.idslprovider.provider) @converter(vm.fieldConverter)"></label>
+                                   
+                                   
+                                          <label  value="@load(item.idsletipomodelo.tipomodelo) @converter(vm.fieldConverter)"></label>
+                                   
+                                   
+                                          <label  value="@load(item.idslmcategoria.categoria) @converter(vm.fieldConverter)"></label>
+                                   
+							             <label  value="@load(item.userag) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.maxtokens) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='mastermodel.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

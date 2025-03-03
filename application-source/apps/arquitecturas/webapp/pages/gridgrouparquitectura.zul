@@ -1,0 +1,58 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ARQUITECTURA.label', 'arquitectura'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ARQUITECTURAAsc'])" sortDescending="@load(vm.comparators['ARQUITECTURADesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('CODE.label', 'code'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CODEAsc'])" sortDescending="@load(vm.comparators['CODEDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('DESCSHORT.label', 'descshort'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DESCSHORTAsc'])" sortDescending="@load(vm.comparators['DESCSHORTDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ACTIVO.label', 'activo'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVOAsc'])" sortDescending="@load(vm.comparators['ACTIVODesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('AUTOR.label', 'autor'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AUTORAsc'])" sortDescending="@load(vm.comparators['AUTORDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('MULTICODE.label', 'multicode'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MULTICODEAsc'])" sortDescending="@load(vm.comparators['MULTICODEDesc'])" />
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="50%" height="50%" />
+							         <label  value="@load(item.getFieldByAtribute('ARQUITECTURA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('CODE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('DESCSHORT').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('ACTIVO').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('AUTOR').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('MULTICODE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterarquitectura.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

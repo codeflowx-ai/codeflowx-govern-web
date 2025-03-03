@@ -1,0 +1,240 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="versioncomponent" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='versioncomponent')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popupversioncomponent" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.atlas.Atlrcomponver" />
+	   <custom-attributes namespace="atlas" />
+	      <custom-attributes uid="89456" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('versioncomponent.screen', 'Version de componentes'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+
+<div id="BNWsuXxgHJ" style="overflow:auto;" class=" default col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="BNWsuXxgHJ-row" class="row">
+
+<tabbox orient="top" mold="default" width="100%">
+     <tabs>
+                 <tab label="Version" />      
+                 <tab label="Info Release" />      
+                 <tab label="Deployment" />      
+     </tabs>
+     <tabpanels>
+      <tabpanel>
+        <div class="row">
+
+
+				
+
+    <div class="col-md-6  input-group" visible="@load(vm.isVisible('VERSION'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('VERSION.label', 'Versión'))"  />
+	   
+	    <textbox   tabindex="0" id="QSxuUtvyMi" 
+	   placeholder="@load(vm.lang.getProperty('VERSION.label', 'version'))" 
+	   value="@bind(vm.beanData.version) @save(vm.beanData.version, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.version)"  sclass="   border-danger" 
+	   visible="@load(vm.isVisible('VERSION'))" disabled="@load(vm.isEditable('VERSION')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['QSxuUtvyMi'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+
+				
+
+  <div class="col-md-6  input-group" visible="@load(vm.isVisible('FECHA')) " >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FECHA.label', 'Fecha'))"/>
+	  
+	      <label sclass=" font-weight-normal align-text-middle" style="" value="@bind(vm.beanData.fecha) @save(vm.beanData.fecha, before=('grabar')) @converter(vm.fieldConverter,type='DATE')"/>
+    
+      </div>
+
+
+
+
+
+
+				
+
+    <div class="col-md-12  input-group" visible="@load(vm.isVisible('IMAGEN'))" >
+   
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('IMAGEN.label', 'Imagen Docker'))"  />
+	   
+	    <textbox   tabindex="0" id="ikYhyMrSLi" 
+	   placeholder="@load(vm.lang.getProperty('IMAGEN.label', 'imagen'))" 
+	   value="@bind(vm.beanData.imagen) @save(vm.beanData.imagen, before=('grabar')) "  sclass="  " 
+	   visible="@load(vm.isVisible('IMAGEN'))" disabled="@load(vm.isEditable('IMAGEN')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['ikYhyMrSLi'])"/>
+            
+	   
+    </div>   
+
+
+
+
+
+<h:div class="col-md-12  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idatlcomponent.label', 'Componente'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idatlcomponent" placeholder="@load(vm.lang.getProperty('idatlcomponent').label,'Componente')" model="@bind(vm.foreings['idatlcomponent'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idatlcomponent',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idatlcomponent)"  onCreate="@command('onCreateCombo',component=self,alias='idatlcomponent')" value="@bind(vm.beanData.idatlcomponent .componente)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.componente)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idatlcomponent'])"/>
+
+  
+</h:div>
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('RELEASE.label', 'Info Release'))"/>
+	  
+	  <tbeditor id="REPCGBSaJh" value="@bind(vm.beanData.release) @save(vm.beanData.release, before=('grabar')) " />
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+      <tabpanel>
+        <div class="row">
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DEPLOYMENTYML.label', 'Deployment'))"/>
+	  
+	      <textbox rows="16" cols="80" id="EtSPkCzHuM" multiline="true" placeholder="@load(vm.lang.getProperty('DEPLOYMENTYML.label', 'deploymentyml'))" value="@bind(vm.beanData.deploymentyml) @save(vm.beanData.deploymentyml, before=('grabar')) "   visible="@load(vm.isVisible('DEPLOYMENTYML'))" disabled="@load(vm.isEditable('DEPLOYMENTYML')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['EtSPkCzHuM'])"/>
+	     
+</h:div>
+
+
+
+         </div>
+      </tabpanel>   
+     </tabpanels>
+</tabbox> 
+
+
+
+</div>
+</div>  					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['versioncomponent.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$versioncomponent');
+  binder.command('doLoad');
+});
+function loadversioncomponent(){
+  var binder = zkbind.$('$versioncomponent');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

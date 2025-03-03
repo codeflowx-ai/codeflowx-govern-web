@@ -1,0 +1,287 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="popoportunidademp" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='popoportunidademp')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popoportunidademp" />
+	  
+			<panel >
+			<panelchildren>
+			<div class="row">
+					<h:div class="col-lg-12">
+					<h:div class="card">
+						<h:div class="card-body">
+						   <div class="row">				
+
+<div id="dwcVemnoTz" style="overflow:auto;" class=" col-lg-12 col-xlg-12 col-md-12"  visible="true" >
+<div id="dwcVemnoTz-row" class="row">
+
+
+
+
+   
+    <h:div class="col-md-8 border-field">
+    
+       <hbox spacing="3px" visible="@load(vm.isVisible('OPORTUNIDAD'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))"  />
+	   </hbox>
+	   <textbox   tabindex="1" id="550257" 
+	   placeholder="@load(vm.lang.getProperty('OPORTUNIDAD.label', 'oportunidad'))" 
+	   value="@bind(vm.beanData.oportunidad) @save(vm.beanData.oportunidad, before=('grabar')) @validator(vm.validator,required=true ,oldValue=vm.beanDataCpy.oportunidad)"  sclass="margin-field form-control  form-control    border-danger" 
+	   visible="@load(vm.isVisible('OPORTUNIDAD'))" disabled="@load(vm.isEditable('OPORTUNIDAD')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['550257'])"/>
+    </h:div>   
+
+
+
+
+
+
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ALTA'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style=" Font-Size:16px;" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_ALTA" />
+	   </hbox>
+    <datebox  readonly="true"   buttonVisible="false"  id="964867"  placeholder="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" tabindex="2" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) "   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('ALTA'))" disabled="@load(vm.isEditable('ALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['964867'])"/>
+      </h:div>
+
+
+
+
+
+   <h:div class="col-md-12">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('DESCRIPCION.label', 'Descripción'))"/>
+	   </hbox>
+	  <tbeditor id="823812" value="@bind(vm.beanData.descripcion) @save(vm.beanData.descripcion, before=('grabar')) " />
+</h:div>
+
+
+
+<h:div class="col-md-4 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmpipeline.label', 'Pipeline'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_kARUdZsvSk" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idcrmpipeline" placeholder="@load(vm.lang.getProperty('idcrmpipeline').label,'Pipeline')" model="@bind(vm.foreings['idcrmpipeline'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idcrmpipeline',item=self.selectedItem.value,changefk='idcrmetapa')"  		selectedItem="@load(vm.beanData.idcrmpipeline)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmpipeline')" value="@bind(vm.beanData.idcrmpipeline .pipeline)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.pipeline)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idcrmpipeline'])"/>
+   <popup id="pop_kARUdZsvSk" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idcrmpipeline.helptext', 'idcrmpipeline'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+<h:div class="col-md-4 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmetapa.label', 'Etapa'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_vFQoIJLNec" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idcrmetapa" placeholder="@load(vm.lang.getProperty('idcrmetapa').label,'Etapa')" model="@bind(vm.foreings['idcrmetapa'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idcrmetapa',item=self.selectedItem.value,updatebean='true')"  		selectedItem="@load(vm.beanData.idcrmetapa)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmetapa',loadFkFrom='idcrmpipeline')" value="@bind(vm.beanData.idcrmetapa .etapa)" disabled="@bind(vm.beanData.idcrmpipeline.idxcrmpipeline eq null) " ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.etapa)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idcrmetapa'])"/>
+   <popup id="pop_vFQoIJLNec" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idcrmetapa.helptext', 'idcrmetapa'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+<h:div class="col-md-4 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmtipooportunidad.label', 'Tipo Oportunidad'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_lczYRJCMcp" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmtipooportunidad" placeholder="@load(vm.lang.getProperty('idmtipooportunidad').label,'Tipo Oportunidad')" model="@bind(vm.foreings['idmtipooportunidad'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmtipooportunidad',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmtipooportunidad)"  onCreate="@command('onCreateCombo',component=self,alias='idmtipooportunidad')" value="@bind(vm.beanData.idmtipooportunidad .tipooportunidad)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.tipooportunidad)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmtipooportunidad'])"/>
+   <popup id="pop_lczYRJCMcp" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmtipooportunidad.helptext', 'idmtipooportunidad'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+<h:div class="col-md-4 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idmtipoprioridad.label', 'Prioridad'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_uvSdQXkBDa" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idmtipoprioridad" placeholder="@load(vm.lang.getProperty('idmtipoprioridad').label,'Prioridad')" model="@bind(vm.foreings['idmtipoprioridad'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idmtipoprioridad',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idmtipoprioridad)"  onCreate="@command('onCreateCombo',component=self,alias='idmtipoprioridad')" value="@bind(vm.beanData.idmtipoprioridad .prioridad)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.prioridad)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idmtipoprioridad'])"/>
+   <popup id="pop_uvSdQXkBDa" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idmtipoprioridad.helptext', 'idmtipoprioridad'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+<h:div class="col-md-4 border-field">
+   <hbox spacing="3px" sclass="margin-field">
+    <label sclass="fs-6 text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idcrmtiponegocio.label', 'Tipo Negocio'))"/>
+ 	 <a	iconSclass="mdi mdi-information-outline" popup="pop_awefdrXblF" />
+   </hbox>
+<combobox mold="rounded" autodrop="true"  id="idcrmtiponegocio" placeholder="@load(vm.lang.getProperty('idcrmtiponegocio').label,'Tipo Negocio')" model="@bind(vm.foreings['idcrmtiponegocio'])"  buttonVisible="true"	onSelect="@command('onSelectForeing', alias='idcrmtiponegocio',item=self.selectedItem.value)"  		selectedItem="@load(vm.beanData.idcrmtiponegocio)"  onCreate="@command('onCreateCombo',component=self,alias='idcrmtiponegocio')" value="@bind(vm.beanData.idcrmtiponegocio .tiponegocio)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.tiponegocio)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idcrmtiponegocio'])"/>
+   <popup id="pop_awefdrXblF" width="200px">
+	  <vbox>  
+     <fragment exps="@load(vm.lang.getProperty('idcrmtiponegocio.helptext', 'idcrmtiponegocio'))" >
+	 
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+</h:div>
+
+
+
+
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('PROBABILIDAD'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PROBABILIDAD.label', ''))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_PROBABILIDAD" />
+	   </hbox>
+    <decimalbox   tabindex="9" id="950190"  placeholder="@load(vm.lang.getProperty('PROBABILIDAD.label', ''))"  value="@bind(vm.beanData.probabilidad) @save(vm.beanData.probabilidad, before=('grabar')) "  format="###,###,##0.00" sclass="margin-field form-control text-dark" visible="@load(vm.isVisible('PROBABILIDAD'))" disabled="@load(vm.isEditable('PROBABILIDAD')?false:true)" onChange="@command('onChangeInput',field='PROBABILIDAD',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['950190'])"/>
+    </h:div>
+
+
+
+
+
+
+
+
+  <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('IMPORTEPREV'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_IMPORTEPREV" />
+	   </hbox>
+    <decimalbox   tabindex="10" id="743104" onCreate="" placeholder="@load(vm.lang.getProperty('IMPORTEPREV.label', 'Importe Previsto'))"   
+    value="@bind(vm.beanData.importeprev) @save(vm.beanData.importeprev, before=('grabar')) "  format="###,###,###,###,##0.00€"  sclass="margin-field form-control  form-control   " visible="@load(vm.isVisible('IMPORTEPREV'))" disabled="@load(vm.isEditable('IMPORTEPREV')?false:true)" onChange="@command('onChangeInput',field='IMPORTEPREV',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['743104'])"/>
+    </h:div>
+
+
+
+
+
+
+
+
+  <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('IMPORTEFINAL'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style=" Font-Size:16px;" value="@load(vm.lang.getProperty('IMPORTEFINAL.label', 'Importe Final'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_IMPORTEFINAL" />
+	   </hbox>
+    <decimalbox   tabindex="11" id="387349" onCreate="" placeholder="@load(vm.lang.getProperty('IMPORTEFINAL.label', 'Importe Final'))"   
+    value="@bind(vm.beanData.importefinal) @save(vm.beanData.importefinal, before=('grabar')) "  format="###,###,###,###,##0.00€"  sclass="margin-field form-control  form-control text-dark" visible="@load(vm.isVisible('IMPORTEFINAL'))" disabled="@load(vm.isEditable('IMPORTEFINAL')?false:true)" onChange="@command('onChangeInput',field='IMPORTEFINAL',evento=event,componente=self,calculate=true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['387349'])"/>
+    </h:div>
+
+
+
+
+
+
+
+
+    <h:div class="col-md-4 border-field">
+       <hbox spacing="3px" visible="@load(vm.isVisible('FECTSTART'))" sclass="margin-field">
+	    <label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle" style="   " value="@load(vm.lang.getProperty('FECTSTART.label', 'Fecha prevista'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_FECTSTART" />
+	   </hbox>
+    <datebox     id="146854"  placeholder="@load(vm.lang.getProperty('FECTSTART.label', 'Fecha prevista'))" tabindex="12" value="@bind(vm.beanData.fectstart) @save(vm.beanData.fectstart, before=('grabar')) @validator(vm.validator,max='TODAY+0' ,min='TODAY-0' ,oldValue=vm.beanDataCpy.fectstart)"   format="dd/MM/yyyy"  
+    visible="@load(vm.isVisible('FECTSTART'))" disabled="@load(vm.isEditable('FECTSTART')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['146854'])"/>
+      </h:div>
+
+
+
+
+</div>
+</div>                     </div>           
+            </h:div>
+            <div class="hstack gap-2 justify-content-end">
+								
+									<button onClick="@command('grabar',action='continuar')"
+										class="btn btn-success" >
+										Guardar
+									</button>
+									<button onClick="@command('grabar',action='nuevo')"
+										class="btn " >
+										Guardar y Nuevo
+									</button>
+									<button onClick="@command('cerrarPopup')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Cerrar
+									</button>
+								
+							</div>
+           </h:div>
+          </h:div>
+         </div>   
+        		</panelchildren>
+		</panel> 
+            <fragment exps="@load(vm.lang['popoportunidademp.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$popoportunidademp');
+  binder.command('doLoad');
+});
+function loadpopoportunidademp(){
+  var binder = zkbind.$('$popoportunidademp');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

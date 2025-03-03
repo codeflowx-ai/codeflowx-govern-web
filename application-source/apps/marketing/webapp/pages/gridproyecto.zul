@@ -1,0 +1,48 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+		
+						 
+<div class="table-responsive table-card">					 
+					
+				 <grid  	model="@load(vm.beans)" sizedByContent="true" span="true" sclass="table align-middle mb-0" >  
+							<columns sizable="true" menupopup="auto">
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('REFERENCE.label', 'REFERENCE'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['REFERENCEAsc'])" sortDescending="@load(vm.comparators['REFERENCEDesc'])"/>
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('PROJECT.label', 'PROJECT'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROJECTAsc'])" sortDescending="@load(vm.comparators['PROJECTDesc'])"/>
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('START.label', 'START'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['STARTAsc'])" sortDescending="@load(vm.comparators['STARTDesc'])"/>
+							    <column style="font-size:14px;" sclass=" text-capitalize " hflex="1" label="@load(vm.lang.getProperty('FINISH.label', 'FINISH'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FINISHAsc'])" sortDescending="@load(vm.comparators['FINISHDesc'])"/>
+ 							      <column style="font-size:14px;" hflex="1" label="Acciones" align="center" />
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterproyecto.zul')">
+							          <label  value="@load(item.reference) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.project) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.start) @converter(vm.fieldConverter)"></label>
+                                   
+							          <label  value="@load(item.finish) @converter(vm.fieldConverter)"></label>
+                                   
+							
+                  			
+                  		<cell align="center">
+						  
+						<button
+						onClick="@command('editData',item=item,page='masterproyecto.zul')"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2"    />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn"   />
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>
+ </div>						
+</zk>						

@@ -1,0 +1,52 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('NOMBRE.label', 'nombre'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['NOMBREAsc'])" sortDescending="@load(vm.comparators['NOMBREDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('ACTIVE.label', 'active'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACTIVEAsc'])" sortDescending="@load(vm.comparators['ACTIVEDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('TIPO.label', 'TIPO'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['TIPOAsc'])" sortDescending="@load(vm.comparators['TIPODesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('SERVICIO.label', 'SERVICIO'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['SERVICIOAsc'])" sortDescending="@load(vm.comparators['SERVICIODesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('ACRONIMO.label', 'ACRONIMO'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['ACRONIMOAsc'])" sortDescending="@load(vm.comparators['ACRONIMODesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('MODEL.label', 'MODEL'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MODELAsc'])" sortDescending="@load(vm.comparators['MODELDesc'])"/>
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('NOMBRE').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('ACTIVE').value) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.getFieldByAtribute('tipo').value) @converter(vm.fieldConverter)"></label>
+                                   <label  value="@load(item.getFieldByAtribute('servicio').value) @converter(vm.fieldConverter)"></label>
+                                   <label  value="@load(item.getFieldByAtribute('acronimo').value) @converter(vm.fieldConverter)"></label>
+                                   <label  value="@load(item.getFieldByAtribute('model').value) @converter(vm.fieldConverter)"></label>
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterpromp.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

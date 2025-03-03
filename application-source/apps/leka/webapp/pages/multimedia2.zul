@@ -1,0 +1,226 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+	<nodom
+			viewModel="@id('vm') @init('com.suinsit.nocode.suinless.ui.MultimediaTrainingUI',pagina='promp')"
+			validationMessages="@id('vmsgs')">
+			<custom-attributes pagina="promp" />
+			<custom-attributes
+				clase="org.suinsit.apps.suinless.Slespromp" />
+			<custom-attributes namespace="suinless" />
+			<custom-attributes uid="21116" />
+			<custom-attributes tipo="MASTER" />
+			<custom-attributes msgform="Proyecto enviado" />
+			<custom-attributes type="form" />
+		<div>
+			<div class="left tittle-principal">
+				<h:h2 class="mb-sm-0">Leka Media</h:h2>
+			</div>
+		</div>
+		<div class="col-lg-12 s-bot mb-5">
+
+			<div class="row">
+				<div class="col-12 mb-4">
+					<label class="txt-mkt">
+						LEKA te permite dar vida a tus ideas: compara y genera imágenes y videos con los mejores modelos de IA en una sola plataforma.
+					</label>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-8 mb-8">
+					<div class="card" height="100%">
+						<div class="row" height="100%">
+							<div class="col-12 mb-12 mb-4">
+								<div class="card cards-mkt-sf">
+									<hlayout spacing="10px"
+										style="margin-bottom:20px;">
+										<vlayout class="mkt"
+											style="padding:20px;">
+											<label
+												class="subtt-mkt">
+												Generador Imagen
+											</label>
+
+											<grid>
+												<rows>
+													<row>
+														<hlayout>
+															<image src="img/im1.jpg" class="img-generator" />
+													
+														</hlayout>
+														<hlayout>
+															<image
+																src="img/im2.jpg" class="img-generator"  />
+															
+														</hlayout>
+														<hlayout>
+															<image
+																src="img/im3.jpg" class="img-generator" />
+															
+														</hlayout>
+														
+													</row>
+												</rows>
+											</grid>
+											
+											<hlayout  style="margin-top:20px;">
+								                <textbox placeholder="Puesta de sol en playa tropical" width="75vh" style="margin-top: 58px;"></textbox>
+								                <button label="Ejecutar" class="btn btn-primary" style="margin-top: 34px; margin-left: 50%"></button>
+								            </hlayout>
+            
+										</vlayout>
+									</hlayout>
+								</div>
+
+							</div>
+						
+							
+						</div>
+						
+			
+						
+
+					</div>
+				</div>
+				<div class="col-4 mb-4">
+					<div class="card cards-mkt-sf">
+						<div class="mkt-dp leka">
+						
+							<div class="row">
+								<div class="chatbot">
+									<div class="chatbot-header">
+										<h:img src="../img/leka-1.png"
+											alt="Chat Icon" />
+										<h:h5>LEKA</h:h5>
+									</div>
+									<div class="chatbot-body">
+										<h:h6>
+											¿Tienes dudas sobre que IA
+											Usar? Pregúntanos.
+										</h:h6>
+										
+										
+										<div class="row">
+											<div class="col-3 mb-4">
+												<label class="pad-0 leka-label-ftr">Modo</label>
+												<combobox class="col-12 pad-0"> 
+													<comboitem label="Chat"
+														description="mantiene una convesacion " />
+													<comboitem label="Single"
+														description="responde sin mantener estados" />
+												</combobox>
+											</div>
+											
+											<div class="col-3 mb-4">
+												<label class="pad-0 leka-label-ftr">Proveedor</label>
+												<combobox class="col-12 pad-0">
+													<comboitem label="Chat"
+														description="mantiene una convesacion " />
+													<comboitem label="Single"
+														description="responde sin mantener estados" />
+												</combobox>
+											</div>
+											
+											<div class="col-3 mb-4">
+												<label class="pad-0 leka-label-ftr">Modelo</label>
+												<combobox class="col-12 pad-0">
+													<comboitem label="Chat"
+														description="mantiene una convesacion " />
+													<comboitem label="Single"
+														description="responde sin mantener estados" />
+												</combobox>
+											</div>
+											
+											<div class="col-3 mb-4">
+												<label class="pad-0 leka-label-ftr">Ejemplos</label>
+												
+												<combobox class="col-12 pad-0">
+													<comboitem label="Chat"
+														description="mantiene una convesacion " />
+													<comboitem label="Single"
+														description="responde sin mantener estados" />
+												</combobox>
+							
+											</div>
+										</div>
+								
+								
+								
+										<hlayout class="b-bot300">
+											<div id="areaMsg" class="area-msgchat300" vflex="1">
+												<forEach
+													items="@bind(vm.chatmsgs)" var="item">
+													<choose>
+														<when
+															test="${item.usuario}">
+															<div
+																sclass="col-12 col-md-12 col-lg-12 stl-chat">
+																<if
+																	test="${item.user ne null}">
+																	<label
+																		value="${item.user}" sclass="${item.sclass}">
+																	</label>
+																</if>
+																<if
+																	test="${item.message ne null}">
+																	<label
+																		value="${item.message}" sclass="${item.sclass}"
+																		multiline="true">
+																	</label>
+																</if>
+															</div>
+
+														</when>
+														<when
+															test="${item.assistan}">
+															<if
+																test="${item.icon ne null}">
+																<h:icon
+																	sclass="${item.icon}">
+																</h:icon>
+															</if>
+															<if
+																test="${item.message ne null}">
+																<label
+																	value="${item.message}" sclass="${item.sclass}"
+																	multiline="true">
+																</label>
+															</if>
+														</when>
+														<otherwise>
+														</otherwise>
+													</choose>
+												</forEach>
+											</div>
+
+										</hlayout>
+										<textbox id="tbmessage"
+											multiline="true"  class="form-control"
+											height="200px"
+											placeholder="Escribe tu mensaje..."
+											value="@bind(vm.chatmsg)" />
+
+										<button class="btn btn-primary"
+											onClick="@command('runMessageImage')">
+											Enviar Mensaje
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</nodom>
+	</div>
+	<script>
+        var img = zk.Widget.$('$img'); // Definir img aquí
+    </script>
+
+
+</zk>

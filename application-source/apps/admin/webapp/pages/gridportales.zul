@@ -1,0 +1,65 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('CODIGO.label', 'Código'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['CODIGOAsc'])" sortDescending="@load(vm.comparators['CODIGODesc'])"  visible="@load(vm.isVisible('CODIGO'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PORTAL.label', 'Portal'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PORTALAsc'])" sortDescending="@load(vm.comparators['PORTALDesc'])"  visible="@load(vm.isVisible('PORTAL'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('APLICACION.label', 'Nombre de la aplicación'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['APLICACIONAsc'])" sortDescending="@load(vm.comparators['APLICACIONDesc'])"  visible="@load(vm.isVisible('APLICACION'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('DASHBOARD.label', 'Dashboard'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['DASHBOARDAsc'])" sortDescending="@load(vm.comparators['DASHBOARDDesc'])"  visible="@load(vm.isVisible('DASHBOARD'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterportales.zul')">
+							             <label  value="@load(item.codigo) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.portal) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.aplicacion) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+							             <label  value="@load(item.dashboard) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masterportales.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

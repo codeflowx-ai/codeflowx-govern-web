@@ -1,0 +1,186 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="logfilters" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='logfilters')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="popuplogfilters" />
+	  <custom-attributes loadScreen="true" />
+<custom-attributes clase="org.suinsit.apps.suinless.Slrfilterlogs" />
+	   <custom-attributes namespace="suinless" />
+	      <custom-attributes uid="61311" />
+	      <custom-attributes tipo="MASTER" />
+	      <panel >
+			<panelchildren>
+			 <div class="row">
+	       <div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div 	class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							 <div class="left tittle-principal">
+                <fragment 	exps="@load(vm.lang.getProperty('LOGFILTERS.screen', 'Logs Filtros'))">
+						<![CDATA[ <h2 class="mb-sm-0"
+						textContent='@load(exps)'></h2> ]]>
+					</fragment>
+                
+             </div>
+                              </div>
+                              <div class="flex-shrink-0">
+								    <div class="hstack text-nowrap gap-2 d-flex">						 	
+									<a onClick="@command('grabar',action='continuar')"
+										class="waves-effect waves-success"
+										iconSclass="fa-duotone fa-floppy-disk align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('grabar',action='nuevo')"
+										class="waves-effect waves-light" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right align-middle fs-16 me-2" >
+										
+									</a>
+									<a onClick="@command('cerrarPopup')"
+										class="waves-effect waves-dark" iconSclass="fa-duotone fa-arrow-left-from-arc align-middle fs-16 me-2">
+										
+									</a>
+								       </div>
+	  	                     </div>
+						</div>
+					</div> <!-- header -->
+					  <div class="card-body">
+					    <div class="row">
+<div id="tdjEXurWJT"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="tdjEXurWJT-card" class="card  default shadow-lg" style="overflow:auto;" >
+       <div id="tdjEXurWJT-body" class="card-body ">
+        <div id="tdjEXurWJT-row" class="form-group row ">
+
+
+				
+
+ <div class="col-md-4  input-group" visible="@load(vm.isVisible('ALTA'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle " style="" value="@load(vm.lang.getProperty('ALTA.label', 'Alta'))"/>
+	   
+	<datebox     id="669949" cols="20"  tabindex="1" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) "   format="dd/MM/yy HH:mm" placeholder="@load(vm.lang.getProperty('ALTA.label', 'Alta'))" 
+    visible="@load(vm.isVisible('ALTA'))" disabled="@load(vm.isEditable('ALTA')?false:true)" sclass="margin-field"/>
+    <label sclass="text-danger" value="@load(vmsgs['669949'])"/>   
+    
+  </div>
+
+
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idalmfilterproject.label', 'Filtro de Proyecto'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idalmfilterproject" placeholder="@load(vm.lang.getProperty('idalmfilterproject').label,'Filtro de Proyecto')" model="@bind(vm.foreings['idalmfilterproject'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idalmfilterproject',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idalmfilterproject)"  onCreate="@command('onCreateCombo',component=self,alias='idalmfilterproject')" value="@bind(vm.beanData.idalmfilterproject .proyecto)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.proyecto)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idalmfilterproject'])"/>
+
+  
+</h:div>
+
+
+
+<h:div class="col-md-4  input-group">
+   
+   
+    <label sclass="text  form-label text-capitalize font-weight-normal" style="" value="@load(vm.lang.getProperty('idssousuario.label', 'Usuario'))"/>
+   
+<combobox mold="rounded" autodrop="true"  id="idssousuario" placeholder="@load(vm.lang.getProperty('idssousuario').label,'Usuario')" model="@bind(vm.foreings['idssousuario'])"  visible="true"	onSelect="@command('onSelectForeing', alias='idssousuario',item=self.selectedItem.value,updatebean='false')"  		selectedItem="@load(vm.beanData.idssousuario)"  onCreate="@command('onCreateCombo',component=self,alias='idssousuario')" value="@bind(vm.beanData.idssousuario .usuario)"  ><template name="model" var="item"><comboitem value="@load(item)" label="@load(item.usuario)" /></template></combobox>
+ <label sclass="text-danger" value="@load(vmsgs['idssousuario'])"/>
+
+  
+</h:div>
+
+
+
+   <h:div class="col-md-12 input-group">
+     
+	    <label sclass=" font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MSGERROR.label', 'Log'))"/>
+	  
+	      <textbox rows="10" cols="100" id="VuDmGnnoco" multiline="true" 
+	      placeholder="@load(vm.lang.getProperty('MSGERROR.label', ''))" value="@bind(vm.beanData.msgerror) @save(vm.beanData.msgerror, before=('grabar')) "   visible="@load(vm.isVisible('MSGERROR'))" disabled="@load(vm.isEditable('MSGERROR')?false:true)"/>
+           <label sclass="text-danger" value="@load(vmsgs['VuDmGnnoco'])"/>
+	     
+</h:div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+					  </div>
+					  </div> <!-- body -->		
+					 </div> <!-- card --> 
+					 </div> <!-- cold -->  
+                    </div>
+                    </panelchildren>
+                </panel>    
+            <fragment exps="@load(vm.lang['LOGFILTERS.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+                 
+
+
+
+
+
+                  
+            <window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+  <script>
+zk.afterMount(function() {
+ var binder = zkbind.$('$logfilters');
+  binder.command('doLoad');
+});
+function loadlogfilters(){
+  var binder = zkbind.$('$logfilters');
+  binder.command('doLoadBean');
+
+}
+</script>	
+</zk>

@@ -1,0 +1,372 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+<idspace  id="pipeline" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='pipeline')" validationMessages="@id('vmsgs')">
+	  <custom-attributes pagina="pipeline" />
+	<custom-attributes clase="org.suinsit.apps.crm.Crmpipeline" />
+	   <custom-attributes namespace="crm" />
+		<custom-attributes uid="20187" />
+	   <custom-attributes tipo="MASTER" />
+	  	<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('Pipeline.screen', 'Pipeline'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								Pipeline
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='continuar')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('grabar',action='nuevo')">
+										Guardar y Nuevo
+									</button>
+								
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div >
+							<h:div >
+		     <div class="row">
+
+
+<div id="ZJSnuOkBqS"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="ZJSnuOkBqS-card" class="card  shadow-lg" style="overflow:auto;" >
+       <div id="ZJSnuOkBqS-body" class="card-body ">
+        <div id="ZJSnuOkBqS-row" class="form-group row ">
+
+
+				
+
+    <h:div class="col-md-3 ">
+    <!-- sclass="margin-field" -->
+       <hbox spacing="3px" visible="@load(vm.isVisible('PIPELINE'))" >
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PIPELINE.label', 'Pipeline'))"  />
+	   </hbox>
+	    <textbox   tabindex="1" id="467129" 
+	   placeholder="@load(vm.lang.getProperty('PIPELINE.label', 'Pipeline'))" 
+	   value="@bind(vm.beanData.pipeline) @save(vm.beanData.pipeline, before=('grabar')) @validator(vm.unique, field='PIPELINE',required=true ,oldValue=vm.beanDataCpy.pipeline)"  sclass="margin-field form-control  form-control    border-danger" 
+	   visible="@load(vm.isVisible('PIPELINE'))" disabled="@load(vm.isEditable('PIPELINE')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['467129'])"/>
+	   
+    </h:div>   
+
+
+
+
+
+
+
+<h:div class="col-md-3 ">
+
+   <hbox spacing="3px">
+     <label sclass="text  form-label text-capitalize    font-weight-normal" style="   " value="@load(vm.lang.getProperty('MODULO.label', 'Objeto'))"/>
+ </hbox>
+
+
+ <combobox mold="rounded" disabled="false"  sclass="" id="MODULO" model="@load(vm.getEnums('MODULO'))" 
+selectedItem="@load(vm.beanData.modulo)"  value="@load(vm.beanData.modulo) @save(vm.beanData.modulo, before=('grabar')) ">
+<template name="model" var="item">
+<comboitem value="${item.stValue ne null ? item.stValue:item.stValue}" label="${item.stValue ne null?item.stValue:item.inValue}"/>
+</template>
+</combobox>
+ <label sclass="text-danger" value="@load(vmsgs['MODULO'])"/>
+</h:div>
+
+
+
+
+
+
+				
+
+    <h:div class="col-md-2 ">
+       <hbox spacing="3px" visible="@load(vm.isVisible('MAXREG'))" sclass="margin-field">
+	    <label sclass="text form-label  text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('MAXREG.label', 'Max. Registros'))"/>
+	    <a iconSclass="bx bxs-message-square-dots" popup="pop_MAXREG" />
+	   </hbox>
+	      <intbox   tabindex="3" id="wUoPCXiajP"  placeholder="@load(vm.lang.getProperty('MAXREG.label', 'Max. Registros'))" sclass="margin-field form-control  form-control      "  value="@bind(vm.beanData.maxreg) @save(vm.beanData.maxreg, before=('grabar')) " visible="@load(vm.isVisible('MAXREG'))" disabled="@load(vm.isEditable('MAXREG')?false:true)" onChange="@command('onChangeInput',field='MAXREG',evento=event,componente=self,calculate=true)" />
+    <label sclass="text-danger" value="@load(vmsgs['wUoPCXiajP'])"/>   
+    
+    </h:div>
+   <popup id="pop_MAXREG" width="200px">
+          <groupbox sclass="z-demo-config" closable="false">
+            <caption>Ayuda</caption>
+            <span>
+                <![CDATA[
+                 Máximo número de registros por etapa
+                ]]>  
+            </span>
+         
+        </groupbox>
+ </popup>
+
+
+
+
+
+
+ <h:div class="col-md-2 ">
+       <hbox spacing="3px" visible="@load(vm.isVisible('DEFECTO'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('DEFECTO.label', 'Principal'))"/>
+	   </hbox>
+ <checkbox mold="default" id="sEKiaQVvoM" value="@bind(vm.beanData.defecto) @save(vm.beanData.defecto, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('DEFECTO'))" disabled="@load(vm.isEditable('DEFECTO')?false:true)" checked="@bind(vm.beanData.defecto) @save(vm.beanData.defecto, before=('grabar'))"/>
+</h:div>
+
+
+
+
+
+ <h:div class="col-md-2 ">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ORDENASC'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ORDENASC.label', 'Ordenar ascendentemente'))"/>
+	    <a iconSclass="mdi mdi-information-outline" popup="pop_PYTCuyxvuU" />
+	   </hbox>
+ <checkbox mold="default" id="PYTCuyxvuU" value="@bind(vm.beanData.ordenasc) @save(vm.beanData.ordenasc, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('ORDENASC'))" disabled="@load(vm.isEditable('ORDENASC')?false:true)" checked="@bind(vm.beanData.ordenasc) @save(vm.beanData.ordenasc, before=('grabar'))"/>
+</h:div>
+<popup id="pop_PYTCuyxvuU" width="200px">
+	  <vbox>  
+	  <fragment exps="@load(vm.lang.getProperty('ORDENASC.helptext', ''))" >
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+
+
+
+
+
+ <h:div class="col-md-4 ">
+       <hbox spacing="3px" visible="@load(vm.isVisible('FRANQUICIAS'))" sclass="margin-field" >
+	    <label sclass="form-check-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('FRANQUICIAS.label', 'Mostrar Franquicias'))"/>
+	    <a iconSclass="mdi mdi-information-outline" popup="pop_AFTNmXHIil" />
+	   </hbox>
+ <checkbox mold="default" id="AFTNmXHIil" value="@bind(vm.beanData.franquicias) @save(vm.beanData.franquicias, before=('grabar'))" sclass="margin-field " visible="@load(vm.isVisible('FRANQUICIAS'))" disabled="@load(vm.isEditable('FRANQUICIAS')?false:true)" checked="@bind(vm.beanData.franquicias) @save(vm.beanData.franquicias, before=('grabar'))"/>
+</h:div>
+<popup id="pop_AFTNmXHIil" width="200px">
+	  <vbox>  
+	  <fragment exps="@load(vm.lang.getProperty('FRANQUICIAS.helptext', ''))" >
+	    	<![CDATA[
+<span textContent='@load(exps)'></span>
+	    	  	]]>        
+	  </fragment></vbox>
+  </popup>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+
+
+<div id="xLuabzSgMz"   visible="true"  class="col-lg-12 col-xlg-12 col-md-12">
+  <div id="xLuabzSgMz-card" class="card " style="overflow:auto;" >
+       <div id="xLuabzSgMz-body" class="card-body ">
+        <div id="xLuabzSgMz-row" class="form-group row ">
+
+  <div class="col-lg-1">
+ <button label="Nueva Etapa"  tooltiptext="añadir nuevo registro" iconSclass="fa-duotone fa-grid-2-plus me-1 align-bottom" class="btn  btn-outline-primary"
+		onClick="@command('appendRow',alias='subcrmetapa' , order='orden')" />
+ </div>		
+ <!--	if(comp.getPropBeans().get("loadOnDemand")!=null) {-->
+ <div class="col-lg-12">		
+  <grid id="kSkcrsItic" height="600px" width="100%" 
+   model="@bind(vm.grid['subcrmetapa']) @template(each.updatable ? 'modelWrite' : 'model')" 
+    onCreate="@command('onSubtableCreate',component=self,alias='subcrmetapa',loadOnDemand='true' , order='orden' )" >
+  <columns sizable="true">
+	    <column label="@load(vm.lang.getProperty('ETAPA.label', 'Etapa'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('COLOR.label', 'color'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('PORCENTAJE.label', 'Porcentaje (%)'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('PERDIDA.label', 'PERDIDA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('GANADA.label', 'GANADA'))"   align="center" sclass="text-capitalize"/>
+     
+	    <column label="@load(vm.lang.getProperty('CIERRE.label', 'Cierre de etapa'))"   align="center" sclass="text-capitalize"/>
+     
+     
+        <column align="center" />
+	 </columns>
+      <template name="model" var="item">
+      	       	<row style="text-align:right; cursor:crosshair;" draggable="true" droppable="true" onDrop="@command('orderRow',alias='subcrmetapa',evento=event,item=item,field='orden' )">
+				     <label  value="@load(item.etapa) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.color) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.porcentaje) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.perdida) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.ganada) @converter(vm.fieldConverter)"></label>
+				     <label  value="@load(item.cierre) @converter(vm.fieldConverter)"></label>
+               <cell align="center">
+		           <button onClick="@command('editRow',alias='subcrmetapa',item=item)"
+						iconSclass="fa-duotone fa-pen-to-square fa-xl" sclass="btn btn-square btn-outline-success m-2" />
+		                 <space></space> 
+						<button
+						onClick="@command('removeSubtable',alias='subcrmetapa',item=item , order='orden')"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2" />
+		                </cell> 
+       </row>
+   	</template>      <template name="modelWrite" var="item">
+      	 <row style="text-align:right;" >
+   
+    	  				          <textbox  value="@bind(item.etapa)" ></textbox>
+				            <colorbox width="80px" height="35px" value="@bind(item.color) @save(item.color, before=('storeRow'))"/>
+				        <decimalbox value="@bind(item.porcentaje) @save(item.porcentaje, before=('storeRow'))"></decimalbox>
+				         <checkbox  value="@bind(item.perdida) @save(item.perdida, before=('storeRow'))" onCheck="@command('onChecked',item=item,field='perdida',evento=event)" sclass="margin-field " checked="@load(item.perdida)"/>
+				         <checkbox  value="@bind(item.ganada) @save(item.ganada, before=('storeRow'))" onCheck="@command('onChecked',item=item,field='ganada',evento=event)" sclass="margin-field " checked="@load(item.ganada)"/>
+				         <checkbox  value="@bind(item.cierre) @save(item.cierre, before=('storeRow'))" onCheck="@command('onChecked',item=item,field='cierre',evento=event)" sclass="margin-field " checked="@load(item.cierre)"/>
+           		<cell align="center">
+  					<button onClick="@command('storeRow',alias='subcrmetapa',item=item)"
+						iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" sclass="btn btn-square btn-outline-success m-2" />
+		            <space></space>
+		            <button
+						onClick="@command('cancelRow',alias='subcrmetapa',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl"
+						sclass="btn btn-square btn-outline-danger m-2" />
+                </cell> 
+       </row>
+   	</template>
+  </grid>
+  </div>
+
+
+
+         </div> 
+       </div>
+  </div>
+ </div>  
+          
+                              
+          
+        
+
+
+
+             </div>      
+            </h:div>
+            
+           </h:div>
+          </h:div>
+         </div>   
+            <fragment exps="@load(vm.lang['Pipeline.screen'])" >
+				<![CDATA[
+				<div id="modal_iconified" class="modal fade" tabindex="-1" style="z-index: 99999;">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title"><span textContent='@load(exps)'></span></h5>
+							</div>
+							<div class="modal-body">
+								<h6 class="font-weight-semibold"><i class="icon-law mr-2"></i>Texto de ayuda pantalla</h6>
+								<span textContent='@load(exps)'></span>
+							</div>
+							<div class="modal-footer">
+								<button class="btn btn-link" data-dismiss="modal"><i class="icon-cross2 font-size-base mr-1"></i> Close</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				]]>
+				</fragment>
+
+                 
+
+
+
+
+
+
+
+                  
+                 
+
+
+                  
+<window id="WIN_HELP" mode="modal" visible="false" position="center,center" 
+    action="show: slideDown;hide: slideUp" sclass="z-messagebox-window" border="none"  width="70%">
+			<div class="modal-content border-0">
+				<div class="modal-header bg-soft-info p-3">
+					<h:h5 class="modal-title">
+						Ayuda
+					</h:h5>
+				</div>
+				<div class="modal-body" >
+				</div>
+				<div class="modal-footer">
+				  <div class="hstack gap-2 justify-content-end">
+									<button onClick="WIN_HELP.setVisible(false)"
+										class="btn btn-light" >
+										Cerrar
+									</button>
+				</div>
+			</div>
+		</div>
+	</window>
+ </idspace>
+<script type="text/javascript" >
+zk.afterMount(function() {
+ var binder = zkbind.$('$pipeline');
+  binder.command('doLoad');
+});
+</script>
+</zk>

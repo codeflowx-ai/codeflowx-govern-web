@@ -1,0 +1,108 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+		<div class="col-lg-12 s-bot">
+			<div class="card">
+				<div class="card-body">
+					<div id="LYXZRmSFYD" style="overflow:auto;"
+						class=" default col-lg-12 col-xlg-12 col-md-12" visible="true">
+						<div id="LYXZRmSFYD-row" class="row">
+							<div class="col-md-3  input-group">
+								<label
+									sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+									style="  " value="Proyecto" />
+								<textbox tabindex="1" id="BzDltmAxYX"
+									placeholder="Proyecto"
+									value="@bind(vm.almproject.proyectoalm) @save(vm.almproject.proyectoalm, before=('nextStep')) 
+									@validator(vm.unique, field='PROYECTOALM',required=true )"
+									sclass="   border-danger" />
+								<label sclass="text-danger"
+									value="@load(vmsgs['BzDltmAxYX'])" />
+							</div>
+							<div class="col-md-3  input-group">
+								<label
+									sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+									style="  " value="Namespace K8s" />
+								<textbox tabindex="2" id="sgiUQVUzJO"
+									placeholder="Namespace K8s"
+									value="@bind(vm.almproject.namespace) @save(vm.almproject.namespace, before=('nextStep')) 
+									@validator(vm.unique, field='NAMESPACE',required=true )"
+									sclass="   border-danger" onChanging="@command('changeNamespace',event=event)" />
+								<label sclass="text-danger"
+									value="@load(vmsgs['sgiUQVUzJO'])" />
+							</div>
+							<h:div class="col-md-3  input-group">
+								<label
+									sclass="text  form-label text-capitalize font-weight-normal"
+									style="" value="Cliente" />
+								<h:div class="col-md-12">
+								</h:div>
+								<h:div class="mb-2">
+									<searchbox
+										model="@bind(vm.customers)" placeholder="customers" 
+										autoclose="true" onSelect="@command('selectCustomers',event=event)"
+										onSearching="@command('searchCustomers',event=event)"  >
+										<template name="model">
+											${each}
+										</template>
+									</searchbox>
+									<textbox id="tboxJjhrkXbEau"
+										placeholder=""
+										value="@bind(vm.almproject.idcrmempresa.empresa) @save(vm.almproject.idcrmempresa.empresa, before=('nextStep')) 
+										@validator(vm.validator, required=true )"
+										sclass="form-control  border-danger border-0" disabled="true"/>
+
+									<label sclass="text-danger"
+										value="@load(vmsgs['tboxJjhrkXbEau'])" />
+								</h:div>
+							</h:div>
+							<h:div class="col-md-4  input-group">
+								<label
+									sclass="text  form-label text-capitalize font-weight-normal"
+									style="" value="Dominio DNS" />
+								<combobox mold="rounded" autodrop="true"
+									id="idatldomain" placeholder="Dominio DNS"
+									model="@bind(vm.domains)" visible="true"
+									selectedItem="@bind(vm.almproject.idatldomain) @save(vm.almproject.idatldomain, before=('nextStep'))"
+									value="@bind(vm.almproject.idatldomain.domain) " constraint="@load(vm.notnull)">
+									<template name="model" var="item">
+										<comboitem value="@load(item)"
+											label="@load(item.domain)" />
+									</template>
+								</combobox>
+								<label sclass="text-danger"
+									 />
+							</h:div>
+							<div class="col-md-4  input-group">
+								<label
+									sclass="text form-label  text-capitalize  font-weight-normal align-text-middle"
+									style="  " value="Subdominio" />
+								<textbox tabindex="5" id="DrXoMeYhyC"
+									placeholder="Subdominio"
+									value="@bind(vm.almproject.dominio) @save(vm.almproject.dominio, before=('nextStep')) @validator(vm.validator, required=true )"
+									sclass="  border-danger" />
+								<label sclass="text-danger"
+									value="@load(vmsgs['DrXoMeYhyC'])" />
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="card-footer">
+					<button zclass="pull-right"
+						sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+						iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"
+						onClick="@command('nextStep')" label="Siguiente" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+</zk>

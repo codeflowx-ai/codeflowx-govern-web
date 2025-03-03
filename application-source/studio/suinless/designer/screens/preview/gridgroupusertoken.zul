@@ -1,0 +1,51 @@
+					 <grid  height="600px" width="100%"	model="@load(vm.groups)" >  
+							<columns sizable="true" menupopup="auto">
+							       <column hflex="1" label="@load(vm.lang.getProperty('FECHA.label', 'fecha'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['FECHAAsc'])" sortDescending="@load(vm.comparators['FECHADesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('INTOKEN.label', 'intoken'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['INTOKENAsc'])" sortDescending="@load(vm.comparators['INTOKENDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('OUTTOKEN.label', 'outtoken'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['OUTTOKENAsc'])" sortDescending="@load(vm.comparators['OUTTOKENDesc'])" />
+							       <column hflex="1" label="@load(vm.lang.getProperty('LEKAPROJECT.label', 'LEKAPROJECT'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['LEKAPROJECTAsc'])" sortDescending="@load(vm.comparators['LEKAPROJECTDesc'])"/>
+							       <column hflex="1" label="@load(vm.lang.getProperty('MODEL.label', 'MODEL'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['MODELAsc'])" sortDescending="@load(vm.comparators['MODELDesc'])"/>
+ 							      <column hflex="1" align="center" />
+							</columns >
+							<!-- template for group -->
+                              <template name="model:group">
+                                <group label="@load(each)" style="text-align:left;"/>
+                              </template>
+							<template name="model" var="item">
+                  			<row style="text-align:right;">
+							         <label  value="@load(item.getFieldByAtribute('FECHA').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('INTOKEN').value) @converter(vm.fieldConverter)"></label>
+                                   
+							         <label  value="@load(item.getFieldByAtribute('OUTTOKEN').value) @converter(vm.fieldConverter)"></label>
+                                   
+                                   <label  value="@load(item.getFieldByAtribute('lekaproject').value) @converter(vm.fieldConverter)"></label>
+                                   <label  value="@load(item.getFieldByAtribute('model').value) @converter(vm.fieldConverter)"></label>
+							
+                  			
+                  		<cell align="center">
+						<button
+						onClick="@command('editData',item=item,page='masterusertoken.zul')"
+						iconSclass="icon-pencil7" sclass="btn btn-outline-secondary" />
+						<space></space>
+						<button
+						onClick="@command('removeData',item=item)"
+						iconSclass="icon-trash"
+						sclass="btn btn-outline-warning" />
+						
+					    </cell>
+					   </row>
+					   
+                  		</template>
+                  		            		 <!-- template for footer -->
+        <template name="model:groupfoot">
+            <groupfoot>
+                <cell colspan="5" style="text-align: right; padding-right: 15px">
+                    <label value="@load(each)" style="font-weight:bold;" />
+                </cell>
+            </groupfoot>
+        </template>
+							<foot>
+						     <footer span="4" align="right" label="@load(vm.labelTotal)" />
+						    </foot>
+						</grid>

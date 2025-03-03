@@ -1,0 +1,78 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+				
+			
+			
+			
+			
+			
+				<grid  	model="@load(vm.beans)"   style="overflow:auto;" >  
+							<columns sizable="true" columnsgroup="false" columnshide="false" >
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('AVATAR.label', 'avatar'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['AVATARAsc'])" sortDescending="@load(vm.comparators['AVATARDesc'])"  visible="@load(vm.isVisible('AVATAR'))"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('PROVIDER.label', 'Proveedor'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['PROVIDERAsc'])" sortDescending="@load(vm.comparators['PROVIDERDesc'])"  visible="@load(vm.isVisible('PROVIDER'))"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Tipo Proveedor.label', 'Tipo Proveedor'))" align="center"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Estado Ley EU.label', 'Estado Ley EU'))" align="center"/>
+							      <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('Nivel Ley EU.label', 'Nivel Ley EU'))" align="center"/>
+							    <column  sclass=" text-capitalize "  label="@load(vm.lang.getProperty('URLWEB.label', 'Web'))" align="center" sort="auto"  sortAscending="@load(vm.comparators['URLWEBAsc'])" sortDescending="@load(vm.comparators['URLWEBDesc'])"  visible="@load(vm.isVisible('URLWEB'))"/>
+ 							      <column  label="Acciones" align="center" width="150px;"/>
+							</columns >
+							<template name="model" var="item">
+						       <row style="text-align:right;cursor:pointer;"  onClick="@command('editData',item=item,page='masterproveedor.zul')">
+                                   <image content="@load(vm.getImage(item,'AVATAR'))" width="40%" height="30%" />
+							             <label  value="@load(item.provider) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+                                   
+                                          <label  value="@load(item.idsletipoprovgob.tipo) @converter(vm.fieldConverter)"></label>
+                                   
+                                   
+                                              <zscript>
+                                                    String estilo = item.idsleestadogob.backcolor;
+                                              </zscript>
+                                              <label  sclass="fw-bolder badge rounded-pill"  style="background-color:${estilo};"  value="@load(item.idsleestadogob.estado) @converter(vm.fieldConverter)"></label>   
+                                   
+                                   
+                                          <label  value="@load(item.idslenivelgob.nivel) @converter(vm.fieldConverter)"></label>
+                                   
+							             <label  value="@load(item.urlweb) @converter(vm.fieldConverter)"></label>
+							              
+							          
+                                   
+	               		<cell align="center"  class="d-flex">
+                  		<div class="edit">
+							<a
+						onClick="@command('editData',item=item,page='masterproveedor.zul')"
+						iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"   />
+						</div>
+						<div class="delete">
+						<a
+						onClick="@command('removeData',item=item)"
+						iconSclass="fa-light fa-nfc-trash fa-xl" 	sclass="waves-effect waves-danger" 
+						  />
+						</div>
+						
+					    </cell>
+					   </row>
+                  		</template>
+							<foot>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+							      <footer>
+							      </footer>
+						     <!--<footer span="4" align="right" label="@load(vm.labelTotal)" />-->
+						    </foot>
+						</grid>
+						
+</zk>						

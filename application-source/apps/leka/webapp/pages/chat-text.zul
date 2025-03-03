@@ -1,0 +1,350 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<style>
+		.chat-container { display: flex; flex-direction: column; height:
+		100%; } .message-list { flex: 1; overflow-y: auto; }
+		.user-message { background: #e3f2fd; margin: 5px; padding: 10px;
+		border-radius: 10px; align-self: flex-end; } .claude-message {
+		background: #f5f5f5; margin: 5px; padding: 10px; border-radius:
+		10px; align-self: flex-start; }
+
+		/* Estilos para el contenido markdown */ .markdown-body {
+		font-family: -apple-system,BlinkMacSystemFont,Segoe
+		UI,Helvetica,Arial,sans-serif; font-size: 16px; line-height:
+		1.5; word-wrap: break-word; }
+
+		.markdown-body h1 { padding-bottom: .3em; font-size: 2em;
+		border-bottom: 1px solid #eaecef; }
+
+		.markdown-body code { padding: .2em .4em; margin: 0; font-size:
+		85%; background-color: rgba(27,31,35,.05); border-radius: 3px; }
+	</style>
+
+
+
+
+	<div class="row">
+		<nodom
+			viewModel="@id('vm') @init('com.suinsit.nocode.suinless.ui.PrompTrainingUI',pagina='promp')"
+			validationMessages="@id('vmsgs')">
+			<custom-attributes pagina="promp" />
+			<custom-attributes
+				clase="org.suinsit.apps.suinless.Slespromp" />
+			<custom-attributes namespace="suinless" />
+			<custom-attributes uid="21116" />
+			<custom-attributes tipo="MASTER" />
+			<custom-attributes msgform="Proyecto enviado" />
+			<custom-attributes type="form" />
+
+			<div class="col-lg-12 s-bot ">
+				<div class="row">
+
+					<div class="leka-drawer-filters">
+
+						<div class="row leka-drawer-flex">
+							<div
+								class="col-md-8 col-lg-8 leka-drawer-txt">
+
+								<div class="left tittle-principal">
+									<h:h2 class="mb-sm-0">
+										Chat-Text
+									</h:h2>
+								</div>
+
+								<label class="txt-mkt">
+									En LEKA, la magia está en la
+									versatilidad: explora ejemplos
+									probados de prompts, convierte voz
+									en texto y compara resultados entre
+									IAs líderes del mercado.
+								</label>
+							</div>
+
+							<div
+								class="col-md-4 col-lg-4 leka-drawer-options">
+								<button class="btn btn-primary"
+									iconSclass="fa-duotone fa-solid fa-play" label="Ejecutar"
+									onClick="@command('runMessage')" />
+								<button class="btn btn-primary"
+									iconSclass="fa-duotone fa-solid fa-floppy-disk"
+									label="Guardar" />
+
+								<a
+									iconSclass="fa-duotone fa-solid fa-sliders"
+									onClick="drawer.open()" />
+							</div>
+						</div>
+
+
+						<drawer id="drawer" class="drawer-filter"
+							position="right" autodrop="false">
+							<div class="d-flex mb-2">
+								<a
+									iconSclass="fa-duotone fa-light fa-xmark"
+									onClick="drawer.close()" />
+								<label class="drawer-ttl">
+									Configuración Modelos
+								</label>
+							</div>
+
+
+							<div
+								class="filtros col-12 end-0 bg-white pt-2 pl-0">
+
+								<div class="mb-4">
+									<div class="col-4">
+										<label
+											class="pad-0 leka-label-ftr">
+											Nombre
+										</label>
+									</div>
+
+									<div class="col-12">
+										<textbox hflex="1" />
+									</div>
+								</div>
+
+								<div class="mb-4">
+									<div class="col-4">
+										<label
+											class="pad-0 leka-label-ftr">
+											Modo
+										</label>
+									</div>
+
+									<combobox class="col-12"
+										value="@bind(vm.mode)" selectedItem="@load(vm.mode)">
+										<comboitem label="Chat"
+											description="mantiene una convesacion " />
+										<comboitem label="Single"
+											description="responde sin mantener estados" />
+									</combobox>
+
+								</div>
+								<div class="mb-4">
+									<div class="col-4">
+										<label
+											class="pad-0 leka-label-ftr">
+											Systems prompt
+										</label>
+									</div>
+									<combobox mold="rounded"
+										autodrop="true" id="idslprompt" placeholder="Prompts"
+										model="@bind(vm.prompts)" visible="true"
+										onSelect="@command('selectPrompt', item=self.selectedItem.value)"
+										selectedItem="@load(vm.oprompt)"
+										value="@bind(vm.systems)">
+										<template name="model"
+											var="item">
+											<comboitem
+												value="@load(item)" label="@load(item.prompt)" description="@load(item.descripcion)"/>
+										</template>
+									</combobox>
+								</div>
+								<div class="mb-4">
+									<div class="col-4">
+										<label
+											class="pad-0 leka-label-ftr">
+											Proveedor
+										</label>
+									</div>
+									<combobox mold="rounded"
+										autodrop="true" id="idslprovider" placeholder="Proveedor"
+										model="@bind(vm.providers)" visible="true"
+										onSelect="@command('selectProvider', item=self.selectedItem.value)"
+										selectedItem="@load(vm.oprovider)"
+										value="@bind(vm.provider)">
+										<template name="model"
+											var="item">
+											<comboitem
+												value="@load(item)" label="@load(item.provider)" />
+										</template>
+									</combobox>
+								</div>
+								<div class="mb-4">
+									<div class="col-4">
+										<label
+											class="pad-0 leka-label-ftr">
+											Modelo
+										</label>
+									</div>
+									<combobox mold="rounded"
+										autodrop="true" id="idslmodels" placeholder="Modelos LLM"
+										model="@bind(vm.models)" visible="true"
+										onSelect="@command('selectModel',item=self.selectedItem.value)"
+										selectedItem="@load(vm.omodelo)" value="@bind(vm.model)"
+										class="col-12">
+										<template name="model"
+											var="item">
+											<comboitem
+												value="@load(item)" label="@load(item.model)" />
+										</template>
+									</combobox>
+								</div>
+								<div class="mb-2" id="description">
+									
+								</div>
+								<div class="mb-2">
+									<label
+										class="pad-0 leka-label-ftr">
+										Temperatura
+									</label>
+									<slider id="temperature"
+										width="100%" mode="decimal" step="0.1"
+										curpos="@bind(vm.temperature)" maxpos="1.0" mold="scale" />
+								</div>
+								<div class="mb-2">
+									<label
+										class="pad-0 leka-label-ftr">
+										Max Tokens
+									</label>
+									<slider id="slider4" width="100%"
+										minpos="0" step="50" curpos="@bind(vm.tokens)"
+										maxpos="@bind(vm.maxTokens)" mold="scale" />
+								</div>
+							</div>
+						</drawer>
+					</div>
+				</div>
+				<div class="row">
+				 <panel width="100%" >
+				  <panelchildren>
+				   <hbox spacing="0" width="100%" height="100%">
+					<div class="col-12 mb-10 mb-5">
+						<div class="card cards-mkt-sf">
+							<div class="mkt-dp leka">
+								<div class="row">
+									<div class="chatbot">
+										<div class="chatbot-header">
+											<h:img
+												src="../img/leka-1.png" alt="Chat Icon" />
+											<h:h5>LEKA</h:h5>
+											tokens
+											<label
+												value="@load(vm.inToken)">
+											</label>
+										</div>
+										<div class="chatbot-body">
+											<h:h6>
+												Usa los ejemplos para
+												aprender la ingenieria
+												de prompt
+											</h:h6>
+											<div class="mb-4">
+												<div class="col-4">
+													<label
+														class="pad-0 leka-label-ftr">
+														System Prompt
+													</label>
+												</div>
+												<div class="col-12">
+													<textbox
+														id="systemPrompt" value="@bind(vm.systems)"
+														multiline="true" style="height: 150px;" hflex="1" />
+												</div>
+											</div>
+											<div class="mb-4">
+												<div class="col-4">
+													<label
+														class="pad-0 leka-label-ftr">
+														Ejemplos
+													</label>
+												</div>
+												<combobox mold="rounded"
+													autodrop="true" id="idexamples"
+													placeholder="Ejemplos de prompt" model="@bind(vm.examples)"
+													visible="true"
+													onSelect="@command('selectExample',item=self.selectedItem.value)"
+													selectedItem="@load(vm.oexample)" class="col-12">
+													<template
+														name="model" var="item">
+														<comboitem
+															value="@load(item)" label="@load(item.ejemplo)" />
+													</template>
+												</combobox>
+											</div>
+											
+											<div class="chat-body-up">
+												<hlayout
+													class="b-bot300">
+													<div
+													sclass="chat-container" class="area-msgchat300" vflex="1"
+													style="overflow:auto;">
+													<div id="response2"
+														style="smarkdown-body;">
+													</div>
+
+												</div>
+												</hlayout>
+											</div>
+											<div class="mb-4">
+												<div class="col-4">
+													<label
+														class="pad-0 leka-label-ftr">
+														Usuario
+													</label>
+												</div>
+												<textbox
+													id="messageInput" multiline="true" class="form-control"
+													value="@bind(vm.usuario)" height="100px"
+													onOK="@command('runMessage')" hflex="1" />
+												
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<splitter id="s2" collapse="before"/>
+					<div class="col-12 mb-10 mb-5">
+						<div class="card cards-mkt-sf">
+							<div class="mkt-dp leka">
+								<div class="row">
+									<div class="chatbot">
+										<div class="chatbot-header">
+											<h:h5>Respuesta</h:h5>
+											tokens
+											<label
+												value="@load(vm.outToken)">
+											</label>
+										</div>
+										<div
+											class="chatbot-body chat-text">
+											<hlayout class="b-bot300">
+												<div
+													sclass="chat-container" class="area-msgchat300" vflex="1"
+													style="overflow:auto;">
+													<div id="response"
+														style="smarkdown-body;">
+													</div>
+												</div>
+											</hlayout>
+										</div>
+										<div class="col-4">
+											<a class="link-mkt"
+												label="Añadir mensaje" onClick="@command('addAssistent')" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					</hbox>
+				</panelchildren>
+				</panel>
+				</div>
+			
+			
+			
+			
+			</div>
+		</nodom>
+	</div>
+
+
+</zk>

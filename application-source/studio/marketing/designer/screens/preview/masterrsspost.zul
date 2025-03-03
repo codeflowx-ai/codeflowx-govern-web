@@ -1,0 +1,350 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+<idspace id="rsspost" viewModel="@id('vm') @init('org.suinsit.nocode.web.MasterBeanUI',pagina='rsspost')" validationMessages="@id('vmsgs')">
+	   <space></space>
+	  <custom-attributes pagina="rsspost" />
+	  <custom-attributes enviroment="preview" />
+			<h:div id="notificacion"></h:div>
+			<div class="row">
+			<div class="col-12">
+				<div
+					class="page-title-box d-sm-flex align-items-center justify-content-between">
+					<vbox spacing="3px">
+					<fragment
+						exps="@load(vm.lang.getProperty('rsspost.screen', 'rsspost'))">
+						<![CDATA[ <h4 class="mb-sm-0"
+						textContent='@load(exps)'></h4> ]]>
+					</fragment>
+					    
+					 </vbox>   
+					<h:div class="page-title-right">
+						<h:ol class="breadcrumb m-0">
+							<h:li class="breadcrumb-item">
+								<h:a href="javascript: void(0);">
+									${ds.menu} 
+								</h:a>
+							</h:li>
+							<h:li class="breadcrumb-item active">
+								rsspost
+							</h:li>
+						</h:ol>
+					</h:div>
+				</div>
+			</div>
+		</div>
+			<div class="row">
+					<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+							<button onClick="@command('toSearch')"
+										class="btn btn-light" iconSclass="fa-duotone fa-arrow-left-from-arc" >
+										Volver
+									</button>	
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+								    <button class="btn btn-secondary"
+										iconSclass="fa-duotone fa-paintbrush-fine" onClick="@command('clear')">
+										Limpiar
+									</button>
+									<button class="btn btn-success"
+										iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('store')">
+										Guardar
+									</button>
+									<button
+										class="btn" iconSclass="fa-duotone fa-floppy-disk-circle-arrow-right" onClick="@command('storeNew')">
+										Guardar y Nuevo
+									</button>
+												
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<h:div class="col-lg-12">
+						<h:div class="card">
+							<h:div class="card-body">
+		     <div class="row">
+
+<h:div class="col-lg-8 col-xlg-8 col-md-8">
+  <h:div class="card  shadow-lg" style="overflow:auto;" >
+       <h:div class="card-body ">
+        <h:div class="form-group row ">
+
+
+
+
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('ALTA'))">
+	    <label id="lbALTA" sclass="form-label text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('ALTA.label', 'alta'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_ALTA" />
+	   </hbox>
+    <datebox id="ALTA"  placeholder="@load(vm.lang.getProperty('ALTA.label', 'alta'))" tabindex="1" value="@bind(vm.beanData.alta) @save(vm.beanData.alta, before=('grabar')) "   format="dd/MM/yyyy"  visible="@load(vm.isVisible('ALTA'))" disabled="@load(vm.isEditable('ALTA')?false:true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['ALTA'])"/>
+      </h:div>
+
+
+
+
+
+
+
+
+  <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('PUBLICAR'))">
+	    <label id="lbPUBLICAR" sclass="form-label text-capitalize  font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('PUBLICAR.label', 'publicar'))"/>
+	    <a iconSclass="su-icon su-icon-question" popup="pop_PUBLICAR" />
+	   </hbox>
+    <datebox id="PUBLICAR" cols="20"  tabindex="2" value="@bind(vm.beanData.publicar) @save(vm.beanData.publicar, before=('grabar')) "   format="dd/MM/yy HH:mm" placeholder="@load(vm.lang.getProperty('PUBLICAR.label', 'publicar'))" visible="@load(vm.isVisible('PUBLICAR'))" disabled="@load(vm.isEditable('PUBLICAR')?false:true)"/>
+    <label sclass="text-danger" value="@load(vmsgs['PUBLICAR'])"/>
+    </h:div>
+
+
+
+
+
+
+
+
+   
+    <h:div class="col-md-12">
+       <hbox spacing="3px" visible="@load(vm.isVisible('HASHTAGS'))">
+	    <label id="lbHASHTAGS" sclass="form-label text-capitalize  font-weight-normal align-text-middle" style="  " value="@load(vm.lang.getProperty('HASHTAGS.label', 'hashtags'))"  />
+	   </hbox>
+	   <textbox  tabindex="3" id="HASHTAGS" placeholder="@load(vm.lang.getProperty('HASHTAGS.label', '#hastag1 ,#hashtag2...'))" value="@bind(vm.beanData.hashtags) @save(vm.beanData.hashtags, before=('grabar')) "  sclass="form-control  form-control" visible="@load(vm.isVisible('HASHTAGS'))" disabled="@load(vm.isEditable('HASHTAGS')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['HASHTAGS'])"/>
+    </h:div>   
+
+
+
+
+   <h:div class="col-md-12">
+     <hbox spacing="3px">
+	    <label sclass="form-label font-weight-normal align-text-middle" style="" value="@load(vm.lang.getProperty('POST.label', 'post'))"/>
+	   </hbox>
+	   <textbox rows="4" cols="80" id="985298" multiline="true" placeholder="@load(vm.lang.getProperty('POST.label', 'post'))" value="@bind(vm.beanData.post) @save(vm.beanData.post, before=('grabar')) "  sclass="form-control  form-control" visible="@load(vm.isVisible('POST'))" disabled="@load(vm.isEditable('POST')?false:true)"/>
+       <label sclass="text-danger" value="@load(vmsgs['985298'])"/>  
+</h:div>
+
+
+
+<div class="col-md-6">
+<listbox  checkmark="true"  model="@load(vm.foreings['idmktrssagency'])" height="300px" onCreate="@command('onSubtableCreate',alias='submktrpostagency')" ><listhead><listheader label="NOMBRE"></listheader></listhead> <template name="model" var="item"><listitem value="@load(item)"><listcell label="@load(item.nombre)"></listcell></listitem></template></listbox>
+</div>
+
+
+         </h:div> 
+       </h:div>
+  </h:div>
+ </h:div>  
+          
+                              
+          
+        
+
+
+
+
+<h:div class="col-lg-4 col-xlg-4 col-md-4">
+  <h:div class="card  shadow-lg" style="overflow:auto;" >
+       <h:div class="card-body ">
+        <h:div class="form-group row ">
+FreeMarker template error (DEBUG mode; use RETHROW in production!):
+Can't compare values of these types. Allowed comparisons are between two numbers, two strings, two dates, or two booleans.
+Left hand operand is a string (wrapper: f.t.SimpleScalar).
+Right hand operand is a boolean (wrapper: f.t.TrueTemplateBooleanModel).
+The blamed expression:
+==> file.component.propBeans['btshowlabel'].value=true  [in template "nocode/viewmodel/preview/component/file.ftl" at line 8, column 61]
+
+----
+FTL stack trace ("~" means nesting-related):
+	- Failed at: #if file.component.propBeans["btshowl...  [in template "nocode/viewmodel/preview/component/file.ftl" at line 8, column 1]
+	- Reached through: #include "file.ftl"  [in template "nocode/viewmodel/preview/component/comps.ftl" at line 51, column 20]
+	- Reached through: #include "comps.ftl"  [in template "nocode/viewmodel/preview/component/div_card.ftl" at line 77, column 19]
+	- Reached through: #include "div_card.ftl"  [in template "nocode/viewmodel/preview/component/div.ftl" at line 5, column 5]
+	- Reached through: #include "div.ftl"  [in template "nocode/viewmodel/preview/component/comps.ftl" at line 7, column 19]
+	- Reached through: #include "component/comps.ftl"  [in template "nocode/viewmodel/preview/master.ftl" at line 80, column 22]
+----
+
+Java stack trace (for programmers):
+----
+freemarker.core._MiscTemplateException: [... Exception message was already printed; see it above ...]
+	at freemarker.core.EvalUtil.compare(EvalUtil.java:303)
+	at freemarker.core.EvalUtil.compare(EvalUtil.java:115)
+	at freemarker.core.ComparisonExpression.evalToBoolean(ComparisonExpression.java:78)
+	at freemarker.core.AndExpression.evalToBoolean(AndExpression.java:36)
+	at freemarker.core.IfBlock.accept(IfBlock.java:49)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.include(Environment.java:2925)
+	at freemarker.core.Include.accept(Include.java:171)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.include(Environment.java:2925)
+	at freemarker.core.Include.accept(Include.java:171)
+	at freemarker.core.Environment.visit(Environment.java:370)
+	at freemarker.core.IteratorBlock$IterationContext.executedNestedContentForCollOrSeqListing(IteratorBlock.java:321)
+	at freemarker.core.IteratorBlock$IterationContext.executeNestedContent(IteratorBlock.java:271)
+	at freemarker.core.IteratorBlock$IterationContext.accept(IteratorBlock.java:244)
+	at freemarker.core.Environment.visitIteratorBlock(Environment.java:644)
+	at freemarker.core.IteratorBlock.acceptWithResult(IteratorBlock.java:108)
+	at freemarker.core.IteratorBlock.accept(IteratorBlock.java:94)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.include(Environment.java:2925)
+	at freemarker.core.Include.accept(Include.java:171)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.include(Environment.java:2925)
+	at freemarker.core.Include.accept(Include.java:171)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.include(Environment.java:2925)
+	at freemarker.core.Include.accept(Include.java:171)
+	at freemarker.core.Environment.visit(Environment.java:370)
+	at freemarker.core.IteratorBlock$IterationContext.executedNestedContentForCollOrSeqListing(IteratorBlock.java:321)
+	at freemarker.core.IteratorBlock$IterationContext.executeNestedContent(IteratorBlock.java:271)
+	at freemarker.core.IteratorBlock$IterationContext.accept(IteratorBlock.java:244)
+	at freemarker.core.Environment.visitIteratorBlock(Environment.java:644)
+	at freemarker.core.IteratorBlock.acceptWithResult(IteratorBlock.java:108)
+	at freemarker.core.IteratorBlock.accept(IteratorBlock.java:94)
+	at freemarker.core.Environment.visit(Environment.java:334)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.visit(Environment.java:340)
+	at freemarker.core.Environment.process(Environment.java:313)
+	at freemarker.template.Template.process(Template.java:383)
+	at org.enartframework.suinsit.runtime.ParserByFremarker.parser(ParserByFremarker.java:90)
+	at io.suinsit.architect.zknocode.generator.BuilderPageXspresso.generate(BuilderPageXspresso.java:122)
+	at com.enartsystems.designer.commons.GeneratorNoCode.generate(GeneratorNoCode.java:96)
+	at com.enartsystems.designer.commons.GeneratorNoCode.generatePagePreview(GeneratorNoCode.java:71)
+	at com.enartsystems.designer.ViewModelDesigner.generateSource(ViewModelDesigner.java:592)
+	at com.enartsystems.designer.ViewModelDesigner.onPreview(ViewModelDesigner.java:386)
+	at com.enartsystems.designer.UXDesigner.preview(UXDesigner.java:1479)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:64)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:564)
+	at org.zkoss.bind.impl.ParamCall.call(ParamCall.java:172)
+	at org.zkoss.bind.impl.BinderImpl.handleNotifyChange(BinderImpl.java:1911)
+	at org.zkoss.bind.impl.BinderImpl.doExecute(BinderImpl.java:2080)
+	at org.zkoss.bind.impl.BinderImpl.doCommand(BinderImpl.java:1806)
+	at org.zkoss.bind.impl.BinderImpl.access$1300(BinderImpl.java:137)
+	at org.zkoss.bind.impl.BinderImpl$CommandEventListener.onEvent0(BinderImpl.java:1647)
+	at org.zkoss.bind.impl.BinderImpl$CommandEventListener.onEvent(BinderImpl.java:1600)
+	at org.zkoss.zk.ui.AbstractComponent.onEvent(AbstractComponent.java:3184)
+	at org.zkoss.zk.ui.AbstractComponent.service(AbstractComponent.java:3154)
+	at org.zkoss.zk.ui.AbstractComponent.service(AbstractComponent.java:3096)
+	at org.zkoss.zk.ui.impl.EventProcessor.process(EventProcessor.java:138)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.processEvent(UiEngineImpl.java:1890)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.process(UiEngineImpl.java:1662)
+	at org.zkoss.zk.ui.impl.UiEngineImpl.execUpdate(UiEngineImpl.java:1329)
+	at org.zkoss.zk.au.http.DHtmlUpdateServlet.process(DHtmlUpdateServlet.java:570)
+	at org.zkoss.zk.au.http.DHtmlUpdateServlet.doGet(DHtmlUpdateServlet.java:450)
+	at org.zkoss.zk.au.http.DHtmlUpdateServlet.doPost(DHtmlUpdateServlet.java:458)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:517)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:584)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:799)
+	at org.eclipse.jetty.servlet.ServletHandler$ChainEnd.doFilter(ServletHandler.java:1656)
+	at org.eclipse.jetty.websocket.server.WebSocketUpgradeFilter.doFilter(WebSocketUpgradeFilter.java:292)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:337)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:115)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:81)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:122)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:126)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:81)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:109)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:149)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:223)
+	at org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter.doFilter(AbstractAuthenticationProcessingFilter.java:217)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:103)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:89)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:112)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:82)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:55)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:346)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:221)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:186)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:354)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:267)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.springframework.boot.actuate.metrics.web.servlet.WebMvcMetricsFilter.doFilterInternal(WebMvcMetricsFilter.java:96)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:117)
+	at org.eclipse.jetty.servlet.FilterHolder.doFilter(FilterHolder.java:193)
+	at org.eclipse.jetty.servlet.ServletHandler$Chain.doFilter(ServletHandler.java:1626)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:552)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
+	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:600)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:235)
+	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1624)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:233)
+	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1440)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:188)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:505)
+	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1594)
+	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:186)
+	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1355)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:127)
+	at org.eclipse.jetty.server.Server.handle(Server.java:516)
+	at org.eclipse.jetty.server.HttpChannel.lambda$handle$1(HttpChannel.java:487)
+	at org.eclipse.jetty.server.HttpChannel.dispatch(HttpChannel.java:732)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:479)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:277)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:311)
+	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:105)
+	at org.eclipse.jetty.io.ChannelEndPoint$1.run(ChannelEndPoint.java:104)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.runTask(EatWhatYouKill.java:338)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:315)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.tryProduce(EatWhatYouKill.java:173)
+	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:131)
+	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:409)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:883)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$Runner.run(QueuedThreadPool.java:1034)
+	at java.base/java.lang.Thread.run(Thread.java:832)
