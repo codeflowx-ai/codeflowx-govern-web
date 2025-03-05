@@ -94,6 +94,7 @@
 								</div>
 							</div>
 						</div>
+						<!-- 
 						<div class="col-4">
 							<div class="row">
 								<div class="col-3 mb-4">
@@ -112,7 +113,6 @@
 											</auxheader>
 										</auxhead>
 										<listhead>
-
 											<listheader
 												label="Fabricante" width="100px" />
 											<listheader label="Modelo"
@@ -126,6 +126,7 @@
 											var="item">
 											<listitem
 												value="@load(item)">
+
 												<listcell>
 													<image
 														content="@load(vm.getImage(item,'avatar'))" width="70%"
@@ -150,6 +151,52 @@
 
 							</div>
 
+						</div>-->
+						
+						<div class="col-4">
+							<div class="row">
+								<div class="col-3 mb-4">
+									<label
+										class="pad-0 leka-label-ftr">
+										Modelo
+									</label>
+									<listbox model="@bind(vm.models)"
+									    visible="true"
+									    height="500px;"
+									    width="400px;"
+									    mold="paging"
+									    onSelect="@command('selectModel', item=self.selectedItem.value)"
+									    selectedItem="@bind(vm.omodelo)">
+									    
+									    <auxhead>
+									        <auxheader colspan="5">Modelos</auxheader>
+									    </auxhead>
+									    
+									    <listhead>
+									        <listheader label="" width="50px" />
+									        <listheader label="Fabricante" width="100px" />
+									        <listheader label="Modelo" width="100px" />
+									        <listheader label="Image" width="55px" />
+									        <listheader label="Video" width="55px" />
+									    </listhead>
+									
+									    <template name="model" var="item">
+									        <listitem value="@load(item)" selected="@bind(vm.omodelo eq item)">
+									            <listcell>
+									                <checkbox checked="@bind(vm.omodelo eq item)" 
+									                    onCheck="@command('selectModel', item=self.selectedItem.value)" />
+									            </listcell>
+									            <listcell>
+									                <image content="@load(vm.getImage(item,'avatar'))" width="70%" height="70%"></image>
+									            </listcell>
+									            <listcell label="@load(item.alias)" />
+									            <listcell label="@load(item.image) @converter(vm.fieldConverter)" />
+									            <listcell label="@load(item.video) @converter(vm.fieldConverter)" />
+									        </listitem>
+									    </template>
+									</listbox>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
