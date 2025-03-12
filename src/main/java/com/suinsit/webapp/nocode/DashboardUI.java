@@ -447,14 +447,15 @@ public class DashboardUI extends MasterHandler {
 			query = QueryBuilder.buildQueryWithLeftJoin(e, lforeins, lfields.toArray(new String[lfields.size()]));
 			sapps = new ArrayList();
 			apps = new ArrayList();
-			dao.query(portalapp, new DataScroll(), query, criterias).getDataList().forEach(ob -> {
-				if (!sapps.contains(getNested(ob, "idssoaplicacion.namespace").toString())) {
+			List<?> tmp = dao.query(portalapp, new DataScroll(), query, criterias).getDataList();
+			tmp.forEach(ob -> {
+		//		if (!sapps.contains(getNested(ob, "idssoaplicacion.namespace").toString())) {
 					String portal = (String) getNested(ob, "idssoportal.aplicacion");
 					if (ctxBean.getApplicationName().equalsIgnoreCase(portal)) {
 						sapps.add(getNested(ob, "idssoaplicacion.namespace").toString());
 						apps.add(getNested(ob, "idssoaplicacion"));
 					}
-				}
+		//		}
 			});
 		} catch (Exception e) {
 			log.debug("NO IMPLEMENTADA LA SEGURIDAD DE PORTALES");
