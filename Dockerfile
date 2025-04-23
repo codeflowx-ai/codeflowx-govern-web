@@ -1,4 +1,4 @@
-FROM 2w1x0a76.gra7.container-registry.ovh.net/suinsit-proyect/jetty:10.1
+FROM suinsit/jetty-10-es
 EXPOSE 8080/tcp
 ADD target/suinsit-nova-1.2.23 /var/lib/jetty/webapps/ROOT
 ADD ROOT.xml /var/lib/jetty/webapps/ROOT.xml 

@@ -1,0 +1,137 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nova-app
+  namespace: suinsit-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nova-app
+  template:
+    metadata:
+      labels:
+        app: nova-app
+
+    spec:
+      serviceAccountName: suinsit-app-sa  # Añadir esta línea
+      containers:
+      - name: nova-app
+        image: suinsit/suinsit-nova-web:1.0.0
+        env:
+        - name: JAVA_OPTIONS
+          value: "-Xms256m -Xmx4048m -XX:+UseG1GC"
+        - name: SPRING_CLOUD_KUBERNETES_ENABLED
+          value: "false"
+        - name: SPRING_CLOUD_KUBERNETES_CONFIG_NAME
+          value: "suinsit-database-config"
+        - name: SPRING_CLOUD_KUBERNETES_CONFIG_NAMESPACE
+          value: "suinsit-platform" 
+        - name: APPLICATION_CONTEXT
+          value: "demo"
+        - name: SPRING_PROFILES_ACTIVE
+          value: "pro"
+        - name: SUINSIT_BBDD_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: username
+        - name: SUINSIT_BBDD_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: database-credentials
+              key: password
+        - name: SUINSIT_BBDD_URL
+          value: jdbc:postgresql://postgres-master.postgres-ha.svc.cluster.local:5432/suinsit_gov_db      
+        - name: AMQ_USER
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: username
+        - name: AMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: rabbit-credentials
+              key: password
+        - name: SUINSIT_CUSTOMER_NAME
+          value: "leka"
+        - name: SUINSIT_CUSTOMER_UID
+          value: "123456"         
+        - name: SUINSIT_CUSTOMER_LABEL
+          value: "Nova Enartsystems"     
+        - name: AMQ_HOST   
+          value: "rabbitmq.rabbitmq.svc.cluster.local"
+        - name: AMQ_PORT
+          value: "5672"
+        - name: SUINLESS_ENDPOINT
+          value: "http://suinsit-suinles.suinsit-leka.svc.cluster.local/v1"
+        - name:  ROOT_LOG
+          value: "INFO"   
+        - name:  TECHNICAL_LOG
+          value: "INFO"
+        - name:  MEMORY_LOG
+          value: "INFO"    
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace  
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "50m"
+          limits:
+            memory: "4048Mi"
+            cpu: "2000m"
+        ports:
+        - containerPort: 8080
+        
+    
+      imagePullSecrets:
+      - name: regcred
+ 
+  
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nova-apps
+  namespace: suinsit-platform
+spec:
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: nova-app  # Cambiado para que coincida con el label del deployment
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: suinsit-nova
+  namespace: suinsit-platform
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    cert-manager.io/duration: 8760h
+    cert-manager.io/renew-before: 4368h
+    external-dns.alpha.kubernetes.io/hostname: nova.suinsit.local
+    external-dns.alpha.kubernetes.io/ttl: "10"
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    # Añadir esta anotación para evitar el problema del webhook
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+spec:
+  ingressClassName: nginx-web-dev
+  
+  rules:
+  - host: nova.suinsit.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nova-apps
+            port: 
+              number: 80            
