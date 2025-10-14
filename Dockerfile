@@ -1,6 +1,6 @@
 FROM suinsit/jetty-10-es
 EXPOSE 8080/tcp
-ADD target/suinsit-nova-1.2.23 /var/lib/jetty/webapps/ROOT
+ADD target/suinsit-nova-1.2.24 /var/lib/jetty/webapps/ROOT
 ADD ROOT.xml /var/lib/jetty/webapps/ROOT.xml 
 #ADD target/*.* /opt/webapps/ROOT.war
 COPY application-source/apps /opt/suinsit/apps

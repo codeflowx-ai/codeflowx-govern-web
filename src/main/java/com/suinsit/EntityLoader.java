@@ -1,15 +1,7 @@
 
 package com.suinsit;
 
-import java.io.File;
-import java.util.Arrays;
-
-import org.enartframework.suinsit.config.Configuration;
 import org.enartframework.suinsit.config.SchemaBD;
-
-import com.enartsystems.mapping.BuilderDataBase;
-
-import suincode.platform.NoCodeAutoGenerator;
 
 public class EntityLoader {
 	SchemaBD schemaBD = new SchemaBD();
@@ -73,22 +65,22 @@ public class EntityLoader {
 
 	public void generate(String[] entityClasses) {
 
-		NoCodeAutoGenerator ncg = new NoCodeAutoGenerator();
-		schemaBD.setDriver("org.postgresql.Driver");
-		schemaBD.setUrl("jdbc:postgresql://localhost:61931/leka_db");
-		schemaBD.setUser("leka_user");
-		schemaBD.setPassword("MWYyZDFlMmU2N2Rm");
-		Configuration configuration = new Configuration(
-				new File("C:\\Users\\ManuelGonzalez\\git\\suinsit-platform-source\\architectures\\suinsit-nocode"));
-		configuration.loadDatabase(true);
-		// configuration.loadDesktopBean(true);
-		configuration.loadLyout(true);
-		configuration.loadToolkit(true);
-		// configuration.loadUIDesigner(true);
-		configuration.loadGenerador(true);
-		ncg.init(configuration, schemaBD,
-				"C:\\Users\\ManuelGonzalez\\git\\suinsit-platform-projects\\suinlesbasic\\application-source\\data\\model");
-		ncg.testImport(entityClasses);
+//		NoCodeAutoGenerator ncg = new NoCodeAutoGenerator();
+//		schemaBD.setDriver("org.postgresql.Driver");
+//		schemaBD.setUrl("jdbc:postgresql://localhost:61931/leka_db");
+//		schemaBD.setUser("leka_user");
+//		schemaBD.setPassword("MWYyZDFlMmU2N2Rm");
+//		Configuration configuration = new Configuration(
+//				new File("C:\\Users\\ManuelGonzalez\\git\\suinsit-platform-source\\architectures\\suinsit-nocode"));
+//		configuration.loadDatabase(true);
+//		// configuration.loadDesktopBean(true);
+//		configuration.loadLyout(true);
+//		configuration.loadToolkit(true);
+//		// configuration.loadUIDesigner(true);
+//		configuration.loadGenerador(true);
+//		ncg.init(configuration, schemaBD,
+//				"C:\\Users\\ManuelGonzalez\\git\\suinsit-platform-projects\\suinlesbasic\\application-source\\data\\model");
+//		ncg.testImport(entityClasses);
 		
 		//ncg.processImport();
 	}

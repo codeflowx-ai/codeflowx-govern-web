@@ -23,10 +23,30 @@ suinsit:
     deploy: /opt/suinsit/apps
   application:
      version: ${SUINSIT_PRODUCTO_VERSION:0.0.1}
-     product: leka-web
+     product: suinsit-nova
+     name: nova
      mode: ${SUINSIT_PRODUCTO_LICENCE:PROFESIONAL}
      server:
        host: ${SUINSIT_SERVER:https://console.suinsit.ai}
+     micros:
+       suinless:
+         baseUrl: http://suinsit-suinles.suinsit-nova.svc.cluster.local/v1
+         paths:
+          rule-designer: /evalAI/ruleDesigner
+          documen-designer: /evalAI/documenDesigner
+          eval-text: /evalAI/evalText
+          traslator: /evalAI/traslate
+          extractor: /evalAI/extracte
+          defineWithXML: /evalAI/defineWithXML
+          assistant: /evalAI/assistant
+          ptraining: /message
+          pimage: /image
+          chat:  /chat/stream 
+          chatImage: /messageImage
+       security:
+         baseUrl: http://localhost:9000/v1/
+         paths:
+           licence: /licence/{customerID}  
 server:
      port: 8080
      
