@@ -1,0 +1,178 @@
+package com.codeflowx.govern.workflow.drools
+
+import com.codeflowx.govern.workflow.drools.facts.AgentApprovalFact
+
+// =====================================================
+// DROOLS RULES: Agent Approval Scoring
+// =====================================================
+// Proceso: agent-approval-v3
+// Fact: AgentApprovalFact
+// Output: decision, minScore, confidenceLevel, justification
+// =====================================================
+
+// ===== REGLA 1: AUTO APPROVE - Todos los scores altos =====
+rule "Auto Approve - All High Scores"
+    salience 100
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 85,
+            complianceScore >= 85,
+            ethicsScore >= 85,
+            compliant == true
+        )
+    then
+        $fact.setDecision("AUTO_APPROVE");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.95);
+        $fact.setJustification("All scores above 85 and compliant. Auto-approved.");
+        
+        System.out.println("✅ Drools: AUTO_APPROVE - Risk: " + $fact.getRiskScore() + 
+                          ", Compliance: " + $fact.getComplianceScore() + 
+                          ", Ethics: " + $fact.getEthicsScore());
+end
+
+// ===== REGLA 2: AUTO REJECT - Score crítico bajo =====
+rule "Auto Reject - Critical Low Score"
+    salience 90
+    when
+        $fact : AgentApprovalFact(
+            riskScore < 50 || complianceScore < 50 || ethicsScore < 50
+        )
+    then
+        $fact.setDecision("AUTO_REJECT");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.92);
+        $fact.setJustification("One or more critical scores below 50. Auto-rejected for safety.");
+        
+        System.out.println("❌ Drools: AUTO_REJECT - Min score: " + $fact.getMinScore() + " (critical)");
+end
+
+// ===== REGLA 3: AUTO REJECT - No compliant =====
+rule "Auto Reject - Non Compliant"
+    salience 85
+    when
+        $fact : AgentApprovalFact(
+            compliant == false
+        )
+    then
+        $fact.setDecision("AUTO_REJECT");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.98);
+        $fact.setJustification("Agent does not meet compliance requirements. Auto-rejected.");
+        
+        System.out.println("❌ Drools: AUTO_REJECT - Non compliant");
+end
+
+// ===== REGLA 4: HITL - Score borderline bajo =====
+rule "HITL Required - Low Borderline"
+    salience 70
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 50, riskScore < 70,
+            complianceScore >= 50, complianceScore < 70,
+            ethicsScore >= 50, ethicsScore < 70,
+            compliant == true
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.65);
+        $fact.setJustification("All scores in low borderline range (50-70). Human review recommended.");
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Low borderline: " + $fact.getMinScore());
+end
+
+// ===== REGLA 5: HITL - Score borderline medio =====
+rule "HITL Required - Medium Borderline"
+    salience 75
+    when
+        $fact : AgentApprovalFact(
+            $avgScore : calculateAvgScore() >= 60, calculateAvgScore() < 85,
+            compliant == true
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.75);
+        $fact.setJustification("Average score in borderline range (60-85). Human oversight required. Avg: " + String.format("%.1f", $avgScore));
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Medium borderline, avg: " + $avgScore);
+end
+
+// ===== REGLA 6: HITL - Ethics score bajo pero otros OK =====
+rule "HITL Required - Ethics Concern"
+    salience 80
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 75,
+            complianceScore >= 75,
+            ethicsScore >= 50, ethicsScore < 75,
+            compliant == true
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.getEthicsScore());
+        $fact.setConfidenceLevel(0.70);
+        $fact.setJustification("Risk and Compliance OK, but Ethics score needs human review (" + $fact.getEthicsScore() + ").");
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Ethics concern: " + $fact.getEthicsScore());
+end
+
+// ===== REGLA 7: HITL - Risk score bajo pero otros OK =====
+rule "HITL Required - Risk Concern"
+    salience 80
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 50, riskScore < 75,
+            complianceScore >= 75,
+            ethicsScore >= 75,
+            compliant == true
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.getRiskScore());
+        $fact.setConfidenceLevel(0.70);
+        $fact.setJustification("Compliance and Ethics OK, but Risk score needs human review (" + $fact.getRiskScore() + ").");
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Risk concern: " + $fact.getRiskScore());
+end
+
+// ===== REGLA 8: HITL - Compliance score bajo pero otros OK =====
+rule "HITL Required - Compliance Concern"
+    salience 80
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 75,
+            complianceScore >= 50, complianceScore < 75,
+            ethicsScore >= 75,
+            compliant == true
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.getComplianceScore());
+        $fact.setConfidenceLevel(0.70);
+        $fact.setJustification("Risk and Ethics OK, but Compliance score needs human review (" + $fact.getComplianceScore() + ").");
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Compliance concern: " + $fact.getComplianceScore());
+end
+
+// ===== REGLA 9: FALLBACK - Si ninguna regla aplica, HITL por seguridad =====
+rule "HITL Required - Default Fallback"
+    salience 10
+    when
+        $fact : AgentApprovalFact(
+            decision == null
+        )
+    then
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.50);
+        $fact.setJustification("No clear decision criteria met. Human review required by default.");
+        
+        System.out.println("⚠️ Drools: HITL_REQUIRED - Fallback (no rule matched)");
+end
+
+// =====================================================
+// FIN DE REGLAS
+// =====================================================
+

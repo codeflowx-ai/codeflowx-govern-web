@@ -1,0 +1,1217 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.RunDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Run" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveRun')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Runuuid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Runuuid *" />
+														<textbox tabindex="2" id="trnrunuuid"
+															value="@bind(vm.currentRun.trnrunuuid)"
+															maxlength="64"
+															constraint="no empty: max 64" />
+														<label sclass="text-danger" value="@load(vmsgs['trnrunuuid'])" />
+													</div>
+												</div>
+											</div>											<!-- Runname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Runname" />
+														<textbox tabindex="3" id="trnrunname"
+															value="@bind(vm.currentRun.trnrunname) @save(vm.currentRun.trnrunname, before=('saveItem')) @validator(vm.unique, field='TRNRUNNAME', required=false, oldValue=vm.originalTrnrunname)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['trnrunname'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Userid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Userid" />
+														<textbox tabindex="4" id="trnuserid"
+															value="@bind(vm.currentRun.trnuserid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnuserid'])" />
+													</div>
+												</div>
+											</div>											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="5" id="trnstatus"
+															selectedItem="@bind(vm.currentRun.trnstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trnstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Starttime -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Starttime *" />
+														<textbox tabindex="6" id="trnstarttime"
+															value="@bind(vm.currentRun.trnstarttime)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trnstarttime'])" />
+													</div>
+												</div>
+											</div>											<!-- Endtime -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Endtime" />
+														<textbox tabindex="7" id="trnendtime"
+															value="@bind(vm.currentRun.trnendtime)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnendtime'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Artifact Uri -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Artifact Uri" />
+														<textbox tabindex="8" id="trnartifacturi"
+															value="@bind(vm.currentRun.trnartifacturi)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trnartifacturi'])" />
+													</div>
+												</div>
+											</div>											<!-- Lifecyclestage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lifecyclestage *" />
+														<textbox tabindex="9" id="trnlifecyclestage"
+															value="@bind(vm.currentRun.trnlifecyclestage)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trnlifecyclestage'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Tag S -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tag S" />
+														<div class="input-group">
+															<textbox value="@bind(vm.newTrntags)"
+																placeholder="Añadir tag s"
+																onOK="@command('addTrntags')" />
+															<button onClick="@command('addTrntags')"
+																iconSclass="fa-plus" />
+														</div>
+														<div class="mt-2">
+															<forEach items="@load(vm.selectedTrntagss)" var="tag">
+																<span class="badge bg-primary me-1">
+																	<label value="@load(tag)" />
+																	<a onClick="@command('removeTrntags', tag=tag)"
+																		iconSclass="fa-times" class="ms-1" />
+																</span>
+															</forEach>
+														</div>
+														<label sclass="text-danger" value="@load(vmsgs['trntags'])" />
+													</div>
+												</div>
+											</div>											<!-- Metadata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metadata" />
+														<textbox tabindex="11" id="trnmetadata"
+															value="@bind(vm.currentRun.trnmetadata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnmetadata'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Governance Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Governance Status" />
+														<combobox tabindex="12" id="trngovernancestatus"
+															selectedItem="@bind(vm.currentRun.trngovernancestatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trngovernancestatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Approval Date -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approval Date" />
+														<textbox tabindex="13" id="trnapprovaldate"
+															value="@bind(vm.currentRun.trnapprovaldate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnapprovaldate'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Approvedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approvedby" />
+														<textbox tabindex="14" id="trnapprovedby"
+															value="@bind(vm.currentRun.trnapprovedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnapprovedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Rejectionreason -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rejectionreason" />
+														<textbox tabindex="15" id="trnrejectionreason"
+															value="@bind(vm.currentRun.trnrejectionreason)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnrejectionreason'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Compliance Checks -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Compliance Checks" />
+														<textbox tabindex="16" id="trncompliancechecks"
+															value="@bind(vm.currentRun.trncompliancechecks)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trncompliancechecks'])" />
+													</div>
+												</div>
+											</div>											<!-- Bias Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Score" />
+														<textbox tabindex="17" id="trnbiasscore"
+															value="@bind(vm.currentRun.trnbiasscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnbiasscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Securityscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Securityscore" />
+														<textbox tabindex="18" id="trnsecurityscore"
+															value="@bind(vm.currentRun.trnsecurityscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnsecurityscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Gitrepo -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitrepo" />
+														<textbox tabindex="19" id="trngitrepo"
+															value="@bind(vm.currentRun.trngitrepo)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitrepo'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Gitcommithash -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitcommithash" />
+														<textbox tabindex="20" id="trngitcommithash"
+															value="@bind(vm.currentRun.trngitcommithash)"
+															maxlength="40"
+															constraint="max 40" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitcommithash'])" />
+													</div>
+												</div>
+											</div>											<!-- Gitbranch -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitbranch" />
+														<textbox tabindex="21" id="trngitbranch"
+															value="@bind(vm.currentRun.trngitbranch)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitbranch'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Runtype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Runtype" />
+														<combobox tabindex="22" id="trnruntype"
+															selectedItem="@bind(vm.currentRun.trnruntype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trnruntype'])" />
+													</div>
+												</div>
+											</div>											<!-- Hierarchylevel -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Hierarchylevel" />
+														<textbox tabindex="23" id="trnhierarchylevel"
+															value="@bind(vm.currentRun.trnhierarchylevel)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnhierarchylevel'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Hierarchypath -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Hierarchypath" />
+														<textbox tabindex="24" id="trnhierarchypath"
+															value="@bind(vm.currentRun.trnhierarchypath)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trnhierarchypath'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="25" id="trncreatedat"
+															value="@bind(vm.currentRun.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At *" />
+														<textbox tabindex="26" id="trnupdatedat"
+															value="@bind(vm.currentRun.trnupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trnupdatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrncheckpoints -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrncheckpoints" />
+														<textbox tabindex="27" id="subtrncheckpoints"
+															value="@bind(vm.currentRun.subtrncheckpoints)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrncheckpoints'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrnenvironments -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnenvironments" />
+														<textbox tabindex="28" id="subtrnenvironments"
+															value="@bind(vm.currentRun.subtrnenvironments)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnenvironments'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrnhpotrials -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnhpotrials" />
+														<textbox tabindex="29" id="subtrnhpotrials"
+															value="@bind(vm.currentRun.subtrnhpotrials)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnhpotrials'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrnmetricseries -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnmetricseries" />
+														<textbox tabindex="30" id="subtrnmetricseries"
+															value="@bind(vm.currentRun.subtrnmetricseries)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnmetricseries'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrnmetricstreams -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnmetricstreams" />
+														<textbox tabindex="31" id="subtrnmetricstreams"
+															value="@bind(vm.currentRun.subtrnmetricstreams)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnmetricstreams'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrnparams -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnparams" />
+														<textbox tabindex="32" id="subtrnparams"
+															value="@bind(vm.currentRun.subtrnparams)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnparams'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrnruns -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrnruns" />
+														<textbox tabindex="33" id="subtrnruns"
+															value="@bind(vm.currentRun.subtrnruns)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrnruns'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrntags -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrntags" />
+														<div class="input-group">
+															<textbox value="@bind(vm.newSubtrntags)"
+																placeholder="Añadir subtrntags"
+																onOK="@command('addSubtrntags')" />
+															<button onClick="@command('addSubtrntags')"
+																iconSclass="fa-plus" />
+														</div>
+														<div class="mt-2">
+															<forEach items="@load(vm.selectedSubtrntagss)" var="tag">
+																<span class="badge bg-primary me-1">
+																	<label value="@load(tag)" />
+																	<a onClick="@command('removeSubtrntags', tag=tag)"
+																		iconSclass="fa-times" class="ms-1" />
+																</span>
+															</forEach>
+														</div>
+														<label sclass="text-danger" value="@load(vmsgs['subtrntags'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrntrainingalerts -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrntrainingalerts" />
+														<textbox tabindex="35" id="subtrntrainingalerts"
+															value="@bind(vm.currentRun.subtrntrainingalerts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrntrainingalerts'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrntrainingartifacts -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrntrainingartifacts" />
+														<textbox tabindex="36" id="subtrntrainingartifacts"
+															value="@bind(vm.currentRun.subtrntrainingartifacts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrntrainingartifacts'])" />
+													</div>
+												</div>
+											</div>											<!-- Subtrntraininglogs -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrntraininglogs" />
+														<textbox tabindex="37" id="subtrntraininglogs"
+															value="@bind(vm.currentRun.subtrntraininglogs)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrntraininglogs'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subtrntrainingmetrics -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subtrntrainingmetrics" />
+														<textbox tabindex="38" id="subtrntrainingmetrics"
+															value="@bind(vm.currentRun.subtrntrainingmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subtrntrainingmetrics'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subtrncheckpoints" onSelect="@command('onSelectCheckpointTab')" />
+												<tab label="Subtrnenvironments" onSelect="@command('onSelectEnvironmentTab')" />
+												<tab label="Subtrnhpotrials" onSelect="@command('onSelectHPOTrialTab')" />
+												<tab label="Subtrnmetricseries" onSelect="@command('onSelectMetricSeriesTab')" />
+												<tab label="Subtrnmetricstreams" onSelect="@command('onSelectMetricStreamTab')" />
+												<tab label="Subtrnparams" onSelect="@command('onSelectParamTab')" />
+												<tab label="Subtrnruns" onSelect="@command('onSelectRunTab')" />
+												<tab label="Subtrntags" onSelect="@command('onSelectTagTab')" />
+												<tab label="Subtrntrainingalerts" onSelect="@command('onSelectTrainingAlertTab')" />
+												<tab label="Subtrntrainingartifacts" onSelect="@command('onSelectTrainingArtifactTab')" />
+												<tab label="Subtrntraininglogs" onSelect="@command('onSelectTrainingLogTab')" />
+												<tab label="Subtrntrainingmetrics" onSelect="@command('onSelectTrainingMetricTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subtrncheckpoints -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrncheckpoints"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalCheckpoints)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrncheckpoints)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrncheckpoints)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrncheckpoints registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnenvironments -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnenvironments"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalEnvironments)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnenvironments)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnenvironments)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnenvironments registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnhpotrials -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnhpotrials"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalHPOTrials)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnhpotrials)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnhpotrials)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnhpotrials registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnmetricseries -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnmetricseries"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalMetricSeriess)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnmetricseries)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnmetricseries)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnmetricseries registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnmetricstreams -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnmetricstreams"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalMetricStreams)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnmetricstreams)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnmetricstreams)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnmetricstreams registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnparams -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnparams"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalParams)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnparams)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnparams)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnparams registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrnruns -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrnruns"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalRuns)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrnruns)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrnruns)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrnruns registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrntags -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrntags"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalTags)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrntags)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrntags)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrntags registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrntrainingalerts -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrntrainingalerts"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalTrainingAlerts)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrntrainingalerts)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrntrainingalerts)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrntrainingalerts registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrntrainingartifacts -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrntrainingartifacts"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalTrainingArtifacts)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrntrainingartifacts)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrntrainingartifacts)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrntrainingartifacts registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrntraininglogs -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrntraininglogs"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalTrainingLogs)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrntraininglogs)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrntraininglogs)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrntraininglogs registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subtrntrainingmetrics -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subtrntrainingmetrics"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalTrainingMetrics)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subtrntrainingmetrics)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subtrntrainingmetrics)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subtrntrainingmetrics registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

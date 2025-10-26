@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="📄 Document Upload - AI Playground" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.DocumentUploadViewModel')">
+        
+        <style>
+            .upload-zone {
+                border: 3px dashed #007bff;
+                border-radius: 10px;
+                padding: 40px;
+                text-align: center;
+                background-color: #f8f9fa;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+            .upload-zone:hover {
+                background-color: #e9ecef;
+                border-color: #0056b3;
+            }
+            .file-card {
+                border: 1px solid #dee2e6;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 10px 0;
+                background: white;
+            }
+            .option-panel {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 20px 0;
+            }
+            .progress-section {
+                padding: 20px;
+                background: #e7f3ff;
+                border-radius: 8px;
+                margin: 20px 0;
+            }
+        </style>
+        
+        <!-- Header -->
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout>
+                <label value="📄 Document Upload" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Upload documents for AI-powered processing and extraction" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Upload Zone -->
+        <div sclass="upload-zone" visible="@load(empty vm.selectedFiles)">
+            <vlayout>
+                <label value="📁" style="font-size: 64px;"/>
+                <label value="Drag and drop files here" style="font-size: 20px; font-weight: bold; margin-top: 20px;"/>
+                <label value="or click to browse" style="font-size: 14px; color: #666; margin-top: 10px;"/>
+                <label value="Supported: PDF, Word, PowerPoint, Excel, TXT, MD (Max 20 files, 50MB each)" 
+                       style="font-size: 12px; color: #999; margin-top: 10px;"/>
+                
+                <button label="Select Files" upload="true,maxsize=-1,multiple=true,native"
+                        onUpload="@command('onFileUpload', event=event)"
+                        iconSclass="z-icon-upload" style="margin-top: 20px;" width="200px" height="40px"/>
+            </vlayout>
+        </div>
+        
+        <!-- Files List -->
+        <groupbox visible="@load(not empty vm.selectedFiles)" closable="false">
+            <caption label="Selected Files (@load(vm.selectedFiles.size()))">
+                <toolbar align="end">
+                    <button label="Clear All" onClick="@command('clearFiles')" 
+                            disabled="@load(vm.processing)" iconSclass="z-icon-trash"/>
+                    <button label="Add More" upload="true,maxsize=-1,multiple=true,native"
+                            onUpload="@command('onFileUpload', event=event)"
+                            disabled="@load(vm.processing)" iconSclass="z-icon-plus"/>
+                </toolbar>
+            </caption>
+            
+            <vlayout spacing="10px">
+                <div sclass="file-card" forEach="@load(vm.selectedFiles)" children="@load(each)">
+                    <hlayout valign="middle">
+                        <!-- File Icon -->
+                        <label value="📄" style="font-size: 32px; margin-right: 15px;"/>
+                        
+                        <!-- File Info -->
+                        <vlayout hflex="1">
+                            <label value="@load(each.filename)" style="font-weight: bold; font-size: 16px;"/>
+                            <hlayout spacing="15px">
+                                <label value="@load(each.fileType.toUpperCase())" 
+                                       style="color: #007bff; font-size: 12px; font-weight: bold;"/>
+                                <label value="@load(vm.formatFileSize(each.fileSize))" 
+                                       style="color: #666; font-size: 12px;"/>
+                                <label value="@load(each.status)" 
+                                       style="@load(each.status eq 'Completado' ? 'color: green;' : 'color: orange;')"/>
+                            </hlayout>
+                        </vlayout>
+                        
+                        <!-- Remove Button -->
+                        <button label="Remove" onClick="@command('removeFile', file=each)"
+                                disabled="@load(vm.processing)" iconSclass="z-icon-times"
+                                style="background-color: #dc3545; color: white;"/>
+                    </hlayout>
+                </div>
+            </vlayout>
+        </groupbox>
+        
+        <!-- Processing Options -->
+        <groupbox visible="@load(not empty vm.selectedFiles)" closable="false" sclass="option-panel">
+            <caption label="Processing Options"/>
+            
+            <grid>
+                <columns>
+                    <column width="200px"/>
+                    <column/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="Preserve Format:"/>
+                        <checkbox checked="@bind(vm.preserveFormat)" disabled="@load(vm.processing)">
+                            <attribute name="label">Keep original document formatting</attribute>
+                        </checkbox>
+                    </row>
+                    <row>
+                        <label value="Extract Tables:"/>
+                        <checkbox checked="@bind(vm.extractTables)" disabled="@load(vm.processing)">
+                            <attribute name="label">Extract tables as structured data</attribute>
+                        </checkbox>
+                    </row>
+                    <row>
+                        <label value="Extract Images:"/>
+                        <checkbox checked="@bind(vm.extractImages)" disabled="@load(vm.processing)">
+                            <attribute name="label">Extract images with metadata</attribute>
+                        </checkbox>
+                    </row>
+                    <row>
+                        <label value="Consolidation Strategy:" visible="@load(vm.selectedFiles.size() > 1)"/>
+                        <combobox value="@bind(vm.consolidationStrategy)" disabled="@load(vm.processing)"
+                                  visible="@load(vm.selectedFiles.size() > 1)" width="200px">
+                            <comboitem label="Concatenate" value="concat"/>
+                            <comboitem label="Summarize" value="summarize"/>
+                            <comboitem label="Merge by Topic" value="topic"/>
+                        </combobox>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+        
+        <!-- Progress Section -->
+        <div sclass="progress-section" visible="@load(vm.processing)">
+            <vlayout>
+                <label value="Processing documents..." style="font-weight: bold; font-size: 16px; margin-bottom: 10px;"/>
+                <progressmeter value="@load(vm.uploadProgress)" width="100%"/>
+                <label value="@load(vm.statusMessage)" style="margin-top: 10px; color: #666;"/>
+            </vlayout>
+        </div>
+        
+        <!-- Status Message -->
+        <hlayout style="padding: 15px; background: #fff3cd; border-radius: 8px; margin: 20px 0;" 
+                 visible="@load(not empty vm.statusMessage and not vm.processing)">
+            <label value="@load(vm.statusMessage)" style="font-size: 14px;"/>
+        </hlayout>
+        
+        <!-- Job ID Display -->
+        <hlayout style="padding: 15px; background: #d4edda; border-radius: 8px; margin: 20px 0;" 
+                 visible="@load(not empty vm.jobId)">
+            <label value="Job ID: @load(vm.jobId)" style="font-weight: bold; color: #155724;"/>
+            <space/>
+            <button label="View Progress" iconSclass="z-icon-eye" 
+                    style="background-color: #28a745; color: white;"/>
+        </hlayout>
+        
+        <!-- Action Buttons -->
+        <div align="center" style="margin-top: 30px;">
+            <hlayout spacing="20px">
+                <button label="Process Documents" onClick="@command('processDocuments')"
+                        disabled="@load(empty vm.selectedFiles or vm.processing)"
+                        iconSclass="z-icon-play-circle" 
+                        style="background-color: #007bff; color: white; font-size: 16px; padding: 15px 40px;"/>
+                
+                <button label="Cancel" onClick="@command('clearFiles')"
+                        disabled="@load(vm.processing)"
+                        iconSclass="z-icon-times-circle"
+                        style="background-color: #6c757d; color: white; font-size: 16px; padding: 15px 40px;"/>
+            </hlayout>
+        </div>
+        
+        <!-- Help Section -->
+        <groupbox style="margin-top: 30px; background: #f8f9fa;" closable="false">
+            <caption label="📖 Help &amp; Guidelines"/>
+            <vlayout spacing="5px">
+                <label value="• Supported formats: PDF, Word (.doc, .docx), PowerPoint (.ppt, .pptx), Excel (.xls, .xlsx), TXT, Markdown (.md)"/>
+                <label value="• Maximum file size: 50MB per file"/>
+                <label value="• Maximum files per upload: 20 files"/>
+                <label value="• Processing time: 5-30 seconds per document (depending on size and complexity)"/>
+                <label value="• Batch processing: For multiple files, you'll receive a Job ID to track progress"/>
+            </vlayout>
+        </groupbox>
+        
+    </window>
+</zk>
+

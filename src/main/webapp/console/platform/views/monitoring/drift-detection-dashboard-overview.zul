@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Drift Detection Dashboard" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.views.monitoring.DriftDetectionDashboardOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <combobox placeholder="Filter by Status" value="@bind(vm.filterStatus)" 
+                      onChange="@command('filterByStatus')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="DETECTED" value="DETECTED"/>
+                <comboitem label="ANALYZING" value="ANALYZING"/>
+                <comboitem label="RESOLVED" value="RESOLVED"/>
+            </combobox>
+        </hlayout>
+        
+        <listbox model="@load(vm.driftDetectionDashboard)" selectedItem="@bind(vm.selectedItem)"
+                 emptyMessage="No drift detection data" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Model" width="150px"/>
+                <listheader label="Type" width="120px"/>
+                <listheader label="Score" width="100px"/>
+                <listheader label="Severity" width="100px"/>
+                <listheader label="Days Since" width="100px"/>
+                <listheader label="Overdue" width="80px"/>
+                <listheader label="Status" width="120px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxdriftdetection)"/>
+                    <listcell label="@load(item.modelname)"/>
+                    <listcell label="@load(item.drftype)"/>
+                    <listcell label="@load(item.drfscore)"/>
+                    <listcell label="@load(item.drfseverity)"/>
+                    <listcell label="@load(item.daysincedetection)"/>
+                    <listcell label="@load(item.isoverdue ? 'YES' : 'NO')"/>
+                    <listcell label="@load(item.drfstatus)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

@@ -1,0 +1,641 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentHealthDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Health" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentHealth')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Health Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Health Status *" />
+														<combobox tabindex="2" id="agthealthstatus"
+															selectedItem="@bind(vm.currentAgentHealth.agthealthstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agthealthstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Availabilitystatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Availabilitystatus *" />
+														<combobox tabindex="3" id="agtavailabilitystatus"
+															selectedItem="@bind(vm.currentAgentHealth.agtavailabilitystatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtavailabilitystatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Overall Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Overall Score" />
+														<textbox tabindex="4" id="agtoverallscore"
+															value="@bind(vm.currentAgentHealth.agtoverallscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtoverallscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Performancescore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Performancescore" />
+														<textbox tabindex="5" id="agtperformancescore"
+															value="@bind(vm.currentAgentHealth.agtperformancescore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtperformancescore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Reliabilityscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Reliabilityscore" />
+														<textbox tabindex="6" id="agtreliabilityscore"
+															value="@bind(vm.currentAgentHealth.agtreliabilityscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtreliabilityscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Stabilityscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Stabilityscore" />
+														<textbox tabindex="7" id="agtstabilityscore"
+															value="@bind(vm.currentAgentHealth.agtstabilityscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtstabilityscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Responsetimems -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Responsetimems" />
+														<textbox tabindex="8" id="agtresponsetimems"
+															value="@bind(vm.currentAgentHealth.agtresponsetimems)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtresponsetimems'])" />
+													</div>
+												</div>
+											</div>											<!-- Throughputrps -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Throughputrps" />
+														<textbox tabindex="9" id="agtthroughputrps"
+															value="@bind(vm.currentAgentHealth.agtthroughputrps)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtthroughputrps'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Errorrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Errorrate" />
+														<textbox tabindex="10" id="agterrorrate"
+															value="@bind(vm.currentAgentHealth.agterrorrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agterrorrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Uptimepercentage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Uptimepercentage" />
+														<textbox tabindex="11" id="agtuptimepercentage"
+															value="@bind(vm.currentAgentHealth.agtuptimepercentage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtuptimepercentage'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Cpuusage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cpuusage" />
+														<textbox tabindex="12" id="agtcpuusage"
+															value="@bind(vm.currentAgentHealth.agtcpuusage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcpuusage'])" />
+													</div>
+												</div>
+											</div>											<!-- Memoryusage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Memoryusage" />
+														<textbox tabindex="13" id="agtmemoryusage"
+															value="@bind(vm.currentAgentHealth.agtmemoryusage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmemoryusage'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Diskusage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Diskusage" />
+														<textbox tabindex="14" id="agtdiskusage"
+															value="@bind(vm.currentAgentHealth.agtdiskusage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtdiskusage'])" />
+													</div>
+												</div>
+											</div>											<!-- Networklatencyms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Networklatencyms" />
+														<textbox tabindex="15" id="agtnetworklatencyms"
+															value="@bind(vm.currentAgentHealth.agtnetworklatencyms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtnetworklatencyms'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Concurrentrequests -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Concurrentrequests" />
+														<textbox tabindex="16" id="agtconcurrentrequests"
+															value="@bind(vm.currentAgentHealth.agtconcurrentrequests)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtconcurrentrequests'])" />
+													</div>
+												</div>
+											</div>											<!-- Maxconcurrentrequests -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxconcurrentrequests" />
+														<textbox tabindex="17" id="agtmaxconcurrentrequests"
+															value="@bind(vm.currentAgentHealth.agtmaxconcurrentrequests)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmaxconcurrentrequests'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Queuesize -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Queuesize" />
+														<textbox tabindex="18" id="agtqueuesize"
+															value="@bind(vm.currentAgentHealth.agtqueuesize)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtqueuesize'])" />
+													</div>
+												</div>
+											</div>											<!-- Processingtimeavgms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Processingtimeavgms" />
+														<textbox tabindex="19" id="agtprocessingtimeavgms"
+															value="@bind(vm.currentAgentHealth.agtprocessingtimeavgms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtprocessingtimeavgms'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Processingtimep95ms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Processingtimep95ms" />
+														<textbox tabindex="20" id="agtprocessingtimep95ms"
+															value="@bind(vm.currentAgentHealth.agtprocessingtimep95ms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtprocessingtimep95ms'])" />
+													</div>
+												</div>
+											</div>											<!-- Processingtimep99ms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Processingtimep99ms" />
+														<textbox tabindex="21" id="agtprocessingtimep99ms"
+															value="@bind(vm.currentAgentHealth.agtprocessingtimep99ms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtprocessingtimep99ms'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Successrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Successrate" />
+														<textbox tabindex="22" id="agtsuccessrate"
+															value="@bind(vm.currentAgentHealth.agtsuccessrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtsuccessrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Retryrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Retryrate" />
+														<textbox tabindex="23" id="agtretryrate"
+															value="@bind(vm.currentAgentHealth.agtretryrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtretryrate'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Time Outrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Time Outrate" />
+														<textbox tabindex="24" id="agttimeoutrate"
+															value="@bind(vm.currentAgentHealth.agttimeoutrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttimeoutrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Lastsuccessfulrequest -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastsuccessfulrequest" />
+														<textbox tabindex="25" id="agtlastsuccessfulrequest"
+															value="@bind(vm.currentAgentHealth.agtlastsuccessfulrequest)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlastsuccessfulrequest'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Lastfailedrequest -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastfailedrequest" />
+														<textbox tabindex="26" id="agtlastfailedrequest"
+															value="@bind(vm.currentAgentHealth.agtlastfailedrequest)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlastfailedrequest'])" />
+													</div>
+												</div>
+											</div>											<!-- Lastrestart -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastrestart" />
+														<textbox tabindex="27" id="agtlastrestart"
+															value="@bind(vm.currentAgentHealth.agtlastrestart)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlastrestart'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Health Checks -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Health Checks" />
+														<textbox tabindex="28" id="agthealthchecks"
+															value="@bind(vm.currentAgentHealth.agthealthchecks)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agthealthchecks'])" />
+													</div>
+												</div>
+											</div>											<!-- Dependencies -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dependencies" />
+														<textbox tabindex="29" id="agtdependencies"
+															value="@bind(vm.currentAgentHealth.agtdependencies)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtdependencies'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Metric S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metric S" />
+														<textbox tabindex="30" id="agtmetrics"
+															value="@bind(vm.currentAgentHealth.agtmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmetrics'])" />
+													</div>
+												</div>
+											</div>											<!-- Issues -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Issues" />
+														<textbox tabindex="31" id="agtissues"
+															value="@bind(vm.currentAgentHealth.agtissues)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtissues'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Recommendations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendations" />
+														<textbox tabindex="32" id="agtrecommendations"
+															value="@bind(vm.currentAgentHealth.agtrecommendations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrecommendations'])" />
+													</div>
+												</div>
+											</div>											<!-- Maintenancereason -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maintenancereason" />
+														<textbox tabindex="33" id="agtmaintenancereason"
+															value="@bind(vm.currentAgentHealth.agtmaintenancereason)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmaintenancereason'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Maintenancescheduleduntil -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maintenancescheduleduntil" />
+														<textbox tabindex="34" id="agtmaintenancescheduleduntil"
+															value="@bind(vm.currentAgentHealth.agtmaintenancescheduleduntil)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmaintenancescheduleduntil'])" />
+													</div>
+												</div>
+											</div>											<!-- Alert Thresholds -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Alert Thresholds" />
+														<textbox tabindex="35" id="agtalertthresholds"
+															value="@bind(vm.currentAgentHealth.agtalertthresholds)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtalertthresholds'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Time Stamp -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Time Stamp *" />
+														<textbox tabindex="36" id="agttimestamp"
+															value="@bind(vm.currentAgentHealth.agttimestamp)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agttimestamp'])" />
+													</div>
+												</div>
+											</div>											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="37" id="agtcreatedby"
+															value="@bind(vm.currentAgentHealth.agtcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="38" id="agtupdatedby"
+															value="@bind(vm.currentAgentHealth.agtupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="39" id="agtcreatedat"
+															value="@bind(vm.currentAgentHealth.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="40" id="agtupdatedat"
+															value="@bind(vm.currentAgentHealth.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

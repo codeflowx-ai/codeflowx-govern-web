@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Performance Metrics Dashboard" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.views.monitoring.PerformanceMetricsDashboardOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <combobox placeholder="Filter by Health" value="@bind(vm.filterHealthStatus)" 
+                      onChange="@command('filterByHealth')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="HEALTHY" value="HEALTHY"/>
+                <comboitem label="WARNING" value="WARNING"/>
+                <comboitem label="CRITICAL" value="CRITICAL"/>
+            </combobox>
+        </hlayout>
+        
+        <listbox model="@load(vm.performanceMetricsDashboard)" selectedItem="@bind(vm.selectedItem)"
+                 emptyMessage="No performance metrics data" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Entity Type" width="120px"/>
+                <listheader label="Avg Latency" width="110px"/>
+                <listheader label="Avg CPU %" width="100px"/>
+                <listheader label="Avg Memory %" width="120px"/>
+                <listheader label="Health" width="100px"/>
+                <listheader label="Days Since" width="100px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxperformancemetric)"/>
+                    <listcell label="@load(item.prfentitytype)"/>
+                    <listcell label="@load(item.avglatencyms)"/>
+                    <listcell label="@load(item.avgcpuusage)"/>
+                    <listcell label="@load(item.avgmemoryusage)"/>
+                    <listcell label="@load(item.healthstatus)"/>
+                    <listcell label="@load(item.dayssincecollection)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

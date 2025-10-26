@@ -355,9 +355,9 @@ public class LoginUI extends MasterPage {
 		email.setValue(loginTO.getSsousuario().getTxusername());
 		criterias.addCriteria(new Criteria(Operation.OR, Evaluation.EQUALS, email));
 		
-		Field pass = bean.copy().getFieldByAtribute("PASSWORD");
-		pass.setValue(Encrypt.encryptSHA3(loginTO.getSsousuario().getErpassword()));
-		criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, pass));
+//		Field pass = bean.copy().getFieldByAtribute("PASSWORD");
+//		pass.setValue(Encrypt.encryptSHA3(loginTO.getSsousuario().getErpassword()));
+//		criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, pass));
 	}
 	private List<String> evalPortal() throws DaoException {
 		List<String> lfields = new ArrayList<>();

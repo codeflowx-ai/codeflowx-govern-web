@@ -1,0 +1,531 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentExpertiseDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Expertise" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentExpertise')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Expertise Level -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Expertise Level *" />
+														<combobox tabindex="2" id="agtexpertiselevel"
+															selectedItem="@bind(vm.currentAgentExpertise.agtexpertiselevel)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtexpertiselevel'])" />
+													</div>
+												</div>
+											</div>											<!-- Competencyscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Competencyscore" />
+														<textbox tabindex="3" id="agtcompetencyscore"
+															value="@bind(vm.currentAgentExpertise.agtcompetencyscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcompetencyscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Successrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Successrate" />
+														<textbox tabindex="4" id="agtsuccessrate"
+															value="@bind(vm.currentAgentExpertise.agtsuccessrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtsuccessrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Performancescore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Performancescore" />
+														<textbox tabindex="5" id="agtperformancescore"
+															value="@bind(vm.currentAgentExpertise.agtperformancescore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtperformancescore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Certificationstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Certificationstatus" />
+														<combobox tabindex="6" id="agtcertificationstatus"
+															selectedItem="@bind(vm.currentAgentExpertise.agtcertificationstatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtcertificationstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Certificationid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Certificationid" />
+														<textbox tabindex="7" id="agtcertificationid"
+															value="@bind(vm.currentAgentExpertise.agtcertificationid)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcertificationid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Certificationdate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Certificationdate" />
+														<textbox tabindex="8" id="agtcertificationdate"
+															value="@bind(vm.currentAgentExpertise.agtcertificationdate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcertificationdate'])" />
+													</div>
+												</div>
+											</div>											<!-- Certificationexpiry -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Certificationexpiry" />
+														<textbox tabindex="9" id="agtcertificationexpiry"
+															value="@bind(vm.currentAgentExpertise.agtcertificationexpiry)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcertificationexpiry'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Certificationauthority -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Certificationauthority" />
+														<textbox tabindex="10" id="agtcertificationauthority"
+															value="@bind(vm.currentAgentExpertise.agtcertificationauthority)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcertificationauthority'])" />
+													</div>
+												</div>
+											</div>											<!-- Skills -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Skills" />
+														<textbox tabindex="11" id="agtskills"
+															value="@bind(vm.currentAgentExpertise.agtskills)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtskills'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Knowledgeareas -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Knowledgeareas" />
+														<textbox tabindex="12" id="agtknowledgeareas"
+															value="@bind(vm.currentAgentExpertise.agtknowledgeareas)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtknowledgeareas'])" />
+													</div>
+												</div>
+											</div>											<!-- Tool Sproficiency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tool Sproficiency" />
+														<textbox tabindex="13" id="agttoolsproficiency"
+															value="@bind(vm.currentAgentExpertise.agttoolsproficiency)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttoolsproficiency'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Achievements -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Achievements" />
+														<textbox tabindex="14" id="agtachievements"
+															value="@bind(vm.currentAgentExpertise.agtachievements)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtachievements'])" />
+													</div>
+												</div>
+											</div>											<!-- Portfolio -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Portfolio" />
+														<textbox tabindex="15" id="agtportfolio"
+															value="@bind(vm.currentAgentExpertise.agtportfolio)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtportfolio'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Testresults -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Testresults" />
+														<textbox tabindex="16" id="agttestresults"
+															value="@bind(vm.currentAgentExpertise.agttestresults)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttestresults'])" />
+													</div>
+												</div>
+											</div>											<!-- Peerreviews -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Peerreviews" />
+														<textbox tabindex="17" id="agtpeerreviews"
+															value="@bind(vm.currentAgentExpertise.agtpeerreviews)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtpeerreviews'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Mentorfeedback -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mentorfeedback" />
+														<textbox tabindex="18" id="agtmentorfeedback"
+															value="@bind(vm.currentAgentExpertise.agtmentorfeedback)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmentorfeedback'])" />
+													</div>
+												</div>
+											</div>											<!-- Continuouslearning -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Continuouslearning" />
+														<textbox tabindex="19" id="agtcontinuouslearning"
+															value="@bind(vm.currentAgentExpertise.agtcontinuouslearning)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcontinuouslearning'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Specializations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Specializations" />
+														<textbox tabindex="20" id="agtspecializations"
+															value="@bind(vm.currentAgentExpertise.agtspecializations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtspecializations'])" />
+													</div>
+												</div>
+											</div>											<!-- Limitations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Limitations" />
+														<textbox tabindex="21" id="agtlimitations"
+															value="@bind(vm.currentAgentExpertise.agtlimitations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlimitations'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Improvementareas -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Improvementareas" />
+														<textbox tabindex="22" id="agtimprovementareas"
+															value="@bind(vm.currentAgentExpertise.agtimprovementareas)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtimprovementareas'])" />
+													</div>
+												</div>
+											</div>											<!-- Learninggoals -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Learninggoals" />
+														<textbox tabindex="23" id="agtlearninggoals"
+															value="@bind(vm.currentAgentExpertise.agtlearninggoals)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlearninggoals'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="24" id="agtstatus"
+															selectedItem="@bind(vm.currentAgentExpertise.agtstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Priority -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Priority" />
+														<combobox tabindex="25" id="agtpriority"
+															selectedItem="@bind(vm.currentAgentExpertise.agtpriority)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtpriority'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Lastassessment -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastassessment" />
+														<textbox tabindex="26" id="agtlastassessment"
+															value="@bind(vm.currentAgentExpertise.agtlastassessment)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtlastassessment'])" />
+													</div>
+												</div>
+											</div>											<!-- Nextassessment -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Nextassessment" />
+														<textbox tabindex="27" id="agtnextassessment"
+															value="@bind(vm.currentAgentExpertise.agtnextassessment)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtnextassessment'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Assessment Frequency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Assessment Frequency" />
+														<textbox tabindex="28" id="agtassessmentfrequency"
+															value="@bind(vm.currentAgentExpertise.agtassessmentfrequency)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['agtassessmentfrequency'])" />
+													</div>
+												</div>
+											</div>											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="29" id="agtcreatedby"
+															value="@bind(vm.currentAgentExpertise.agtcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="30" id="agtupdatedby"
+															value="@bind(vm.currentAgentExpertise.agtupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="31" id="agtcreatedat"
+															value="@bind(vm.currentAgentExpertise.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="32" id="agtupdatedat"
+															value="@bind(vm.currentAgentExpertise.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

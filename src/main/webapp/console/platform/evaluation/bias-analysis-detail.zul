@@ -1,0 +1,413 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="evaluation"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.evaluation.BiasAnalysisDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Bias Analysis" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveBiasAnalysis')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Model Id -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Model Id" />
+														<textbox tabindex="2" id="modelid"
+															value="@bind(vm.currentBiasAnalysis.modelid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modelid'])" />
+													</div>
+												</div>
+											</div>											<!-- Agent Id -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Agent Id" />
+														<textbox tabindex="3" id="agentid"
+															value="@bind(vm.currentBiasAnalysis.agentid)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agentid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ragsystemid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ragsystemid" />
+														<textbox tabindex="4" id="ragsystemid"
+															value="@bind(vm.currentBiasAnalysis.ragsystemid)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['ragsystemid'])" />
+													</div>
+												</div>
+											</div>											<!-- Prompt Id -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Prompt Id" />
+														<textbox tabindex="5" id="promptid"
+															value="@bind(vm.currentBiasAnalysis.promptid)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['promptid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Analysistimestamp -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Analysistimestamp *" />
+														<textbox tabindex="6" id="analysistimestamp"
+															value="@bind(vm.currentBiasAnalysis.analysistimestamp)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['analysistimestamp'])" />
+													</div>
+												</div>
+											</div>											<!-- Overall Bias Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Overall Bias Score *" />
+														<textbox tabindex="7" id="overallbiasscore"
+															value="@bind(vm.currentBiasAnalysis.overallbiasscore)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['overallbiasscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="8" id="status"
+															selectedItem="@bind(vm.currentBiasAnalysis.status)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['status'])" />
+													</div>
+												</div>
+											</div>											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="9" id="createdby"
+															value="@bind(vm.currentBiasAnalysis.createdby)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['createdby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="10" id="createdat"
+															value="@bind(vm.currentBiasAnalysis.createdat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['createdat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At *" />
+														<textbox tabindex="11" id="updatedat"
+															value="@bind(vm.currentBiasAnalysis.updatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['updatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subgovbiasdetections -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subgovbiasdetections" />
+														<textbox tabindex="12" id="subgovbiasdetections"
+															value="@bind(vm.currentBiasAnalysis.subgovbiasdetections)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subgovbiasdetections'])" />
+													</div>
+												</div>
+											</div>											<!-- Subgovbiasrecommendations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subgovbiasrecommendations" />
+														<textbox tabindex="13" id="subgovbiasrecommendations"
+															value="@bind(vm.currentBiasAnalysis.subgovbiasrecommendations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subgovbiasrecommendations'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subgovfairnessmetrics -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subgovfairnessmetrics" />
+														<textbox tabindex="14" id="subgovfairnessmetrics"
+															value="@bind(vm.currentBiasAnalysis.subgovfairnessmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subgovfairnessmetrics'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subgovbiasdetections" onSelect="@command('onSelectBiasDetectionTab')" />
+												<tab label="Subgovbiasrecommendations" onSelect="@command('onSelectBiasRecommendationTab')" />
+												<tab label="Subgovfairnessmetrics" onSelect="@command('onSelectFairnessMetricTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subgovbiasdetections -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subgovbiasdetections"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalBiasDetections)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subgovbiasdetections)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovbiasdetections)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subgovbiasdetections registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subgovbiasrecommendations -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subgovbiasrecommendations"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalBiasRecommendations)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subgovbiasrecommendations)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovbiasrecommendations)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subgovbiasrecommendations registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subgovfairnessmetrics -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subgovfairnessmetrics"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalFairnessMetrics)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subgovfairnessmetrics)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovfairnessmetrics)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subgovfairnessmetrics registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

@@ -1,0 +1,300 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="models"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.models.ModelRecommendationDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-microchip label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de El Recommendation" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModelRecommendation')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Userid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Userid" />
+														<textbox tabindex="2" id="moduserid"
+															value="@bind(vm.currentModelRecommendation.moduserid)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['moduserid'])" />
+													</div>
+												</div>
+											</div>											<!-- Projectid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectid" />
+														<textbox tabindex="3" id="modprojectid"
+															value="@bind(vm.currentModelRecommendation.modprojectid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modprojectid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Tasktype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tasktype *" />
+														<combobox tabindex="4" id="modtasktype"
+															selectedItem="@bind(vm.currentModelRecommendation.modtasktype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modtasktype'])" />
+													</div>
+												</div>
+											</div>											<!-- Taskdescription -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Taskdescription" />
+														<textbox tabindex="5" id="modtaskdescription"
+															value="@bind(vm.currentModelRecommendation.modtaskdescription)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modtaskdescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Requirements -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Requirements" />
+														<textbox tabindex="6" id="modrequirements"
+															value="@bind(vm.currentModelRecommendation.modrequirements)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modrequirements'])" />
+													</div>
+												</div>
+											</div>											<!-- Budgetconstraint -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Budgetconstraint" />
+														<textbox tabindex="7" id="modbudgetconstraint"
+															value="@bind(vm.currentModelRecommendation.modbudgetconstraint)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modbudgetconstraint'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Recommendedmodels -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendedmodels" />
+														<textbox tabindex="8" id="modrecommendedmodels"
+															value="@bind(vm.currentModelRecommendation.modrecommendedmodels)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modrecommendedmodels'])" />
+													</div>
+												</div>
+											</div>											<!-- Toprecommendationid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Toprecommendationid" />
+														<textbox tabindex="9" id="modtoprecommendationid"
+															value="@bind(vm.currentModelRecommendation.modtoprecommendationid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modtoprecommendationid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Recommendationscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendationscore" />
+														<textbox tabindex="10" id="modrecommendationscore"
+															value="@bind(vm.currentModelRecommendation.modrecommendationscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modrecommendationscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Recommendationreason -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendationreason" />
+														<textbox tabindex="11" id="modrecommendationreason"
+															value="@bind(vm.currentModelRecommendation.modrecommendationreason)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modrecommendationreason'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Alternativemodels -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Alternativemodels" />
+														<textbox tabindex="12" id="modalternativemodels"
+															value="@bind(vm.currentModelRecommendation.modalternativemodels)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modalternativemodels'])" />
+													</div>
+												</div>
+											</div>											<!-- Wasaccepted -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Wasaccepted" />
+														<textbox tabindex="13" id="modwasaccepted"
+															value="@bind(vm.currentModelRecommendation.modwasaccepted)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modwasaccepted'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Selectedmodelid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Selectedmodelid" />
+														<textbox tabindex="14" id="modselectedmodelid"
+															value="@bind(vm.currentModelRecommendation.modselectedmodelid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modselectedmodelid'])" />
+													</div>
+												</div>
+											</div>											<!-- Userfeedback -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Userfeedback" />
+														<textbox tabindex="15" id="moduserfeedback"
+															value="@bind(vm.currentModelRecommendation.moduserfeedback)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['moduserfeedback'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Actualperformance -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Actualperformance" />
+														<textbox tabindex="16" id="modactualperformance"
+															value="@bind(vm.currentModelRecommendation.modactualperformance)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modactualperformance'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="17" id="modcreatedat"
+															value="@bind(vm.currentModelRecommendation.modcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

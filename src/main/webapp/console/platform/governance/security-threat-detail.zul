@@ -1,0 +1,276 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="governance"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.governance.SecurityThreatDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-shield-check label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Security Threat" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveSecurityThreat')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Threatname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Threatname *" />
+														<textbox tabindex="2" id="threatname"
+															value="@bind(vm.currentSecurityThreat.threatname) @save(vm.currentSecurityThreat.threatname, before=('saveItem')) @validator(vm.unique, field='THREATNAME', required=true, oldValue=vm.originalThreatname)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['threatname'])" />
+													</div>
+												</div>
+											</div>											<!-- Description -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Description *" />
+														<textbox tabindex="3" id="description"
+															value="@bind(vm.currentSecurityThreat.description)"
+															rows="4" multiline="true"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['description'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Threattype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Threattype *" />
+														<combobox tabindex="4" id="threattype"
+															selectedItem="@bind(vm.currentSecurityThreat.threattype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['threattype'])" />
+													</div>
+												</div>
+											</div>											<!-- Severity -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Severity *" />
+														<textbox tabindex="5" id="severity"
+															value="@bind(vm.currentSecurityThreat.severity)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['severity'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="6" id="status"
+															selectedItem="@bind(vm.currentSecurityThreat.status)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['status'])" />
+													</div>
+												</div>
+											</div>											<!-- At Tackvector -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="At Tackvector" />
+														<textbox tabindex="7" id="attackvector"
+															value="@bind(vm.currentSecurityThreat.attackvector)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['attackvector'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Impactassessment -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Impactassessment" />
+														<textbox tabindex="8" id="impactassessment"
+															value="@bind(vm.currentSecurityThreat.impactassessment)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['impactassessment'])" />
+													</div>
+												</div>
+											</div>											<!-- Mitigationmeasures -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mitigationmeasures" />
+														<textbox tabindex="9" id="mitigationmeasures"
+															value="@bind(vm.currentSecurityThreat.mitigationmeasures)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['mitigationmeasures'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Detectedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detectedat *" />
+														<textbox tabindex="10" id="detectedat"
+															value="@bind(vm.currentSecurityThreat.detectedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['detectedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Detectedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detectedby *" />
+														<textbox tabindex="11" id="detectedby"
+															value="@bind(vm.currentSecurityThreat.detectedby)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['detectedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Assignedto -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Assignedto" />
+														<textbox tabindex="12" id="assignedto"
+															value="@bind(vm.currentSecurityThreat.assignedto)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['assignedto'])" />
+													</div>
+												</div>
+											</div>											<!-- Resolved At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Resolved At" />
+														<textbox tabindex="13" id="resolvedat"
+															value="@bind(vm.currentSecurityThreat.resolvedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['resolvedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="14" id="createdat"
+															value="@bind(vm.currentSecurityThreat.createdat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['createdat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At *" />
+														<textbox tabindex="15" id="updatedat"
+															value="@bind(vm.currentSecurityThreat.updatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['updatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

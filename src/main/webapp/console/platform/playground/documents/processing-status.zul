@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="📈 Processing Status" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.ProcessingStatusViewModel')">
+        
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="📈 Processing Status" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Monitor document processing jobs in real-time" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+            <button label="Refresh" onClick="@command('loadJobs')" iconSclass="z-icon-refresh"
+                    style="background-color: white; color: #667eea;"/>
+        </hlayout>
+        
+        <!-- Active Jobs -->
+        <groupbox closable="false">
+            <caption label="Active Jobs (@load(vm.activeJobs.size()))"/>
+            <vlayout>
+                <div forEach="@load(vm.activeJobs)" style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin: 10px 0;">
+                    <hlayout valign="middle">
+                        <vlayout hflex="1">
+                            <label value="Job: @load(each.jobId)" style="font-weight: bold;"/>
+                            <label value="@load(each.currentStep)" style="margin-top: 5px; color: #666;"/>
+                            <progressmeter value="@load(each.progressPercent)" width="100%" style="margin-top: 10px;"/>
+                            <hlayout style="margin-top: 5px;">
+                                <label value="@load(each.documentsProcessed) / @load(each.totalDocuments) documents"/>
+                                <space hflex="1"/>
+                                <label value="ETA: @load(each.estimatedRemainingTime) s" style="color: #3b82f6;"/>
+                            </hlayout>
+                        </vlayout>
+                    </hlayout>
+                </div>
+            </vlayout>
+        </groupbox>
+        
+        <!-- Completed Jobs History -->
+        <groupbox closable="false" style="margin-top: 20px;">
+            <caption label="Completed Jobs History"/>
+            <listbox model="@load(vm.completedJobs)" height="400px" emptyMessage="No completed jobs">
+                <listhead>
+                    <listheader label="Job ID" width="200px"/>
+                    <listheader label="Status" width="120px"/>
+                    <listheader label="Documents" width="100px"/>
+                    <listheader label="End Time" width="180px"/>
+                    <listheader label="Actions" width="150px"/>
+                </listhead>
+                <template name="model" var="job">
+                    <listitem>
+                        <listcell label="@load(job.jobId)"/>
+                        <listcell label="@load(job.status)"
+                                  style="@load(job.status eq 'completed' ? 'color: #22c55e;' : 'color: #ef4444;')"/>
+                        <listcell label="@load(job.documentsProcessed) / @load(job.totalDocuments)"/>
+                        <listcell label="@load(job.endTime)"/>
+                        <listcell>
+                            <button label="View Result" onClick="@command('viewJobResult', jobId=job.jobId)"
+                                    iconSclass="z-icon-eye" style="background-color: #3b82f6; color: white;"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </groupbox>
+    </window>
+</zk>
+

@@ -1,0 +1,521 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentBiasDetectionDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Bias Detection" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentBiasDetection')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Bias Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Type *" />
+														<combobox tabindex="2" id="agtbiastype"
+															selectedItem="@bind(vm.currentAgentBiasDetection.agtbiastype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtbiastype'])" />
+													</div>
+												</div>
+											</div>											<!-- Bias Category -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Category" />
+														<textbox tabindex="3" id="agtbiascategory"
+															value="@bind(vm.currentAgentBiasDetection.agtbiascategory)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agtbiascategory'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Severity -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Severity *" />
+														<textbox tabindex="4" id="agtseverity"
+															value="@bind(vm.currentAgentBiasDetection.agtseverity)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['agtseverity'])" />
+													</div>
+												</div>
+											</div>											<!-- Confidencescore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Confidencescore" />
+														<textbox tabindex="5" id="agtconfidencescore"
+															value="@bind(vm.currentAgentBiasDetection.agtconfidencescore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtconfidencescore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Bias Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Score" />
+														<textbox tabindex="6" id="agtbiasscore"
+															value="@bind(vm.currentAgentBiasDetection.agtbiasscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtbiasscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Description -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Description" />
+														<textbox tabindex="7" id="agtdescription"
+															value="@bind(vm.currentAgentBiasDetection.agtdescription)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtdescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Affectedcontent -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Affectedcontent" />
+														<textbox tabindex="8" id="agtaffectedcontent"
+															value="@bind(vm.currentAgentBiasDetection.agtaffectedcontent)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtaffectedcontent'])" />
+													</div>
+												</div>
+											</div>											<!-- Detection Method -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detection Method" />
+														<textbox tabindex="9" id="agtdetectionmethod"
+															value="@bind(vm.currentAgentBiasDetection.agtdetectionmethod)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agtdetectionmethod'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Detection Algorithm -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detection Algorithm" />
+														<textbox tabindex="10" id="agtdetectionalgorithm"
+															value="@bind(vm.currentAgentBiasDetection.agtdetectionalgorithm)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtdetectionalgorithm'])" />
+													</div>
+												</div>
+											</div>											<!-- Detection Parameter S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detection Parameter S" />
+														<textbox tabindex="11" id="agtdetectionparameters"
+															value="@bind(vm.currentAgentBiasDetection.agtdetectionparameters)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtdetectionparameters'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Evidence -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Evidence" />
+														<textbox tabindex="12" id="agtevidence"
+															value="@bind(vm.currentAgentBiasDetection.agtevidence)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtevidence'])" />
+													</div>
+												</div>
+											</div>											<!-- Impactassessment -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Impactassessment" />
+														<textbox tabindex="13" id="agtimpactassessment"
+															value="@bind(vm.currentAgentBiasDetection.agtimpactassessment)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtimpactassessment'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Affectedgroups -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Affectedgroups" />
+														<textbox tabindex="14" id="agtaffectedgroups"
+															value="@bind(vm.currentAgentBiasDetection.agtaffectedgroups)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtaffectedgroups'])" />
+													</div>
+												</div>
+											</div>											<!-- Mitigationstrategy -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mitigationstrategy" />
+														<textbox tabindex="15" id="agtmitigationstrategy"
+															value="@bind(vm.currentAgentBiasDetection.agtmitigationstrategy)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmitigationstrategy'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Mitigationstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mitigationstatus" />
+														<combobox tabindex="16" id="agtmitigationstatus"
+															selectedItem="@bind(vm.currentAgentBiasDetection.agtmitigationstatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtmitigationstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Mitigationactions -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mitigationactions" />
+														<textbox tabindex="17" id="agtmitigationactions"
+															value="@bind(vm.currentAgentBiasDetection.agtmitigationactions)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmitigationactions'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Verificationstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Verificationstatus" />
+														<combobox tabindex="18" id="agtverificationstatus"
+															selectedItem="@bind(vm.currentAgentBiasDetection.agtverificationstatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtverificationstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Verificationnotes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Verificationnotes" />
+														<textbox tabindex="19" id="agtverificationnotes"
+															value="@bind(vm.currentAgentBiasDetection.agtverificationnotes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtverificationnotes'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Verifierid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Verifierid" />
+														<textbox tabindex="20" id="agtverifierid"
+															value="@bind(vm.currentAgentBiasDetection.agtverifierid)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtverifierid'])" />
+													</div>
+												</div>
+											</div>											<!-- Verifiedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Verifiedat" />
+														<textbox tabindex="21" id="agtverifiedat"
+															value="@bind(vm.currentAgentBiasDetection.agtverifiedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtverifiedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="22" id="agtstatus"
+															selectedItem="@bind(vm.currentAgentBiasDetection.agtstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Priority -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Priority" />
+														<combobox tabindex="23" id="agtpriority"
+															selectedItem="@bind(vm.currentAgentBiasDetection.agtpriority)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtpriority'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Detectedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Detectedat *" />
+														<textbox tabindex="24" id="agtdetectedat"
+															value="@bind(vm.currentAgentBiasDetection.agtdetectedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtdetectedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Resolved At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Resolved At" />
+														<textbox tabindex="25" id="agtresolvedat"
+															value="@bind(vm.currentAgentBiasDetection.agtresolvedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtresolvedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Escalatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Escalatedat" />
+														<textbox tabindex="26" id="agtescalatedat"
+															value="@bind(vm.currentAgentBiasDetection.agtescalatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtescalatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Escalatedto -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Escalatedto" />
+														<textbox tabindex="27" id="agtescalatedto"
+															value="@bind(vm.currentAgentBiasDetection.agtescalatedto)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtescalatedto'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="28" id="agtcreatedby"
+															value="@bind(vm.currentAgentBiasDetection.agtcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="29" id="agtupdatedby"
+															value="@bind(vm.currentAgentBiasDetection.agtupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="30" id="agtcreatedat"
+															value="@bind(vm.currentAgentBiasDetection.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="31" id="agtupdatedat"
+															value="@bind(vm.currentAgentBiasDetection.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="native"
+    xmlns:x="xhtml">
+    
+    <div viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.analytics.AnalyticsReportViewModel')">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 col-md-6">
+                    <h:h1 class="h2 fw-bold mb-1">
+                        <h:i class="bi bi-file-earmark-bar-graph me-2"></h:i>
+                        <label value="${labels.analytics.reports.title}" />
+                    </h:h1>
+                    <h:p class="text-muted mb-0">${labels.analytics.reports.subtitle}</h:p>
+                </h:div>
+                <h:div class="col-12 col-md-6 text-end">
+                    <button class="btn btn-primary" onClick="@command('newReport')">
+                        <h:i class="bi bi-plus-circle me-2"></h:i>
+                        <label value="${labels.analytics.reports.create}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Búsqueda y Filtros -->
+            <h:div class="row mb-3">
+                <h:div class="col-12 col-md-6">
+                    <h:div class="input-group">
+                        <h:span class="input-group-text"><h:i class="bi bi-search"></h:i></h:span>
+                        <textbox class="form-control" placeholder="${labels.analytics.reports.search}..." 
+                                 value="@bind(vm.searchTerm)" 
+                                 onOK="@command('search')"/>
+                        <button class="btn btn-outline-secondary" onClick="@command('search')">
+                            ${labels.common.search}
+                        </button>
+                    </h:div>
+                </h:div>
+                <h:div class="col-12 col-md-3">
+                    <h:select class="form-select" value="@bind(vm.filterType)" onChange="@command('search')">
+                        <h:option value="all">${labels.common.allTypes}</h:option>
+                        <h:option value="daily">Daily</h:option>
+                        <h:option value="weekly">Weekly</h:option>
+                        <h:option value="monthly">Monthly</h:option>
+                        <h:option value="custom">Custom</h:option>
+                    </h:select>
+                </h:div>
+                <h:div class="col-12 col-md-3">
+                    <h:select class="form-select" value="@bind(vm.filterStatus)" onChange="@command('search')">
+                        <h:option value="all">${labels.common.allStatus}</h:option>
+                        <h:option value="completed">Completed</h:option>
+                        <h:option value="generating">Generating</h:option>
+                        <h:option value="pending">Pending</h:option>
+                        <h:option value="failed">Failed</h:option>
+                    </h:select>
+                </h:div>
+            </h:div>
+            
+            <!-- Botones de acción -->
+            <h:div class="row mb-3">
+                <h:div class="col-12 text-end">
+                    <button class="btn btn-outline-secondary me-2" onClick="@command('clearSearch')">
+                        <h:i class="bi bi-x-circle me-2"></h:i>
+                        <label value="${labels.common.clear}" />
+                    </button>
+                    <button class="btn btn-outline-secondary" onClick="@command('refresh')">
+                        <h:i class="bi bi-arrow-clockwise me-2"></h:i>
+                        <label value="${labels.common.refresh}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Tabla -->
+            <h:div class="row">
+                <h:div class="col-12">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body p-0">
+                            <h:div class="table-responsive">
+                                <h:table class="table table-hover mb-0">
+                                    <h:thead class="table-light">
+                                        <h:tr>
+                                            <h:th>${labels.analytics.reports.name}</h:th>
+                                            <h:th>${labels.analytics.reports.type}</h:th>
+                                            <h:th>${labels.analytics.reports.description}</h:th>
+                                            <h:th class="text-center">${labels.common.status}</h:th>
+                                            <h:th>${labels.analytics.reports.generated}</h:th>
+                                            <h:th class="text-end">${labels.common.actions}</h:th>
+                                        </h:tr>
+                                    </h:thead>
+                                    <h:tbody>
+                                        <forEach items="@load(vm.pageResult.content)" var="report">
+                                            <h:tr>
+                                                <h:td>
+                                                    <label value="@load(report.anlreportname)" class="fw-bold"/>
+                                                </h:td>
+                                                <h:td>
+                                                    <h:span class="badge bg-info">
+                                                        <label value="@load(report.anlreporttype)"/>
+                                                    </h:span>
+                                                </h:td>
+                                                <h:td>
+                                                    <h:small class="text-muted">
+                                                        <label value="@load(vm.truncateDescription(report.anlreportdescription))"/>
+                                                    </h:small>
+                                                </h:td>
+                                                <h:td class="text-center">
+                                                    <h:span class="@load(c:cat('badge bg-', vm.getReportStatusBadge(report.anlstatus)))">
+                                                        <label value="@load(report.anlstatus)"/>
+                                                    </h:span>
+                                                </h:td>
+                                                <h:td>
+                                                    <h:small>
+                                                        <label value="@load(report.anlgeneratedat)" />
+                                                    </h:small>
+                                                </h:td>
+                                                <h:td class="text-end">
+                                                    <button class="btn btn-sm btn-outline-info me-1" 
+                                                            onClick="@command('viewReportData', item=report)"
+                                                            title="${labels.analytics.reports.view}">
+                                                        <h:i class="bi bi-eye"></h:i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onClick="@command('editReport', item=report)">
+                                                        <h:i class="bi bi-pencil"></h:i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-success me-1" 
+                                                            onClick="@command('regenerateReport', item=report)"
+                                                            title="${labels.analytics.reports.regenerate}">
+                                                        <h:i class="bi bi-arrow-repeat"></h:i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                            onClick="@command('deleteReport', item=report)">
+                                                        <h:i class="bi bi-trash"></h:i>
+                                                    </button>
+                                                </h:td>
+                                            </h:tr>
+                                        </forEach>
+                                    </h:tbody>
+                                </h:table>
+                            </h:div>
+                        </h:div>
+                        
+                        <!-- Paginación -->
+                        <h:div class="card-footer bg-light">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:small class="text-muted">
+                                        ${labels.common.page} <label value="@load(vm.pageParams.pageActual)"/> 
+                                        ${labels.common.of} <label value="@load(vm.pageResult.totalPages)"/> 
+                                        (<label value="@load(vm.pageResult.totalRows)"/> ${labels.common.records})
+                                    </h:small>
+                                </h:div>
+                                <h:div>
+                                    <button class="btn btn-sm btn-outline-secondary me-2"
+                                            onClick="@command('previousPage')"
+                                            disabled="@load(vm.pageParams.pageActual eq 1)">
+                                        <h:i class="bi bi-chevron-left"></h:i>
+                        <label value="${labels.common.previous}" />
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            onClick="@command('nextPage')"
+                                            disabled="@load(vm.pageResult.nextRow eq 0)">
+                                        ${labels.common.next} <h:i class="bi bi-chevron-right"></h:i>
+                                    </button>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+        </h:div>
+    </div>
+    
+    <!-- Modal de Edición -->
+    <window visible="@load(vm.showDialog)" mode="modal" 
+            border="normal" width="700px" closable="true"
+            onClose="@command('cancelEdit')">
+        <h:div class="p-4">
+            <h:h5 class="mb-4">
+                <label value="@load(vm.isEditing ? labels.analytics.reports.edit : labels.analytics.reports.create)"/>
+            </h:h5>
+            
+            <h:div class="row">
+                <h:div class="col-12 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.name} *</h:label>
+                    <textbox class="form-control" 
+                             value="@bind(vm.selectedReport.anlreportname)"
+                             placeholder="${labels.analytics.reports.name.placeholder}"/>
+                </h:div>
+                
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.type} *</h:label>
+                    <textbox class="form-control" 
+                             value="@bind(vm.selectedReport.anlreporttype)"
+                             placeholder="daily, weekly, monthly..."/>
+                </h:div>
+                
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.status} *</h:label>
+                    <textbox class="form-control" 
+                             value="@bind(vm.selectedReport.anlstatus)"
+                             placeholder="completed, pending, failed..."/>
+                </h:div>
+                
+                <h:div class="col-12 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.description}</h:label>
+                    <textbox class="form-control" rows="3" 
+                             value="@bind(vm.selectedReport.anlreportdescription)"
+                             placeholder="${labels.analytics.reports.description.placeholder}"/>
+                </h:div>
+                
+                <h:div class="col-12 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.schedule}</h:label>
+                    <textbox class="form-control" 
+                             value="@bind(vm.selectedReport.anlschedule)"
+                             placeholder="0 0 * * * (cron expression)"/>
+                </h:div>
+                
+                <h:div class="col-12 mb-3">
+                    <h:label class="form-label">${labels.analytics.reports.config}</h:label>
+                    <textbox class="form-control" rows="4" 
+                             value="@bind(vm.selectedReport.anlreportconfig)"
+                             placeholder='{"param1": "value1", "param2": "value2"}'/>
+                </h:div>
+            </h:div>
+            
+            <h:div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary" onClick="@command('cancelEdit')">
+                    ${labels.common.cancel}
+                </button>
+                <button class="btn btn-primary" onClick="@command('saveReport')">
+                    <h:i class="bi bi-check-circle me-2"></h:i>
+                        <label value="${labels.common.save}" />
+                </button>
+            </h:div>
+        </h:div>
+    </window>
+    
+    <!-- Modal para Ver Datos del Reporte -->
+    <window visible="@load(vm.showDataDialog)" mode="modal" 
+            border="normal" width="900px" height="600px" closable="true"
+            onClose="@command('closeDataDialog')">
+        <h:div class="p-4">
+            <h:h5 class="mb-4">
+                <h:i class="bi bi-file-earmark-text me-2"></h:i>
+                        <label value="${labels.analytics.reports.data}" />: <label value="@load(vm.selectedReport.anlreportname)"/>
+            </h:h5>
+            
+            <h:div class="row mb-3">
+                <h:div class="col-12 col-md-6">
+                    <h:strong>Tipo:</h:strong> <label value="@load(vm.selectedReport.anlreporttype)"/>
+                </h:div>
+                <h:div class="col-12 col-md-6">
+                    <h:strong>Estado:</h:strong> 
+                    <h:span class="@load(c:cat('badge bg-', vm.getReportStatusBadge(vm.selectedReport.anlstatus)))">
+                        <label value="@load(vm.selectedReport.anlstatus)"/>
+                    </h:span>
+                </h:div>
+            </h:div>
+            
+            <h:div class="row mb-3">
+                <h:div class="col-12">
+                    <h:strong>Generado:</h:strong> <label value="@load(vm.selectedReport.anlgeneratedat)"/>
+                </h:div>
+            </h:div>
+            
+            <h:div class="row">
+                <h:div class="col-12">
+                    <h:label class="form-label fw-bold">Datos del Reporte (JSON):</h:label>
+                    <textbox class="form-control" rows="15" readonly="true" 
+                             value="@load(vm.selectedReport.anlreportdata)"
+                             style="font-family: monospace; font-size: 12px;"/>
+                </h:div>
+            </h:div>
+            
+            <h:div class="d-flex justify-content-end gap-2 mt-4">
+                <button class="btn btn-secondary" onClick="@command('closeDataDialog')">
+                    ${labels.common.close}
+                </button>
+            </h:div>
+        </h:div>
+    </window>
+</zk>
+

@@ -1,0 +1,217 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.infrastructure.InfrastructureOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-cloud me-2"></h:i>
+						Infraestructura Cloud
+					</h:h2>
+					<h:p class="text-muted">
+						Gestión de recursos cloud e infraestructura
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1"></div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
+										class="waves-effect waves-light"
+										onClick="@command('registerResource')"
+										label="Crear Recurso">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 s-bot">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<fragment exps="Total Recursos">
+									<![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalResources)">
+									<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<fragment exps="Recursos Compute">
+									<![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.computeResources)">
+									<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<fragment exps="Clusters K8s">
+									<![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalClusters)">
+									<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<fragment exps="Recursos Healthy">
+									<![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.healthyResources)">
+									<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</div>
+			
+			<div class="section filters">
+				<div class="search-bar">
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="Buscar por nombre..."
+						class="form-control" onOK="@command('applyFilters')" />
+					
+					<combobox
+						placeholder="Tipo"
+						selectedItem="@bind(vm.typeFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="Todos" value="ALL" />
+						<comboitem label="COMPUTE" value="COMPUTE" />
+						<comboitem label="STORAGE" value="STORAGE" />
+						<comboitem label="NETWORK" value="NETWORK" />
+						<comboitem label="DATABASE" value="DATABASE" />
+						<comboitem label="GPU" value="GPU" />
+						<comboitem label="KUBERNETES" value="KUBERNETES" />
+					</combobox>
+					
+					<combobox
+						placeholder="Salud"
+						selectedItem="@bind(vm.healthFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="Todos" value="ALL" />
+						<comboitem label="HEALTHY" value="HEALTHY" />
+						<comboitem label="DEGRADED" value="DEGRADED" />
+						<comboitem label="UNHEALTHY" value="UNHEALTHY" />
+						<comboitem label="UNKNOWN" value="UNKNOWN" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Buscar"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Limpiar"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<grid model="@load(vm.filteredResources)"
+								style="overflow:auto;">
+								<columns sizable="true">
+									<column label="ID" align="center" sort="auto" width="5%" />
+									<column label="Nombre" align="center" width="20%" />
+									<column label="Tipo" align="center" width="12%" />
+									<column label="Proveedor" align="center" width="12%" />
+									<column label="Región" align="center" width="10%" />
+									<column label="Salud" align="center" width="10%" />
+									<column label="Costo/Hora" align="center" width="10%" />
+									<column label="Acciones" align="center" width="10%" />
+								</columns>
+
+								<template name="model" var="resource">
+									<row style="text-align:center;cursor:pointer;"
+										onClick="@command('viewResourceDetails', resourceId=resource.idxcloudresource)">
+										<label value="@load(resource.idxcloudresource)" />
+										<label value="@load(resource.infresname)" />
+										
+										<h:span class="badge bg-secondary">
+											<label value="@load(resource.infresresourcetype)" />
+										</h:span>
+										
+										<label value="@load(resource.providerName)" />
+										<label value="@load(resource.infresregion)" />
+										
+										<h:span class="@load(resource.infreshealthstatus eq 'HEALTHY' ? 'badge bg-success' : (resource.infreshealthstatus eq 'DEGRADED' ? 'badge bg-warning' : 'badge bg-danger'))">
+											<label value="@load(resource.infreshealthstatus)" />
+										</h:span>
+										
+										<label value="@load(resource.infreshourlycost) @converter('formattedNumber', format='###,##0.00')" />
+
+										<cell align="center" class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewResourceDetails', resourceId=resource.idxcloudresource)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="Ver detalles" />
+											</div>
+											<div class="delete">
+												<a
+													onClick="@command('deleteResource', resourceId=resource.idxcloudresource)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="Eliminar" />
+											</div>
+										</cell>
+									</row>
+								</template>
+								
+								<foot>
+									<footer span="8" align="center">
+										<paging
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+									</footer>
+								</foot>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

@@ -1,0 +1,591 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="models"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.models.ModelEndpointDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-microchip label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de El Endpoint" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModelEndpoint')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Endpoint Name -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Endpoint Name *" />
+														<textbox tabindex="2" id="modendpointname"
+															value="@bind(vm.currentModelEndpoint.modendpointname) @save(vm.currentModelEndpoint.modendpointname, before=('saveItem')) @validator(vm.unique, field='MODENDPOINTNAME', required=true, oldValue=vm.originalModendpointname)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modendpointname'])" />
+													</div>
+												</div>
+											</div>											<!-- Endpoint Url -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Endpoint Url *" />
+														<textbox tabindex="3" id="modendpointurl"
+															value="@bind(vm.currentModelEndpoint.modendpointurl)"
+															maxlength="500"
+															constraint="no empty: max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['modendpointurl'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Endpoint Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Endpoint Type" />
+														<combobox tabindex="4" id="modendpointtype"
+															selectedItem="@bind(vm.currentModelEndpoint.modendpointtype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modendpointtype'])" />
+													</div>
+												</div>
+											</div>											<!-- Deployment Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Deployment Type" />
+														<combobox tabindex="5" id="moddeploymenttype"
+															selectedItem="@bind(vm.currentModelEndpoint.moddeploymenttype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['moddeploymenttype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Region -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Region" />
+														<textbox tabindex="6" id="modregion"
+															value="@bind(vm.currentModelEndpoint.modregion)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['modregion'])" />
+													</div>
+												</div>
+											</div>											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="7" id="modstatus"
+															selectedItem="@bind(vm.currentModelEndpoint.modstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Health Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Health Status" />
+														<combobox tabindex="8" id="modhealthstatus"
+															selectedItem="@bind(vm.currentModelEndpoint.modhealthstatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modhealthstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Lasthealthcheck -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lasthealthcheck" />
+														<textbox tabindex="9" id="modlasthealthcheck"
+															value="@bind(vm.currentModelEndpoint.modlasthealthcheck)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modlasthealthcheck'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Currentload -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Currentload" />
+														<textbox tabindex="10" id="modcurrentload"
+															value="@bind(vm.currentModelEndpoint.modcurrentload)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modcurrentload'])" />
+													</div>
+												</div>
+											</div>											<!-- Maxconcurrentrequests -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxconcurrentrequests" />
+														<textbox tabindex="11" id="modmaxconcurrentrequests"
+															value="@bind(vm.currentModelEndpoint.modmaxconcurrentrequests)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmaxconcurrentrequests'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Currentrequests -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Currentrequests" />
+														<textbox tabindex="12" id="modcurrentrequests"
+															value="@bind(vm.currentModelEndpoint.modcurrentrequests)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modcurrentrequests'])" />
+													</div>
+												</div>
+											</div>											<!-- Avgresponsetimems -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Avgresponsetimems" />
+														<textbox tabindex="13" id="modavgresponsetimems"
+															value="@bind(vm.currentModelEndpoint.modavgresponsetimems)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modavgresponsetimems'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- P95responsetimems -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="P95responsetimems" />
+														<textbox tabindex="14" id="modp95responsetimems"
+															value="@bind(vm.currentModelEndpoint.modp95responsetimems)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modp95responsetimems'])" />
+													</div>
+												</div>
+											</div>											<!-- P99responsetimems -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="P99responsetimems" />
+														<textbox tabindex="15" id="modp99responsetimems"
+															value="@bind(vm.currentModelEndpoint.modp99responsetimems)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modp99responsetimems'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ratelimitperminute -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ratelimitperminute" />
+														<textbox tabindex="16" id="modratelimitperminute"
+															value="@bind(vm.currentModelEndpoint.modratelimitperminute)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modratelimitperminute'])" />
+													</div>
+												</div>
+											</div>											<!-- Ratelimitperday -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ratelimitperday" />
+														<textbox tabindex="17" id="modratelimitperday"
+															value="@bind(vm.currentModelEndpoint.modratelimitperday)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modratelimitperday'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Quotaremaining -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotaremaining" />
+														<textbox tabindex="18" id="modquotaremaining"
+															value="@bind(vm.currentModelEndpoint.modquotaremaining)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modquotaremaining'])" />
+													</div>
+												</div>
+											</div>											<!-- Throttlingenabled -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Throttlingenabled" />
+														<textbox tabindex="19" id="modthrottlingenabled"
+															value="@bind(vm.currentModelEndpoint.modthrottlingenabled)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modthrottlingenabled'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Autoscalingenabled -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Autoscalingenabled" />
+														<textbox tabindex="20" id="modautoscalingenabled"
+															value="@bind(vm.currentModelEndpoint.modautoscalingenabled)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modautoscalingenabled'])" />
+													</div>
+												</div>
+											</div>											<!-- Mininstances -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mininstances" />
+														<textbox tabindex="21" id="modmininstances"
+															value="@bind(vm.currentModelEndpoint.modmininstances)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmininstances'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Maxinstances -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxinstances" />
+														<textbox tabindex="22" id="modmaxinstances"
+															value="@bind(vm.currentModelEndpoint.modmaxinstances)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmaxinstances'])" />
+													</div>
+												</div>
+											</div>											<!-- Currentinstances -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Currentinstances" />
+														<textbox tabindex="23" id="modcurrentinstances"
+															value="@bind(vm.currentModelEndpoint.modcurrentinstances)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modcurrentinstances'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Connectiontimeoutms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Connectiontimeoutms" />
+														<textbox tabindex="24" id="modconnectiontimeoutms"
+															value="@bind(vm.currentModelEndpoint.modconnectiontimeoutms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modconnectiontimeoutms'])" />
+													</div>
+												</div>
+											</div>											<!-- Readtimeoutms -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Readtimeoutms" />
+														<textbox tabindex="25" id="modreadtimeoutms"
+															value="@bind(vm.currentModelEndpoint.modreadtimeoutms)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modreadtimeoutms'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Retrypolicy -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Retrypolicy" />
+														<textbox tabindex="26" id="modretrypolicy"
+															value="@bind(vm.currentModelEndpoint.modretrypolicy)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modretrypolicy'])" />
+													</div>
+												</div>
+											</div>											<!-- Allowedagents -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Allowedagents" />
+														<textbox tabindex="27" id="modallowedagents"
+															value="@bind(vm.currentModelEndpoint.modallowedagents)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modallowedagents'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Allowedprojects -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Allowedprojects" />
+														<textbox tabindex="28" id="modallowedprojects"
+															value="@bind(vm.currentModelEndpoint.modallowedprojects)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modallowedprojects'])" />
+													</div>
+												</div>
+											</div>											<!-- Publicaccess -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Publicaccess" />
+														<textbox tabindex="29" id="modpublicaccess"
+															value="@bind(vm.currentModelEndpoint.modpublicaccess)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modpublicaccess'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Monitoring Enabled -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Monitoring Enabled" />
+														<textbox tabindex="30" id="modmonitoringenabled"
+															value="@bind(vm.currentModelEndpoint.modmonitoringenabled)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmonitoringenabled'])" />
+													</div>
+												</div>
+											</div>											<!-- Alert Onfailure -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Alert Onfailure" />
+														<textbox tabindex="31" id="modalertonfailure"
+															value="@bind(vm.currentModelEndpoint.modalertonfailure)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modalertonfailure'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Alert Onhighlatency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Alert Onhighlatency" />
+														<textbox tabindex="32" id="modalertonhighlatency"
+															value="@bind(vm.currentModelEndpoint.modalertonhighlatency)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modalertonhighlatency'])" />
+													</div>
+												</div>
+											</div>											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="33" id="modcreatedby"
+															value="@bind(vm.currentModelEndpoint.modcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="34" id="modupdatedby"
+															value="@bind(vm.currentModelEndpoint.modupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="35" id="modcreatedat"
+															value="@bind(vm.currentModelEndpoint.modcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="36" id="modupdatedat"
+															value="@bind(vm.currentModelEndpoint.modupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

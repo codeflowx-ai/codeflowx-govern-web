@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Process Executions Dashboard" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.views.monitoring.ProcessExecutionsDashboardOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <combobox placeholder="Filter by Status" value="@bind(vm.filterStatus)" 
+                      onChange="@command('filterByStatus')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="RUNNING" value="RUNNING"/>
+                <comboitem label="COMPLETED" value="COMPLETED"/>
+                <comboitem label="FAILED" value="FAILED"/>
+            </combobox>
+        </hlayout>
+        
+        <listbox model="@load(vm.processExecutionsDashboard)" selectedItem="@bind(vm.selectedItem)"
+                 emptyMessage="No process execution data" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Process" width="180px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Avg Duration" width="120px"/>
+                <listheader label="Total Runs" width="100px"/>
+                <listheader label="Success Rate %" width="120px"/>
+                <listheader label="AI Auto %" width="120px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxprocessexecution)"/>
+                    <listcell label="@load(item.pexprocessname)"/>
+                    <listcell label="@load(item.pexstatus)"/>
+                    <listcell label="@load(item.avgdurationms)"/>
+                    <listcell label="@load(item.totalruns)"/>
+                    <listcell label="@load(item.successrate)"/>
+                    <listcell label="@load(item.automationpercentage)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

@@ -1,0 +1,254 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.MetricSeriesDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Metric Series" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveMetricSeries')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Metric Name -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metric Name *" />
+														<textbox tabindex="2" id="trnmetricname"
+															value="@bind(vm.currentMetricSeries.trnmetricname) @save(vm.currentMetricSeries.trnmetricname, before=('saveItem')) @validator(vm.unique, field='TRNMETRICNAME', required=true, oldValue=vm.originalTrnmetricname)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trnmetricname'])" />
+													</div>
+												</div>
+											</div>											<!-- Value S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Value S" />
+														<textbox tabindex="3" id="trnvalues"
+															value="@bind(vm.currentMetricSeries.trnvalues)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnvalues'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Steps -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Steps" />
+														<textbox tabindex="4" id="trnsteps"
+															value="@bind(vm.currentMetricSeries.trnsteps)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnsteps'])" />
+													</div>
+												</div>
+											</div>											<!-- Time Stamps -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Time Stamps" />
+														<textbox tabindex="5" id="trntimestamps"
+															value="@bind(vm.currentMetricSeries.trntimestamps)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trntimestamps'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Minvalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Minvalue" />
+														<textbox tabindex="6" id="trnminvalue"
+															value="@bind(vm.currentMetricSeries.trnminvalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnminvalue'])" />
+													</div>
+												</div>
+											</div>											<!-- Maxvalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxvalue" />
+														<textbox tabindex="7" id="trnmaxvalue"
+															value="@bind(vm.currentMetricSeries.trnmaxvalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnmaxvalue'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Avgvalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Avgvalue" />
+														<textbox tabindex="8" id="trnavgvalue"
+															value="@bind(vm.currentMetricSeries.trnavgvalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnavgvalue'])" />
+													</div>
+												</div>
+											</div>											<!-- Lastvalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastvalue" />
+														<textbox tabindex="9" id="trnlastvalue"
+															value="@bind(vm.currentMetricSeries.trnlastvalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnlastvalue'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Trend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Trend" />
+														<textbox tabindex="10" id="trntrend"
+															value="@bind(vm.currentMetricSeries.trntrend)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trntrend'])" />
+													</div>
+												</div>
+											</div>											<!-- Totalpoints -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalpoints" />
+														<textbox tabindex="11" id="trntotalpoints"
+															value="@bind(vm.currentMetricSeries.trntotalpoints)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trntotalpoints'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Samplingrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Samplingrate" />
+														<textbox tabindex="12" id="trnsamplingrate"
+															value="@bind(vm.currentMetricSeries.trnsamplingrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnsamplingrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="13" id="trncreatedat"
+															value="@bind(vm.currentMetricSeries.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="14" id="trnupdatedat"
+															value="@bind(vm.currentMetricSeries.trnupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

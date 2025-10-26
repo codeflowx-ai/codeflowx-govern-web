@@ -1,0 +1,121 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+    <idspace id="monitoring"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.monitoring.AuditLogDetailViewModel')"
+        validationMessages="@id('vmsgs')">
+        <div class="row">
+            <div>
+                <div class="left tittle-principal">
+                    <h:h2 class="mb-1" style="font-weight: bold;">
+                        <h:i class="fa-sharp-duotone fa-solid fa-database label-icon align-middle fs-16 me-2"></h:i>
+                        <label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+                    </h:h2>
+                    <h:p class="text-muted">
+                        <label value="Gestión y configuración de Audit Log" class="text-muted" />
+                    </h:p>
+                </div>
+            </div>
+            
+            <div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <div class="flex-grow-1">
+                                <a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+                                    onClick="@command('cancelEdit')"
+                                    sclass="waves-effect waves-light" 
+                                    tooltiptext="Volver">
+                                </a>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <div class="hstack text-nowrap gap-2 d-flex">
+                                    <a class="waves-effect waves-light"
+                                        iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+                                        onClick="@command('saveAuditLog')"
+                                        tooltiptext="Guardar Audit Log">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Formulario Principal -->
+                            <div class="col-lg-12 col-xlg-12 col-md-12">
+                                <div class="card default shadow-xl">
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="I D X A U D I T L O G" />
+                                        <textbox tabindex="1" id="idxauditlog"
+                                            value="@bind(vm.currentAuditLog.idxauditlog)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['idxauditlog'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="E N T I T Y T Y P E" />
+                                        <combobox tabindex="2" id="entitytype"
+                                            selectedItem="@bind(vm.currentAuditLog.entitytype)"
+                                            readonly="true">
+                                            <comboitem label="LLM" value="LLM"/>
+                                            <comboitem label="Visión" value="VISION"/>
+                                            <comboitem label="Audio" value="AUDIO"/>
+                                            <comboitem label="Embedding" value="EMBEDDING"/>
+                                        </combobox>
+                                        <label sclass="text-danger" value="@load(vmsgs['entitytype'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="E N T I T Y I D" />
+                                        <textbox tabindex="3" id="entityid"
+                                            value="@bind(vm.currentAuditLog.entityid)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['entityid'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="I P A D D R E S S" />
+                                        <textbox tabindex="4" id="ipaddress"
+                                            value="@bind(vm.currentAuditLog.ipaddress)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['ipaddress'])" />
+                                    </div>
+                                </div>
+                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabs de Información Descendente -->
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>

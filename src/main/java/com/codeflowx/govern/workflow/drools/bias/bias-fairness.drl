@@ -1,0 +1,117 @@
+package com.codeflowx.govern.workflow.drools.bias;
+
+import com.codeflowx.govern.workflow.drools.facts.BiasDetectionFact;
+import java.util.ArrayList;
+
+global org.slf4j.Logger logger;
+
+// ============================================
+// REGLA 1: NO BIAS - Auto-Approve
+// ============================================
+rule "No Bias Detected - Auto-Approve"
+    salience 100
+    when
+        $fact : BiasDetectionFact(
+            demographicParity >= thresholdDemographicParity,
+            equalizedOdds >= thresholdEqualizedOdds,
+            calibration >= thresholdCalibration
+        )
+    then
+        logger.info("🟢 DROOLS: No bias - Auto-approve");
+        
+        $fact.setBiasDetected(false);
+        $fact.setSeverity("NONE");
+        $fact.setDecision("AUTO_APPROVE");
+        $fact.setRequiresCommitteeReview(false);
+        $fact.setMitigationActions(new ArrayList<>());
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 2: MINOR BIAS - Mitigation Required
+// ============================================
+rule "Minor Bias Detected - Mitigation Required"
+    salience 90
+    when
+        $fact : BiasDetectionFact(
+            (demographicParity < thresholdDemographicParity && demographicParity >= 0.80) ||
+            (equalizedOdds < thresholdEqualizedOdds && equalizedOdds >= 0.75),
+            decision == null
+        )
+    then
+        logger.warn("🟡 DROOLS: Minor bias - Mitigation required");
+        
+        ArrayList<String> actions = new ArrayList<>();
+        
+        if ($fact.getDemographicParity() < $fact.getThresholdDemographicParity()) {
+            actions.add("Re-balancear dataset con muestras equitativas");
+        }
+        if ($fact.getEqualizedOdds() < $fact.getThresholdEqualizedOdds()) {
+            actions.add("Aplicar fairness constraints durante entrenamiento");
+        }
+        
+        $fact.setBiasDetected(true);
+        $fact.setSeverity("MEDIUM");
+        $fact.setDecision("MITIGATION_REQUIRED");
+        $fact.setRequiresCommitteeReview(false);
+        $fact.setMitigationActions(actions);
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 3: SIGNIFICANT BIAS - Committee Review
+// ============================================
+rule "Significant Bias Detected - Committee Review"
+    salience 80
+    when
+        $fact : BiasDetectionFact(
+            demographicParity < 0.80 || equalizedOdds < 0.75,
+            decision == null
+        )
+    then
+        logger.error("🔴 DROOLS: Significant bias - Committee review required");
+        
+        ArrayList<String> actions = new ArrayList<>();
+        actions.add("🚨 Revisión obligatoria del comité de ética");
+        actions.add("Aplicar adversarial debiasing");
+        actions.add("Considerar re-diseño del modelo");
+        
+        $fact.setBiasDetected(true);
+        $fact.setSeverity("HIGH");
+        $fact.setDecision("MITIGATION_REQUIRED");
+        $fact.setRequiresCommitteeReview(true);
+        $fact.setMitigationActions(actions);
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 4: CRITICAL BIAS - Reject Model
+// ============================================
+rule "Critical Bias - Reject Model"
+    salience 200  // Máxima prioridad
+    when
+        $fact : BiasDetectionFact(
+            demographicParity < 0.70 || equalizedOdds < 0.65
+        )
+    then
+        logger.error("🚨 DROOLS: CRITICAL BIAS - Auto-reject");
+        
+        ArrayList<String> actions = new ArrayList<>();
+        actions.add("❌ MODELO RECHAZADO - Bias inaceptable");
+        actions.add("Notificar CEO/CTO inmediatamente");
+        actions.add("Revisar proceso de desarrollo completo");
+        actions.add("Implementar controles adicionales");
+        
+        $fact.setBiasDetected(true);
+        $fact.setSeverity("CRITICAL");
+        $fact.setDecision("REJECT");
+        $fact.setRequiresCommitteeReview(true);
+        $fact.setMitigationActions(actions);
+        
+        update($fact);
+end
+
+

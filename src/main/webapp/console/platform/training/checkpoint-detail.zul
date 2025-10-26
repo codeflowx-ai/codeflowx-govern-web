@@ -1,0 +1,316 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.CheckpointDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Checkpoint" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveCheckpoint')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Checkpointname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Checkpointname *" />
+														<textbox tabindex="2" id="trncheckpointname"
+															value="@bind(vm.currentCheckpoint.trncheckpointname) @save(vm.currentCheckpoint.trncheckpointname, before=('saveItem')) @validator(vm.unique, field='TRNCHECKPOINTNAME', required=true, oldValue=vm.originalTrncheckpointname)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['trncheckpointname'])" />
+													</div>
+												</div>
+											</div>											<!-- Epoch -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Epoch" />
+														<textbox tabindex="3" id="trnepoch"
+															value="@bind(vm.currentCheckpoint.trnepoch)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnepoch'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Step -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Step" />
+														<textbox tabindex="4" id="trnstep"
+															value="@bind(vm.currentCheckpoint.trnstep)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnstep'])" />
+													</div>
+												</div>
+											</div>											<!-- Checkpointtype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Checkpointtype *" />
+														<combobox tabindex="5" id="trncheckpointtype"
+															selectedItem="@bind(vm.currentCheckpoint.trncheckpointtype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trncheckpointtype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Path -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Path *" />
+														<textbox tabindex="6" id="trnpath"
+															value="@bind(vm.currentCheckpoint.trnpath)"
+															maxlength="500"
+															constraint="no empty: max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trnpath'])" />
+													</div>
+												</div>
+											</div>											<!-- Filesize -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Filesize" />
+														<textbox tabindex="7" id="trnfilesize"
+															value="@bind(vm.currentCheckpoint.trnfilesize)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnfilesize'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Storagelocation -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Storagelocation" />
+														<textbox tabindex="8" id="trnstoragelocation"
+															value="@bind(vm.currentCheckpoint.trnstoragelocation)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trnstoragelocation'])" />
+													</div>
+												</div>
+											</div>											<!-- Metric Ssnapshot -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metric Ssnapshot" />
+														<textbox tabindex="9" id="trnmetricssnapshot"
+															value="@bind(vm.currentCheckpoint.trnmetricssnapshot)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnmetricssnapshot'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Isbest -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isbest" />
+														<textbox tabindex="10" id="trnisbest"
+															value="@bind(vm.currentCheckpoint.trnisbest)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnisbest'])" />
+													</div>
+												</div>
+											</div>											<!-- Restorable -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Restorable" />
+														<textbox tabindex="11" id="trnrestorable"
+															value="@bind(vm.currentCheckpoint.trnrestorable)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnrestorable'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Autopurge -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Autopurge" />
+														<textbox tabindex="12" id="trnautopurge"
+															value="@bind(vm.currentCheckpoint.trnautopurge)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnautopurge'])" />
+													</div>
+												</div>
+											</div>											<!-- Retentiondays -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Retentiondays" />
+														<textbox tabindex="13" id="trnretentiondays"
+															value="@bind(vm.currentCheckpoint.trnretentiondays)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnretentiondays'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Purgedate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Purgedate" />
+														<textbox tabindex="14" id="trnpurgedate"
+															value="@bind(vm.currentCheckpoint.trnpurgedate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnpurgedate'])" />
+													</div>
+												</div>
+											</div>											<!-- Wasrestored -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Wasrestored" />
+														<textbox tabindex="15" id="trnwasrestored"
+															value="@bind(vm.currentCheckpoint.trnwasrestored)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnwasrestored'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Restoredat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Restoredat" />
+														<textbox tabindex="16" id="trnrestoredat"
+															value="@bind(vm.currentCheckpoint.trnrestoredat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnrestoredat'])" />
+													</div>
+												</div>
+											</div>											<!-- Checksum -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Checksum" />
+														<textbox tabindex="17" id="trnchecksum"
+															value="@bind(vm.currentCheckpoint.trnchecksum)"
+															maxlength="64"
+															constraint="max 64" />
+														<label sclass="text-danger" value="@load(vmsgs['trnchecksum'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="18" id="trncreatedat"
+															value="@bind(vm.currentCheckpoint.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

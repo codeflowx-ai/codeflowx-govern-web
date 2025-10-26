@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="📋 Document Details" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.DocumentDetailsViewModel')">
+        
+        <!-- Header -->
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="@load(vm.filename)" style="font-size: 32px; font-weight: bold;"/>
+                <hlayout spacing="15px" style="margin-top: 10px;">
+                    <label value="@load(vm.fileType.toUpperCase())" style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 5px;"/>
+                    <label value="Status: @load(vm.status)"/>
+                </hlayout>
+            </vlayout>
+            <vlayout style="text-align: right;">
+                <button label="Export TXT" onClick="@command('exportAsTxt')" iconSclass="z-icon-file-text" 
+                        style="background-color: white; color: #667eea;"/>
+                <button label="Export JSON" onClick="@command('exportAsJson')" iconSclass="z-icon-file-code" 
+                        style="background-color: white; color: #667eea; margin-top: 10px;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Tabs con contenido -->
+        <tabbox>
+            <tabs>
+                <tab label="📝 Extracted Text"/>
+                <tab label="🏗️ Structure"/>
+                <tab label="📊 Tables"/>
+                <tab label="🖼️ Images"/>
+                <tab label="📋 Metadata"/>
+            </tabs>
+            <tabpanels>
+                <!-- Text Tab -->
+                <tabpanel>
+                    <groupbox closable="false" height="600px">
+                        <caption label="Extracted Text Content"/>
+                        <textbox value="@load(vm.extractedText)" multiline="true" rows="25" width="100%" readonly="true"/>
+                    </groupbox>
+                </tabpanel>
+                
+                <!-- Structure Tab -->
+                <tabpanel>
+                    <groupbox closable="false" height="600px">
+                        <caption label="Document Structure"/>
+                        <vlayout>
+                            <label value="Structure data will be displayed here" style="color: #666;"/>
+                            <!-- TODO: Implementar tree view de estructura -->
+                        </vlayout>
+                    </groupbox>
+                </tabpanel>
+                
+                <!-- Tables Tab -->
+                <tabpanel>
+                    <groupbox closable="false" height="600px">
+                        <caption label="Extracted Tables (@load(vm.extractedTables.size()))"/>
+                        <vlayout>
+                            <div forEach="@load(vm.extractedTables)">
+                                <label value="Table @load(each.index)" style="font-weight: bold; margin: 10px 0;"/>
+                                <separator height="10px"/>
+                            </div>
+                        </vlayout>
+                    </groupbox>
+                </tabpanel>
+                
+                <!-- Images Tab -->
+                <tabpanel>
+                    <groupbox closable="false" height="600px">
+                        <caption label="Extracted Images (@load(vm.extractedImages.size()))"/>
+                        <vlayout>
+                            <label value="No images extracted" visible="@load(empty vm.extractedImages)" style="color: #666;"/>
+                        </vlayout>
+                    </groupbox>
+                </tabpanel>
+                
+                <!-- Metadata Tab -->
+                <tabpanel>
+                    <groupbox closable="false" height="600px">
+                        <caption label="Document Metadata"/>
+                        <grid>
+                            <columns>
+                                <column width="200px"/>
+                                <column/>
+                            </columns>
+                            <rows>
+                                <row>
+                                    <label value="Filename:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.filename)"/>
+                                </row>
+                                <row>
+                                    <label value="File Type:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.fileType)"/>
+                                </row>
+                                <row>
+                                    <label value="File Size:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.fileSize)"/>
+                                </row>
+                                <row>
+                                    <label value="Confidence Score:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.confidenceScore)" style="color: #22c55e;"/>
+                                </row>
+                            </rows>
+                        </grid>
+                    </groupbox>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </window>
+</zk>
+

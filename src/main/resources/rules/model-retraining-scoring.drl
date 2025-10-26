@@ -1,0 +1,251 @@
+package com.codeflowx.govern.workflow.drools.rules;
+
+import com.codeflowx.govern.workflow.drools.facts.ModelRetrainingFact;
+import java.util.ArrayList;
+import java.util.List;
+
+// Reglas de decisión para reentrenamiento automático de modelos ML
+// Sistema inteligente de reentrenamiento con governance
+
+rule "Calculate Performance Metrics"
+    when
+        $fact: ModelRetrainingFact(
+            currentAccuracy != 0.0,
+            baselineAccuracy != 0.0
+        )
+    then
+        $fact.calculatePerformanceRatio();
+        $fact.calculateDaysSinceLastRetrain();
+        update($fact);
+end
+
+rule "Determine Urgency Level"
+    when
+        $fact: ModelRetrainingFact(
+            performanceRatio != 0.0
+        )
+    then
+        $fact.determineUrgencyLevel();
+        update($fact);
+end
+
+rule "Determine Retraining Strategy"
+    when
+        $fact: ModelRetrainingFact(
+            urgencyLevel != null
+        )
+    then
+        $fact.determineRetrainingStrategy();
+        update($fact);
+end
+
+rule "Make Retraining Decision"
+    when
+        $fact: ModelRetrainingFact(
+            retrainingStrategy != null,
+            decision == null
+        )
+    then
+        $fact.makeDecision();
+        update($fact);
+end
+
+rule "Critical Performance - Immediate Full Retrain"
+    when
+        $fact: ModelRetrainingFact(
+            performanceDegradation > 30 || currentAccuracy < 0.6 || driftScore > 0.8
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("CRÍTICO: Reentrenamiento completo inmediato");
+        recommendations.add("Usar GPU on-demand (no spot)");
+        recommendations.add("Habilitar automated HPO");
+        recommendations.add("A/B testing obligatorio con 5% tráfico");
+        recommendations.add("Monitoreo en tiempo real durante 48h");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("FULL_RETRAIN");
+        $fact.setUseAutomatedHPO(true);
+        $fact.setRequiresApproval(false);
+        $fact.setAbTestingTrafficSplit(5.0);
+        $fact.setRiskLevel("CRITICAL");
+        update($fact);
+end
+
+rule "High Degradation - Urgent Retrain"
+    when
+        $fact: ModelRetrainingFact(
+            performanceDegradation > 20 && performanceDegradation <= 30,
+            driftScore > 0.5 && driftScore <= 0.8
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Degradación alta - reentrenamiento urgente");
+        recommendations.add("Considerar spot instances para optimizar costo");
+        recommendations.add("A/B testing con 10% tráfico");
+        recommendations.add("Validación completa pre-producción");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setAbTestingTrafficSplit(10.0);
+        $fact.setRiskLevel("HIGH");
+        update($fact);
+end
+
+rule "Moderate Degradation - Scheduled Retrain"
+    when
+        $fact: ModelRetrainingFact(
+            performanceDegradation > 10 && performanceDegradation <= 20,
+            driftScore > 0.3 && driftScore <= 0.5
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Degradación moderada - reentrenamiento incremental");
+        recommendations.add("Usar spot instances (70% ahorro)");
+        recommendations.add("A/B testing con 20% tráfico");
+        recommendations.add("Monitoring 24h antes de full rollout");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRetrainingStrategy("INCREMENTAL");
+        $fact.setAbTestingTrafficSplit(20.0);
+        $fact.setRiskLevel("MEDIUM");
+        update($fact);
+end
+
+rule "Schema Changed - Force Full Retrain"
+    when
+        $fact: ModelRetrainingFact(
+            dataSchemaChanged == true
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Esquema de datos cambiado - reentrenamiento completo obligatorio");
+        recommendations.add("Validar compatibilidad con producción");
+        recommendations.add("Testing exhaustivo pre-deploy");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("FULL_RETRAIN");
+        $fact.setRetrainingStrategy("FULL");
+        $fact.setRequiresApproval(true);
+        $fact.setRiskLevel("HIGH");
+        update($fact);
+end
+
+rule "Long Time Without Retrain - Preventive"
+    when
+        $fact: ModelRetrainingFact(
+            daysSinceLastRetrain > 90,
+            performanceDegradation < 15
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Más de 90 días sin reentrenar - reentrenamiento preventivo");
+        recommendations.add("Reentrenamiento incremental con datos recientes");
+        recommendations.add("Bajo riesgo - usar spot instances");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("INCREMENTAL_RETRAIN");
+        $fact.setRequiresApproval(true);
+        $fact.setRiskLevel("LOW");
+        update($fact);
+end
+
+rule "Stable Performance - Skip Retrain"
+    when
+        $fact: ModelRetrainingFact(
+            performanceDegradation < 5,
+            driftScore < 0.2,
+            daysSinceLastRetrain < 90
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Performance estable - no requiere reentrenamiento");
+        recommendations.add("Continuar monitoreo automático");
+        recommendations.add("Próxima evaluación en 30 días");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("SKIP");
+        $fact.setRequiresApproval(false);
+        $fact.setRiskLevel("LOW");
+        update($fact);
+end
+
+rule "Cost Optimization - Use Spot Instances"
+    when
+        $fact: ModelRetrainingFact(
+            urgencyLevel == "LOW" || urgencyLevel == "MEDIUM",
+            spotInstancesAvailable == true,
+            estimatedTrainingTime > 2.0
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Usar spot instances para 70% ahorro en costo");
+        recommendations.add("Configurar checkpointing cada 30 min");
+        recommendations.add("Fallback automático a on-demand si interruption");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setAvailableInfrastructure("SPOT");
+        update($fact);
+end
+
+rule "High Cost - Enable HPO Only If Critical"
+    when
+        $fact: ModelRetrainingFact(
+            estimatedCost > 100.0,
+            urgencyLevel != "CRITICAL"
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Costo estimado alto - deshabilitar HPO automático");
+        recommendations.add("Usar hiperparámetros optimizados previos");
+        recommendations.add("Monitorear costo en tiempo real");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setUseAutomatedHPO(false);
+        update($fact);
+end
+
+rule "Low Data Quality - Require Approval"
+    when
+        $fact: ModelRetrainingFact(
+            dataQualityScore < 0.7
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Calidad de datos baja - requiere revisión humana");
+        recommendations.add("Validar y limpiar datos antes de reentrenar");
+        recommendations.add("Considerar data augmentation");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRequiresApproval(true);
+        $fact.setRiskLevel("MEDIUM");
+        update($fact);
+end
+
+rule "Insufficient New Data - Skip or Wait"
+    when
+        $fact: ModelRetrainingFact(
+            newDataAvailable < (trainingDataSize * 0.05),
+            performanceDegradation < 15
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Datos nuevos insuficientes (<5%) - esperar más datos");
+        recommendations.add("Continuar recolección de datos");
+        recommendations.add("Reevaluar en 14 días");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("SKIP");
+        update($fact);
+end
+
+rule "Set Final Retraining Config"
+    when
+        $fact: ModelRetrainingFact(
+            decision != null,
+            retrainingStrategy != null,
+            urgencyLevel != null
+        )
+    then
+        // Configuración final lista para ejecución
+        update($fact);
+end

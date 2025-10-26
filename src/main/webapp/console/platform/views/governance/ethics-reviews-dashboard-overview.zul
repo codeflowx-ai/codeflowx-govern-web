@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Ethics Reviews Dashboard" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.views.governance.EthicsReviewsDashboardOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <combobox placeholder="Filter by Status" value="@bind(vm.filterStatus)" 
+                      onChange="@command('filterByStatus')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="PENDING" value="PENDING"/>
+                <comboitem label="APPROVED" value="APPROVED"/>
+                <comboitem label="REJECTED" value="REJECTED"/>
+            </combobox>
+        </hlayout>
+        
+        <listbox model="@load(vm.ethicsReviewsDashboard)" selectedItem="@bind(vm.selectedItem)"
+                 emptyMessage="No ethics review data" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Entity Type" width="120px"/>
+                <listheader label="Score" width="100px"/>
+                <listheader label="Severity" width="100px"/>
+                <listheader label="Concerns" width="100px"/>
+                <listheader label="Days Since" width="100px"/>
+                <listheader label="Overdue" width="80px"/>
+                <listheader label="Status" width="120px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxethicsreview)"/>
+                    <listcell label="@load(item.ethentitytype)"/>
+                    <listcell label="@load(item.ethscore)"/>
+                    <listcell label="@load(item.ethseverity)"/>
+                    <listcell label="@load(item.concernscount)"/>
+                    <listcell label="@load(item.dayssincecreation)"/>
+                    <listcell label="@load(item.isoverdue ? 'YES' : 'NO')"/>
+                    <listcell label="@load(item.ethstatus)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

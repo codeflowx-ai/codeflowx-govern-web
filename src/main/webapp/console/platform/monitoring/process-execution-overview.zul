@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Process Executions" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.monitoring.ProcessExecutionOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <button label="Delete" iconSclass="fa fa-trash" onClick="@command('delete')" 
+                    disabled="@load(vm.selectedProcessExecution eq null)"/>
+        </hlayout>
+        
+        <listbox model="@load(vm.processExecutions)" selectedItem="@bind(vm.selectedProcessExecution)"
+                 emptyMessage="No process executions found" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Process Def ID" width="150px"/>
+                <listheader label="Instance ID" width="200px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Duration (ms)" width="130px"/>
+                <listheader label="Variables" width="200px"/>
+                <listheader label="Created At" width="180px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxprocessexecution)"/>
+                    <listcell label="@load(item.pexprocessdefinitionid)"/>
+                    <listcell label="@load(item.pexprocessinstanceid)"/>
+                    <listcell label="@load(item.pexstatus)"/>
+                    <listcell label="@load(item.pexdurationms)"/>
+                    <listcell label="@load(item.pexvariables)"/>
+                    <listcell label="@load(item.pexcreatedat)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

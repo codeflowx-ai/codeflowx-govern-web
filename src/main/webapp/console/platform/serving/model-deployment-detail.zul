@@ -1,0 +1,379 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="serving"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.serving.ModelDeploymentDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Model Deployment" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModelDeployment')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Srvdeploymentname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentname *" />
+														<textbox tabindex="2" id="srvdeploymentname"
+															value="@bind(vm.currentModelDeployment.srvdeploymentname) @save(vm.currentModelDeployment.srvdeploymentname, before=('saveItem')) @validator(vm.unique, field='SRVDEPLOYMENTNAME', required=true, oldValue=vm.originalSrvdeploymentname)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentname'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentstatus *" />
+														<combobox tabindex="3" id="srvdeploymentstatus"
+															selectedItem="@bind(vm.currentModelDeployment.srvdeploymentstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Srvdeploymentendpoint -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentendpoint" />
+														<textbox tabindex="4" id="srvdeploymentendpoint"
+															value="@bind(vm.currentModelDeployment.srvdeploymentendpoint)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentendpoint'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentport -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentport" />
+														<textbox tabindex="5" id="srvdeploymentport"
+															value="@bind(vm.currentModelDeployment.srvdeploymentport)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentport'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Srvdeploymentreplicas -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentreplicas" />
+														<textbox tabindex="6" id="srvdeploymentreplicas"
+															value="@bind(vm.currentModelDeployment.srvdeploymentreplicas)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentreplicas'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentresources -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentresources" />
+														<textbox tabindex="7" id="srvdeploymentresources"
+															value="@bind(vm.currentModelDeployment.srvdeploymentresources)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentresources'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Srvdeploymentconfig -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentconfig" />
+														<textbox tabindex="8" id="srvdeploymentconfig"
+															value="@bind(vm.currentModelDeployment.srvdeploymentconfig)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentconfig'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentenvvars -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentenvvars" />
+														<textbox tabindex="9" id="srvdeploymentenvvars"
+															value="@bind(vm.currentModelDeployment.srvdeploymentenvvars)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentenvvars'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Srvdeploymentlabels -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentlabels" />
+														<textbox tabindex="10" id="srvdeploymentlabels"
+															value="@bind(vm.currentModelDeployment.srvdeploymentlabels)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentlabels'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentactive -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentactive" />
+														<textbox tabindex="11" id="srvdeploymentactive"
+															value="@bind(vm.currentModelDeployment.srvdeploymentactive)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentactive'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Srvdeploymentcreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentcreatedat *" />
+														<textbox tabindex="12" id="srvdeploymentcreatedat"
+															value="@bind(vm.currentModelDeployment.srvdeploymentcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Srvdeploymentupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Srvdeploymentupdatedat" />
+														<textbox tabindex="13" id="srvdeploymentupdatedat"
+															value="@bind(vm.currentModelDeployment.srvdeploymentupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['srvdeploymentupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subsrvmodelmetrics -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subsrvmodelmetrics" />
+														<textbox tabindex="14" id="subsrvmodelmetrics"
+															value="@bind(vm.currentModelDeployment.subsrvmodelmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subsrvmodelmetrics'])" />
+													</div>
+												</div>
+											</div>											<!-- Subsrvpredictions -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subsrvpredictions" />
+														<textbox tabindex="15" id="subsrvpredictions"
+															value="@bind(vm.currentModelDeployment.subsrvpredictions)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subsrvpredictions'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subsrvmodelmetrics" onSelect="@command('onSelectModelMetricsTab')" />
+												<tab label="Subsrvpredictions" onSelect="@command('onSelectModelPredictionTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subsrvmodelmetrics -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subsrvmodelmetrics"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalModelMetricss)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subsrvmodelmetrics)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subsrvmodelmetrics)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subsrvmodelmetrics registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subsrvpredictions -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subsrvpredictions"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalModelPredictions)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subsrvpredictions)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subsrvpredictions)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subsrvpredictions registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

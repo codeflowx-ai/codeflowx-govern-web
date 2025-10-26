@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Drift Detection" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.monitoring.DriftDetectionOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <button label="Delete" iconSclass="fa fa-trash" onClick="@command('delete')" 
+                    disabled="@load(vm.selectedDriftDetection eq null)"/>
+        </hlayout>
+        
+        <listbox model="@load(vm.driftDetections)" selectedItem="@bind(vm.selectedDriftDetection)"
+                 emptyMessage="No drift detections found" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Model ID" width="100px"/>
+                <listheader label="Type" width="150px"/>
+                <listheader label="Score" width="100px"/>
+                <listheader label="Detected" width="100px"/>
+                <listheader label="Severity" width="120px"/>
+                <listheader label="Action" width="150px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Created At" width="180px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxdriftdetection)"/>
+                    <listcell label="@load(item.idxmodel)"/>
+                    <listcell label="@load(item.drftype)"/>
+                    <listcell label="@load(item.drfscore)"/>
+                    <listcell label="@load(item.drfdetected ? 'YES' : 'NO')"/>
+                    <listcell label="@load(item.drfseverity)"/>
+                    <listcell label="@load(item.drfaction)"/>
+                    <listcell label="@load(item.drfstatus)"/>
+                    <listcell label="@load(item.drfcreatedat)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

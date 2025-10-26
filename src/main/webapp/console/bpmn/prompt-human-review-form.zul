@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="promptHumanReviewWindow" 
+            title="Revisión Humana de Prompt" 
+            border="normal" 
+            width="1000px" 
+            height="700px"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.PromptHumanReviewViewModel')">
+
+        <style>
+            .section-title { font-weight: bold; font-size: 16px; color: #1976d2; margin-bottom: 15px; padding-bottom: 5px; border-bottom: 2px solid #1976d2; }
+            .form-group { margin-bottom: 20px; }
+            .form-label { font-weight: bold; color: #333; margin-bottom: 5px; display: block; }
+            .required::after { content: " *"; color: red; }
+            .info-card { background-color: #ffffff; padding: 15px; border-radius: 4px; border: 1px solid #e0e0e0; margin-bottom: 15px; }
+            .score-box { display: inline-block; padding: 10px 20px; border-radius: 4px; font-size: 18px; font-weight: bold; text-align: center; min-width: 80px; }
+            .score-high { background-color: #4caf50; color: white; }
+            .score-medium { background-color: #ff9800; color: white; }
+            .score-low { background-color: #f44336; color: white; }
+            .risk-item { background-color: #fff3e0; padding: 8px 12px; border-left: 4px solid #ff9800; margin-bottom: 8px; border-radius: 2px; }
+            .action-buttons { text-align: right; padding-top: 20px; border-top: 1px solid #ddd; }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px; overflow-y: auto;">
+            
+            <!-- Información del Prompt -->
+            <div>
+                <label class="section-title" value="📄 Información del Prompt"/>
+                <div class="info-card">
+                    <grid>
+                        <rows>
+                            <row>
+                                <label value="Nombre:" style="font-weight: bold; width: 150px;"/>
+                                <label value="@load(vm.prompt.prmname)"/>
+                            </row>
+                            <row>
+                                <label value="Categoría:" style="font-weight: bold;"/>
+                                <label value="@load(vm.prompt.prmcategory)"/>
+                            </row>
+                            <row>
+                                <label value="Versión:" style="font-weight: bold;"/>
+                                <label value="@load(vm.prompt.prmversion)"/>
+                            </row>
+                            <row>
+                                <label value="Tipo de Aprobación:" style="font-weight: bold;"/>
+                                <label value="@load(vm.approval.prmapprovaltype)"/>
+                            </row>
+                            <row>
+                                <label value="Razón de Solicitud:" style="font-weight: bold;"/>
+                                <label value="@load(vm.approval.prmrequestreason)" multiline="true"/>
+                            </row>
+                        </rows>
+                    </grid>
+                </div>
+            </div>
+
+            <!-- Contenido del Prompt -->
+            <div>
+                <label class="section-title" value="📝 Contenido del Prompt"/>
+                <div class="info-card" style="background-color: #f5f5f5; font-family: monospace; font-size: 12px; max-height: 150px; overflow-y: auto;">
+                    <label value="@load(vm.prompt.prmcontent)" multiline="true"/>
+                </div>
+            </div>
+
+            <!-- Resultado del Safety Check -->
+            <div>
+                <label class="section-title" value="🔒 Resultado del Safety Check"/>
+                <div class="info-card">
+                    <hlayout spacing="30px" valign="middle">
+                        <vlayout>
+                            <label value="Puntuación de Seguridad" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.safetyScore)" 
+                                   sclass="@load(vm.safetyScore ge 90 ? 'score-box score-high' : vm.safetyScore ge 70 ? 'score-box score-medium' : 'score-box score-low')"/>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Jailbreak Detectado" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.jailbreakDetected ? 'SÍ ⚠️' : 'NO ✓')" 
+                                   style="@load(vm.jailbreakDetected ? 'color: red; font-weight: bold;' : 'color: green; font-weight: bold;')"/>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Injection Detectado" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.injectionDetected ? 'SÍ ⚠️' : 'NO ✓')" 
+                                   style="@load(vm.injectionDetected ? 'color: red; font-weight: bold;' : 'color: green; font-weight: bold;')"/>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Contenido Malicioso" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.maliciousContentDetected ? 'SÍ ⚠️' : 'NO ✓')" 
+                                   style="@load(vm.maliciousContentDetected ? 'color: red; font-weight: bold;' : 'color: green; font-weight: bold;')"/>
+                        </vlayout>
+                    </hlayout>
+                    
+                    <!-- Riesgos Detectados -->
+                    <div visible="@load(not empty vm.safetyRisks)" style="margin-top: 15px;">
+                        <label value="Riesgos Identificados:" style="font-weight: bold; color: #f57c00;"/>
+                        <div style="margin-top: 10px;">
+                            <div class="risk-item" forEach="@load(vm.safetyRisks)">
+                                <label value="@load(each)"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resultado del Compliance Check -->
+            <div>
+                <label class="section-title" value="✓ Resultado del Compliance Check"/>
+                <div class="info-card">
+                    <hlayout spacing="30px" valign="middle">
+                        <vlayout>
+                            <label value="Puntuación de Compliance" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.complianceScore)" 
+                                   sclass="@load(vm.complianceScore == 100 ? 'score-box score-high' : vm.complianceScore ge 80 ? 'score-box score-medium' : 'score-box score-low')"/>
+                        </vlayout>
+                        <vlayout>
+                            <label value="Recomendación" style="font-size: 12px; color: #666;"/>
+                            <label value="@load(vm.complianceRecommendation)" style="font-weight: bold;"/>
+                        </vlayout>
+                    </hlayout>
+                </div>
+            </div>
+
+            <!-- Decisión de Aprobación -->
+            <div>
+                <label class="section-title" value="⚖️ Decisión"/>
+                <div class="info-card">
+                    <div class="form-group">
+                        <label class="form-label required">¿Aprobar el prompt?</label>
+                        <radiogroup id="decisionRadio" selectedItem="@bind(vm.approved)">
+                            <radio label="✓ APROBAR" value="true" style="margin-right: 30px; color: #4caf50; font-weight: bold;"/>
+                            <radio label="✗ RECHAZAR" value="false" style="color: #f44336; font-weight: bold;"/>
+                        </radiogroup>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notas de Aprobación</label>
+                        <textbox id="approvalNotesText" 
+                                 width="100%" 
+                                 rows="3" 
+                                 multiline="true"
+                                 value="@bind(vm.approvalNotes)"
+                                 placeholder="Añada notas o comentarios sobre su decisión..."/>
+                    </div>
+
+                    <div class="form-group" visible="@load(vm.approved eq false)">
+                        <label class="form-label required">Razón del Rechazo</label>
+                        <textbox id="rejectionReasonText" 
+                                 width="100%" 
+                                 rows="3" 
+                                 multiline="true"
+                                 value="@bind(vm.rejectionReason)"
+                                 placeholder="Explique la razón del rechazo del prompt..."/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <hlayout spacing="10px">
+                    <button label="Cancelar" 
+                            onClick="@command('cancel')" 
+                            sclass="btn-secondary"/>
+                    <button label="Confirmar Decisión" 
+                            onClick="@command('confirmDecision')" 
+                            sclass="btn-primary"
+                            disabled="@load(vm.approved eq null or (vm.approved eq false and empty vm.rejectionReason))"/>
+                </hlayout>
+            </div>
+
+        </vlayout>
+
+    </window>
+</zk>
+
+

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+	<window title="🚨 URGENTE: Decisión de Bias (24h SLA)" border="normal" width="800px" height="600px" 
+	        apply="org.zkoss.bind.BindComposer" viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.BiasUrgentDecisionViewModel')">
+		
+		<vbox spacing="20px" style="padding: 20px;">
+			
+			<!-- ALERTA URGENTE -->
+			<hbox style="background-color: #e74c3c; color: white; padding: 15px; border-radius: 5px;">
+				<label value="🚨 ALERTA URGENTE" style="font-size: 18px; font-weight: bold;"/>
+			</hbox>
+			
+			<!-- INFORMACIÓN DEL SLA -->
+			<groupbox title="⏰ Información del SLA">
+				<grid>
+					<columns>
+						<column width="200px"/>
+						<column/>
+					</columns>
+					<rows>
+						<row>
+							<cell><label value="Tiempo Transcurrido:"/></cell>
+							<cell><label value="@load(vm.elapsedTime)" style="font-weight: bold; color: #e74c3c;"/></cell>
+						</row>
+						<row>
+							<cell><label value="SLA Límite:"/></cell>
+							<cell><label value="24 horas" style="font-weight: bold;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Estado:"/></cell>
+							<cell><label value="SLA EXCEDIDO" style="font-weight: bold; color: #e74c3c;"/></cell>
+						</row>
+					</rows>
+				</grid>
+			</groupbox>
+			
+			<!-- INFORMACIÓN DEL MODELO -->
+			<groupbox title="📊 Modelo con Bias Detectado">
+				<grid>
+					<columns>
+						<column width="200px"/>
+						<column/>
+					</columns>
+					<rows>
+						<row>
+							<cell><label value="Modelo ID:"/></cell>
+							<cell><label value="@load(vm.modelId)" style="font-weight: bold;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Score de Bias:"/></cell>
+							<cell><label value="@load(vm.overallBiasScore + '/100')" 
+							           style="font-weight: bold; color: #e74c3c;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Nivel de Riesgo:"/></cell>
+							<cell><label value="@load(vm.riskLevel)" style="font-weight: bold; color: #e74c3c;"/></cell>
+						</row>
+					</rows>
+				</grid>
+			</groupbox>
+			
+			<!-- ACCIONES URGENTES -->
+			<groupbox title="⚡ Acciones Urgentes Disponibles">
+				<vbox>
+					<label value="Seleccione una acción inmediata:" style="font-weight: bold; margin-bottom: 15px;"/>
+					
+					<radiogroup model="@bind(vm.urgentDecision)">
+						<radio label="🔧 Mitigar - Aprobar con plan de mitigación obligatorio" value="MITIGATE"/>
+						<radio label="❌ Rechazar - Rechazar el modelo por bias crítico" value="REJECT"/>
+						<radio label="⚠️ Aceptar Riesgo - Aprobar con aceptación explícita del riesgo" value="ACCEPT_RISK"/>
+					</radiogroup>
+					
+					<separator/>
+					
+					<label value="Justificación de la decisión urgente:" style="font-weight: bold; margin-top: 15px;"/>
+					<textbox multiline="true" rows="4" width="100%" 
+					         model="@bind(vm.urgentJustification)" 
+					         placeholder="Explique por qué esta decisión es apropiada para el caso urgente..."/>
+				</vbox>
+			</groupbox>
+			
+			<!-- INFORMACIÓN ADICIONAL -->
+			<groupbox title="ℹ️ Información Adicional">
+				<vbox>
+					<label value="• Esta decisión será registrada como decisión de SLA excedido" style="color: #7f8c8d;"/>
+					<label value="• Se notificará automáticamente al equipo de governance" style="color: #7f8c8d;"/>
+					<label value="• La decisión será auditada en la próxima revisión de governance" style="color: #7f8c8d;"/>
+				</vbox>
+			</groupbox>
+			
+			<!-- BOTONES DE ACCIÓN -->
+			<hbox style="margin-top: 20px;" hflex="1">
+				<button label="⚡ Ejecutar Decisión Urgente" 
+				        style="background-color: #e74c3c; color: white; font-weight: bold;"
+				        onClick="@command('executeUrgentDecision')"
+				        disabled="@load(empty vm.urgentDecision)"/>
+				<button label="📋 Ver Historial Completo" 
+				        style="background-color: #3498db; color: white;"
+				        onClick="@command('showFullHistory')"/>
+				<button label="❌ Cancelar" 
+				        style="background-color: #95a5a6; color: white;"
+				        onClick="@command('cancelUrgentDecision')"/>
+			</hbox>
+			
+		</vbox>
+		
+	</window>
+</zk>

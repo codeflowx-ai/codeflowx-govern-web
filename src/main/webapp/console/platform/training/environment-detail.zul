@@ -1,0 +1,503 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.EnvironmentDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Environment" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveEnvironment')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Pythonversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Pythonversion *" />
+														<textbox tabindex="2" id="trnpythonversion"
+															value="@bind(vm.currentEnvironment.trnpythonversion)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trnpythonversion'])" />
+													</div>
+												</div>
+											</div>											<!-- Packages -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Packages" />
+														<textbox tabindex="3" id="trnpackages"
+															value="@bind(vm.currentEnvironment.trnpackages)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnpackages'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Pipfreeze -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Pipfreeze" />
+														<textbox tabindex="4" id="trnpipfreeze"
+															value="@bind(vm.currentEnvironment.trnpipfreeze)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnpipfreeze'])" />
+													</div>
+												</div>
+											</div>											<!-- Condaenv -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Condaenv" />
+														<textbox tabindex="5" id="trncondaenv"
+															value="@bind(vm.currentEnvironment.trncondaenv)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trncondaenv'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Cputype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cputype" />
+														<combobox tabindex="6" id="trncputype"
+															selectedItem="@bind(vm.currentEnvironment.trncputype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trncputype'])" />
+													</div>
+												</div>
+											</div>											<!-- Cpucores -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cpucores" />
+														<textbox tabindex="7" id="trncpucores"
+															value="@bind(vm.currentEnvironment.trncpucores)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trncpucores'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ramgb -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ramgb" />
+														<textbox tabindex="8" id="trnramgb"
+															value="@bind(vm.currentEnvironment.trnramgb)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnramgb'])" />
+													</div>
+												</div>
+											</div>											<!-- Gputype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gputype" />
+														<combobox tabindex="9" id="trngputype"
+															selectedItem="@bind(vm.currentEnvironment.trngputype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trngputype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Gpucount -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gpucount" />
+														<textbox tabindex="10" id="trngpucount"
+															value="@bind(vm.currentEnvironment.trngpucount)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trngpucount'])" />
+													</div>
+												</div>
+											</div>											<!-- Gpumemorygb -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gpumemorygb" />
+														<textbox tabindex="11" id="trngpumemorygb"
+															value="@bind(vm.currentEnvironment.trngpumemorygb)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trngpumemorygb'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Cudaversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cudaversion" />
+														<textbox tabindex="12" id="trncudaversion"
+															value="@bind(vm.currentEnvironment.trncudaversion)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trncudaversion'])" />
+													</div>
+												</div>
+											</div>											<!-- Cudnnversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cudnnversion" />
+														<textbox tabindex="13" id="trncudnnversion"
+															value="@bind(vm.currentEnvironment.trncudnnversion)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['trncudnnversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Os -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Os" />
+														<textbox tabindex="14" id="trnos"
+															value="@bind(vm.currentEnvironment.trnos)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trnos'])" />
+													</div>
+												</div>
+											</div>											<!-- Kernelversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Kernelversion" />
+														<textbox tabindex="15" id="trnkernelversion"
+															value="@bind(vm.currentEnvironment.trnkernelversion)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trnkernelversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dockerimage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dockerimage" />
+														<textbox tabindex="16" id="trndockerimage"
+															value="@bind(vm.currentEnvironment.trndockerimage)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trndockerimage'])" />
+													</div>
+												</div>
+											</div>											<!-- Dockerfile -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dockerfile" />
+														<textbox tabindex="17" id="trndockerfile"
+															value="@bind(vm.currentEnvironment.trndockerfile)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trndockerfile'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Containerid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Containerid" />
+														<textbox tabindex="18" id="trncontainerid"
+															value="@bind(vm.currentEnvironment.trncontainerid)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trncontainerid'])" />
+													</div>
+												</div>
+											</div>											<!-- Gitrepo -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitrepo" />
+														<textbox tabindex="19" id="trngitrepo"
+															value="@bind(vm.currentEnvironment.trngitrepo)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitrepo'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Gitcommit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitcommit" />
+														<textbox tabindex="20" id="trngitcommit"
+															value="@bind(vm.currentEnvironment.trngitcommit)"
+															maxlength="40"
+															constraint="max 40" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitcommit'])" />
+													</div>
+												</div>
+											</div>											<!-- Gitbranch -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitbranch" />
+														<textbox tabindex="21" id="trngitbranch"
+															value="@bind(vm.currentEnvironment.trngitbranch)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trngitbranch'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Gitdirty -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitdirty" />
+														<textbox tabindex="22" id="trngitdirty"
+															value="@bind(vm.currentEnvironment.trngitdirty)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trngitdirty'])" />
+													</div>
+												</div>
+											</div>											<!-- Gitdiff -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Gitdiff" />
+														<textbox tabindex="23" id="trngitdiff"
+															value="@bind(vm.currentEnvironment.trngitdiff)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trngitdiff'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Framework -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Framework" />
+														<combobox tabindex="24" id="trnframework"
+															selectedItem="@bind(vm.currentEnvironment.trnframework)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trnframework'])" />
+													</div>
+												</div>
+											</div>											<!-- Frameworkversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Frameworkversion" />
+														<combobox tabindex="25" id="trnframeworkversion"
+															selectedItem="@bind(vm.currentEnvironment.trnframeworkversion)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trnframeworkversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Frameworkbackend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Frameworkbackend" />
+														<combobox tabindex="26" id="trnframeworkbackend"
+															selectedItem="@bind(vm.currentEnvironment.trnframeworkbackend)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['trnframeworkbackend'])" />
+													</div>
+												</div>
+											</div>											<!-- Envvars -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Envvars" />
+														<textbox tabindex="27" id="trnenvvars"
+															value="@bind(vm.currentEnvironment.trnenvvars)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnenvvars'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Reprohash -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Reprohash" />
+														<textbox tabindex="28" id="trnreprohash"
+															value="@bind(vm.currentEnvironment.trnreprohash)"
+															maxlength="64"
+															constraint="max 64" />
+														<label sclass="text-danger" value="@load(vmsgs['trnreprohash'])" />
+													</div>
+												</div>
+											</div>											<!-- Isreproducible -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isreproducible" />
+														<textbox tabindex="29" id="trnisreproducible"
+															value="@bind(vm.currentEnvironment.trnisreproducible)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnisreproducible'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="30" id="trncreatedat"
+															value="@bind(vm.currentEnvironment.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

@@ -1,0 +1,238 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.MetricStreamDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Metric Stream" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveMetricStream')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Streamid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Streamid *" />
+														<textbox tabindex="2" id="trnstreamid"
+															value="@bind(vm.currentMetricStream.trnstreamid)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['trnstreamid'])" />
+													</div>
+												</div>
+											</div>											<!-- Isactive -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isactive" />
+														<textbox tabindex="3" id="trnisactive"
+															value="@bind(vm.currentMetricStream.trnisactive)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnisactive'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updatefrequency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updatefrequency" />
+														<textbox tabindex="4" id="trnupdatefrequency"
+															value="@bind(vm.currentMetricStream.trnupdatefrequency)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnupdatefrequency'])" />
+													</div>
+												</div>
+											</div>											<!-- Buffersize -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Buffersize" />
+														<textbox tabindex="5" id="trnbuffersize"
+															value="@bind(vm.currentMetricStream.trnbuffersize)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnbuffersize'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subscribers -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subscribers" />
+														<textbox tabindex="6" id="trnsubscribers"
+															value="@bind(vm.currentMetricStream.trnsubscribers)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnsubscribers'])" />
+													</div>
+												</div>
+											</div>											<!-- Lastmetricupdate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lastmetricupdate" />
+														<textbox tabindex="7" id="trnlastmetricupdate"
+															value="@bind(vm.currentMetricStream.trnlastmetricupdate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnlastmetricupdate'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Metric Ssent -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metric Ssent" />
+														<textbox tabindex="8" id="trnmetricssent"
+															value="@bind(vm.currentMetricStream.trnmetricssent)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnmetricssent'])" />
+													</div>
+												</div>
+											</div>											<!-- By Tessent -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="By Tessent" />
+														<textbox tabindex="9" id="trnbytessent"
+															value="@bind(vm.currentMetricStream.trnbytessent)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnbytessent'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Protocol -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Protocol" />
+														<textbox tabindex="10" id="trnprotocol"
+															value="@bind(vm.currentMetricStream.trnprotocol)"
+															maxlength="20"
+															constraint="max 20" />
+														<label sclass="text-danger" value="@load(vmsgs['trnprotocol'])" />
+													</div>
+												</div>
+											</div>											<!-- Connectionquality -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Connectionquality" />
+														<textbox tabindex="11" id="trnconnectionquality"
+															value="@bind(vm.currentMetricStream.trnconnectionquality)"
+															maxlength="20"
+															constraint="max 20" />
+														<label sclass="text-danger" value="@load(vmsgs['trnconnectionquality'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="12" id="trncreatedat"
+															value="@bind(vm.currentMetricStream.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="13" id="trnupdatedat"
+															value="@bind(vm.currentMetricStream.trnupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

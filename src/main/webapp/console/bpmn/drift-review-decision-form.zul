@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Revisión Programada de Drift - 48 Horas" border="normal" width="850px" closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.DriftReviewDecisionViewModel')">
+
+        <style>
+            .decision-card { border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+            .decision-card:hover { background: #f5f5f5; border-color: #1976d2; }
+            .decision-card.selected { background: #e3f2fd; border: 2px solid #1976d2; }
+            .alert-box { background: #ffebee; padding: 15px; border-left: 4px solid #d32f2f; margin-bottom: 20px; }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px;">
+
+            <!-- Alert de Timer -->
+            <div sclass="alert-box">
+                <hlayout spacing="10px">
+                    <label value="⏰" style="font-size: 24px;"/>
+                    <vlayout>
+                        <label value="Han transcurrido 48 horas desde la detección de drift" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Modelo: ${vm.modelName} | Drift Score: ${vm.driftScore}" style="color: #666;"/>
+                        <label value="Tipo de Drift: ${vm.driftType} | Severidad: ${vm.severity}" style="color: #d32f2f; font-weight: bold;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Información del Drift -->
+            <groupbox title="📊 Resumen del Drift Detectado" mold="3d">
+                <grid>
+                    <rows>
+                        <row><label value="Score de Drift:"/><label value="@load(vm.driftScore)" style="font-weight: bold;"/></row>
+                        <row><label value="Umbral:"/><label value="@load(vm.driftThreshold)"/></row>
+                        <row><label value="Recomendaciones:"/><label value="@load(vm.driftRecommendations)" style="color: #1976d2;"/></row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <separator/>
+
+            <!-- Opciones de Decisión -->
+            <label value="Por favor, decide la acción definitiva:" style="font-weight: bold; font-size: 16px;"/>
+
+            <!-- Opción 1: Reentrenar Ahora -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'RETRAIN' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='RETRAIN')">
+                <hlayout spacing="15px">
+                    <label value="🔄" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Reentrenar Modelo Ahora" style="font-weight: bold; font-size: 14px; color: #d32f2f;"/>
+                        <label value="Iniciar proceso de reentrenamiento con datos actualizados" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Drift score > 0.50" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 2: Esperar Más Datos -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'WAIT_MORE_DATA' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='WAIT_MORE_DATA')">
+                <hlayout spacing="15px">
+                    <label value="⏳" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Esperar Más Datos (7 días)" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Acumular más métricas antes de decidir" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Drift score entre 0.25-0.40" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 3: Aceptar Drift -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'ACCEPT_DRIFT' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='ACCEPT_DRIFT')">
+                <hlayout spacing="15px">
+                    <label value="✅" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Aceptar Drift (Sin Acción)" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="El drift es aceptable, continuar monitoreando" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Drift score < 0.30 o es drift esperado" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Justificación -->
+            <separator/>
+            <label value="Justificación (obligatoria):" style="font-weight: bold;"/>
+            <textbox rows="3" width="100%" placeholder="Explica el razonamiento detrás de tu decisión..." 
+                     value="@bind(vm.justification)" constraint="no empty"/>
+
+            <!-- Botones -->
+            <separator/>
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')" iconSclass="z-icon-times" style="min-width: 100px;"/>
+                <button label="Confirmar Decisión" onClick="@command('confirmDecision')" iconSclass="z-icon-check" 
+                        disabled="@load(empty vm.selectedDecision or empty vm.justification)"
+                        style="min-width: 150px; background: #1976d2; color: white; font-weight: bold;"/>
+            </hlayout>
+
+        </vlayout>
+    </window>
+</zk>
+

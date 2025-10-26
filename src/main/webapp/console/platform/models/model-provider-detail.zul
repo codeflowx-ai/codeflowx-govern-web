@@ -1,0 +1,735 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="models"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.models.ModelProviderDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-microchip label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de El Provider" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModelProvider')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Name -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Name *" />
+														<textbox tabindex="2" id="modname"
+															value="@bind(vm.currentModelProvider.modname) @save(vm.currentModelProvider.modname, before=('saveItem')) @validator(vm.unique, field='MODNAME', required=true, oldValue=vm.originalModname)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['modname'])" />
+													</div>
+												</div>
+											</div>											<!-- Displayname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Displayname" />
+														<textbox tabindex="3" id="moddisplayname"
+															value="@bind(vm.currentModelProvider.moddisplayname) @save(vm.currentModelProvider.moddisplayname, before=('saveItem')) @validator(vm.unique, field='MODDISPLAYNAME', required=false, oldValue=vm.originalModdisplayname)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['moddisplayname'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Description -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Description" />
+														<textbox tabindex="4" id="moddescription"
+															value="@bind(vm.currentModelProvider.moddescription)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['moddescription'])" />
+													</div>
+												</div>
+											</div>											<!-- Provider Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Provider Type *" />
+														<combobox tabindex="5" id="modprovidertype"
+															selectedItem="@bind(vm.currentModelProvider.modprovidertype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modprovidertype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Baseurl -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Baseurl" />
+														<textbox tabindex="6" id="modbaseurl"
+															value="@bind(vm.currentModelProvider.modbaseurl)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['modbaseurl'])" />
+													</div>
+												</div>
+											</div>											<!-- Apiversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Apiversion" />
+														<textbox tabindex="7" id="modapiversion"
+															value="@bind(vm.currentModelProvider.modapiversion)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['modapiversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="8" id="modstatus"
+															selectedItem="@bind(vm.currentModelProvider.modstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modstatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Pricingmodel -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Pricingmodel" />
+														<textbox tabindex="9" id="modpricingmodel"
+															value="@bind(vm.currentModelProvider.modpricingmodel)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['modpricingmodel'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Pricingdetails -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Pricingdetails" />
+														<textbox tabindex="10" id="modpricingdetails"
+															value="@bind(vm.currentModelProvider.modpricingdetails)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modpricingdetails'])" />
+													</div>
+												</div>
+											</div>											<!-- Hasfreetier -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Hasfreetier" />
+														<textbox tabindex="11" id="modhasfreetier"
+															value="@bind(vm.currentModelProvider.modhasfreetier)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modhasfreetier'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Authtype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Authtype" />
+														<combobox tabindex="12" id="modauthtype"
+															selectedItem="@bind(vm.currentModelProvider.modauthtype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modauthtype'])" />
+													</div>
+												</div>
+											</div>											<!-- Authconfig -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Authconfig" />
+														<textbox tabindex="13" id="modauthconfig"
+															value="@bind(vm.currentModelProvider.modauthconfig)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modauthconfig'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Supportstext -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportstext" />
+														<textbox tabindex="14" id="modsupportstext"
+															value="@bind(vm.currentModelProvider.modsupportstext)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportstext'])" />
+													</div>
+												</div>
+											</div>											<!-- Supportsembeddings -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsembeddings" />
+														<textbox tabindex="15" id="modsupportsembeddings"
+															value="@bind(vm.currentModelProvider.modsupportsembeddings)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsembeddings'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Supportsaudio -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsaudio" />
+														<textbox tabindex="16" id="modsupportsaudio"
+															value="@bind(vm.currentModelProvider.modsupportsaudio)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsaudio'])" />
+													</div>
+												</div>
+											</div>											<!-- Supportsvision -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsvision" />
+														<textbox tabindex="17" id="modsupportsvision"
+															value="@bind(vm.currentModelProvider.modsupportsvision)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsvision'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Supportsmultimodal -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsmultimodal" />
+														<textbox tabindex="18" id="modsupportsmultimodal"
+															value="@bind(vm.currentModelProvider.modsupportsmultimodal)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsmultimodal'])" />
+													</div>
+												</div>
+											</div>											<!-- Supportsfunctioncalling -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsfunctioncalling" />
+														<textbox tabindex="19" id="modsupportsfunctioncalling"
+															value="@bind(vm.currentModelProvider.modsupportsfunctioncalling)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsfunctioncalling'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Supportsstreaming -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsstreaming" />
+														<textbox tabindex="20" id="modsupportsstreaming"
+															value="@bind(vm.currentModelProvider.modsupportsstreaming)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsstreaming'])" />
+													</div>
+												</div>
+											</div>											<!-- Supportsfinetuning -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportsfinetuning" />
+														<textbox tabindex="21" id="modsupportsfinetuning"
+															value="@bind(vm.currentModelProvider.modsupportsfinetuning)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modsupportsfinetuning'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ratelimitrequests -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ratelimitrequests" />
+														<textbox tabindex="22" id="modratelimitrequests"
+															value="@bind(vm.currentModelProvider.modratelimitrequests)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modratelimitrequests'])" />
+													</div>
+												</div>
+											</div>											<!-- Ratelimittokens -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ratelimittokens" />
+														<textbox tabindex="23" id="modratelimittokens"
+															value="@bind(vm.currentModelProvider.modratelimittokens)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modratelimittokens'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Maxcontextlength -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxcontextlength" />
+														<textbox tabindex="24" id="modmaxcontextlength"
+															value="@bind(vm.currentModelProvider.modmaxcontextlength)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmaxcontextlength'])" />
+													</div>
+												</div>
+											</div>											<!-- Maxoutputtokens -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Maxoutputtokens" />
+														<textbox tabindex="25" id="modmaxoutputtokens"
+															value="@bind(vm.currentModelProvider.modmaxoutputtokens)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmaxoutputtokens'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Availableregions -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Availableregions" />
+														<textbox tabindex="26" id="modavailableregions"
+															value="@bind(vm.currentModelProvider.modavailableregions)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modavailableregions'])" />
+													</div>
+												</div>
+											</div>											<!-- Dataresidency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dataresidency" />
+														<textbox tabindex="27" id="moddataresidency"
+															value="@bind(vm.currentModelProvider.moddataresidency)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['moddataresidency'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Slauptime -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Slauptime" />
+														<textbox tabindex="28" id="modslauptime"
+															value="@bind(vm.currentModelProvider.modslauptime)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modslauptime'])" />
+													</div>
+												</div>
+											</div>											<!-- Avgresponsetimems -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Avgresponsetimems" />
+														<textbox tabindex="29" id="modavgresponsetimems"
+															value="@bind(vm.currentModelProvider.modavgresponsetimems)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modavgresponsetimems'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Health Checkurl -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Health Checkurl" />
+														<textbox tabindex="30" id="modhealthcheckurl"
+															value="@bind(vm.currentModelProvider.modhealthcheckurl)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['modhealthcheckurl'])" />
+													</div>
+												</div>
+											</div>											<!-- Document At Ionurl -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Document At Ionurl" />
+														<textbox tabindex="31" id="moddocumentationurl"
+															value="@bind(vm.currentModelProvider.moddocumentationurl)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['moddocumentationurl'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Contactemail -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Contactemail" />
+														<textbox tabindex="32" id="modcontactemail"
+															value="@bind(vm.currentModelProvider.modcontactemail) @save(vm.currentModelProvider.modcontactemail, before=('saveItem')) @validator(vm.unique, field='MODCONTACTEMAIL', required=false, oldValue=vm.originalModcontactemail)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modcontactemail'])" />
+													</div>
+												</div>
+											</div>											<!-- Supporturl -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supporturl" />
+														<textbox tabindex="33" id="modsupporturl"
+															value="@bind(vm.currentModelProvider.modsupporturl)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['modsupporturl'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="34" id="modcreatedby"
+															value="@bind(vm.currentModelProvider.modcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="35" id="modupdatedby"
+															value="@bind(vm.currentModelProvider.modupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="36" id="modcreatedat"
+															value="@bind(vm.currentModelProvider.modcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="37" id="modupdatedat"
+															value="@bind(vm.currentModelProvider.modupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Submodcatalog -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Submodcatalog" />
+														<textbox tabindex="38" id="submodcatalog"
+															value="@bind(vm.currentModelProvider.submodcatalog)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['submodcatalog'])" />
+													</div>
+												</div>
+											</div>											<!-- Submodprovidercredentials -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Submodprovidercredentials" />
+														<textbox tabindex="39" id="submodprovidercredentials"
+															value="@bind(vm.currentModelProvider.submodprovidercredentials)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['submodprovidercredentials'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Submodcatalog" onSelect="@command('onSelectModelCatalogTab')" />
+												<tab label="Submodprovidercredentials" onSelect="@command('onSelectProviderCredentialTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Submodcatalog -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Submodcatalog"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalModelCatalogs)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.submodcatalog)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.submodcatalog)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay submodcatalog registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Submodprovidercredentials -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Submodprovidercredentials"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProviderCredentials)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.submodprovidercredentials)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.submodprovidercredentials)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay submodprovidercredentials registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

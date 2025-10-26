@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Dataset Quality Review - Human Review Required" border="normal" width="90%" height="90%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.governance.DatasetQualityReviewViewModel')"
+            closable="true">
+
+        <style>
+            .quality-high { background-color: #d4edda; color: #155724; padding: 10px; border-radius: 5px; }
+            .quality-medium { background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; }
+            .quality-low { background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; }
+            .metric-card { border: 1px solid #dee2e6; padding: 15px; border-radius: 5px; margin: 10px 0; }
+            .metric-label { font-weight: bold; color: #495057; }
+            .metric-value { font-size: 24px; font-weight: bold; color: #007bff; }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px;">
+
+            <!-- Header -->
+            <hlayout>
+                <label value="Dataset Quality Review" style="font-size: 24px; font-weight: bold;"/>
+            </hlayout>
+
+            <separator height="10px"/>
+
+            <!-- Dataset Info -->
+            <groupbox>
+                <caption label="Dataset Information"/>
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Dataset Name:" class="metric-label"/>
+                            <label value="@load(vm.datasetName)"/>
+                        </row>
+                        <row>
+                            <label value="Dataset Path:" class="metric-label"/>
+                            <label value="@load(vm.datasetPath)"/>
+                        </row>
+                        <row>
+                            <label value="Total Rows:" class="metric-label"/>
+                            <label value="@load(vm.totalRows)"/>
+                        </row>
+                        <row>
+                            <label value="Total Columns:" class="metric-label"/>
+                            <label value="@load(vm.totalColumns)"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <!-- Overall Quality Score -->
+            <groupbox>
+                <caption label="Overall Quality Score"/>
+                <hlayout style="align-items: center;">
+                    <label value="@load(vm.qualityScore)" class="metric-value" 
+                           style="@load(vm.qualityScore ge 90 ? 'color: #28a745;' : (vm.qualityScore ge 75 ? 'color: #ffc107;' : 'color: #dc3545;'))"/>
+                    <label value="/ 100"/>
+                    <space width="20px"/>
+                    <label value="@load(vm.qualityRating)" 
+                           sclass="@load(vm.qualityScore ge 90 ? 'quality-high' : (vm.qualityScore ge 75 ? 'quality-medium' : 'quality-low'))"/>
+                </hlayout>
+            </groupbox>
+
+            <!-- Quality Metrics -->
+            <groupbox>
+                <caption label="Quality Metrics (0-1 scale)"/>
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column width="150px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Completeness:" class="metric-label"/>
+                            <progressmeter value="@load(vm.completenessScore * 100)"/>
+                            <label value="@load(vm.completenessScore)" style="font-weight: bold;"/>
+                        </row>
+                        <row>
+                            <label value="Validity:" class="metric-label"/>
+                            <progressmeter value="@load(vm.validityScore * 100)"/>
+                            <label value="@load(vm.validityScore)" style="font-weight: bold;"/>
+                        </row>
+                        <row>
+                            <label value="Uniqueness:" class="metric-label"/>
+                            <progressmeter value="@load(vm.uniquenessScore * 100)"/>
+                            <label value="@load(vm.uniquenessScore)" style="font-weight: bold;"/>
+                        </row>
+                        <row>
+                            <label value="Missing Values:" class="metric-label"/>
+                            <label value="@load(vm.missingPercentage)" style="font-weight: bold;"/>
+                            <label value="%"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <!-- Bias/Fairness -->
+            <groupbox>
+                <caption label="Bias / Fairness"/>
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="Fairness Score:" class="metric-label"/>
+                            <label value="@load(vm.biasScore)" style="font-size: 18px; font-weight: bold;"
+                                   sclass="@load(vm.biasScore ge 80 ? 'quality-high' : (vm.biasScore ge 60 ? 'quality-medium' : 'quality-low'))"/>
+                        </row>
+                        <row>
+                            <label value="Bias Severity:" class="metric-label"/>
+                            <label value="@load(vm.biasSeverity)" 
+                                   style="@load(vm.biasSeverity eq 'NONE' or vm.biasSeverity eq 'LOW' ? 'color: green;' : (vm.biasSeverity eq 'MEDIUM' ? 'color: orange;' : 'color: red;'))"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <!-- PII / Compliance -->
+            <groupbox>
+                <caption label="PII / Compliance"/>
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <label value="PII Found:" class="metric-label"/>
+                            <label value="@load(vm.piiFound ? 'YES' : 'NO')" 
+                                   style="@load(vm.piiFound ? 'color: red; font-weight: bold;' : 'color: green;')"/>
+                        </row>
+                        <row>
+                            <label value="Total PII Detected:" class="metric-label"/>
+                            <label value="@load(vm.totalPiiDetected)" style="font-weight: bold;"/>
+                        </row>
+                        <row>
+                            <label value="PII Severity:" class="metric-label"/>
+                            <label value="@load(vm.piiSeverity)"/>
+                        </row>
+                        <row>
+                            <label value="GDPR Compliant:" class="metric-label"/>
+                            <label value="@load(vm.gdprCompliant ? 'YES' : 'NO')" 
+                                   style="@load(vm.gdprCompliant ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;')"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <!-- Automated Decision -->
+            <groupbox>
+                <caption label="Automated Decision (Drools)"/>
+                <vlayout>
+                    <label value="@load(vm.justification)" style="font-size: 14px; padding: 10px;"/>
+                </vlayout>
+            </groupbox>
+
+            <!-- Human Comments -->
+            <groupbox>
+                <caption label="Your Comments (Required for Rejection)"/>
+                <textbox multiline="true" rows="5" width="100%" value="@bind(vm.humanComments)"
+                         placeholder="Enter your comments here..."/>
+            </groupbox>
+
+            <!-- Action Buttons -->
+            <hlayout spacing="10px" style="padding: 20px 0;">
+                <button label="Approve Dataset" iconSclass="fa fa-check" 
+                        onClick="@command('approve')"
+                        style="background-color: #28a745; color: white; font-size: 16px; padding: 10px 30px;"/>
+                <button label="Reject Dataset" iconSclass="fa fa-times" 
+                        onClick="@command('reject')"
+                        style="background-color: #dc3545; color: white; font-size: 16px; padding: 10px 30px;"/>
+            </hlayout>
+
+        </vlayout>
+
+    </window>
+</zk>
+

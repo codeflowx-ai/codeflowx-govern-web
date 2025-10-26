@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Ethics Reviews" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.governance.EthicsReviewOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <button label="Delete" iconSclass="fa fa-trash" onClick="@command('delete')" 
+                    disabled="@load(vm.selectedEthicsReview eq null)"/>
+        </hlayout>
+        
+        <listbox model="@load(vm.ethicsReviews)" selectedItem="@bind(vm.selectedEthicsReview)"
+                 emptyMessage="No ethics reviews found" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Entity Type" width="120px"/>
+                <listheader label="Entity ID" width="100px"/>
+                <listheader label="Score" width="100px"/>
+                <listheader label="Severity" width="120px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Requires Action" width="130px"/>
+                <listheader label="Created At" width="180px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxethicsreview)"/>
+                    <listcell label="@load(item.ethentitytype)"/>
+                    <listcell label="@load(item.ethentityid)"/>
+                    <listcell label="@load(item.ethscore)"/>
+                    <listcell label="@load(item.ethseverity)"/>
+                    <listcell label="@load(item.ethstatus)"/>
+                    <listcell label="@load(item.ethrequiresaction ? 'YES' : 'NO')"/>
+                    <listcell label="@load(item.ethcreatedat)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

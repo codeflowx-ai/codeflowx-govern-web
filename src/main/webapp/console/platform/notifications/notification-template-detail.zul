@@ -1,0 +1,318 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="notifications"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.notifications.NotificationTemplateDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Notification Template" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveNotificationTemplate')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Ntftemplatename -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatename *" />
+														<textbox tabindex="2" id="ntftemplatename"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatename) @save(vm.currentNotificationTemplate.ntftemplatename, before=('saveItem')) @validator(vm.unique, field='NTFTEMPLATENAME', required=true, oldValue=vm.originalNtftemplatename)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatename'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplatecode -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatecode *" />
+														<textbox tabindex="3" id="ntftemplatecode"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatecode) @save(vm.currentNotificationTemplate.ntftemplatecode, before=('saveItem')) @validator(vm.unique, field='NTFTEMPLATECODE', required=true, oldValue=vm.originalNtftemplatecode)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatecode'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ntftemplatedescription -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatedescription" />
+														<textbox tabindex="4" id="ntftemplatedescription"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatedescription)"
+															maxlength="1000"
+															constraint="max 1000" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatedescription'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplatesubject -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatesubject" />
+														<textbox tabindex="5" id="ntftemplatesubject"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatesubject)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatesubject'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ntftemplatebody -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatebody *" />
+														<textbox tabindex="6" id="ntftemplatebody"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatebody)"
+															rows="4" multiline="true"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatebody'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplatevariables -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatevariables" />
+														<textbox tabindex="7" id="ntftemplatevariables"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatevariables)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatevariables'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ntftemplatetype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatetype *" />
+														<combobox tabindex="8" id="ntftemplatetype"
+															selectedItem="@bind(vm.currentNotificationTemplate.ntftemplatetype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatetype'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplatelanguage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatelanguage" />
+														<textbox tabindex="9" id="ntftemplatelanguage"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatelanguage)"
+															maxlength="10"
+															constraint="max 10" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatelanguage'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ntftemplateactive -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplateactive" />
+														<textbox tabindex="10" id="ntftemplateactive"
+															value="@bind(vm.currentNotificationTemplate.ntftemplateactive)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplateactive'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplateversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplateversion" />
+														<textbox tabindex="11" id="ntftemplateversion"
+															value="@bind(vm.currentNotificationTemplate.ntftemplateversion)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplateversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ntftemplatecreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplatecreatedat *" />
+														<textbox tabindex="12" id="ntftemplatecreatedat"
+															value="@bind(vm.currentNotificationTemplate.ntftemplatecreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplatecreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Ntftemplateupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ntftemplateupdatedat" />
+														<textbox tabindex="13" id="ntftemplateupdatedat"
+															value="@bind(vm.currentNotificationTemplate.ntftemplateupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['ntftemplateupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subntfnotifications -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subntfnotifications" />
+														<textbox tabindex="14" id="subntfnotifications"
+															value="@bind(vm.currentNotificationTemplate.subntfnotifications)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subntfnotifications'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subntfnotifications" onSelect="@command('onSelectNotificationTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subntfnotifications -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subntfnotifications"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalNotifications)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subntfnotifications)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subntfnotifications)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subntfnotifications registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

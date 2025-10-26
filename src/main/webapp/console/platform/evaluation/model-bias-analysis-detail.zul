@@ -1,0 +1,276 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="evaluation"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.evaluation.ModelBiasAnalysisDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Model Bias Analysis" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModelBiasAnalysis')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Modbiastype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modbiastype *" />
+														<combobox tabindex="2" id="modbiastype"
+															selectedItem="@bind(vm.currentModelBiasAnalysis.modbiastype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modbiastype'])" />
+													</div>
+												</div>
+											</div>											<!-- Modbiasdescription -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modbiasdescription" />
+														<textbox tabindex="3" id="modbiasdescription"
+															value="@bind(vm.currentModelBiasAnalysis.modbiasdescription)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modbiasdescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modseverity -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modseverity *" />
+														<textbox tabindex="4" id="modseverity"
+															value="@bind(vm.currentModelBiasAnalysis.modseverity)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['modseverity'])" />
+													</div>
+												</div>
+											</div>											<!-- Modbiasscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modbiasscore" />
+														<textbox tabindex="5" id="modbiasscore"
+															value="@bind(vm.currentModelBiasAnalysis.modbiasscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modbiasscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modaffectedgroups -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modaffectedgroups" />
+														<textbox tabindex="6" id="modaffectedgroups"
+															value="@bind(vm.currentModelBiasAnalysis.modaffectedgroups)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modaffectedgroups'])" />
+													</div>
+												</div>
+											</div>											<!-- Modmitigationstrategies -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modmitigationstrategies" />
+														<textbox tabindex="7" id="modmitigationstrategies"
+															value="@bind(vm.currentModelBiasAnalysis.modmitigationstrategies)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modmitigationstrategies'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modanalysisdata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modanalysisdata" />
+														<textbox tabindex="8" id="modanalysisdata"
+															value="@bind(vm.currentModelBiasAnalysis.modanalysisdata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modanalysisdata'])" />
+													</div>
+												</div>
+											</div>											<!-- Modstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modstatus *" />
+														<combobox tabindex="9" id="modstatus"
+															selectedItem="@bind(vm.currentModelBiasAnalysis.modstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modreviewedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modreviewedby" />
+														<textbox tabindex="10" id="modreviewedby"
+															value="@bind(vm.currentModelBiasAnalysis.modreviewedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modreviewedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Modreviewedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modreviewedat" />
+														<textbox tabindex="11" id="modreviewedat"
+															value="@bind(vm.currentModelBiasAnalysis.modreviewedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modreviewedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modcreatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modcreatedby *" />
+														<textbox tabindex="12" id="modcreatedby"
+															value="@bind(vm.currentModelBiasAnalysis.modcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Modupdatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modupdatedby" />
+														<textbox tabindex="13" id="modupdatedby"
+															value="@bind(vm.currentModelBiasAnalysis.modupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Modcreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modcreatedat *" />
+														<textbox tabindex="14" id="modcreatedat"
+															value="@bind(vm.currentModelBiasAnalysis.modcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['modcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Modupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modupdatedat" />
+														<textbox tabindex="15" id="modupdatedat"
+															value="@bind(vm.currentModelBiasAnalysis.modupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['modupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

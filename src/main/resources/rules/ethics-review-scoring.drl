@@ -1,0 +1,306 @@
+package com.codeflowx.govern.workflow.drools.rules;
+
+import com.codeflowx.govern.workflow.drools.facts.EthicsReviewFact;
+import java.util.ArrayList;
+import java.util.List;
+
+// Reglas de evaluación ética para sistemas IA
+// Sistema de puntuación y clasificación de riesgos éticos
+
+rule "Calculate Overall Ethics Score"
+    when
+        $fact: EthicsReviewFact(
+            fairnessScore != 0.0,
+            transparencyScore != 0.0,
+            accountabilityScore != 0.0,
+            privacyScore != 0.0,
+            safetyScore != 0.0
+        )
+    then
+        $fact.calculateOverallEthicsScore();
+        update($fact);
+end
+
+rule "Determine Ethics Grade"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore != 0.0,
+            ethicsGrade == null
+        )
+    then
+        $fact.determineEthicsGrade();
+        update($fact);
+end
+
+rule "Determine Risk Level"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore != 0.0
+        )
+    then
+        $fact.determineRiskLevel();
+        update($fact);
+end
+
+rule "Make Decision"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore != 0.0,
+            decision == null
+        )
+    then
+        $fact.makeDecision();
+        update($fact);
+end
+
+rule "Determine Committee Review Need"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore != 0.0
+        )
+    then
+        $fact.determineCommitteeReview();
+        update($fact);
+end
+
+rule "Excellent Ethics - No Violations"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore >= 0.9,
+            fairnessScore >= 0.9,
+            !discriminationRisk,
+            !manipulationRisk,
+            !surveillanceRisk,
+            !dualUseRisk,
+            euAiActCompliant,
+            gdprCompliant
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Sistema cumple excelentes estándares éticos");
+        recommendations.add("Mantener monitoreo continuo");
+        recommendations.add("Documentar como caso de buenas prácticas");
+        $fact.setRecommendations(recommendations);
+        $fact.setDecision("APPROVED");
+        $fact.setRequiresCommitteeReview(false);
+        update($fact);
+end
+
+rule "Good Ethics with Minor Concerns"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore >= 0.8,
+            overallEthicsScore < 0.9,
+            !discriminationRisk,
+            !dualUseRisk
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        List<String> mitigations = new ArrayList<>();
+        
+        if ($fact.getFairnessScore() < 0.8) {
+            recommendations.add("Mejorar equidad del sistema");
+            mitigations.add("Implementar auditorías de equidad regulares");
+        }
+        if ($fact.getTransparencyScore() < 0.8) {
+            recommendations.add("Mejorar transparencia y explicabilidad");
+            mitigations.add("Implementar explicaciones interpretables");
+        }
+        if (!$fact.isStakeholdersConsulted()) {
+            recommendations.add("Consultar con stakeholders afectados");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setMitigationActions(mitigations);
+        $fact.setDecision("CONDITIONAL");
+        update($fact);
+end
+
+rule "Critical - Discrimination Risk"
+    when
+        $fact: EthicsReviewFact(
+            discriminationRisk == true
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("CRÍTICO: Riesgo de discriminación detectado");
+        recommendations.add("Revisión obligatoria por comité de ética");
+        recommendations.add("Análisis detallado de sesgo por grupos");
+        recommendations.add("Implementar métricas de equidad");
+        recommendations.add("Plan de mitigación obligatorio");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("CRITICAL");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "Critical - Dual Use Risk"
+    when
+        $fact: EthicsReviewFact(
+            dualUseRisk == true
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("CRÍTICO: Riesgo de doble uso detectado");
+        recommendations.add("Evaluación de seguridad nacional requerida");
+        recommendations.add("Controles de acceso estrictos obligatorios");
+        recommendations.add("Monitoreo continuo de uso");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("CRITICAL");
+        $fact.setDecision("REJECTED");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "High Risk - Manipulation Detected"
+    when
+        $fact: EthicsReviewFact(
+            manipulationRisk == true
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Riesgo de manipulación detectado");
+        recommendations.add("Revisar mecanismos de personalización");
+        recommendations.add("Implementar salvaguardas contra manipulación");
+        recommendations.add("Transparencia obligatoria sobre personalización");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("HIGH");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "High Risk - Surveillance Concerns"
+    when
+        $fact: EthicsReviewFact(
+            surveillanceRisk == true
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Riesgo de vigilancia masiva detectado");
+        recommendations.add("Revisar políticas de recolección de datos");
+        recommendations.add("Implementar anonimización");
+        recommendations.add("Consentimiento explícito obligatorio");
+        recommendations.add("Límites de retención de datos");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("HIGH");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "EU AI Act - Unacceptable Risk"
+    when
+        $fact: EthicsReviewFact(
+            aiRiskCategory == "unacceptable"
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("CRÍTICO: Sistema clasificado como riesgo inaceptable");
+        recommendations.add("No permitido bajo EU AI Act");
+        recommendations.add("Suspender desarrollo inmediatamente");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("CRITICAL");
+        $fact.setDecision("REJECTED");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "EU AI Act - High Risk System"
+    when
+        $fact: EthicsReviewFact(
+            aiRiskCategory == "high"
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        List<String> mitigations = new ArrayList<>();
+        
+        recommendations.add("Sistema de alto riesgo bajo EU AI Act");
+        mitigations.add("Conformity assessment obligatorio");
+        mitigations.add("Documentación técnica completa");
+        mitigations.add("Sistema de gestión de calidad");
+        mitigations.add("Monitoreo post-market obligatorio");
+        mitigations.add("Registro en base de datos EU");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setMitigationActions(mitigations);
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "Vulnerable Groups Affected"
+    when
+        $fact: EthicsReviewFact(
+            vulnerableGroups != null,
+            vulnerableGroups.size() > 0
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Sistema afecta grupos vulnerables");
+        recommendations.add("Protecciones especiales requeridas");
+        recommendations.add("Consulta con grupos afectados obligatoria");
+        recommendations.add("Evaluación de impacto diferencial");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "Large Scale Impact"
+    when
+        $fact: EthicsReviewFact(
+            estimatedAffectedUsers > 1000000
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Sistema de impacto masivo (>1M usuarios)");
+        recommendations.add("Auditoría ética externa requerida");
+        recommendations.add("Plan de contingencia obligatorio");
+        recommendations.add("Monitoreo en tiempo real");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "Non-Compliant Regulatory"
+    when
+        $fact: EthicsReviewFact(
+            !euAiActCompliant || !gdprCompliant
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        List<String> mitigations = new ArrayList<>();
+        
+        if (!$fact.isEuAiActCompliant()) {
+            recommendations.add("NO CUMPLE EU AI Act");
+            mitigations.add("Revisión completa de cumplimiento");
+        }
+        if (!$fact.isGdprCompliant()) {
+            recommendations.add("NO CUMPLE GDPR");
+            mitigations.add("Implementar controles de privacidad");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setMitigationActions(mitigations);
+        $fact.setRiskLevel("HIGH");
+        $fact.setRequiresCommitteeReview(true);
+        update($fact);
+end
+
+rule "Set Final Evaluation Status"
+    when
+        $fact: EthicsReviewFact(
+            overallEthicsScore != 0.0,
+            ethicsGrade != null,
+            riskLevel != null,
+            decision != null
+        )
+    then
+        // Marcar evaluación como completada
+        $fact.setEvaluationMethod("automatic");
+        update($fact);
+end

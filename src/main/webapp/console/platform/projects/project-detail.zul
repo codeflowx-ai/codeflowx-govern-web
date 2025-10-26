@@ -1,0 +1,578 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="projects"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.projects.ProjectDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-folder-open label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Project" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveProject')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Name -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Name *" />
+														<textbox tabindex="2" id="name"
+															value="@bind(vm.currentProject.name) @save(vm.currentProject.name, before=('saveItem')) @validator(vm.unique, field='NAME', required=true, oldValue=vm.originalName)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['name'])" />
+													</div>
+												</div>
+											</div>											<!-- Description -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Description" />
+														<textbox tabindex="3" id="description"
+															value="@bind(vm.currentProject.description)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['description'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Projectcode -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectcode *" />
+														<textbox tabindex="4" id="projectcode"
+															value="@bind(vm.currentProject.projectcode) @save(vm.currentProject.projectcode, before=('saveItem')) @validator(vm.unique, field='PROJECTCODE', required=true, oldValue=vm.originalProjectcode)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['projectcode'])" />
+													</div>
+												</div>
+											</div>											<!-- Projecttype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projecttype *" />
+														<combobox tabindex="5" id="projecttype"
+															selectedItem="@bind(vm.currentProject.projecttype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['projecttype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="6" id="status"
+															selectedItem="@bind(vm.currentProject.status)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['status'])" />
+													</div>
+												</div>
+											</div>											<!-- Priority -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Priority" />
+														<combobox tabindex="7" id="priority"
+															selectedItem="@bind(vm.currentProject.priority)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['priority'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ownerid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ownerid" />
+														<textbox tabindex="8" id="ownerid"
+															value="@bind(vm.currentProject.ownerid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['ownerid'])" />
+													</div>
+												</div>
+											</div>											<!-- Clientid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Clientid" />
+														<textbox tabindex="9" id="clientid"
+															value="@bind(vm.currentProject.clientid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['clientid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Departmentid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Departmentid" />
+														<textbox tabindex="10" id="departmentid"
+															value="@bind(vm.currentProject.departmentid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['departmentid'])" />
+													</div>
+												</div>
+											</div>											<!-- Startdate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Startdate" />
+														<textbox tabindex="11" id="startdate"
+															value="@bind(vm.currentProject.startdate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['startdate'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Enddate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Enddate" />
+														<textbox tabindex="12" id="enddate"
+															value="@bind(vm.currentProject.enddate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['enddate'])" />
+													</div>
+												</div>
+											</div>											<!-- Estimatedhours -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estimatedhours" />
+														<textbox tabindex="13" id="estimatedhours"
+															value="@bind(vm.currentProject.estimatedhours)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['estimatedhours'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Actualhours -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Actualhours" />
+														<textbox tabindex="14" id="actualhours"
+															value="@bind(vm.currentProject.actualhours)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['actualhours'])" />
+													</div>
+												</div>
+											</div>											<!-- Budget -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Budget" />
+														<textbox tabindex="15" id="budget"
+															value="@bind(vm.currentProject.budget)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['budget'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Actualcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Actualcost" />
+														<textbox tabindex="16" id="actualcost"
+															value="@bind(vm.currentProject.actualcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['actualcost'])" />
+													</div>
+												</div>
+											</div>											<!-- Managerid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Managerid" />
+														<textbox tabindex="17" id="managerid"
+															value="@bind(vm.currentProject.managerid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['managerid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By" />
+														<textbox tabindex="18" id="createdby"
+															value="@bind(vm.currentProject.createdby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['createdby'])" />
+													</div>
+												</div>
+											</div>											<!-- Isactive -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isactive" />
+														<textbox tabindex="19" id="isactive"
+															value="@bind(vm.currentProject.isactive)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['isactive'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="20" id="createdat"
+															value="@bind(vm.currentProject.createdat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['createdat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At *" />
+														<textbox tabindex="21" id="updatedat"
+															value="@bind(vm.currentProject.updatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['updatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Metadata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metadata" />
+														<textbox tabindex="22" id="metadata"
+															value="@bind(vm.currentProject.metadata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['metadata'])" />
+													</div>
+												</div>
+											</div>											<!-- Subgovprojectartifacts -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subgovprojectartifacts" />
+														<textbox tabindex="23" id="subgovprojectartifacts"
+															value="@bind(vm.currentProject.subgovprojectartifacts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subgovprojectartifacts'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subgovprojectmembers -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subgovprojectmembers" />
+														<textbox tabindex="24" id="subgovprojectmembers"
+															value="@bind(vm.currentProject.subgovprojectmembers)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subgovprojectmembers'])" />
+													</div>
+												</div>
+											</div>											<!-- Subprjprojecttechnologies -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subprjprojecttechnologies" />
+														<textbox tabindex="25" id="subprjprojecttechnologies"
+															value="@bind(vm.currentProject.subprjprojecttechnologies)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subprjprojecttechnologies'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subgovprojectartifacts" onSelect="@command('onSelectProjectArtifactTab')" />
+												<tab label="Subgovprojectmembers" onSelect="@command('onSelectProjectMemberTab')" />
+												<tab label="Subprjprojecttechnologies" onSelect="@command('onSelectProjectTechnologyTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subgovprojectartifacts -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subgovprojectartifacts"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProjectArtifacts)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subgovprojectartifacts)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovprojectartifacts)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subgovprojectartifacts registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subgovprojectmembers -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subgovprojectmembers"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProjectMembers)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subgovprojectmembers)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovprojectmembers)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subgovprojectmembers registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subprjprojecttechnologies -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subprjprojecttechnologies"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProjectTechnologys)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subprjprojecttechnologies)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subprjprojecttechnologies)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subprjprojecttechnologies registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

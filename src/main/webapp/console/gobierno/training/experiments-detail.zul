@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns:h="native" xmlns:zk="http://www.zkoss.org/2005/zul">
+    
+    <!-- ViewModel binding -->
+    <window viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.training.ExperimentsDetailViewModel')"
+            border="none" width="100%" height="100%">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:h2 class="mb-1" style="font-weight: bold;">
+                        🧪 <label value="@load(vm.isNewExperiment ? 'Nuevo Experimento' : 'Editar Experimento')"/>
+                    </h:h2>
+                    <h:p class="text-muted">Gestión completa de experimentos de entrenamiento</h:p>
+                </h:div>
+            </h:div>
+            
+            <!-- Botones de acción -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 text-end">
+                    <button label="💾 Guardar" 
+                            class="btn btn-success me-2"
+                            onClick="@command('saveExperiment')" 
+                            disabled="@load(!vm.isEditMode)"/>
+                    <button label="▶️ Iniciar Training" 
+                            class="btn btn-primary me-2"
+                            onClick="@command('startTraining')" 
+                            visible="@load(!vm.isNewExperiment)"/>
+                    <button label="⏸️ Detener Training" 
+                            class="btn btn-warning me-2"
+                            onClick="@command('stopTraining')" 
+                            visible="@load(!vm.isNewExperiment)"/>
+                    <button label="✏️ Editar" 
+                            class="btn btn-secondary me-2"
+                            onClick="@command('editExperiment')"
+                            visible="@load(!vm.isEditMode and !vm.isNewExperiment)"/>
+                    <button label="❌ Cancelar" 
+                            class="btn btn-outline-secondary"
+                            onClick="@command('cancel')"/>
+                </h:div>
+            </h:div>
+            
+            <!-- Información Principal del Experimento -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-primary text-white">
+                            <h:h5 class="mb-0">📋 Información General</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div class="row">
+                                <h:div class="col-md-6 mb-3">
+                                    <h:label class="form-label">Nombre del Experimento *</h:label>
+                                    <textbox value="@bind(vm.currentExperiment.trnname)"
+                                             class="form-control"
+                                             placeholder="Nombre descriptivo"
+                                             disabled="@load(!vm.isEditMode)"/>
+                                </h:div>
+                                <h:div class="col-md-6 mb-3">
+                                    <h:label class="form-label">Lifecycle Stage</h:label>
+                                    <textbox value="@bind(vm.currentExperiment.trnlifecyclestage)"
+                                             class="form-control"
+                                             disabled="@load(!vm.isEditMode)"/>
+                                </h:div>
+                            </h:div>
+                            
+                            <h:div class="row">
+                                <h:div class="col-md-12 mb-3">
+                                    <h:label class="form-label">Descripción</h:label>
+                                    <textbox value="@bind(vm.currentExperiment.trndescription)"
+                                             class="form-control"
+                                             rows="3"
+                                             multiline="true"
+                                             disabled="@load(!vm.isEditMode)"/>
+                                </h:div>
+                            </h:div>
+                            
+                            <h:div class="row">
+                                <h:div class="col-md-6 mb-3">
+                                    <h:label class="form-label">Artifact Location</h:label>
+                                    <textbox value="@bind(vm.currentExperiment.trnartifactlocation)"
+                                             class="form-control"
+                                             disabled="@load(!vm.isEditMode)"/>
+                                </h:div>
+                                <h:div class="col-md-6 mb-3">
+                                    <h:label class="form-label">Tags</h:label>
+                                    <textbox value="@bind(vm.currentExperiment.trntags)"
+                                             class="form-control"
+                                             disabled="@load(!vm.isEditMode)"/>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Tabs con información detallada -->
+            <tabbox>
+                <tabs>
+                    <tab label="▶️ Runs" onClick="@command('onSelectRunsTab')"/>
+                    <tab label="🎯 HPO Trials" onClick="@command('onSelectHpoTrialsTab')"/>
+                    <tab label="📌 Checkpoints" onClick="@command('onSelectCheckpointsTab')"/>
+                    <tab label="📊 Metrics" onClick="@command('onSelectMetricsTab')"/>
+                    <tab label="📝 Training Logs" onClick="@command('onSelectLogsTab')"/>
+                    <tab label="💾 Datasets" onClick="@command('onSelectDatasetsTab')"/>
+                    <tab label="🔗 Lineage" onClick="@command('onSelectLineageTab')"/>
+                    <tab label="🛡️ Governance" onClick="@command('onSelectGovernanceTab')"/>
+                </tabs>
+                <tabpanels>
+                    
+                    <!-- Tab: Runs -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <h:div class="mb-3 text-end">
+                                <button label="➕ Nueva Run" 
+                                        class="btn btn-sm btn-primary"
+                                        onClick="@command('createRun')"/>
+                            </h:div>
+                            <grid model="@load(vm.experimentRuns)">
+                                <columns>
+                                    <column label="Run Name" width="200px"/>
+                                    <column label="Status" width="100px"/>
+                                    <column label="Start Time" width="180px"/>
+                                    <column label="End Time" width="180px"/>
+                                    <column label="Duration" width="100px"/>
+                                    <column label="Actions" width="150px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.runname)"/>
+                                        <label value="@load(each.runstatus)" 
+                                               style="@load(each.runstatus eq 'COMPLETED' ? 'color: green; font-weight: bold;' : 'color: orange;')"/>
+                                        <label value="@load(each.runstarttime) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                        <label value="@load(each.runendtime) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                        <label value="@load(each.runduration)"/>
+                                        <h:div>
+                                            <button label="👁️ Ver" 
+                                                    class="btn btn-sm btn-info me-1"
+                                                    onClick="@command('viewRun', run=each)"/>
+                                        </h:div>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: HPO Trials -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <h:div class="mb-3 text-end">
+                                <button label="🎯 Ejecutar HPO" 
+                                        class="btn btn-sm btn-success"
+                                        onClick="@command('tuneHyperparameters')"/>
+                            </h:div>
+                            <grid model="@load(vm.hpoTrials)">
+                                <columns>
+                                    <column label="Trial #" width="80px"/>
+                                    <column label="Hyperparameters" width="300px"/>
+                                    <column label="Score" width="100px"/>
+                                    <column label="Status" width="100px"/>
+                                    <column label="Duration" width="100px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.hpotrialid)"/>
+                                        <label value="@load(each.hpoparameters)"/>
+                                        <label value="@load(each.hposcore) @converter('formatedNumber', format='###,##0.000')"/>
+                                        <label value="@load(each.hpostatus)"/>
+                                        <label value="@load(each.hpoduration)"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Checkpoints -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <h:div class="mb-3 text-end">
+                                <button label="📌 Crear Checkpoint" 
+                                        class="btn btn-sm btn-primary"
+                                        onClick="@command('createCheckpoint')"/>
+                            </h:div>
+                            <grid model="@load(vm.checkpoints)">
+                                <columns>
+                                    <column label="Checkpoint Name" width="200px"/>
+                                    <column label="Epoch" width="80px"/>
+                                    <column label="Metric Value" width="120px"/>
+                                    <column label="Created At" width="180px"/>
+                                    <column label="Actions" width="150px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.chkname)"/>
+                                        <label value="@load(each.chkepoch)"/>
+                                        <label value="@load(each.chkmetricvalue) @converter('formatedNumber', format='###,##0.000')"/>
+                                        <label value="@load(each.chkcreatedat) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                        <h:div>
+                                            <button label="📥 Cargar" 
+                                                    class="btn btn-sm btn-success me-1"
+                                                    onClick="@command('loadCheckpoint', checkpoint=each)"/>
+                                        </h:div>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Metrics -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.metrics)">
+                                <columns>
+                                    <column label="Metric Name" width="200px"/>
+                                    <column label="Value" width="120px"/>
+                                    <column label="Step" width="80px"/>
+                                    <column label="Timestamp" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.trmmetricname)"/>
+                                        <label value="@load(each.trmmetricvalue) @converter('formatedNumber', format='###,##0.0000')"/>
+                                        <label value="@load(each.trmstep)"/>
+                                        <label value="@load(each.trmtimestamp) @converter('formatedDate', format='dd/MM/yyyy HH:mm:ss')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Training Logs -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.trainingLogs)">
+                                <columns>
+                                    <column label="Timestamp" width="180px"/>
+                                    <column label="Level" width="100px"/>
+                                    <column label="Message" width="500px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.trlcreatedat) @converter('formatedDate', format='dd/MM/yyyy HH:mm:ss')"/>
+                                        <label value="@load(each.trllevel)" 
+                                               style="@load(each.trllevel eq 'ERROR' ? 'color: red; font-weight: bold;' : 'color: blue;')"/>
+                                        <label value="@load(each.trlmessage)"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Datasets -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.datasets)">
+                                <columns>
+                                    <column label="Dataset Name" width="200px"/>
+                                    <column label="Type" width="100px"/>
+                                    <column label="Size" width="120px"/>
+                                    <column label="Format" width="100px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.dstname)"/>
+                                        <label value="@load(each.dsttype)"/>
+                                        <label value="@load(each.dstsize)"/>
+                                        <label value="@load(each.dstformat)"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Lineage -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <h:p class="text-muted">Visualización de lineage próximamente...</h:p>
+                        </h:div>
+                    </tabpanel>
+                    
+                    <!-- Tab: Governance -->
+                    <tabpanel>
+                        <h:div class="card-body">
+                            <h:div class="mb-3 text-end">
+                                <button label="🛡️ Ejecutar Compliance Check" 
+                                        class="btn btn-sm btn-warning"
+                                        onClick="@command('runComplianceCheck')"/>
+                            </h:div>
+                            <h:p><h:strong>Compliance Status:</h:strong> Pending Implementation</h:p>
+                        </h:div>
+                    </tabpanel>
+                    
+                </tabpanels>
+            </tabbox>
+            
+        </h:div>
+        
+    </window>
+    
+</zk>
+

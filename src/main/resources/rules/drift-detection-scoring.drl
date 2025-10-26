@@ -1,0 +1,160 @@
+package com.codeflowx.govern.workflow.drools.rules;
+
+import com.codeflowx.govern.workflow.drools.facts.DriftDetectionFact;
+
+// =====================================================
+// REGLAS DE SCORING PARA DRIFT DETECTION V1
+// =====================================================
+// Proceso: drift-detection-v1
+// Propósito: Determinar nivel de drift y acciones requeridas
+// 
+// INPUT: driftScore, driftType, timeWindow, sampleSize
+// OUTPUT: decision, severity, confidenceLevel, justification, requiresRetraining, recommendedAction
+// =====================================================
+
+// REGLA 1: NO DRIFT (Score < 20)
+rule "No Drift Detected - Low Score"
+    when
+        $fact: DriftDetectionFact(driftScore < 20)
+    then
+        $fact.setDecision("NO_DRIFT");
+        $fact.setSeverity("LOW");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Drift score bajo (" + $fact.getDriftScore() + "/100). Modelo estable.");
+        $fact.setRequiresRetraining(false);
+        $fact.setRecommendedAction("MONITOR");
+        update($fact);
+end
+
+// REGLA 2: DRIFT MODERADO (Score 20-40)
+rule "Moderate Drift Detected"
+    when
+        $fact: DriftDetectionFact(driftScore >= 20, driftScore < 40, decision == null)
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("MEDIUM");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Drift moderado detectado (" + $fact.getDriftScore() + "/100). Requiere revisión y monitorización cercana.");
+        $fact.setRequiresRetraining(false);
+        $fact.setRecommendedAction("REVIEW");
+        update($fact);
+end
+
+// REGLA 3: DRIFT ALTO (Score 40-60)
+rule "High Drift Detected"
+    when
+        $fact: DriftDetectionFact(driftScore >= 40, driftScore < 60, decision == null)
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("HIGH");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Drift alto detectado (" + $fact.getDriftScore() + "/100). Evaluación para reentrenamiento recomendada.");
+        $fact.setRequiresRetraining(true);
+        $fact.setRecommendedAction("EVALUATE_RETRAIN");
+        update($fact);
+end
+
+// REGLA 4: DRIFT CRÍTICO (Score >= 60)
+rule "Critical Drift Detected"
+    when
+        $fact: DriftDetectionFact(driftScore >= 60, decision == null)
+    then
+        $fact.setDecision("CRITICAL_DRIFT");
+        $fact.setSeverity("CRITICAL");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Drift crítico detectado (" + $fact.getDriftScore() + "/100). Reentrenamiento urgente o rollback necesario.");
+        $fact.setRequiresRetraining(true);
+        $fact.setRecommendedAction("RETRAIN_URGENT");
+        update($fact);
+end
+
+// REGLA 5: CONCEPT DRIFT CRÍTICO
+rule "Critical Concept Drift"
+    when
+        $fact: DriftDetectionFact(
+            driftType == "CONCEPT",
+            driftScore >= 50,
+            decision == null
+        )
+    then
+        $fact.setDecision("CRITICAL_DRIFT");
+        $fact.setSeverity("CRITICAL");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Concept drift crítico (" + $fact.getDriftScore() + "/100). Las relaciones entre características han cambiado significativamente.");
+        $fact.setRequiresRetraining(true);
+        $fact.setRecommendedAction("RETRAIN_URGENT");
+        update($fact);
+end
+
+// REGLA 6: DATA DRIFT con muestra pequeña
+rule "Data Drift Small Sample"
+    when
+        $fact: DriftDetectionFact(
+            driftType == "DATA",
+            driftScore >= 30,
+            sampleSize < 1000,
+            decision == null
+        )
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("MEDIUM");
+        $fact.setConfidenceLevel("LOW");
+        $fact.setJustification("Data drift detectado pero con muestra pequeña (" + $fact.getSampleSize() + " registros). Requiere más datos para confirmar.");
+        $fact.setRequiresRetraining(false);
+        $fact.setRecommendedAction("WAIT_MORE_DATA");
+        update($fact);
+end
+
+// REGLA 7: PREDICTION DRIFT
+rule "Prediction Drift High"
+    when
+        $fact: DriftDetectionFact(
+            driftType == "PREDICTION",
+            driftScore >= 45,
+            decision == null
+        )
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("HIGH");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Prediction drift alto (" + $fact.getDriftScore() + "/100). Las predicciones se están desviando de los valores reales.");
+        $fact.setRequiresRetraining(true);
+        $fact.setRecommendedAction("RETRAIN");
+        update($fact);
+end
+
+// REGLA 8: Drift en ventana temporal corta
+rule "Drift Short Time Window"
+    when
+        $fact: DriftDetectionFact(
+            timeWindow < 24,
+            driftScore >= 40,
+            decision == null
+        )
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("HIGH");
+        $fact.setConfidenceLevel("MEDIUM");
+        $fact.setJustification("Drift detectado en ventana temporal corta (" + $fact.getTimeWindow() + "h). Puede ser fluctuación temporal o drift real.");
+        $fact.setRequiresRetraining(false);
+        $fact.setRecommendedAction("MONITOR_CLOSELY");
+        update($fact);
+end
+
+// REGLA 9: Drift persistente (ventana larga)
+rule "Drift Long Time Window"
+    when
+        $fact: DriftDetectionFact(
+            timeWindow >= 72,
+            driftScore >= 30,
+            decision == null
+        )
+    then
+        $fact.setDecision("DRIFT_DETECTED");
+        $fact.setSeverity("HIGH");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setJustification("Drift persistente en ventana de " + $fact.getTimeWindow() + " horas. Indica cambio estructural en los datos.");
+        $fact.setRequiresRetraining(true);
+        $fact.setRecommendedAction("RETRAIN");
+        update($fact);
+end

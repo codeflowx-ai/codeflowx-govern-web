@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Dataset Quality Evaluations" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.governance.DatasetQualityOverviewViewModel')">
+        
+        <hlayout spacing="10px" style="padding: 10px;">
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <button label="Delete" iconSclass="fa fa-trash" onClick="@command('delete')" 
+                    disabled="@load(vm.selectedDatasetQuality eq null)"/>
+            
+            <separator width="20px"/>
+            
+            <combobox placeholder="Filter by Decision" value="@bind(vm.filterDecision)" 
+                      onChange="@command('filterByDecision')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="APPROVED" value="APPROVED"/>
+                <comboitem label="REVIEW_REQUIRED" value="REVIEW_REQUIRED"/>
+                <comboitem label="REJECTED" value="REJECTED"/>
+            </combobox>
+            
+            <combobox placeholder="Filter by Status" value="@bind(vm.filterStatus)" 
+                      onChange="@command('filterByStatus')" width="150px">
+                <comboitem label="All" value=""/>
+                <comboitem label="COMPLETED" value="COMPLETED"/>
+                <comboitem label="FAILED" value="FAILED"/>
+                <comboitem label="PROCESSING" value="PROCESSING"/>
+            </combobox>
+        </hlayout>
+        
+        <listbox model="@load(vm.datasetQualityList)" selectedItem="@bind(vm.selectedDatasetQuality)"
+                 emptyMessage="No dataset quality evaluations found" height="600px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Dataset Name" width="200px"/>
+                <listheader label="Overall Score" width="120px"/>
+                <listheader label="Rating" width="100px"/>
+                <listheader label="Completeness" width="120px"/>
+                <listheader label="Validity" width="100px"/>
+                <listheader label="Decision" width="150px"/>
+                <listheader label="Human Review" width="120px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Created At" width="180px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxdatasetquality)"/>
+                    <listcell label="@load(item.dqldatasetname)"/>
+                    <listcell label="@load(item.dqloverallscore)" 
+                              style="@load(item.dqloverallscore ge 90 ? 'color: green; font-weight: bold;' : (item.dqloverallscore ge 75 ? 'color: orange;' : 'color: red;'))"/>
+                    <listcell label="@load(item.dqlqualityrating)"/>
+                    <listcell label="@load(item.dqlcompletenesscore)"/>
+                    <listcell label="@load(item.dqlvalidityscore)"/>
+                    <listcell label="@load(item.dqldecision)" 
+                              style="@load(item.dqldecision eq 'APPROVED' ? 'color: green;' : (item.dqldecision eq 'REJECTED' ? 'color: red;' : 'color: orange;'))"/>
+                    <listcell label="@load(item.dqlrequireshumanreview ? 'YES' : 'NO')"/>
+                    <listcell label="@load(item.dqlstatus)"/>
+                    <listcell label="@load(item.dqlcreatedat)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

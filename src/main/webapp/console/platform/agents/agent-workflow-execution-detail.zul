@@ -1,0 +1,346 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentWorkflowExecutionDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Workflow Execution" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentWorkflowExecution')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Execution Id -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Execution Id *" />
+														<textbox tabindex="2" id="agtexecutionid"
+															value="@bind(vm.currentAgentWorkflowExecution.agtexecutionid)"
+															maxlength="100"
+															constraint="no empty: max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agtexecutionid'])" />
+													</div>
+												</div>
+											</div>											<!-- Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Status *" />
+														<combobox tabindex="3" id="agtstatus"
+															selectedItem="@bind(vm.currentAgentWorkflowExecution.agtstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Inputdata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Inputdata" />
+														<textbox tabindex="4" id="agtinputdata"
+															value="@bind(vm.currentAgentWorkflowExecution.agtinputdata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtinputdata'])" />
+													</div>
+												</div>
+											</div>											<!-- Outputdata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Outputdata" />
+														<textbox tabindex="5" id="agtoutputdata"
+															value="@bind(vm.currentAgentWorkflowExecution.agtoutputdata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtoutputdata'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Execution Log -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Execution Log" />
+														<textbox tabindex="6" id="agtexecutionlog"
+															value="@bind(vm.currentAgentWorkflowExecution.agtexecutionlog)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtexecutionlog'])" />
+													</div>
+												</div>
+											</div>											<!-- Agent Execution S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Agent Execution S" />
+														<textbox tabindex="7" id="agtagentexecutions"
+															value="@bind(vm.currentAgentWorkflowExecution.agtagentexecutions)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtagentexecutions'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Errormessage -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Errormessage" />
+														<textbox tabindex="8" id="agterrormessage"
+															value="@bind(vm.currentAgentWorkflowExecution.agterrormessage)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agterrormessage'])" />
+													</div>
+												</div>
+											</div>											<!-- Errordetails -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Errordetails" />
+														<textbox tabindex="9" id="agterrordetails"
+															value="@bind(vm.currentAgentWorkflowExecution.agterrordetails)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agterrordetails'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Startedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Startedat *" />
+														<textbox tabindex="10" id="agtstartedat"
+															value="@bind(vm.currentAgentWorkflowExecution.agtstartedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtstartedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Completed At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Completed At" />
+														<textbox tabindex="11" id="agtcompletedat"
+															value="@bind(vm.currentAgentWorkflowExecution.agtcompletedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcompletedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Durationseconds -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Durationseconds" />
+														<textbox tabindex="12" id="agtdurationseconds"
+															value="@bind(vm.currentAgentWorkflowExecution.agtdurationseconds)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtdurationseconds'])" />
+													</div>
+												</div>
+											</div>											<!-- Agent Sinvolved -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Agent Sinvolved" />
+														<textbox tabindex="13" id="agtagentsinvolved"
+															value="@bind(vm.currentAgentWorkflowExecution.agtagentsinvolved)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtagentsinvolved'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Taskscompleted -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Taskscompleted" />
+														<textbox tabindex="14" id="agttaskscompleted"
+															value="@bind(vm.currentAgentWorkflowExecution.agttaskscompleted)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttaskscompleted'])" />
+													</div>
+												</div>
+											</div>											<!-- Tasksfailed -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tasksfailed" />
+														<textbox tabindex="15" id="agttasksfailed"
+															value="@bind(vm.currentAgentWorkflowExecution.agttasksfailed)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttasksfailed'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Successrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Successrate" />
+														<textbox tabindex="16" id="agtsuccessrate"
+															value="@bind(vm.currentAgentWorkflowExecution.agtsuccessrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtsuccessrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="17" id="agtcreatedby"
+															value="@bind(vm.currentAgentWorkflowExecution.agtcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="18" id="agtupdatedby"
+															value="@bind(vm.currentAgentWorkflowExecution.agtupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="19" id="agtcreatedat"
+															value="@bind(vm.currentAgentWorkflowExecution.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="20" id="agtupdatedat"
+															value="@bind(vm.currentAgentWorkflowExecution.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

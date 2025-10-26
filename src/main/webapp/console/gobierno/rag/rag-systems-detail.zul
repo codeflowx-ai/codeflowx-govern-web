@@ -1,0 +1,462 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="rag"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.rag.RagSystemsDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-database label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de sistemas RAG" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveRagSystem')"
+										tooltiptext="Guardar sistema RAG">
+									</a>
+									
+									<a class="waves-effect waves-light"
+										onClick="@command('indexDataSources')"
+										iconSclass="fa-sharp-duotone fa-solid fa-folder-arrow-up label-icon align-middle fs-16 me-2"
+										tooltiptext="Indexar fuentes de datos" 
+										visible="@load(vm.editing)"/>
+									
+									<a class="waves-effect waves-light"
+										iconSclass="fa-sharp-duotone fa-solid fa-code-branch label-icon align-middle fs-16 me-2"
+										onClick="@command('createNewVersion')"
+										tooltiptext="Crear nueva versión" 
+										visible="@load(vm.editing)"/>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<div class="form-group row">
+											<!-- Nombre -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Nombre del Sistema RAG" />
+														<textbox tabindex="1" id="ragname"
+															value="@bind(vm.currentRagSystem.ragname)"
+															sclass="border-danger" maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['ragname'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Versión -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Versión" />
+														<textbox tabindex="2" id="ragversion"
+															value="@bind(vm.currentRagSystem.ragversion)"
+															maxlength="50" />
+														<label sclass="text-danger" value="@load(vmsgs['ragversion'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Tipo -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tipo" />
+														<combobox tabindex="3" id="ragtype"
+															selectedItem="@bind(vm.currentRagSystem.ragtype)"
+															readonly="true">
+															<comboitem label="Vector DB" value="VECTOR_DB"/>
+															<comboitem label="Híbrido" value="HYBRID"/>
+															<comboitem label="Semántico" value="SEMANTIC"/>
+															<comboitem label="Keywords" value="KEYWORD"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['ragtype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Modelo de Embedding -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Modelo de Embedding" />
+														<textbox tabindex="4" id="ragembeddingmodel"
+															value="@bind(vm.currentRagSystem.ragembeddingmodel)"
+															maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['ragembeddingmodel'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Estado -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estado" />
+														<combobox tabindex="5" id="ragstatus"
+															selectedItem="@bind(vm.currentRagSystem.ragstatus)"
+															readonly="true">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Indexando" value="INDEXING"/>
+															<comboitem label="Mantenimiento" value="MAINTENANCE"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['ragstatus'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Estado de Aprobación -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Aprobación" />
+														<combobox tabindex="6" id="ragapprovalstatus"
+															selectedItem="@bind(vm.currentRagSystem.ragapprovalstatus)"
+															readonly="true">
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Aprobado" value="APPROVED"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['ragapprovalstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Descripción -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Descripción" />
+														<textbox tabindex="7" id="ragdescription"
+															value="@bind(vm.currentRagSystem.ragdescription)"
+															rows="3" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['ragdescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Configuración General -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Configuración (JSON)" />
+														<textbox tabindex="8" id="ragconfiguration"
+															value="@bind(vm.currentRagSystem.ragconfiguration)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['ragconfiguration'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Config Retrieval -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Config Retrieval (JSON)" />
+														<textbox tabindex="9" id="ragretrievalconfig"
+															value="@bind(vm.currentRagSystem.ragretrievalconfig)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['ragretrievalconfig'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Config Generation -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Config Generation (JSON)" />
+														<textbox tabindex="10" id="raggenerationconfig"
+															value="@bind(vm.currentRagSystem.raggenerationconfig)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['raggenerationconfig'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Metadata JSON -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metadata (JSON)" />
+														<textbox tabindex="11" id="ragmetadata"
+															value="@bind(vm.currentRagSystem.ragmetadata)"
+															rows="3" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['ragmetadata'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Fuentes de Datos" />
+												<tab label="Versiones" />
+												<tab label="Estadísticas" />
+											</tabs>
+											<tabpanels>
+												
+												<!-- Panel 1: Fuentes de Datos -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Fuentes de Datos"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalDataSources)"/> 
+															<label value="fuentes"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Tipo"/></h:th>
+																	<h:th><label value="Formato"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Documentos"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.ragDataSources)" var="datasource">
+																	<h:tr>
+																		<h:td><label value="@load(datasource.idxragdatasource)"/></h:td>
+																		<h:td><label value="@load(datasource.ragdsname)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-secondary">
+																				<label value="@load(datasource.ragdstype)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(datasource.ragdsformat)"/></h:td>
+																		<h:td>
+																			<h:span class="badge ${datasource.ragdsstatus eq 'ACTIVE' ? 'bg-success' : 'bg-secondary'}">
+																				<label value="@load(datasource.ragdsstatus)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td>
+																			<h:span class="badge bg-info">
+																				<label value="@load(datasource.ragdstotaldocs)"/>
+																			</h:span>
+																		</h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.ragDataSources)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay fuentes de datos registradas"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 2: Versiones -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Historial de Versiones"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalVersions)"/> 
+															<label value="versiones"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Versión"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
+																	<h:th><label value="Creado"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.ragVersions)" var="version">
+																	<h:tr>
+																		<h:td><label value="@load(version.idxragversion)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-info">
+																				v<label value="@load(version.ragversionnumber)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(version.ragversiondescription)"/></h:td>
+																		<h:td><label value="@load(version.ragcreatedat)"/></h:td>
+																		<h:td>
+																			<h:span class="badge ${version.ragstatus eq 'ACTIVE' ? 'bg-success' : 'bg-secondary'}">
+																				<label value="@load(version.ragstatus)"/>
+																			</h:span>
+																		</h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.ragVersions)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay versiones registradas"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 3: Estadísticas -->
+												<tabpanel>
+													<h:div class="row g-3">
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-folder-open" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.totalDataSources)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Fuentes de Datos"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-code-branch" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.totalVersions)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Versiones"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-bullseye" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.avgRetrievalAccuracy)"/>%
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Precisión Retrieval"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-12">
+															<h:div class="card shadow-sm border-0">
+																<h:div class="card-body">
+																	<h:h5 class="mb-3">
+																		<label value="Información del Sistema RAG"/>
+																	</h:h5>
+																	<h:div class="row">
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Creado por"/>:</h:strong> 
+																				<label value="@load(vm.currentRagSystem.ragcreatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Fecha de creación"/>:</h:strong> 
+																				<label value="@load(vm.currentRagSystem.ragcreatedat)"/>
+																			</h:p>
+																		</h:div>
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Actualizado por"/>:</h:strong> 
+																				<label value="@load(vm.currentRagSystem.ragupdatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Última actualización"/>:</h:strong> 
+																				<label value="@load(vm.currentRagSystem.ragupdatedat)"/>
+																			</h:p>
+																		</h:div>
+																	</h:div>
+																</h:div>
+															</h:div>
+														</h:div>
+													</h:div>
+												</tabpanel>
+												
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>
+

@@ -1,0 +1,244 @@
+package com.codeflowx.govern.workflow.drools
+
+import com.codeflowx.govern.workflow.drools.facts.ModelApprovalFact
+
+// =====================================================
+// DROOLS RULES: Model Approval Scoring
+// =====================================================
+// Proceso: model-approval-v1
+// Fact: ModelApprovalFact
+// Output: finalDecision, minScore, confidenceLevel, justification, requiresMonitoring
+// =====================================================
+
+// ===== REGLA 1: APPROVED - Producción con scores perfectos =====
+rule "Approved - Production Perfect Scores"
+    salience 100
+    when
+        $fact : ModelApprovalFact(
+            bothReviewsApproved() == true,
+            isProductionDeployment() == true,
+            performanceScore >= 90,
+            biasScore >= 90,
+            complianceScore >= 90
+        )
+    then
+        $fact.setFinalDecision("APPROVED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.98);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("All scores >= 90, both reviews approved. Ready for PRODUCTION.");
+        
+        System.out.println("✅ Drools: APPROVED - Production deployment, perfect scores");
+end
+
+// ===== REGLA 2: APPROVED - Staging con buenos scores =====
+rule "Approved - Staging Good Scores"
+    salience 95
+    when
+        $fact : ModelApprovalFact(
+            bothReviewsApproved() == true,
+            isProductionDeployment() == false,
+            performanceScore >= 75,
+            biasScore >= 75,
+            complianceScore >= 75
+        )
+    then
+        $fact.setFinalDecision("APPROVED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.95);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("All scores >= 75, both reviews approved. Ready for STAGING.");
+        
+        System.out.println("✅ Drools: APPROVED - Staging deployment");
+end
+
+// ===== REGLA 3: CONDITIONAL_APPROVAL - Producción con scores medios =====
+rule "Conditional Approval - Production Medium Scores"
+    salience 80
+    when
+        $fact : ModelApprovalFact(
+            bothReviewsApproved() == true,
+            isProductionDeployment() == true,
+            performanceScore >= 80, performanceScore < 90,
+            biasScore >= 80, biasScore < 90,
+            complianceScore >= 80, complianceScore < 90
+        )
+    then
+        $fact.setFinalDecision("CONDITIONAL_APPROVAL");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.85);
+        $fact.setRequiresMonitoring(true);
+        $fact.setJustification("Scores 80-90 range. PRODUCTION approved with enhanced monitoring required.");
+        
+        System.out.println("⚠️ Drools: CONDITIONAL_APPROVAL - Production with monitoring");
+end
+
+// ===== REGLA 4: REJECTED - Governance condicional en Production =====
+rule "Rejected - Governance Conditional for Production"
+    salience 90
+    when
+        $fact : ModelApprovalFact(
+            isProductionDeployment() == true,
+            governanceApproval == "CONDITIONAL"
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.92);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("Governance approval is CONDITIONAL. Not allowed for PRODUCTION. Deploy to STAGING first.");
+        
+        System.out.println("❌ Drools: REJECTED - Conditional governance for production");
+end
+
+// ===== REGLA 5: REJECTED - ML Engineer rechazó =====
+rule "Rejected - ML Engineer Rejection"
+    salience 95
+    when
+        $fact : ModelApprovalFact(
+            mlEngineerApproval == "REJECTED"
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.98);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("ML Engineer rejected the model. Technical issues must be resolved.");
+        
+        System.out.println("❌ Drools: REJECTED - ML Engineer rejection");
+end
+
+// ===== REGLA 6: REJECTED - Governance rechazó =====
+rule "Rejected - Governance Rejection"
+    salience 95
+    when
+        $fact : ModelApprovalFact(
+            governanceApproval == "REJECTED"
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.98);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("Governance rejected the model. Policy/ethics issues must be resolved.");
+        
+        System.out.println("❌ Drools: REJECTED - Governance rejection");
+end
+
+// ===== REGLA 7: REJECTED - Score crítico bajo =====
+rule "Rejected - Critical Low Score"
+    salience 90
+    when
+        $fact : ModelApprovalFact(
+            performanceScore < 60 || biasScore < 60 || complianceScore < 60
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.95);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("One or more critical scores below 60. Model not ready for deployment.");
+        
+        System.out.println("❌ Drools: REJECTED - Critical low score: " + $fact.getMinScore());
+end
+
+// ===== REGLA 8: CONDITIONAL_APPROVAL - Needs Changes pero staging OK =====
+rule "Conditional Approval - Needs Changes for Staging"
+    salience 75
+    when
+        $fact : ModelApprovalFact(
+            mlEngineerApproval == "NEEDS_CHANGES",
+            isProductionDeployment() == false,
+            performanceScore >= 70,
+            biasScore >= 70,
+            complianceScore >= 70
+        )
+    then
+        $fact.setFinalDecision("CONDITIONAL_APPROVAL");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.70);
+        $fact.setRequiresMonitoring(true);
+        $fact.setJustification("ML Engineer flagged changes needed, but scores acceptable for STAGING with monitoring.");
+        
+        System.out.println("⚠️ Drools: CONDITIONAL_APPROVAL - Needs changes but staging OK");
+end
+
+// ===== REGLA 9: REJECTED - Needs Changes para Production =====
+rule "Rejected - Needs Changes for Production"
+    salience 85
+    when
+        $fact : ModelApprovalFact(
+            mlEngineerApproval == "NEEDS_CHANGES",
+            isProductionDeployment() == true
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.90);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("ML Engineer flagged changes needed. Not allowed for PRODUCTION.");
+        
+        System.out.println("❌ Drools: REJECTED - Needs changes for production");
+end
+
+// ===== REGLA 10: CONDITIONAL_APPROVAL - Bias score borderline =====
+rule "Conditional Approval - Bias Borderline"
+    salience 70
+    when
+        $fact : ModelApprovalFact(
+            bothReviewsApproved() == true,
+            performanceScore >= 85,
+            biasScore >= 70, biasScore < 85,
+            complianceScore >= 85
+        )
+    then
+        $fact.setFinalDecision("CONDITIONAL_APPROVAL");
+        $fact.setMinScore($fact.getBiasScore());
+        $fact.setConfidenceLevel(0.80);
+        $fact.setRequiresMonitoring(true);
+        $fact.setJustification("Bias score borderline (" + $fact.getBiasScore() + "). Approved with bias monitoring required.");
+        
+        System.out.println("⚠️ Drools: CONDITIONAL_APPROVAL - Bias monitoring required");
+end
+
+// ===== REGLA 11: CONDITIONAL_APPROVAL - Performance borderline =====
+rule "Conditional Approval - Performance Borderline"
+    salience 70
+    when
+        $fact : ModelApprovalFact(
+            bothReviewsApproved() == true,
+            performanceScore >= 70, performanceScore < 85,
+            biasScore >= 85,
+            complianceScore >= 85
+        )
+    then
+        $fact.setFinalDecision("CONDITIONAL_APPROVAL");
+        $fact.setMinScore($fact.getPerformanceScore());
+        $fact.setConfidenceLevel(0.80);
+        $fact.setRequiresMonitoring(true);
+        $fact.setJustification("Performance score borderline (" + $fact.getPerformanceScore() + "). Approved with performance monitoring required.");
+        
+        System.out.println("⚠️ Drools: CONDITIONAL_APPROVAL - Performance monitoring required");
+end
+
+// ===== REGLA 12: FALLBACK - Default reject por seguridad =====
+rule "Rejected - Default Fallback"
+    salience 10
+    when
+        $fact : ModelApprovalFact(
+            finalDecision == null
+        )
+    then
+        $fact.setFinalDecision("REJECTED");
+        $fact.setMinScore($fact.calculateMinScore());
+        $fact.setConfidenceLevel(0.50);
+        $fact.setRequiresMonitoring(false);
+        $fact.setJustification("No clear approval criteria met. Rejected by default for safety.");
+        
+        System.out.println("❌ Drools: REJECTED - Fallback (safety)");
+end
+
+// =====================================================
+// FIN DE REGLAS
+// =====================================================
+

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="🔍 Advanced Search" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.DocumentSearchViewModel')">
+        
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="🔍 Advanced Document Search" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Search documents by content and metadata" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+        </hlayout>
+        
+        <hlayout>
+            <!-- Sidebar: Search History -->
+            <groupbox width="250px" closable="false">
+                <caption label="Search History"/>
+                <listbox model="@load(vm.searchHistory)" height="400px" emptyMessage="No recent searches">
+                    <template name="model" var="query">
+                        <listitem onClick="@command('executeSearch', query=query)">
+                            <listcell label="@load(query)" style="cursor: pointer;"/>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+            
+            <!-- Main Content -->
+            <vlayout hflex="1" style="margin-left: 20px;">
+                <!-- Search Box -->
+                <hlayout spacing="10px">
+                    <textbox value="@bind(vm.searchQuery)" placeholder="Search documents by content..." 
+                             width="500px" style="padding: 15px; font-size: 16px; border-radius: 8px;"/>
+                    <button label="Search" onClick="@command('executeSearch')" iconSclass="z-icon-search"
+                            disabled="@load(empty vm.searchQuery or vm.loading)"
+                            style="background-color: #3b82f6; color: white; padding: 15px 30px;"/>
+                </hlayout>
+                
+                <!-- Filters -->
+                <groupbox style="margin-top: 20px; background: #f8f9fa;" closable="false">
+                    <caption label="Advanced Filters"/>
+                    <hlayout spacing="15px">
+                        <combobox value="@bind(vm.filterFileType)" placeholder="File type" width="150px">
+                            <comboitem label="All types" value=""/>
+                            <comboitem label="PDF" value="pdf"/>
+                            <comboitem label="DOCX" value="docx"/>
+                            <comboitem label="PPTX" value="pptx"/>
+                        </combobox>
+                        <datebox value="@bind(vm.filterDateFrom)" placeholder="From date"/>
+                        <datebox value="@bind(vm.filterDateTo)" placeholder="To date"/>
+                    </hlayout>
+                </groupbox>
+                
+                <!-- Search Results -->
+                <groupbox style="margin-top: 20px;" closable="false">
+                    <caption label="Search Results (@load(vm.searchResults.size()))"/>
+                    <listbox model="@load(vm.searchResults)" height="400px" emptyMessage="No results found">
+                        <listhead>
+                            <listheader label="Document" width="300px"/>
+                            <listheader label="Snippet" hflex="1"/>
+                            <listheader label="Relevance" width="100px"/>
+                        </listhead>
+                        <template name="model" var="result">
+                            <listitem>
+                                <listcell label="@load(result.filename)" style="font-weight: bold;"/>
+                                <listcell label="@load(result.snippet)" style="font-size: 12px; color: #666;"/>
+                                <listcell>
+                                    <progressmeter value="@load(result.relevance * 100)"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </groupbox>
+            </vlayout>
+        </hlayout>
+    </window>
+</zk>
+

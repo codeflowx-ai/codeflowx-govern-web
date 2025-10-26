@@ -1,0 +1,334 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="infrastructure"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.infrastructure.InfrastructureCostDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cloud label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Rastructure Cost" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveInfrastructureCost')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Costproviderid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costproviderid" />
+														<textbox tabindex="2" id="infcostproviderid"
+															value="@bind(vm.currentInfrastructureCost.infcostproviderid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostproviderid'])" />
+													</div>
+												</div>
+											</div>											<!-- Costresourceid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costresourceid" />
+														<textbox tabindex="3" id="infcostresourceid"
+															value="@bind(vm.currentInfrastructureCost.infcostresourceid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostresourceid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costresourcetype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costresourcetype" />
+														<combobox tabindex="4" id="infcostresourcetype"
+															selectedItem="@bind(vm.currentInfrastructureCost.infcostresourcetype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infcostresourcetype'])" />
+													</div>
+												</div>
+											</div>											<!-- Costresourcename -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costresourcename" />
+														<textbox tabindex="5" id="infcostresourcename"
+															value="@bind(vm.currentInfrastructureCost.infcostresourcename) @save(vm.currentInfrastructureCost.infcostresourcename, before=('saveItem')) @validator(vm.unique, field='INFCOSTRESOURCENAME', required=false, oldValue=vm.originalInfcostresourcename)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostresourcename'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costperiodstart -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costperiodstart *" />
+														<textbox tabindex="6" id="infcostperiodstart"
+															value="@bind(vm.currentInfrastructureCost.infcostperiodstart)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostperiodstart'])" />
+													</div>
+												</div>
+											</div>											<!-- Costperiodend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costperiodend *" />
+														<textbox tabindex="7" id="infcostperiodend"
+															value="@bind(vm.currentInfrastructureCost.infcostperiodend)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostperiodend'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costhourlyrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costhourlyrate" />
+														<textbox tabindex="8" id="infcosthourlyrate"
+															value="@bind(vm.currentInfrastructureCost.infcosthourlyrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcosthourlyrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Costinvoiceid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costinvoiceid" />
+														<textbox tabindex="9" id="infcostinvoiceid"
+															value="@bind(vm.currentInfrastructureCost.infcostinvoiceid)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostinvoiceid'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costinvoicedate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costinvoicedate" />
+														<textbox tabindex="10" id="infcostinvoicedate"
+															value="@bind(vm.currentInfrastructureCost.infcostinvoicedate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostinvoicedate'])" />
+													</div>
+												</div>
+											</div>											<!-- Costpaymentstatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costpaymentstatus" />
+														<combobox tabindex="11" id="infcostpaymentstatus"
+															selectedItem="@bind(vm.currentInfrastructureCost.infcostpaymentstatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infcostpaymentstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costpaymentdate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costpaymentdate" />
+														<textbox tabindex="12" id="infcostpaymentdate"
+															value="@bind(vm.currentInfrastructureCost.infcostpaymentdate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostpaymentdate'])" />
+													</div>
+												</div>
+											</div>											<!-- Costbreakdown -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costbreakdown" />
+														<textbox tabindex="13" id="infcostbreakdown"
+															value="@bind(vm.currentInfrastructureCost.infcostbreakdown)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostbreakdown'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costmetadata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costmetadata" />
+														<textbox tabindex="14" id="infcostmetadata"
+															value="@bind(vm.currentInfrastructureCost.infcostmetadata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostmetadata'])" />
+													</div>
+												</div>
+											</div>											<!-- Costtags -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costtags" />
+														<textbox tabindex="15" id="infcosttags"
+															value="@bind(vm.currentInfrastructureCost.infcosttags)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcosttags'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costcreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costcreatedat *" />
+														<textbox tabindex="16" id="infcostcreatedat"
+															value="@bind(vm.currentInfrastructureCost.infcostcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Costupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costupdatedat *" />
+														<textbox tabindex="17" id="infcostupdatedat"
+															value="@bind(vm.currentInfrastructureCost.infcostupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infcostupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costcreatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costcreatedby" />
+														<textbox tabindex="18" id="infcostcreatedby"
+															value="@bind(vm.currentInfrastructureCost.infcostcreatedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Costupdatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costupdatedby" />
+														<textbox tabindex="19" id="infcostupdatedby"
+															value="@bind(vm.currentInfrastructureCost.infcostupdatedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infcostupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

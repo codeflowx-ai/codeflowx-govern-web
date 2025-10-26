@@ -1,0 +1,511 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentEthicsAssessmentDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Ethics Assessment" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentEthicsAssessment')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Assessment Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Assessment Type *" />
+														<combobox tabindex="2" id="agtassessmenttype"
+															selectedItem="@bind(vm.currentAgentEthicsAssessment.agtassessmenttype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtassessmenttype'])" />
+													</div>
+												</div>
+											</div>											<!-- Assessment Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Assessment Status *" />
+														<combobox tabindex="3" id="agtassessmentstatus"
+															selectedItem="@bind(vm.currentAgentEthicsAssessment.agtassessmentstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtassessmentstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Overall Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Overall Score" />
+														<textbox tabindex="4" id="agtoverallscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agtoverallscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtoverallscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Bias Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Score" />
+														<textbox tabindex="5" id="agtbiasscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agtbiasscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtbiasscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Fairnessscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fairnessscore" />
+														<textbox tabindex="6" id="agtfairnessscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agtfairnessscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtfairnessscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Transparency Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Transparency Score" />
+														<textbox tabindex="7" id="agttransparencyscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agttransparencyscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttransparencyscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Accountabilityscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Accountabilityscore" />
+														<textbox tabindex="8" id="agtaccountabilityscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agtaccountabilityscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtaccountabilityscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Privacyscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Privacyscore" />
+														<textbox tabindex="9" id="agtprivacyscore"
+															value="@bind(vm.currentAgentEthicsAssessment.agtprivacyscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtprivacyscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ethicalguidelines -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ethicalguidelines" />
+														<textbox tabindex="10" id="agtethicalguidelines"
+															value="@bind(vm.currentAgentEthicsAssessment.agtethicalguidelines)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtethicalguidelines'])" />
+													</div>
+												</div>
+											</div>											<!-- Bias Detection S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Detection S" />
+														<textbox tabindex="11" id="agtbiasdetections"
+															value="@bind(vm.currentAgentEthicsAssessment.agtbiasdetections)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtbiasdetections'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Fairnessmetrics -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fairnessmetrics" />
+														<textbox tabindex="12" id="agtfairnessmetrics"
+															value="@bind(vm.currentAgentEthicsAssessment.agtfairnessmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtfairnessmetrics'])" />
+													</div>
+												</div>
+											</div>											<!-- Transparency Metric S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Transparency Metric S" />
+														<textbox tabindex="13" id="agttransparencymetrics"
+															value="@bind(vm.currentAgentEthicsAssessment.agttransparencymetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttransparencymetrics'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Recommendations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendations" />
+														<textbox tabindex="14" id="agtrecommendations"
+															value="@bind(vm.currentAgentEthicsAssessment.agtrecommendations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrecommendations'])" />
+													</div>
+												</div>
+											</div>											<!-- Mitigationactions -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Mitigationactions" />
+														<textbox tabindex="15" id="agtmitigationactions"
+															value="@bind(vm.currentAgentEthicsAssessment.agtmitigationactions)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtmitigationactions'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Evidence -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Evidence" />
+														<textbox tabindex="16" id="agtevidence"
+															value="@bind(vm.currentAgentEthicsAssessment.agtevidence)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtevidence'])" />
+													</div>
+												</div>
+											</div>											<!-- Testcases -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Testcases" />
+														<textbox tabindex="17" id="agttestcases"
+															value="@bind(vm.currentAgentEthicsAssessment.agttestcases)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttestcases'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Algorithmused -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Algorithmused" />
+														<textbox tabindex="18" id="agtalgorithmused"
+															value="@bind(vm.currentAgentEthicsAssessment.agtalgorithmused)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtalgorithmused'])" />
+													</div>
+												</div>
+											</div>											<!-- Datasetused -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Datasetused" />
+														<textbox tabindex="19" id="agtdatasetused"
+															value="@bind(vm.currentAgentEthicsAssessment.agtdatasetused)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtdatasetused'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Evaluation Criteria -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Evaluation Criteria" />
+														<textbox tabindex="20" id="agtevaluationcriteria"
+															value="@bind(vm.currentAgentEthicsAssessment.agtevaluationcriteria)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtevaluationcriteria'])" />
+													</div>
+												</div>
+											</div>											<!-- Risklevel -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Risklevel" />
+														<combobox tabindex="21" id="agtrisklevel"
+															selectedItem="@bind(vm.currentAgentEthicsAssessment.agtrisklevel)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtrisklevel'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Humanreviewerid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Humanreviewerid" />
+														<textbox tabindex="22" id="agthumanreviewerid"
+															value="@bind(vm.currentAgentEthicsAssessment.agthumanreviewerid)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agthumanreviewerid'])" />
+													</div>
+												</div>
+											</div>											<!-- Humanreviewnotes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Humanreviewnotes" />
+														<textbox tabindex="23" id="agthumanreviewnotes"
+															value="@bind(vm.currentAgentEthicsAssessment.agthumanreviewnotes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agthumanreviewnotes'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Humanreviewedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Humanreviewedat" />
+														<textbox tabindex="24" id="agthumanreviewedat"
+															value="@bind(vm.currentAgentEthicsAssessment.agthumanreviewedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agthumanreviewedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Assessment Date -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Assessment Date *" />
+														<textbox tabindex="25" id="agtassessmentdate"
+															value="@bind(vm.currentAgentEthicsAssessment.agtassessmentdate)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtassessmentdate'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Completed At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Completed At" />
+														<textbox tabindex="26" id="agtcompletedat"
+															value="@bind(vm.currentAgentEthicsAssessment.agtcompletedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtcompletedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Validuntil -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Validuntil" />
+														<textbox tabindex="27" id="agtvaliduntil"
+															value="@bind(vm.currentAgentEthicsAssessment.agtvaliduntil)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtvaliduntil'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="28" id="agtcreatedby"
+															value="@bind(vm.currentAgentEthicsAssessment.agtcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="29" id="agtupdatedby"
+															value="@bind(vm.currentAgentEthicsAssessment.agtupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="30" id="agtcreatedat"
+															value="@bind(vm.currentAgentEthicsAssessment.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="31" id="agtupdatedat"
+															value="@bind(vm.currentAgentEthicsAssessment.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

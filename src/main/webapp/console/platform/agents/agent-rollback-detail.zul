@@ -1,0 +1,537 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="agents"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentRollbackDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Agent Rollback" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveAgentRollback')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Rollback Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Type *" />
+														<combobox tabindex="2" id="agtrollbacktype"
+															selectedItem="@bind(vm.currentAgentRollback.agtrollbacktype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbacktype'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Status *" />
+														<combobox tabindex="3" id="agtrollbackstatus"
+															selectedItem="@bind(vm.currentAgentRollback.agtrollbackstatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Fromversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fromversion *" />
+														<textbox tabindex="4" id="agtfromversion"
+															value="@bind(vm.currentAgentRollback.agtfromversion)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['agtfromversion'])" />
+													</div>
+												</div>
+											</div>											<!-- Toversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Toversion *" />
+														<textbox tabindex="5" id="agttoversion"
+															value="@bind(vm.currentAgentRollback.agttoversion)"
+															maxlength="50"
+															constraint="no empty: max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['agttoversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Reason -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Reason" />
+														<textbox tabindex="6" id="agtrollbackreason"
+															value="@bind(vm.currentAgentRollback.agtrollbackreason)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackreason'])" />
+													</div>
+												</div>
+											</div>											<!-- Triggerevent -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Triggerevent" />
+														<textbox tabindex="7" id="agttriggerevent"
+															value="@bind(vm.currentAgentRollback.agttriggerevent)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agttriggerevent'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Triggerthreshold -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Triggerthreshold" />
+														<textbox tabindex="8" id="agttriggerthreshold"
+															value="@bind(vm.currentAgentRollback.agttriggerthreshold)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttriggerthreshold'])" />
+													</div>
+												</div>
+											</div>											<!-- Triggervalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Triggervalue" />
+														<textbox tabindex="9" id="agttriggervalue"
+															value="@bind(vm.currentAgentRollback.agttriggervalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agttriggervalue'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Strategy -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Strategy" />
+														<textbox tabindex="10" id="agtrollbackstrategy"
+															value="@bind(vm.currentAgentRollback.agtrollbackstrategy)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackstrategy'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Steps -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Steps" />
+														<textbox tabindex="11" id="agtrollbacksteps"
+															value="@bind(vm.currentAgentRollback.agtrollbacksteps)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbacksteps'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Config -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Config" />
+														<textbox tabindex="12" id="agtrollbackconfig"
+															value="@bind(vm.currentAgentRollback.agtrollbackconfig)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackconfig'])" />
+													</div>
+												</div>
+											</div>											<!-- Validationchecks -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Validationchecks" />
+														<textbox tabindex="13" id="agtvalidationchecks"
+															value="@bind(vm.currentAgentRollback.agtvalidationchecks)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtvalidationchecks'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Plan -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Plan" />
+														<textbox tabindex="14" id="agtrollbackplan"
+															value="@bind(vm.currentAgentRollback.agtrollbackplan)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackplan'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Log -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Log" />
+														<textbox tabindex="15" id="agtrollbacklog"
+															value="@bind(vm.currentAgentRollback.agtrollbacklog)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbacklog'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Metric S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Metric S" />
+														<textbox tabindex="16" id="agtrollbackmetrics"
+															value="@bind(vm.currentAgentRollback.agtrollbackmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackmetrics'])" />
+													</div>
+												</div>
+											</div>											<!-- Affectedinstances -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Affectedinstances" />
+														<textbox tabindex="17" id="agtaffectedinstances"
+															value="@bind(vm.currentAgentRollback.agtaffectedinstances)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtaffectedinstances'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Durationseconds -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Durationseconds" />
+														<textbox tabindex="18" id="agtrollbackdurationseconds"
+															value="@bind(vm.currentAgentRollback.agtrollbackdurationseconds)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackdurationseconds'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Startedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Startedat" />
+														<textbox tabindex="19" id="agtrollbackstartedat"
+															value="@bind(vm.currentAgentRollback.agtrollbackstartedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackstartedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Completed At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Completed At" />
+														<textbox tabindex="20" id="agtrollbackcompletedat"
+															value="@bind(vm.currentAgentRollback.agtrollbackcompletedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackcompletedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Failedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Failedat" />
+														<textbox tabindex="21" id="agtrollbackfailedat"
+															value="@bind(vm.currentAgentRollback.agtrollbackfailedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackfailedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Error -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Error" />
+														<textbox tabindex="22" id="agtrollbackerror"
+															value="@bind(vm.currentAgentRollback.agtrollbackerror)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackerror'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Errordetails -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Errordetails" />
+														<textbox tabindex="23" id="agtrollbackerrordetails"
+															value="@bind(vm.currentAgentRollback.agtrollbackerrordetails)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackerrordetails'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Approvedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Approvedby" />
+														<textbox tabindex="24" id="agtrollbackapprovedby"
+															value="@bind(vm.currentAgentRollback.agtrollbackapprovedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackapprovedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Approvedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Approvedat" />
+														<textbox tabindex="25" id="agtrollbackapprovedat"
+															value="@bind(vm.currentAgentRollback.agtrollbackapprovedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackapprovedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Escalatedto -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Escalatedto" />
+														<textbox tabindex="26" id="agtrollbackescalatedto"
+															value="@bind(vm.currentAgentRollback.agtrollbackescalatedto)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackescalatedto'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Escalatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Escalatedat" />
+														<textbox tabindex="27" id="agtrollbackescalatedat"
+															value="@bind(vm.currentAgentRollback.agtrollbackescalatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackescalatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Escalationreason -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Escalationreason" />
+														<textbox tabindex="28" id="agtrollbackescalationreason"
+															value="@bind(vm.currentAgentRollback.agtrollbackescalationreason)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackescalationreason'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Notificationrecipients -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Notificationrecipients" />
+														<textbox tabindex="29" id="agtrollbacknotificationrecipients"
+															value="@bind(vm.currentAgentRollback.agtrollbacknotificationrecipients)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbacknotificationrecipients'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Rollback Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Created By *" />
+														<textbox tabindex="30" id="agtrollbackcreatedby"
+															value="@bind(vm.currentAgentRollback.agtrollbackcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Rollback Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Rollback Updated By" />
+														<textbox tabindex="31" id="agtrollbackupdatedby"
+															value="@bind(vm.currentAgentRollback.agtrollbackupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['agtrollbackupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="32" id="agtcreatedat"
+															value="@bind(vm.currentAgentRollback.agtcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['agtcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="33" id="agtupdatedat"
+															value="@bind(vm.currentAgentRollback.agtupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['agtupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

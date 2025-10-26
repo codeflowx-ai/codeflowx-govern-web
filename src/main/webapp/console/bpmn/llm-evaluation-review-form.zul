@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+
+    <window id="llmEvaluationReviewWindow" 
+            title="LLM Evaluation Review - Score Below Threshold"
+            border="normal" 
+            width="90%" 
+            height="85%"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.LlmEvaluationReviewViewModel')">
+
+        <!-- Header -->
+        <hlayout style="padding: 15px; background: #fff3cd; border-bottom: 2px solid #ffc107;">
+            <label value="⚠️ Evaluation Score Below Threshold" 
+                   style="font-size: 18px; font-weight: bold; color: #856404;"/>
+            <space hflex="1"/>
+            <label value="@load(vm.modelName)" 
+                   style="font-size: 16px; font-weight: 600;"/>
+        </hlayout>
+
+        <!-- Score Summary -->
+        <div style="margin: 15px; padding: 15px; background: white; border: 1px solid #dee2e6; border-radius: 8px;">
+            <hlayout spacing="30px">
+                <vlayout>
+                    <label value="Overall Score:" style="font-weight: 600; color: #666;"/>
+                    <label value="@load(vm.overallScore)" 
+                           style="font-size: 32px; font-weight: bold; color: #dc3545;"/>
+                </vlayout>
+                <separator orient="vertical"/>
+                <vlayout>
+                    <label value="Threshold:" style="font-weight: 600; color: #666;"/>
+                    <label value="@load(vm.threshold)" 
+                           style="font-size: 32px; font-weight: bold; color: #28a745;"/>
+                </vlayout>
+                <separator orient="vertical"/>
+                <vlayout hflex="1">
+                    <label value="Gap:" style="font-weight: 600; color: #666;"/>
+                    <label value="@load(vm.gap)" 
+                           style="font-size: 32px; font-weight: bold; color: #ff6b6b;"/>
+                </vlayout>
+            </hlayout>
+        </div>
+
+        <!-- Detailed Metrics -->
+        <tabbox style="margin: 15px;" height="400px">
+            <tabs>
+                <tab label="📊 Metrics Details"/>
+                <tab label="📋 Test Cases"/>
+                <tab label="🔍 Recommendations"/>
+            </tabs>
+            <tabpanels>
+                <!-- Tab 1: Metrics -->
+                <tabpanel>
+                    <grid model="@load(vm.metrics)">
+                        <columns>
+                            <column label="Metric" width="200px"/>
+                            <column label="Value" width="100px"/>
+                            <column label="Threshold" width="100px"/>
+                            <column label="Status" width="100px"/>
+                        </columns>
+                        <template name="model" var="metric">
+                            <row>
+                                <label value="@load(metric.name)"/>
+                                <label value="@load(metric.value)" 
+                                       style="@load(metric.passed ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;')"/>
+                                <label value="@load(metric.threshold)"/>
+                                <label value="@load(metric.passed ? '✅ Pass' : '❌ Fail')" 
+                                       style="@load(metric.passed ? 'color: green;' : 'color: red;')"/>
+                            </row>
+                        </template>
+                    </grid>
+                </tabpanel>
+
+                <!-- Tab 2: Test Cases -->
+                <tabpanel>
+                    <label value="Test Cases Summary:" style="font-weight: 600; margin-bottom: 10px;"/>
+                    <separator height="10px"/>
+                    <label value="@load('Total: ' += vm.totalTestCases)"/>
+                    <label value="@load('Passed: ' += vm.passedTestCases)" style="color: green;"/>
+                    <label value="@load('Failed: ' += vm.failedTestCases)" style="color: red;"/>
+                </tabpanel>
+
+                <!-- Tab 3: Recommendations -->
+                <tabpanel>
+                    <vlayout spacing="10px">
+                        <label value="🤖 AI Recommendations:" style="font-weight: bold; font-size: 14px;"/>
+                        <textbox value="@load(vm.recommendations)" 
+                                 rows="10" 
+                                 readonly="true" 
+                                 width="100%"
+                                 style="background: #f8f9fa; padding: 10px;"/>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Human Decision -->
+        <groupbox style="margin: 15px;">
+            <caption label="👤 Your Decision" style="font-weight: bold;"/>
+            
+            <vlayout spacing="10px" style="padding: 10px;">
+                <radiogroup selectedItem="@bind(vm.action)">
+                    <hlayout spacing="20px">
+                        <radio label="✅ Approve (despite low score)" value="approve"/>
+                        <radio label="❌ Reject" value="reject"/>
+                        <radio label="🔄 Re-run with different parameters" value="rerun"/>
+                    </hlayout>
+                </radiogroup>
+
+                <hlayout>
+                    <label value="Justification:" style="font-weight: 600; width: 120px;"/>
+                    <textbox value="@bind(vm.justification)" 
+                             rows="3" 
+                             width="600px"
+                             placeholder="Explain your decision..."
+                             style="padding: 8px;"/>
+                </hlayout>
+            </vlayout>
+        </groupbox>
+
+        <!-- Footer -->
+        <div style="padding: 15px; background: #f8f9fa; border-top: 2px solid #dee2e6;">
+            <hlayout spacing="10px">
+                <space hflex="1"/>
+                <button label="Cancel" onClick="@command('doCancel')" width="120px"/>
+                <button label="Submit Decision" 
+                        onClick="@command('doSubmit')" 
+                        width="150px"
+                        disabled="@load(empty vm.action or empty vm.justification)"
+                        style="background: #007bff; color: white; font-weight: bold;"/>
+            </hlayout>
+        </div>
+
+    </window>
+
+</zk>
+
+

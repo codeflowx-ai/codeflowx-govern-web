@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Recordatorio: Dataset en Cuarentena (7 días)" border="normal" width="750px" 
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.DatasetReviewReminderViewModel')">
+        
+        <vlayout spacing="15px" style="padding: 20px;">
+            <div style="background: #fff3e0; padding: 15px; border-left: 4px solid #ff9800;">
+                <label value="⏰ Dataset en cuarentena hace 7 días" style="font-weight: bold;"/>
+                <separator height="5px"/>
+                <label value="Dataset: ${vm.datasetName} | Quality Score: ${vm.qualityScore}%" style="color: #666;"/>
+            </div>
+
+            <radiogroup selectedItem="@bind(vm.selectedDecision)">
+                <vlayout spacing="10px">
+                    <radio value="APPROVE" label="✅ Aprobar para Training"/>
+                    <radio value="REQUEST_FIXES" label="🔧 Solicitar Correcciones al Data Team"/>
+                    <radio value="REJECT" label="❌ Rechazar Dataset"/>
+                </vlayout>
+            </radiogroup>
+
+            <label value="Notas:"/>
+            <textbox rows="2" width="100%" value="@bind(vm.notes)"/>
+
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')"/>
+                <button label="Confirmar" onClick="@command('confirm')" style="background: #1976d2; color: white;"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+

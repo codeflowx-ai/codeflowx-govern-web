@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Performance Metrics" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.monitoring.PerformanceMetricsOverviewViewModel')">
+        
+        <hlayout>
+            <button label="Refresh" iconSclass="fa fa-refresh" onClick="@command('loadData')"/>
+            <button label="Delete" iconSclass="fa fa-trash" onClick="@command('delete')" 
+                    disabled="@load(vm.selectedPerformanceMetrics eq null)"/>
+        </hlayout>
+        
+        <listbox model="@load(vm.performanceMetrics)" selectedItem="@bind(vm.selectedPerformanceMetrics)"
+                 emptyMessage="No performance metrics found" height="500px">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Entity Type" width="120px"/>
+                <listheader label="Entity ID" width="100px"/>
+                <listheader label="Latency (ms)" width="120px"/>
+                <listheader label="Throughput" width="120px"/>
+                <listheader label="CPU %" width="100px"/>
+                <listheader label="Memory %" width="100px"/>
+                <listheader label="Status" width="100px"/>
+                <listheader label="Created At" width="180px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxperformancemetric)"/>
+                    <listcell label="@load(item.prfentitytype)"/>
+                    <listcell label="@load(item.prfentityid)"/>
+                    <listcell label="@load(item.prflatencyms)"/>
+                    <listcell label="@load(item.prfthroughput)"/>
+                    <listcell label="@load(item.prfcpuusagepercent)"/>
+                    <listcell label="@load(item.prfmemoryusagepercent)"/>
+                    <listcell label="@load(item.prfstatus)"/>
+                    <listcell label="@load(item.prfcreatedat)"/>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>
+

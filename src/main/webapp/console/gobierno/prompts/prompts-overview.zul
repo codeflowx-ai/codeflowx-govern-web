@@ -1,0 +1,294 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.prompts.PromptsOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+
+		<div class="row  " style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-message-quote me-2"></h:i>
+						<label value="${labels.prompts.overview.title}" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label
+							value="${labels.prompts.overview.subtitle}" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+
+							</div>
+							<div class="flex-shrink-0">
+								<div
+									class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2 "
+										class="waves-effect waves-light"
+										onClick="@command('createPrompt')"
+										label="${labels.prompts.overview.button.create}">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.prompts.overview.metrics.total}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalPrompts)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.prompts.overview.metrics.active}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.activePrompts)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							   <fragment exps="${labels.prompts.overview.metrics.versions}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalVersions)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							     <fragment exps="${labels.prompts.overview.metrics.avgrating}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.avgRating)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="${labels.prompts.overview.filters.search.placeholder}"
+						class="form-control" onOK="@command('applyFilters')" />
+					<!-- Filtro por Tipo -->
+					<combobox
+						placeholder="${labels.prompts.overview.filters.type}"
+						selectedItem="@bind(vm.typeFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="SYSTEM" value="SYSTEM" />
+						<comboitem label="USER" value="USER" />
+						<comboitem label="ASSISTANT" value="ASSISTANT" />
+						<comboitem label="FUNCTION" value="FUNCTION" />
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox
+						placeholder="${labels.prompts.overview.filters.status}"
+						selectedItem="@bind(vm.statusFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="INACTIVE" value="INACTIVE" />
+						<comboitem label="DRAFT" value="DRAFT" />
+					</combobox>
+					<!-- Filtro por Categoría -->
+					<combobox
+						placeholder="${labels.prompts.overview.filters.category}"
+						selectedItem="@bind(vm.categoryFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="GENERAL" value="GENERAL" />
+						<comboitem label="CODE" value="CODE" />
+						<comboitem label="CREATIVE" value="CREATIVE" />
+						<comboitem label="ANALYSIS" value="ANALYSIS" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Find"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Clear"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.filteredPrompts)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="${labels.prompts.overview.table.id}" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.name}" align="center"
+										width="25%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.type}"
+										align="center" width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.category}" align="center"
+										width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.version}" align="center"
+										width="8%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.status}" align="center"
+										width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.versions}"
+										align="center" width="8%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.prompts.overview.table.rating}"
+										align="center" width="10%" />
+
+									<column
+										label="${labels.prompts.overview.table.actions}"
+										align="center" />
+								</columns>
+
+								<template name="model" var="prompt">
+									<row
+										style="text-align:right;cursor:pointer;"
+										onClick="@command('viewPromptDetails', promptId=prompt.idxprompt)">
+										<label
+											value="@load(prompt.idxprompt) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(prompt.prmname) @converter(vm.fieldConverter)">
+										</label>
+
+										<h:span
+											class="badge bg-secondary">
+											<label
+												value="@load(prompt.prmtype)" />
+										</h:span>
+
+										<label
+											value="@load(prompt.prmcategory)">
+										</label>
+
+										<label
+											value="@load(prompt.prmversion)" sclass="badge bg-info" />
+
+										<label
+											value="@load(prompt.prmstatus)"
+											sclass="badge ${prompt.prmstatus eq 'ACTIVE' ? 'bg-success' : (prompt.prmstatus eq 'INACTIVE' ? 'bg-secondary' : 'bg-warning')}" />
+
+										<label
+											value="@load(prompt.totalversions)"
+											sclass="badge bg-primary" />
+
+										<label
+											value="@load(prompt.avgrating)"
+											sclass="badge ${prompt.avgrating >= 4 ? 'bg-success' : (prompt.avgrating >= 3 ? 'bg-warning' : 'bg-danger')}" />
+
+										<cell align="center"
+											class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewPromptDetails', promptId=prompt.idxprompt)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="${labels.prompts.overview.button.view.tooltip}" />
+											</div>
+											<div class="delete">
+												<a
+													onClick="@command('deletePrompt', promptId=prompt.idxprompt)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="${labels.prompts.overview.button.delete.tooltip}" />
+											</div>
+
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+
+
+									</footer>
+									<footer span="4" align="left">
+
+
+
+
+									</footer>
+									<footer></footer>
+
+								</foot>
+
+
+
+							</grid>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>

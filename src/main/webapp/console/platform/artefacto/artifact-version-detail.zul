@@ -1,0 +1,225 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="artefacto"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.artefacto.ArtifactVersionDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Artifact Version" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveArtifactVersion')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Catverartifactid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverartifactid *" />
+														<textbox tabindex="2" id="catverartifactid"
+															value="@bind(vm.currentArtifactVersion.catverartifactid)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['catverartifactid'])" />
+													</div>
+												</div>
+											</div>											<!-- Catverversionnumber -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverversionnumber *" />
+														<textbox tabindex="3" id="catverversionnumber"
+															value="@bind(vm.currentArtifactVersion.catverversionnumber)"
+															maxlength="20"
+															constraint="no empty: max 20" />
+														<label sclass="text-danger" value="@load(vmsgs['catverversionnumber'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Catverdescription -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverdescription" />
+														<textbox tabindex="4" id="catverdescription"
+															value="@bind(vm.currentArtifactVersion.catverdescription)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['catverdescription'])" />
+													</div>
+												</div>
+											</div>											<!-- Catveruri -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catveruri" />
+														<textbox tabindex="5" id="catveruri"
+															value="@bind(vm.currentArtifactVersion.catveruri)"
+															maxlength="500"
+															constraint="max 500" />
+														<label sclass="text-danger" value="@load(vmsgs['catveruri'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Catvermetadata -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catvermetadata" />
+														<textbox tabindex="6" id="catvermetadata"
+															value="@bind(vm.currentArtifactVersion.catvermetadata)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['catvermetadata'])" />
+													</div>
+												</div>
+											</div>											<!-- Catverchecksum -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverchecksum" />
+														<textbox tabindex="7" id="catverchecksum"
+															value="@bind(vm.currentArtifactVersion.catverchecksum)"
+															maxlength="64"
+															constraint="max 64" />
+														<label sclass="text-danger" value="@load(vmsgs['catverchecksum'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Catversizebytes -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catversizebytes" />
+														<textbox tabindex="8" id="catversizebytes"
+															value="@bind(vm.currentArtifactVersion.catversizebytes)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['catversizebytes'])" />
+													</div>
+												</div>
+											</div>											<!-- Catvercreatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catvercreatedby" />
+														<textbox tabindex="9" id="catvercreatedby"
+															value="@bind(vm.currentArtifactVersion.catvercreatedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['catvercreatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Catverupdatedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverupdatedby" />
+														<textbox tabindex="10" id="catverupdatedby"
+															value="@bind(vm.currentArtifactVersion.catverupdatedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['catverupdatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Catvercreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catvercreatedat *" />
+														<textbox tabindex="11" id="catvercreatedat"
+															value="@bind(vm.currentArtifactVersion.catvercreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['catvercreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Catverupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Catverupdatedat *" />
+														<textbox tabindex="12" id="catverupdatedat"
+															value="@bind(vm.currentArtifactVersion.catverupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['catverupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

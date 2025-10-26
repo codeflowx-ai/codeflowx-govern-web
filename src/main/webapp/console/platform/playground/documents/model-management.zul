@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="🤖 Model Management - AI Document Processing" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.ModelManagementViewModel')">
+        
+        <style>
+            .status-card {
+                border: 2px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 20px;
+                margin: 10px;
+                background: white;
+                text-align: center;
+            }
+            .status-card.active {
+                border-color: #22c55e;
+                background: #f0fdf4;
+            }
+            .status-card.inactive {
+                border-color: #ef4444;
+                background: #fef2f2;
+            }
+            .model-card {
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 15px;
+                margin: 10px 0;
+                background: white;
+            }
+            .model-card.loaded {
+                border-left: 4px solid #22c55e;
+            }
+            .log-entry {
+                padding: 8px;
+                margin: 5px 0;
+                border-radius: 5px;
+                font-family: monospace;
+                font-size: 12px;
+            }
+            .log-info { background: #eff6ff; color: #1e40af; }
+            .log-success { background: #f0fdf4; color: #166534; }
+            .log-error { background: #fef2f2; color: #991b1b; }
+            .log-warning { background: #fefce8; color: #854d0e; }
+        </style>
+        
+        <!-- Header con Gradiente -->
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="🤖 Model Management" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Manage AI models for document processing - REQUIRED BEFORE UPLOAD" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+            <vlayout style="text-align: right;">
+                <button label="Refresh All" onClick="@command('refreshAll')" 
+                        iconSclass="z-icon-refresh" style="background-color: white; color: #667eea;"/>
+                <button label="Health Check" onClick="@command('checkHealth')" 
+                        iconSclass="z-icon-heartbeat" style="background-color: white; color: #667eea; margin-top: 10px;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- System Status Cards -->
+        <groupbox closable="false">
+            <caption label="System Status"/>
+            
+            <hlayout spacing="20px" style="justify-content: space-around;">
+                <!-- ModelService Status -->
+                <vlayout sclass="@load(vm.modelServiceInitialized ? 'status-card active' : 'status-card inactive')" width="200px">
+                    <label value="@load(vm.modelServiceInitialized ? '✅' : '❌')" style="font-size: 36px;"/>
+                    <label value="ModelService" style="font-weight: bold; font-size: 16px; margin-top: 10px;"/>
+                    <label value="@load(vm.modelServiceInitialized ? 'Initialized' : 'Not Initialized')" 
+                           style="font-size: 12px; margin-top: 5px;"/>
+                </vlayout>
+                
+                <!-- Model Loader Status -->
+                <vlayout sclass="@load(vm.modelLoaderAvailable ? 'status-card active' : 'status-card inactive')" width="200px">
+                    <label value="@load(vm.modelLoaderAvailable ? '✅' : '❌')" style="font-size: 36px;"/>
+                    <label value="Model Loader" style="font-weight: bold; font-size: 16px; margin-top: 10px;"/>
+                    <label value="@load(vm.modelLoaderAvailable ? 'Available' : 'Unavailable')" 
+                           style="font-size: 12px; margin-top: 5px;"/>
+                </vlayout>
+                
+                <!-- GPU Status -->
+                <vlayout sclass="@load(vm.gpuAvailable ? 'status-card active' : 'status-card inactive')" width="200px">
+                    <label value="@load(vm.gpuAvailable ? '🚀' : '⚠️')" style="font-size: 36px;"/>
+                    <label value="GPU" style="font-weight: bold; font-size: 16px; margin-top: 10px;"/>
+                    <label value="@load(vm.gpuAvailable ? 'Available' : 'Not Available')" 
+                           style="font-size: 12px; margin-top: 5px;"/>
+                </vlayout>
+                
+                <!-- Loaded Models Count -->
+                <vlayout sclass="status-card" width="200px" style="border-color: #3b82f6; background: #eff6ff;">
+                    <label value="@load(vm.loadedModels.size())" style="font-size: 36px; font-weight: bold; color: #1e40af;"/>
+                    <label value="Loaded Models" style="font-weight: bold; font-size: 16px; margin-top: 10px;"/>
+                    <label value="@load(vm.modelCacheSize + ' cached')" 
+                           style="font-size: 12px; margin-top: 5px; color: #1e40af;"/>
+                </vlayout>
+            </hlayout>
+            
+            <!-- System Status Summary -->
+            <separator height="20px"/>
+            <hlayout style="padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                <label value="Overall Status:" style="font-weight: bold; margin-right: 10px;"/>
+                <label value="@load(vm.systemStatus)" 
+                       style="@load(vm.systemStatus eq 'operational' ? 'color: #22c55e; font-weight: bold;' : 'color: #ef4444; font-weight: bold;')"/>
+                <space hflex="1"/>
+                <label value="Cache Directory: @load(vm.cacheDirectory)" style="font-size: 12px; color: #666;"/>
+            </hlayout>
+        </groupbox>
+        
+        <!-- Loaded Models List -->
+        <groupbox closable="false" style="margin-top: 20px;" visible="@load(not empty vm.loadedModels)">
+            <caption label="Currently Loaded Models (@load(vm.loadedModels.size()))"/>
+            
+            <vlayout>
+                <div forEach="@load(vm.loadedModels)" sclass="model-card loaded">
+                    <hlayout valign="middle">
+                        <label value="✅" style="font-size: 24px; margin-right: 15px;"/>
+                        <vlayout>
+                            <label value="@load(each)" style="font-weight: bold; font-size: 14px;"/>
+                            <label value="Loaded in memory - Ready for use" style="font-size: 12px; color: #22c55e;"/>
+                        </vlayout>
+                    </hlayout>
+                </div>
+            </vlayout>
+        </groupbox>
+        
+        <!-- Register New Model -->
+        <groupbox closable="false" style="margin-top: 20px;">
+            <caption label="Register New Model"/>
+            
+            <grid>
+                <columns>
+                    <column width="150px"/>
+                    <column/>
+                </columns>
+                <rows>
+                    <row>
+                        <label value="Model Name:"/>
+                        <textbox value="@bind(vm.newModelName)" width="100%" 
+                                 placeholder="e.g. microsoft/layoutlm-base-uncased"/>
+                    </row>
+                    <row>
+                        <label value="Provider:"/>
+                        <combobox value="@bind(vm.newModelProvider)" width="200px">
+                            <comboitem label="Hugging Face" value="huggingface"/>
+                            <comboitem label="OpenAI" value="openai"/>
+                            <comboitem label="Custom" value="custom"/>
+                        </combobox>
+                    </row>
+                    <row>
+                        <label value="Task:"/>
+                        <combobox value="@bind(vm.newModelTask)" width="300px">
+                            <comboitem label="Document Extraction" value="document-extraction"/>
+                            <comboitem label="Text Summarization" value="summarization"/>
+                            <comboitem label="Question Answering" value="question-answering"/>
+                            <comboitem label="Translation" value="translation"/>
+                            <comboitem label="Classification" value="classification"/>
+                        </combobox>
+                    </row>
+                    <row>
+                        <cell colspan="2" align="center">
+                            <button label="Register Model" onClick="@command('registerModel')" 
+                                    disabled="@load(vm.loading)"
+                                    iconSclass="z-icon-plus-circle"
+                                    style="background-color: #3b82f6; color: white; padding: 10px 30px;"/>
+                        </cell>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+        
+        <!-- Available Models Catalog -->
+        <groupbox closable="false" style="margin-top: 20px;">
+            <caption label="Available Models Catalog"/>
+            
+            <tabbox>
+                <tabs>
+                    <tab forEach="@load(vm.modelsByCategory.keySet())" label="@load(each)" />
+                </tabs>
+                <tabpanels>
+                    <tabpanel forEach="@load(vm.modelsByCategory.entrySet())">
+                        <vlayout>
+                            <div forEach="@load(each.value)" sclass="model-card">
+                                <hlayout valign="middle">
+                                    <label value="@load(each.status eq 'LOADED' ? '✅' : '📦')" 
+                                           style="font-size: 24px; margin-right: 15px;"/>
+                                    <vlayout hflex="1">
+                                        <label value="@load(each.name)" style="font-weight: bold; font-size: 14px;"/>
+                                        <label value="@load(each.description)" style="font-size: 12px; color: #666; margin-top: 5px;"/>
+                                        <hlayout spacing="10px" style="margin-top: 5px;">
+                                            <label value="@load(each.provider)" 
+                                                   style="background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 4px; font-size: 11px;"/>
+                                            <label value="@load(each.task)" 
+                                                   style="background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 4px; font-size: 11px;"/>
+                                            <label value="@load(each.status)" 
+                                                   style="@load(each.status eq 'LOADED' ? 'background: #d1fae5; color: #065f46;' : 'background: #fef3c7; color: #92400e;') padding: 2px 8px; border-radius: 4px; font-size: 11px;"/>
+                                        </hlayout>
+                                    </vlayout>
+                                    <button label="Load Model" onClick="@command('loadModel', model=each)" 
+                                            disabled="@load(each.status eq 'LOADED' or vm.loading)"
+                                            iconSclass="z-icon-download"
+                                            style="background-color: #22c55e; color: white;"/>
+                                </hlayout>
+                            </div>
+                        </vlayout>
+                    </tabpanel>
+                </tabpanels>
+            </tabbox>
+        </groupbox>
+        
+        <!-- System Logs -->
+        <groupbox closable="false" style="margin-top: 20px;">
+            <caption label="System Logs (@load(vm.systemLogs.size()))">
+                <toolbar align="end">
+                    <button label="Clear Logs" onClick="@command('clearLogs')" 
+                            iconSclass="z-icon-trash" disabled="@load(empty vm.systemLogs)"/>
+                </toolbar>
+            </caption>
+            
+            <vlayout height="300px" style="overflow-y: auto; padding: 10px; background: #f8f9fa;">
+                <div forEach="@load(vm.systemLogs)" 
+                     sclass="@load(each.level eq 'INFO' ? 'log-info' : (each.level eq 'SUCCESS' ? 'log-success' : (each.level eq 'ERROR' ? 'log-error' : 'log-warning')))">
+                    <label value="@load(each.timestamp) @converter('formatedDate', format='HH:mm:ss')" 
+                           style="font-weight: bold; margin-right: 10px;"/>
+                    <label value="[@load(each.level)]" style="font-weight: bold; margin-right: 10px;"/>
+                    <label value="@load(each.message)" style="margin-right: 10px;"/>
+                    <label value="@load(each.details)" style="opacity: 0.8;"/>
+                </div>
+            </vlayout>
+        </groupbox>
+        
+        <!-- Help Section -->
+        <groupbox style="margin-top: 20px; background: #fef3c7;" closable="false">
+            <caption label="⚠️ Important - Required Setup"/>
+            <vlayout spacing="5px">
+                <label value="Before processing documents, you MUST:" style="font-weight: bold; font-size: 14px;"/>
+                <label value="1. Verify ModelService is initialized (green status above)"/>
+                <label value="2. Register at least one document extraction model (e.g. microsoft/layoutlm-base-uncased)"/>
+                <label value="3. Load the registered model into memory"/>
+                <label value="4. Check that the model appears in 'Currently Loaded Models' section"/>
+                <separator height="10px"/>
+                <label value="💡 Recommended models:" style="font-weight: bold;"/>
+                <label value="• Document Extraction: microsoft/layoutlm-base-uncased"/>
+                <label value="• Summarization: facebook/bart-large-cnn"/>
+                <label value="• Q&A: facebook/rag-token-nq"/>
+            </vlayout>
+        </groupbox>
+        
+    </window>
+</zk>
+

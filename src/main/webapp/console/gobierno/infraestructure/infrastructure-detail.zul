@@ -1,0 +1,388 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="infrastructure"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.infrastructure.InfrastructureDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cloud label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de recursos de infraestructura" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveResource')"
+										tooltiptext="Guardar recurso">
+									</a>
+									
+									<a class="waves-effect waves-light"
+										onClick="@command('checkHealthStatus')"
+										iconSclass="fa-sharp-duotone fa-solid fa-heart-pulse label-icon align-middle fs-16 me-2"
+										tooltiptext="Verificar estado de salud" 
+										visible="@load(vm.editing)"/>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<div class="form-group row">
+											<!-- Nombre -->
+											<div class="default col-lg-8 col-xlg-8 col-md-8">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Nombre del Recurso" />
+														<textbox tabindex="1" id="infresname"
+															value="@bind(vm.currentResource.infresname)"
+															sclass="border-danger" maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['infresname'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Tipo de Recurso -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tipo de Recurso" />
+														<combobox tabindex="2" id="infresresourcetype"
+															selectedItem="@bind(vm.currentResource.infresresourcetype)"
+															readonly="true">
+															<comboitem label="Kubernetes" value="KUBERNETES"/>
+															<comboitem label="GPU" value="GPU"/>
+															<comboitem label="Cloud" value="CLOUD"/>
+															<comboitem label="Storage" value="STORAGE"/>
+															<comboitem label="Compute" value="COMPUTE"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infresresourcetype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Resource ID -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Resource ID (Externo)" />
+														<textbox tabindex="3" id="infresresourceid"
+															value="@bind(vm.currentResource.infresresourceid)"
+															maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['infresresourceid'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Región -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Región" />
+														<textbox tabindex="4" id="infresregion"
+															value="@bind(vm.currentResource.infresregion)"
+															maxlength="100" />
+														<label sclass="text-danger" value="@load(vmsgs['infresregion'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Zona de Disponibilidad -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Availability Zone" />
+														<textbox tabindex="5" id="infresavailabilityzone"
+															value="@bind(vm.currentResource.infresavailabilityzone)"
+															maxlength="100" />
+														<label sclass="text-danger" value="@load(vmsgs['infresavailabilityzone'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Descripción -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Descripción" />
+														<textbox tabindex="6" id="infresdescription"
+															value="@bind(vm.currentResource.infresdescription)"
+															rows="3" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['infresdescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Endpoint URL -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Endpoint URL" />
+														<textbox tabindex="7" id="infresendpointurl"
+															value="@bind(vm.currentResource.infresendpointurl)"
+															maxlength="500" />
+														<label sclass="text-danger" value="@load(vmsgs['infresendpointurl'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Estado -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estado" />
+														<combobox tabindex="8" id="infresstatus"
+															selectedItem="@bind(vm.currentResource.infresstatus)"
+															readonly="true">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Provisionando" value="PROVISIONING"/>
+															<comboitem label="Mantenimiento" value="MAINTENANCE"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infresstatus'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Estado de Salud -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Salud" />
+														<combobox tabindex="9" id="infreshealthstatus"
+															selectedItem="@bind(vm.currentResource.infreshealthstatus)"
+															readonly="true">
+															<comboitem label="Healthy" value="HEALTHY"/>
+															<comboitem label="Degradado" value="DEGRADED"/>
+															<comboitem label="Crítico" value="CRITICAL"/>
+															<comboitem label="Desconocido" value="UNKNOWN"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infreshealthstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Configuración JSON -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Configuración (JSON)" />
+														<textbox tabindex="10" id="infresconfiguration"
+															value="@bind(vm.currentResource.infresconfiguration)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['infresconfiguration'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Metadata JSON -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metadata (JSON)" />
+														<textbox tabindex="11" id="infresmetadata"
+															value="@bind(vm.currentResource.infresmetadata)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['infresmetadata'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Tabs de Información -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Capacidad y Uso" />
+												<tab label="Costos" />
+												<tab label="Estadísticas" />
+											</tabs>
+											<tabpanels>
+												
+												<!-- Panel 1: Capacidad -->
+												<tabpanel>
+													<h:div class="row g-3">
+														<h:div class="col-md-6">
+															<h:div class="card shadow-sm border-0">
+																<h:div class="card-body">
+																	<h:h6 class="mb-3"><label value="Capacidad Total"/></h:h6>
+																	<h:h3><label value="@load(vm.currentResource.infrescapacitytotal)"/></h:h3>
+																	<h:div class="progress mt-2">
+																		<h:div class="progress-bar" role="progressbar" style="width: 70%">70%</h:div>
+																	</h:div>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-6">
+															<h:div class="card shadow-sm border-0">
+																<h:div class="card-body">
+																	<h:h6 class="mb-3"><label value="Capacidad Usada"/></h:h6>
+																	<h:h3><label value="@load(vm.currentResource.infrescapacityused)"/></h:h3>
+																	<h:div class="progress mt-2">
+																		<h:div class="progress-bar bg-warning" role="progressbar" style="width: 45%">45%</h:div>
+																	</h:div>
+																</h:div>
+															</h:div>
+														</h:div>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 2: Costos -->
+												<tabpanel>
+													<h:div class="row g-3">
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-dollar-sign" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		$<label value="@load(vm.monthlyCost)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Costo Mensual"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-calendar" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		$<label value="@load(vm.dailyCost)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Costo Diario"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-4">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-clock" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		$<label value="@load(vm.hourlyCost)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Costo por Hora"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 3: Estadísticas -->
+												<tabpanel>
+													<h:div class="row g-3">
+														<h:div class="col-md-12">
+															<h:div class="card shadow-sm border-0">
+																<h:div class="card-body">
+																	<h:h5 class="mb-3">
+																		<label value="Información del Recurso"/>
+																	</h:h5>
+																	<h:div class="row">
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Creado por"/>:</h:strong> 
+																				<label value="@load(vm.currentResource.infrescreatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Fecha de creación"/>:</h:strong> 
+																				<label value="@load(vm.currentResource.infrescreatedat)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Proveedor"/>:</h:strong> 
+																				<label value="@load(vm.providerName)"/>
+																			</h:p>
+																		</h:div>
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Actualizado por"/>:</h:strong> 
+																				<label value="@load(vm.currentResource.infresupdatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Última actualización"/>:</h:strong> 
+																				<label value="@load(vm.currentResource.infresupdatedat)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Cluster"/>:</h:strong> 
+																				<label value="@load(vm.clusterName)"/>
+																			</h:p>
+																		</h:div>
+																	</h:div>
+																</h:div>
+															</h:div>
+														</h:div>
+													</h:div>
+												</tabpanel>
+												
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>
+

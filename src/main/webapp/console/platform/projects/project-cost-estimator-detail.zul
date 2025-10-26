@@ -1,0 +1,896 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="projects"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.projects.ProjectCostEstimatorDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-folder-open label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Project Cost Estimator" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveProjectCostEstimator')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Projectid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectid *" />
+														<textbox tabindex="2" id="prjprojectid"
+															value="@bind(vm.currentProjectCostEstimator.prjprojectid)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojectid'])" />
+													</div>
+												</div>
+											</div>											<!-- Estimationname -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estimationname *" />
+														<textbox tabindex="3" id="prjestimationname"
+															value="@bind(vm.currentProjectCostEstimator.prjestimationname) @save(vm.currentProjectCostEstimator.prjestimationname, before=('saveItem')) @validator(vm.unique, field='PRJESTIMATIONNAME', required=true, oldValue=vm.originalPrjestimationname)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['prjestimationname'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Periodstart -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Periodstart *" />
+														<textbox tabindex="4" id="prjperiodstart"
+															value="@bind(vm.currentProjectCostEstimator.prjperiodstart)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjperiodstart'])" />
+													</div>
+												</div>
+											</div>											<!-- Periodend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Periodend" />
+														<textbox tabindex="5" id="prjperiodend"
+															value="@bind(vm.currentProjectCostEstimator.prjperiodend)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjperiodend'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Model Usagecost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Model Usagecost" />
+														<textbox tabindex="6" id="prjmodelusagecost"
+															value="@bind(vm.currentProjectCostEstimator.prjmodelusagecost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjmodelusagecost'])" />
+													</div>
+												</div>
+											</div>											<!-- Totaltokensconsumed -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totaltokensconsumed" />
+														<textbox tabindex="7" id="prjtotaltokensconsumed"
+															value="@bind(vm.currentProjectCostEstimator.prjtotaltokensconsumed)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotaltokensconsumed'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Apirequestscount -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Apirequestscount" />
+														<textbox tabindex="8" id="prjapirequestscount"
+															value="@bind(vm.currentProjectCostEstimator.prjapirequestscount)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjapirequestscount'])" />
+													</div>
+												</div>
+											</div>											<!-- Computecost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Computecost" />
+														<textbox tabindex="9" id="prjcomputecost"
+															value="@bind(vm.currentProjectCostEstimator.prjcomputecost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjcomputecost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Storagecost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Storagecost" />
+														<textbox tabindex="10" id="prjstoragecost"
+															value="@bind(vm.currentProjectCostEstimator.prjstoragecost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjstoragecost'])" />
+													</div>
+												</div>
+											</div>											<!-- Networkcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Networkcost" />
+														<textbox tabindex="11" id="prjnetworkcost"
+															value="@bind(vm.currentProjectCostEstimator.prjnetworkcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjnetworkcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Servingcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Servingcost" />
+														<textbox tabindex="12" id="prjservingcost"
+															value="@bind(vm.currentProjectCostEstimator.prjservingcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjservingcost'])" />
+													</div>
+												</div>
+											</div>											<!-- Developmenthours -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Developmenthours" />
+														<textbox tabindex="13" id="prjdevelopmenthours"
+															value="@bind(vm.currentProjectCostEstimator.prjdevelopmenthours)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjdevelopmenthours'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Hourlyrate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Hourlyrate" />
+														<textbox tabindex="14" id="prjhourlyrate"
+															value="@bind(vm.currentProjectCostEstimator.prjhourlyrate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjhourlyrate'])" />
+													</div>
+												</div>
+											</div>											<!-- Developmentcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Developmentcost" />
+														<textbox tabindex="15" id="prjdevelopmentcost"
+															value="@bind(vm.currentProjectCostEstimator.prjdevelopmentcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjdevelopmentcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Licensecost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Licensecost" />
+														<textbox tabindex="16" id="prjlicensecost"
+															value="@bind(vm.currentProjectCostEstimator.prjlicensecost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjlicensecost'])" />
+													</div>
+												</div>
+											</div>											<!-- Monitoring Cost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Monitoring Cost" />
+														<textbox tabindex="17" id="prjmonitoringcost"
+															value="@bind(vm.currentProjectCostEstimator.prjmonitoringcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjmonitoringcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Supportcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Supportcost" />
+														<textbox tabindex="18" id="prjsupportcost"
+															value="@bind(vm.currentProjectCostEstimator.prjsupportcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjsupportcost'])" />
+													</div>
+												</div>
+											</div>											<!-- Othercosts -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Othercosts" />
+														<textbox tabindex="19" id="prjothercosts"
+															value="@bind(vm.currentProjectCostEstimator.prjothercosts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjothercosts'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Totalinfrastructurecost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalinfrastructurecost" />
+														<textbox tabindex="20" id="prjtotalinfrastructurecost"
+															value="@bind(vm.currentProjectCostEstimator.prjtotalinfrastructurecost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalinfrastructurecost'])" />
+													</div>
+												</div>
+											</div>											<!-- Totalexternalcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalexternalcost" />
+														<textbox tabindex="21" id="prjtotalexternalcost"
+															value="@bind(vm.currentProjectCostEstimator.prjtotalexternalcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalexternalcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Totalinternalcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalinternalcost" />
+														<textbox tabindex="22" id="prjtotalinternalcost"
+															value="@bind(vm.currentProjectCostEstimator.prjtotalinternalcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalinternalcost'])" />
+													</div>
+												</div>
+											</div>											<!-- Totalrealcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalrealcost" />
+														<textbox tabindex="23" id="prjtotalrealcost"
+															value="@bind(vm.currentProjectCostEstimator.prjtotalrealcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalrealcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Marginpercentage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Marginpercentage" />
+														<textbox tabindex="24" id="prjmarginpercentage"
+															value="@bind(vm.currentProjectCostEstimator.prjmarginpercentage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjmarginpercentage'])" />
+													</div>
+												</div>
+											</div>											<!-- Marginamount -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Marginamount" />
+														<textbox tabindex="25" id="prjmarginamount"
+															value="@bind(vm.currentProjectCostEstimator.prjmarginamount)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjmarginamount'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Estimatedprice -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estimatedprice" />
+														<textbox tabindex="26" id="prjestimatedprice"
+															value="@bind(vm.currentProjectCostEstimator.prjestimatedprice)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjestimatedprice'])" />
+													</div>
+												</div>
+											</div>											<!-- Clientcurrency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Clientcurrency" />
+														<textbox tabindex="27" id="prjclientcurrency"
+															value="@bind(vm.currentProjectCostEstimator.prjclientcurrency)"
+															maxlength="3"
+															constraint="max 3" />
+														<label sclass="text-danger" value="@load(vmsgs['prjclientcurrency'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Exchangerate -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Exchangerate" />
+														<textbox tabindex="28" id="prjexchangerate"
+															value="@bind(vm.currentProjectCostEstimator.prjexchangerate)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjexchangerate'])" />
+													</div>
+												</div>
+											</div>											<!-- Priceinclientcurrency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Priceinclientcurrency" />
+														<textbox tabindex="29" id="prjpriceinclientcurrency"
+															value="@bind(vm.currentProjectCostEstimator.prjpriceinclientcurrency)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjpriceinclientcurrency'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Projectedmonthlycost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectedmonthlycost" />
+														<textbox tabindex="30" id="prjprojectedmonthlycost"
+															value="@bind(vm.currentProjectCostEstimator.prjprojectedmonthlycost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojectedmonthlycost'])" />
+													</div>
+												</div>
+											</div>											<!-- Projectedannualcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectedannualcost" />
+														<textbox tabindex="31" id="prjprojectedannualcost"
+															value="@bind(vm.currentProjectCostEstimator.prjprojectedannualcost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojectedannualcost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Costtrend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costtrend" />
+														<textbox tabindex="32" id="prjcosttrend"
+															value="@bind(vm.currentProjectCostEstimator.prjcosttrend)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['prjcosttrend'])" />
+													</div>
+												</div>
+											</div>											<!-- Budgetlimit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Budgetlimit" />
+														<textbox tabindex="33" id="prjbudgetlimit"
+															value="@bind(vm.currentProjectCostEstimator.prjbudgetlimit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjbudgetlimit'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Budgetalertthreshold -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Budgetalertthreshold" />
+														<textbox tabindex="34" id="prjbudgetalertthreshold"
+															value="@bind(vm.currentProjectCostEstimator.prjbudgetalertthreshold)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjbudgetalertthreshold'])" />
+													</div>
+												</div>
+											</div>											<!-- Isoverbudget -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isoverbudget" />
+														<textbox tabindex="35" id="prjisoverbudget"
+															value="@bind(vm.currentProjectCostEstimator.prjisoverbudget)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjisoverbudget'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Budgetutilization -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Budgetutilization" />
+														<textbox tabindex="36" id="prjbudgetutilization"
+															value="@bind(vm.currentProjectCostEstimator.prjbudgetutilization)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjbudgetutilization'])" />
+													</div>
+												</div>
+											</div>											<!-- Costbreakdown -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costbreakdown" />
+														<textbox tabindex="37" id="prjcostbreakdown"
+															value="@bind(vm.currentProjectCostEstimator.prjcostbreakdown)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjcostbreakdown'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Model Breakdown -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Model Breakdown" />
+														<textbox tabindex="38" id="prjmodelbreakdown"
+															value="@bind(vm.currentProjectCostEstimator.prjmodelbreakdown)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjmodelbreakdown'])" />
+													</div>
+												</div>
+											</div>											<!-- Agent Breakdown -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Agent Breakdown" />
+														<textbox tabindex="39" id="prjagentbreakdown"
+															value="@bind(vm.currentProjectCostEstimator.prjagentbreakdown)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjagentbreakdown'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Notes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Notes" />
+														<textbox tabindex="40" id="prjnotes"
+															value="@bind(vm.currentProjectCostEstimator.prjnotes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjnotes'])" />
+													</div>
+												</div>
+											</div>											<!-- Justification -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Justification" />
+														<textbox tabindex="41" id="prjjustification"
+															value="@bind(vm.currentProjectCostEstimator.prjjustification)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjjustification'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Includes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Includes" />
+														<textbox tabindex="42" id="prjincludes"
+															value="@bind(vm.currentProjectCostEstimator.prjincludes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjincludes'])" />
+													</div>
+												</div>
+											</div>											<!-- Excludes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Excludes" />
+														<textbox tabindex="43" id="prjexcludes"
+															value="@bind(vm.currentProjectCostEstimator.prjexcludes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjexcludes'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created By *" />
+														<textbox tabindex="44" id="prjcreatedby"
+															value="@bind(vm.currentProjectCostEstimator.prjcreatedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['prjcreatedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated By -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated By" />
+														<textbox tabindex="45" id="prjupdatedby"
+															value="@bind(vm.currentProjectCostEstimator.prjupdatedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['prjupdatedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Approvedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approvedby" />
+														<textbox tabindex="46" id="prjapprovedby"
+															value="@bind(vm.currentProjectCostEstimator.prjapprovedby)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['prjapprovedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Approvedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approvedat" />
+														<textbox tabindex="47" id="prjapprovedat"
+															value="@bind(vm.currentProjectCostEstimator.prjapprovedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjapprovedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="48" id="prjcreatedat"
+															value="@bind(vm.currentProjectCostEstimator.prjcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="49" id="prjupdatedat"
+															value="@bind(vm.currentProjectCostEstimator.prjupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Subprjbillingdetails -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subprjbillingdetails" />
+														<textbox tabindex="50" id="subprjbillingdetails"
+															value="@bind(vm.currentProjectCostEstimator.subprjbillingdetails)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subprjbillingdetails'])" />
+													</div>
+												</div>
+											</div>											<!-- Subprjinvoices -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Subprjinvoices" />
+														<textbox tabindex="51" id="subprjinvoices"
+															value="@bind(vm.currentProjectCostEstimator.subprjinvoices)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['subprjinvoices'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Subprjbillingdetails" onSelect="@command('onSelectProjectBillingDetailTab')" />
+												<tab label="Subprjinvoices" onSelect="@command('onSelectProjectInvoiceTab')" />
+											</tabs>
+											<tabpanels>
+												<!-- Panel: Subprjbillingdetails -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subprjbillingdetails"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProjectBillingDetails)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subprjbillingdetails)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subprjbillingdetails)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subprjbillingdetails registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												<!-- Panel: Subprjinvoices -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Subprjinvoices"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalProjectInvoices)"/> 
+															<label value="registros"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.subprjinvoices)" var="item">
+																	<h:tr>
+																		<h:td><label value="@load(item.id)"/></h:td>
+																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-success">
+																				<label value="@load(item.status)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subprjinvoices)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay subprjinvoices registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

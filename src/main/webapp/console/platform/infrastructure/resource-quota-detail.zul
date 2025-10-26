@@ -1,0 +1,180 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="infrastructure"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.infrastructure.ResourceQuotaDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cloud label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Resource Quota" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveResourceQuota')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Quotaclusterid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotaclusterid" />
+														<textbox tabindex="2" id="infquotaclusterid"
+															value="@bind(vm.currentResourceQuota.infquotaclusterid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infquotaclusterid'])" />
+													</div>
+												</div>
+											</div>											<!-- Quotanamespace -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotanamespace" />
+														<textbox tabindex="3" id="infquotanamespace"
+															value="@bind(vm.currentResourceQuota.infquotanamespace) @save(vm.currentResourceQuota.infquotanamespace, before=('saveItem')) @validator(vm.unique, field='INFQUOTANAMESPACE', required=false, oldValue=vm.originalInfquotanamespace)"
+															maxlength="255"
+															constraint="max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['infquotanamespace'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Quotacpulimit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotacpulimit" />
+														<textbox tabindex="4" id="infquotacpulimit"
+															value="@bind(vm.currentResourceQuota.infquotacpulimit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infquotacpulimit'])" />
+													</div>
+												</div>
+											</div>											<!-- Quotamemorygblimit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotamemorygblimit" />
+														<textbox tabindex="5" id="infquotamemorygblimit"
+															value="@bind(vm.currentResourceQuota.infquotamemorygblimit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infquotamemorygblimit'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Quotastoragegblimit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotastoragegblimit" />
+														<textbox tabindex="6" id="infquotastoragegblimit"
+															value="@bind(vm.currentResourceQuota.infquotastoragegblimit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infquotastoragegblimit'])" />
+													</div>
+												</div>
+											</div>											<!-- Quotapodlimit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotapodlimit" />
+														<textbox tabindex="7" id="infquotapodlimit"
+															value="@bind(vm.currentResourceQuota.infquotapodlimit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infquotapodlimit'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Quotacreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotacreatedat *" />
+														<textbox tabindex="8" id="infquotacreatedat"
+															value="@bind(vm.currentResourceQuota.infquotacreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infquotacreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Quotaupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Quotaupdatedat *" />
+														<textbox tabindex="9" id="infquotaupdatedat"
+															value="@bind(vm.currentResourceQuota.infquotaupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infquotaupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

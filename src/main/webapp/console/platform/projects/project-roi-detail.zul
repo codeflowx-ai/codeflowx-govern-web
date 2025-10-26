@@ -1,0 +1,470 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="projects"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.projects.ProjectROIDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-folder-open label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Project" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveProjectROI')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Projectid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectid *" />
+														<textbox tabindex="2" id="prjprojectid"
+															value="@bind(vm.currentProjectROI.prjprojectid)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojectid'])" />
+													</div>
+												</div>
+											</div>											<!-- Periodstart -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Periodstart *" />
+														<textbox tabindex="3" id="prjperiodstart"
+															value="@bind(vm.currentProjectROI.prjperiodstart)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjperiodstart'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Periodend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Periodend" />
+														<textbox tabindex="4" id="prjperiodend"
+															value="@bind(vm.currentProjectROI.prjperiodend)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjperiodend'])" />
+													</div>
+												</div>
+											</div>											<!-- Totalinvestment -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalinvestment *" />
+														<textbox tabindex="5" id="prjtotalinvestment"
+															value="@bind(vm.currentProjectROI.prjtotalinvestment)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalinvestment'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Totalrevenue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Totalrevenue" />
+														<textbox tabindex="6" id="prjtotalrevenue"
+															value="@bind(vm.currentProjectROI.prjtotalrevenue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtotalrevenue'])" />
+													</div>
+												</div>
+											</div>											<!-- Recurringrevenue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recurringrevenue" />
+														<textbox tabindex="7" id="prjrecurringrevenue"
+															value="@bind(vm.currentProjectROI.prjrecurringrevenue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjrecurringrevenue'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Profit -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Profit" />
+														<textbox tabindex="8" id="prjprofit"
+															value="@bind(vm.currentProjectROI.prjprofit)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprofit'])" />
+													</div>
+												</div>
+											</div>											<!-- Profitmargin -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Profitmargin" />
+														<textbox tabindex="9" id="prjprofitmargin"
+															value="@bind(vm.currentProjectROI.prjprofitmargin)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprofitmargin'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Roipercentage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Roipercentage" />
+														<textbox tabindex="10" id="prjroipercentage"
+															value="@bind(vm.currentProjectROI.prjroipercentage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjroipercentage'])" />
+													</div>
+												</div>
+											</div>											<!-- Paybackperiodmonths -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Paybackperiodmonths" />
+														<textbox tabindex="11" id="prjpaybackperiodmonths"
+															value="@bind(vm.currentProjectROI.prjpaybackperiodmonths)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjpaybackperiodmonths'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Clientlifetimevalue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Clientlifetimevalue" />
+														<textbox tabindex="12" id="prjclientlifetimevalue"
+															value="@bind(vm.currentProjectROI.prjclientlifetimevalue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjclientlifetimevalue'])" />
+													</div>
+												</div>
+											</div>											<!-- Customeracquisitioncost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Customeracquisitioncost" />
+														<textbox tabindex="13" id="prjcustomeracquisitioncost"
+															value="@bind(vm.currentProjectROI.prjcustomeracquisitioncost)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjcustomeracquisitioncost'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Ltvcacratio -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Ltvcacratio" />
+														<textbox tabindex="14" id="prjltvcacratio"
+															value="@bind(vm.currentProjectROI.prjltvcacratio)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjltvcacratio'])" />
+													</div>
+												</div>
+											</div>											<!-- Costefficiencyscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Costefficiencyscore" />
+														<textbox tabindex="15" id="prjcostefficiencyscore"
+															value="@bind(vm.currentProjectROI.prjcostefficiencyscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjcostefficiencyscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Time Tomarketdays -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Time Tomarketdays" />
+														<textbox tabindex="16" id="prjtimetomarketdays"
+															value="@bind(vm.currentProjectROI.prjtimetomarketdays)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjtimetomarketdays'])" />
+													</div>
+												</div>
+											</div>											<!-- Automationpercentage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Automationpercentage" />
+														<textbox tabindex="17" id="prjautomationpercentage"
+															value="@bind(vm.currentProjectROI.prjautomationpercentage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjautomationpercentage'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Clientsatisfactionscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Clientsatisfactionscore" />
+														<textbox tabindex="18" id="prjclientsatisfactionscore"
+															value="@bind(vm.currentProjectROI.prjclientsatisfactionscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjclientsatisfactionscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Npsscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Npsscore" />
+														<textbox tabindex="19" id="prjnpsscore"
+															value="@bind(vm.currentProjectROI.prjnpsscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjnpsscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Renewallikelihood -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Renewallikelihood" />
+														<textbox tabindex="20" id="prjrenewallikelihood"
+															value="@bind(vm.currentProjectROI.prjrenewallikelihood)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjrenewallikelihood'])" />
+													</div>
+												</div>
+											</div>											<!-- Projected12mrevenue -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projected12mrevenue" />
+														<textbox tabindex="21" id="prjprojected12mrevenue"
+															value="@bind(vm.currentProjectROI.prjprojected12mrevenue)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojected12mrevenue'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Projectedroi -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Projectedroi" />
+														<textbox tabindex="22" id="prjprojectedroi"
+															value="@bind(vm.currentProjectROI.prjprojectedroi)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjprojectedroi'])" />
+													</div>
+												</div>
+											</div>											<!-- Industryavgroi -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Industryavgroi" />
+														<textbox tabindex="23" id="prjindustryavgroi"
+															value="@bind(vm.currentProjectROI.prjindustryavgroi)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjindustryavgroi'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Vsindustry -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Vsindustry" />
+														<textbox tabindex="24" id="prjvsindustry"
+															value="@bind(vm.currentProjectROI.prjvsindustry)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['prjvsindustry'])" />
+													</div>
+												</div>
+											</div>											<!-- Analysisnotes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Analysisnotes" />
+														<textbox tabindex="25" id="prjanalysisnotes"
+															value="@bind(vm.currentProjectROI.prjanalysisnotes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjanalysisnotes'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Recommendations -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Recommendations" />
+														<textbox tabindex="26" id="prjrecommendations"
+															value="@bind(vm.currentProjectROI.prjrecommendations)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjrecommendations'])" />
+													</div>
+												</div>
+											</div>											<!-- Analyzedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Analyzedby *" />
+														<textbox tabindex="27" id="prjanalyzedby"
+															value="@bind(vm.currentProjectROI.prjanalyzedby)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['prjanalyzedby'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="28" id="prjcreatedat"
+															value="@bind(vm.currentProjectROI.prjcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['prjcreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="29" id="prjupdatedat"
+															value="@bind(vm.currentProjectROI.prjupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['prjupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

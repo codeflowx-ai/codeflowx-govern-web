@@ -1,0 +1,304 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="infrastructure"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.infrastructure.KubernetesNodeDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cloud label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Kubernetes Node" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveKubernetesNode')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- K8snodeclusterid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodeclusterid *" />
+														<textbox tabindex="2" id="infk8snodeclusterid"
+															value="@bind(vm.currentKubernetesNode.infk8snodeclusterid)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodeclusterid'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodename -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodename *" />
+														<textbox tabindex="3" id="infk8snodename"
+															value="@bind(vm.currentKubernetesNode.infk8snodename) @save(vm.currentKubernetesNode.infk8snodename, before=('saveItem')) @validator(vm.unique, field='INFK8SNODENAME', required=true, oldValue=vm.originalInfk8snodename)"
+															maxlength="255"
+															constraint="no empty: max 255" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodename'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodestatus -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodestatus" />
+														<combobox tabindex="4" id="infk8snodestatus"
+															selectedItem="@bind(vm.currentKubernetesNode.infk8snodestatus)"
+															readonly="true"
+															>
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodestatus'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snoderole -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snoderole" />
+														<combobox tabindex="5" id="infk8snoderole"
+															selectedItem="@bind(vm.currentKubernetesNode.infk8snoderole)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['infk8snoderole'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodecpucapacity -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodecpucapacity" />
+														<textbox tabindex="6" id="infk8snodecpucapacity"
+															value="@bind(vm.currentKubernetesNode.infk8snodecpucapacity)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodecpucapacity'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodememorygb -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodememorygb" />
+														<textbox tabindex="7" id="infk8snodememorygb"
+															value="@bind(vm.currentKubernetesNode.infk8snodememorygb)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodememorygb'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodepodcapacity -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodepodcapacity" />
+														<textbox tabindex="8" id="infk8snodepodcapacity"
+															value="@bind(vm.currentKubernetesNode.infk8snodepodcapacity)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodepodcapacity'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodeipaddress -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodeipaddress" />
+														<textbox tabindex="9" id="infk8snodeipaddress"
+															value="@bind(vm.currentKubernetesNode.infk8snodeipaddress)"
+															maxlength="50"
+															constraint="max 50" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodeipaddress'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodeos -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodeos" />
+														<textbox tabindex="10" id="infk8snodeos"
+															value="@bind(vm.currentKubernetesNode.infk8snodeos)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodeos'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodekernelversion -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodekernelversion" />
+														<textbox tabindex="11" id="infk8snodekernelversion"
+															value="@bind(vm.currentKubernetesNode.infk8snodekernelversion)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodekernelversion'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodecontainerruntime -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodecontainerruntime" />
+														<textbox tabindex="12" id="infk8snodecontainerruntime"
+															value="@bind(vm.currentKubernetesNode.infk8snodecontainerruntime)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodecontainerruntime'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodelabels -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodelabels" />
+														<textbox tabindex="13" id="infk8snodelabels"
+															value="@bind(vm.currentKubernetesNode.infk8snodelabels)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodelabels'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodetaints -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodetaints" />
+														<textbox tabindex="14" id="infk8snodetaints"
+															value="@bind(vm.currentKubernetesNode.infk8snodetaints)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodetaints'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodeannotations -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodeannotations" />
+														<textbox tabindex="15" id="infk8snodeannotations"
+															value="@bind(vm.currentKubernetesNode.infk8snodeannotations)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodeannotations'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- K8snodecreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodecreatedat *" />
+														<textbox tabindex="16" id="infk8snodecreatedat"
+															value="@bind(vm.currentKubernetesNode.infk8snodecreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodecreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- K8snodeupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="K8snodeupdatedat *" />
+														<textbox tabindex="17" id="infk8snodeupdatedat"
+															value="@bind(vm.currentKubernetesNode.infk8snodeupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['infk8snodeupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

@@ -1,0 +1,135 @@
+package com.codeflowx.govern.workflow.drools.drift;
+
+import com.codeflowx.govern.workflow.drools.facts.DriftDetectionFact;
+
+global org.slf4j.Logger logger;
+
+// ============================================
+// REGLA 1: NO DRIFT (0-10%)
+// ============================================
+rule "No Drift - Normal Operation"
+    salience 100
+    when
+        $fact : DriftDetectionFact(
+            driftScore <= 0.10
+        )
+    then
+        logger.info("🟢 DROOLS: No drift detectado - Score: {}", $fact.getDriftScore());
+        
+        $fact.setSeverity("LOW");
+        $fact.setAction("MONITOR");
+        $fact.setRequiresHumanAnalysis(false);
+        $fact.setEscalationLevel("NONE");
+        $fact.setRecommendation("✅ Modelo operando normalmente. Continuar monitoreo.");
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 2: MINOR DRIFT (10-20%)
+// ============================================
+rule "Minor Drift - Warning"
+    salience 90
+    when
+        $fact : DriftDetectionFact(
+            driftScore > 0.10,
+            driftScore <= threshold,  // threshold = 0.20
+            severity == null
+        )
+    then
+        logger.warn("🟡 DROOLS: Minor drift - Score: {}", $fact.getDriftScore());
+        
+        $fact.setSeverity("MEDIUM");
+        $fact.setAction("ALERT");
+        $fact.setRequiresHumanAnalysis(false);
+        $fact.setEscalationLevel("TEAM");
+        $fact.setRecommendation(String.format(
+            "⚠️ Drift detectado: %.1f%%. Alertar equipo ML. Revisar en 24h.",
+            $fact.getDriftScore() * 100
+        ));
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 3: SIGNIFICANT DRIFT (20-40%)
+// ============================================
+rule "Significant Drift - Requires Action"
+    salience 80
+    when
+        $fact : DriftDetectionFact(
+            driftScore > threshold,
+            driftScore <= 0.40,
+            severity == null
+        )
+    then
+        logger.error("🔴 DROOLS: Significant drift - Score: {} (CRITICAL)", $fact.getDriftScore());
+        
+        $fact.setSeverity("HIGH");
+        $fact.setAction("RETRAIN");
+        $fact.setRequiresHumanAnalysis(true);
+        $fact.setEscalationLevel("MANAGER");
+        $fact.setRecommendation(String.format(
+            "🚨 Drift crítico: %.1f%%. ACCIÓN REQUERIDA:\n" +
+            "1. Analizar causa raíz (SLA: 2h)\n" +
+            "2. Decidir: re-training vs rollback\n" +
+            "3. Notificar stakeholders",
+            $fact.getDriftScore() * 100
+        ));
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 4: EXTREME DRIFT (>40%)
+// ============================================
+rule "Extreme Drift - Emergency Rollback"
+    salience 200  // Máxima prioridad
+    when
+        $fact : DriftDetectionFact(
+            driftScore > 0.40
+        )
+    then
+        logger.error("🚨 DROOLS: EXTREME DRIFT - {} (EMERGENCY)", $fact.getDriftScore());
+        
+        $fact.setSeverity("CRITICAL");
+        $fact.setAction("ROLLBACK");
+        $fact.setRequiresHumanAnalysis(true);
+        $fact.setEscalationLevel("EXECUTIVE");
+        $fact.setRecommendation(String.format(
+            "🚨🚨 DRIFT EXTREMO: %.1f%%. ACCIÓN INMEDIATA:\n" +
+            "1. ROLLBACK automático a versión anterior\n" +
+            "2. Alertar CEO/CTO (PagerDuty)\n" +
+            "3. Análisis post-mortem obligatorio (SLA: 30min)",
+            $fact.getDriftScore() * 100
+        ));
+        
+        update($fact);
+end
+
+// ============================================
+// REGLA 5: ACCURACY DEGRADATION OVERRIDE
+// ============================================
+rule "Accuracy Degradation Override - Force Rollback"
+    salience 150
+    when
+        $fact : DriftDetectionFact(
+            accuracyDegradation < -0.30,  // -30% accuracy
+            action != "ROLLBACK"
+        )
+    then
+        logger.error("🚨 DROOLS: Critical accuracy loss - Forcing ROLLBACK");
+        
+        $fact.setSeverity("CRITICAL");
+        $fact.setAction("ROLLBACK");
+        $fact.setEscalationLevel("EXECUTIVE");
+        $fact.setRecommendation(String.format(
+            "🚨 ACCURACY LOSS: %.1f%%. ROLLBACK INMEDIATO.\n" +
+            "Degradación inaceptable de precisión. Modelo no apto para producción.",
+            $fact.getAccuracyDegradation() * 100
+        ));
+        
+        update($fact);
+end
+
+

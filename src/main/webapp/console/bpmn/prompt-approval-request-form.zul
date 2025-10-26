@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="promptApprovalRequestWindow" 
+            title="Solicitud de Aprobación de Prompt" 
+            border="normal" 
+            width="900px" 
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.PromptApprovalRequestViewModel')">
+
+        <style>
+            .form-group { margin-bottom: 20px; }
+            .form-label { font-weight: bold; color: #333; margin-bottom: 5px; display: block; }
+            .required::after { content: " *"; color: red; }
+            .info-box { background-color: #e3f2fd; padding: 15px; border-radius: 4px; margin-bottom: 20px; border-left: 4px solid #2196F3; }
+            .preview-box { background-color: #f5f5f5; padding: 15px; border-radius: 4px; max-height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+            .action-buttons { text-align: right; padding-top: 20px; border-top: 1px solid #ddd; }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px;">
+            
+            <!-- Info Box -->
+            <div class="info-box">
+                <hlayout spacing="10px">
+                    <label value="ℹ️" style="font-size: 24px;"/>
+                    <vlayout>
+                        <label value="Solicitud de Aprobación de Prompt" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Complete el formulario para solicitar la aprobación de un prompt. El sistema ejecutará automáticamente análisis de seguridad y compliance." style="font-size: 12px; color: #666;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Selección de Prompt -->
+            <div class="form-group">
+                <label class="form-label required">Prompt</label>
+                <combobox id="promptCombo" 
+                          width="100%" 
+                          model="@bind(vm.availablePrompts)"
+                          selectedItem="@bind(vm.selectedPrompt)"
+                          onChange="@command('onPromptSelected')"
+                          placeholder="Seleccione el prompt a aprobar...">
+                    <template name="model">
+                        <comboitem label="@load(each.prmname)"/>
+                    </template>
+                </combobox>
+            </div>
+
+            <!-- Tipo de Aprobación -->
+            <div class="form-group">
+                <label class="form-label required">Tipo de Aprobación</label>
+                <combobox id="approvalTypeCombo" 
+                          width="100%" 
+                          selectedItem="@bind(vm.approvalType)"
+                          placeholder="Seleccione el tipo de aprobación...">
+                    <comboitem label="Nuevo Prompt" value="NEW_PROMPT"/>
+                    <comboitem label="Actualización" value="UPDATE"/>
+                    <comboitem label="Reactivación" value="REACTIVATION"/>
+                </combobox>
+            </div>
+
+            <!-- Razón de la Solicitud -->
+            <div class="form-group">
+                <label class="form-label required">Razón de la Solicitud</label>
+                <textbox id="requestReasonText" 
+                         width="100%" 
+                         rows="4" 
+                         multiline="true"
+                         value="@bind(vm.requestReason)"
+                         placeholder="Describa la razón por la cual solicita la aprobación de este prompt..."/>
+            </div>
+
+            <!-- Vista Previa del Contenido del Prompt (Read-Only) -->
+            <div class="form-group" visible="@load(vm.selectedPrompt ne null)">
+                <label class="form-label">Vista Previa del Contenido</label>
+                <div class="preview-box">
+                    <label value="@load(vm.promptPreview)" multiline="true"/>
+                </div>
+            </div>
+
+            <!-- Información del Prompt Seleccionado -->
+            <hlayout spacing="30px" visible="@load(vm.selectedPrompt ne null)">
+                <vlayout>
+                    <label value="Categoría" style="font-weight: bold; font-size: 11px; color: #666;"/>
+                    <label value="@load(vm.selectedPrompt.prmcategory)" style="font-size: 12px;"/>
+                </vlayout>
+                <vlayout>
+                    <label value="Versión" style="font-weight: bold; font-size: 11px; color: #666;"/>
+                    <label value="@load(vm.selectedPrompt.prmversion)" style="font-size: 12px;"/>
+                </vlayout>
+                <vlayout>
+                    <label value="Estado Actual" style="font-weight: bold; font-size: 11px; color: #666;"/>
+                    <label value="@load(vm.selectedPrompt.prmstatus)" style="font-size: 12px;"/>
+                </vlayout>
+            </hlayout>
+
+            <!-- Botones de Acción -->
+            <div class="action-buttons">
+                <hlayout spacing="10px">
+                    <button label="Cancelar" 
+                            onClick="@command('cancel')" 
+                            sclass="btn-secondary"/>
+                    <button label="Enviar Solicitud" 
+                            onClick="@command('submitRequest')" 
+                            sclass="btn-primary"
+                            disabled="@load(empty vm.selectedPrompt or empty vm.approvalType or empty vm.requestReason)"/>
+                </hlayout>
+            </div>
+
+        </vlayout>
+
+    </window>
+</zk>
+
+

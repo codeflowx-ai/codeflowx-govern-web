@@ -1,0 +1,277 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+    <idspace id="serving"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.serving.ModelDetailViewModel')"
+        validationMessages="@id('vmsgs')">
+        <div class="row">
+            <div>
+                <div class="left tittle-principal">
+                    <h:h2 class="mb-1" style="font-weight: bold;">
+                        <h:i class="fa-sharp-duotone fa-solid fa-rocket label-icon align-middle fs-16 me-2"></h:i>
+                        <label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+                    </h:h2>
+                    <h:p class="text-muted">
+                        <label value="Gestión y configuración de Model" class="text-muted" />
+                    </h:p>
+                </div>
+            </div>
+            
+            <div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <div class="flex-grow-1">
+                                <a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+                                    onClick="@command('cancelEdit')"
+                                    sclass="waves-effect waves-light" 
+                                    tooltiptext="Volver">
+                                </a>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <div class="hstack text-nowrap gap-2 d-flex">
+                                    <a class="waves-effect waves-light"
+                                        iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+                                        onClick="@command('saveModel')"
+                                        tooltiptext="Guardar Model">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Formulario Principal -->
+                            <div class="col-lg-12 col-xlg-12 col-md-12">
+                                <div class="card default shadow-xl">
+                                    <div class="card-body">
+                                        <div class="form-group row">
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="I D X M O D E L" />
+                                        <textbox tabindex="1" id="idxmodel"
+                                            value="@bind(vm.currentModel.idxmodel)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['idxmodel'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L N A M E" />
+                                        <textbox tabindex="2" id="srvmodelname"
+                                            value="@bind(vm.currentModel.srvmodelname)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelname'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L V E R S I O N" />
+                                        <textbox tabindex="3" id="srvmodelversion"
+                                            value="@bind(vm.currentModel.srvmodelversion)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelversion'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L T Y P E" />
+                                        <combobox tabindex="4" id="srvmodeltype"
+                                            selectedItem="@bind(vm.currentModel.srvmodeltype)"
+                                            readonly="true">
+                                            <comboitem label="LLM" value="LLM"/>
+                                            <comboitem label="Visión" value="VISION"/>
+                                            <comboitem label="Audio" value="AUDIO"/>
+                                            <comboitem label="Embedding" value="EMBEDDING"/>
+                                        </combobox>
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodeltype'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L F R A M E W O R K" />
+                                        <combobox tabindex="5" id="srvmodelframework"
+                                            selectedItem="@bind(vm.currentModel.srvmodelframework)"
+                                            readonly="true">
+                                            <comboitem label="Opción 1" value="OPTION1"/>
+                                            <comboitem label="Opción 2" value="OPTION2"/>
+                                            <comboitem label="Opción 3" value="OPTION3"/>
+                                        </combobox>
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelframework'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L S T A T U S" />
+                                        <combobox tabindex="6" id="srvmodelstatus"
+                                            selectedItem="@bind(vm.currentModel.srvmodelstatus)"
+                                            readonly="true">
+                                            <comboitem label="Activo" value="ACTIVE"/>
+                                            <comboitem label="Inactivo" value="INACTIVE"/>
+                                            <comboitem label="Pendiente" value="PENDING"/>
+                                        </combobox>
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelstatus'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L D E S C R I P T I O N" />
+                                        <textbox tabindex="7" id="srvmodeldescription"
+                                            value="@bind(vm.currentModel.srvmodeldescription)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodeldescription'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L P A T H" />
+                                        <textbox tabindex="8" id="srvmodelpath"
+                                            value="@bind(vm.currentModel.srvmodelpath)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelpath'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L S I Z E" />
+                                        <textbox tabindex="9" id="srvmodelsize"
+                                            value="@bind(vm.currentModel.srvmodelsize)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelsize'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L C O N F I G" />
+                                        <textbox tabindex="10" id="srvmodelconfig"
+                                            value="@bind(vm.currentModel.srvmodelconfig)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelconfig'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L M E T A D A T A" />
+                                        <textbox tabindex="11" id="srvmodelmetadata"
+                                            value="@bind(vm.currentModel.srvmodelmetadata)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelmetadata'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-12 col-xlg-12 col-md-12">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L T A G S" />
+                                        <h:div class="tag-input-container">
+                                            <h:div class="selected-tags">
+                                                <forEach items="@load(vm.selectedTags)" var="tag">
+                                                    <h:span class="badge bg-primary me-1">
+                                                        <label value="@load(tag)"/>
+                                                        <h:a onClick="@command('removeTag', tag=tag)" class="ms-1" style="color: white; text-decoration: none;">×</h:a>
+                                                    </h:span>
+                                                </forEach>
+                                            </h:div>
+                                            <h:div class="input-group">
+                                                <textbox tabindex="12" id="srvmodeltags"
+                                                    value="@bind(vm.newTag)"
+                                                    placeholder="Añadir S R V M O D E L T A G S"
+                                                    onOK="@command('addTag')" />
+                                                <h:button onClick="@command('addTag')" class="btn btn-outline-primary">
+                                                    <h:i class="fa fa-plus"></h:i>
+                                                </h:button>
+                                            </h:div>
+                                        </h:div>
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodeltags'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L A C T I V E" />
+                                        <textbox tabindex="13" id="srvmodelactive"
+                                            value="@bind(vm.currentModel.srvmodelactive)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelactive'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L C R E A T E D A T" />
+                                        <textbox tabindex="14" id="srvmodelcreatedat"
+                                            value="@bind(vm.currentModel.srvmodelcreatedat)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelcreatedat'])" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="default col-lg-6 col-xlg-6 col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12 input-group">
+                                        <label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+                                            value="S R V M O D E L U P D A T E D A T" />
+                                        <textbox tabindex="15" id="srvmodelupdatedat"
+                                            value="@bind(vm.currentModel.srvmodelupdatedat)"
+                                            maxlength="255" />
+                                        <label sclass="text-danger" value="@load(vmsgs['srvmodelupdatedat'])" />
+                                    </div>
+                                </div>
+                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Tabs de Información Descendente -->
+                            
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>

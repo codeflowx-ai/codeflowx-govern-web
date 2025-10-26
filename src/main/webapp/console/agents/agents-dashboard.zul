@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns:h="native" xmlns:zk="http://www.zkoss.org/2005/zul">
+    
+    <!-- ViewModel binding -->
+    <window viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.agents.AgentsDashboardViewModel')"
+            border="none" width="100%" height="100%">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:h2 class="mb-1" style="font-weight: bold;">🤖 Agents Dashboard</h:h2>
+                    <h:p class="text-muted">Monitoreo y gestión de agentes AI</h:p>
+                </h:div>
+            </h:div>
+            
+            <!-- Botones de acción -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 text-end">
+                    <button label="➕ Crear Agente" 
+                            class="btn btn-success me-2"
+                            onClick="@command('createAgent')" />
+                    <button label="🔄 Refrescar" 
+                            class="btn btn-primary"
+                            onClick="@command('refreshDashboard')" />
+                </h:div>
+            </h:div>
+            
+            <!-- KPIs Principales -->
+            <h:div class="row g-3 mb-4">
+                
+                <!-- Total Agentes -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Agentes</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.totalAgents)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">registrados</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Agentes Activos -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Agentes Activos</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.activeAgents)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">operativos</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Agentes Saludables -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Saludables</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.healthyAgents)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">sin errores</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Score Promedio -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Score Promedio</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.avgScore) @converter('formatedNumber', format='###,##0.0')"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">de performance</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+            <!-- Health Dashboard -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-primary text-white">
+                            <h:h5 class="mb-0">🏥 Agent Health Status</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.performanceMetrics)">
+                                <columns>
+                                    <column label="Agent Name" width="200px"/>
+                                    <column label="Type" width="150px"/>
+                                    <column label="Status" width="100px"/>
+                                    <column label="Success Rate" width="120px"/>
+                                    <column label="Avg Response Time" width="150px"/>
+                                    <column label="Total Requests" width="120px"/>
+                                    <column label="Last Active" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.agtname)"/>
+                                        <label value="@load(each.agttype)"/>
+                                        <label value="@load(each.agtstatus)" 
+                                               style="@load(each.agtstatus eq 'ACTIVE' ? 'color: green; font-weight: bold;' : 'color: red;')"/>
+                                        <label value="@load(each.successrate) @converter('formatedNumber', format='###,##0.0')"/>
+                                        <label value="@load(each.avgresponsetime) @converter('formatedNumber', format='###,##0')"/>
+                                        <label value="@load(each.totalrequests)"/>
+                                        <label value="@load(each.lastactive) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Deployment Status -->
+            <h:div class="row mb-4">
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-success text-white">
+                            <h:h5 class="mb-0">🚀 Deployment Status</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.deploymentStatuses)">
+                                <columns>
+                                    <column label="Agent" width="200px"/>
+                                    <column label="Environment" width="120px"/>
+                                    <column label="Status" width="100px"/>
+                                    <column label="Deployed At" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.agtname)"/>
+                                        <label value="@load(each.environment)"/>
+                                        <label value="@load(each.status)" 
+                                               style="@load(each.status eq 'DEPLOYED' ? 'color: green; font-weight: bold;' : 'color: orange;')"/>
+                                        <label value="@load(each.deployedat) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Compliance Status -->
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-warning text-dark">
+                            <h:h5 class="mb-0">🛡️ Compliance Status</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.complianceStatuses)">
+                                <columns>
+                                    <column label="Agent" width="200px"/>
+                                    <column label="Compliance Score" width="150px"/>
+                                    <column label="Status" width="120px"/>
+                                    <column label="Last Check" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.agtname)"/>
+                                        <label value="@load(each.compliancescore) @converter('formatedNumber', format='###,##0.0')"/>
+                                        <label value="@load(each.status)" 
+                                               style="@load(each.status eq 'COMPLIANT' ? 'color: green; font-weight: bold;' : 'color: red;')"/>
+                                        <label value="@load(each.lastcheck) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+        </h:div>
+        
+    </window>
+    
+</zk>
+

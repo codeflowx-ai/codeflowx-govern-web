@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns:h="native" xmlns:zk="http://www.zkoss.org/2005/zul">
+    
+    <!-- ViewModel binding -->
+    <window viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.monitoring.MonitoringDashboardViewModel')"
+            border="none" width="100%" height="100%">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:h2 class="mb-1" style="font-weight: bold;">🔍 Monitoring Dashboard</h:h2>
+                    <h:p class="text-muted">Monitoreo en tiempo real del sistema</h:p>
+                </h:div>
+            </h:div>
+            
+            <!-- Botón de refrescar -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 text-end">
+                    <button label="🔄 Refrescar" 
+                            class="btn btn-primary"
+                            onClick="@command('refreshDashboard')" />
+                </h:div>
+            </h:div>
+            
+            <!-- KPIs Principales -->
+            <h:div class="row g-3 mb-4">
+                
+                <!-- Total Métricas -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Métricas</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.totalMetrics)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">monitoreadas</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Total Alertas -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Alertas</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.totalAlerts)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">activas</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Alertas Críticas -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Alertas Críticas</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.criticalAlerts)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">requieren atención</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- System Health -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">System Health</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.systemHealth)"/>%
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">saludable</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+            <!-- Monitoring Dashboard -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-primary text-white">
+                            <h:h5 class="mb-0">📊 System Metrics</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div if="@load(vm.monitoringDashboard ne null)">
+                                <h:p><h:strong>System Status:</h:strong> <label value="@load(vm.monitoringDashboard.systemstatus)"/></h:p>
+                                <h:p><h:strong>Uptime:</h:strong> <label value="@load(vm.monitoringDashboard.uptime)"/> hours</h:p>
+                                <h:p><h:strong>CPU Usage:</h:strong> <label value="@load(vm.monitoringDashboard.cpuusage) @converter('formatedNumber', format='###,##0.0')"/>%</h:p>
+                                <h:p><h:strong>Memory Usage:</h:strong> <label value="@load(vm.monitoringDashboard.memoryusage) @converter('formatedNumber', format='###,##0.0')"/>%</h:p>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Alert Summaries & Metrics Visualization -->
+            <h:div class="row mb-4">
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-danger text-white">
+                            <h:h5 class="mb-0">🚨 Active Alerts</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.alertSummaries)">
+                                <columns>
+                                    <column label="Alert Type" width="150px"/>
+                                    <column label="Severity" width="100px"/>
+                                    <column label="Count" width="80px"/>
+                                    <column label="Last Triggered" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.alerttype)"/>
+                                        <label value="@load(each.severity)" 
+                                               style="@load(each.severity eq 'CRITICAL' ? 'color: red; font-weight: bold;' : 'color: orange;')"/>
+                                        <label value="@load(each.alertcount)"/>
+                                        <label value="@load(each.lasttriggered) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-info text-white">
+                            <h:h5 class="mb-0">📈 Metrics Trends</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.metricsVisualizations)">
+                                <columns>
+                                    <column label="Metric" width="200px"/>
+                                    <column label="Current Value" width="120px"/>
+                                    <column label="Trend" width="100px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.metricname)"/>
+                                        <label value="@load(each.currentvalue) @converter('formatedNumber', format='###,##0.00')"/>
+                                        <label value="@load(each.trend)" 
+                                               style="@load(each.trend eq 'UP' ? 'color: green;' : 'color: red;')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Anomaly Heatmap -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-warning text-dark">
+                            <h:h5 class="mb-0">🔥 Anomaly Detection</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.anomalyHeatmaps)">
+                                <columns>
+                                    <column label="Component" width="200px"/>
+                                    <column label="Anomaly Score" width="150px"/>
+                                    <column label="Status" width="120px"/>
+                                    <column label="Detected At" width="180px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.component)"/>
+                                        <label value="@load(each.anomalyscore) @converter('formatedNumber', format='###,##0.00')"/>
+                                        <label value="@load(each.status)" 
+                                               style="@load(each.status eq 'ANOMALY' ? 'color: red; font-weight: bold;' : 'color: green;')"/>
+                                        <label value="@load(each.detectedat) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+        </h:div>
+        
+    </window>
+    
+</zk>
+

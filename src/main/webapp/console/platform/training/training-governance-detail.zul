@@ -1,0 +1,367 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.TrainingGovernanceDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Training Governance" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveTrainingGovernance')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Training Jobid -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Training Jobid" />
+														<textbox tabindex="2" id="trainingjobid"
+															value="@bind(vm.currentTrainingGovernance.trainingjobid)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trainingjobid'])" />
+													</div>
+												</div>
+											</div>											<!-- Governance Type -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Governance Type *" />
+														<combobox tabindex="3" id="governancetype"
+															selectedItem="@bind(vm.currentTrainingGovernance.governancetype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['governancetype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Compliance Status -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Compliance Status *" />
+														<combobox tabindex="4" id="compliancestatus"
+															selectedItem="@bind(vm.currentTrainingGovernance.compliancestatus)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Pendiente" value="PENDING"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['compliancestatus'])" />
+													</div>
+												</div>
+											</div>											<!-- Dataprivacycheck -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dataprivacycheck" />
+														<textbox tabindex="5" id="dataprivacycheck"
+															value="@bind(vm.currentTrainingGovernance.dataprivacycheck)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dataprivacycheck'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Bias Detection -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Detection" />
+														<textbox tabindex="6" id="biasdetection"
+															value="@bind(vm.currentTrainingGovernance.biasdetection)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['biasdetection'])" />
+													</div>
+												</div>
+											</div>											<!-- Bias Score -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Bias Score" />
+														<textbox tabindex="7" id="biasscore"
+															value="@bind(vm.currentTrainingGovernance.biasscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['biasscore'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Fairnessmetrics -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fairnessmetrics" />
+														<textbox tabindex="8" id="fairnessmetrics"
+															value="@bind(vm.currentTrainingGovernance.fairnessmetrics)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['fairnessmetrics'])" />
+													</div>
+												</div>
+											</div>											<!-- Explainabilitycheck -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Explainabilitycheck" />
+														<textbox tabindex="9" id="explainabilitycheck"
+															value="@bind(vm.currentTrainingGovernance.explainabilitycheck)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['explainabilitycheck'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Robustnesstest -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Robustnesstest" />
+														<textbox tabindex="10" id="robustnesstest"
+															value="@bind(vm.currentTrainingGovernance.robustnesstest)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['robustnesstest'])" />
+													</div>
+												</div>
+											</div>											<!-- Adversarialtest -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Adversarialtest" />
+														<textbox tabindex="11" id="adversarialtest"
+															value="@bind(vm.currentTrainingGovernance.adversarialtest)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['adversarialtest'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Securityscan -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Securityscan" />
+														<textbox tabindex="12" id="securityscan"
+															value="@bind(vm.currentTrainingGovernance.securityscan)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['securityscan'])" />
+													</div>
+												</div>
+											</div>											<!-- Licensingcheck -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Licensingcheck" />
+														<textbox tabindex="13" id="licensingcheck"
+															value="@bind(vm.currentTrainingGovernance.licensingcheck)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['licensingcheck'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Licensetype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Licensetype" />
+														<combobox tabindex="14" id="licensetype"
+															selectedItem="@bind(vm.currentTrainingGovernance.licensetype)"
+															readonly="true"
+															>
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['licensetype'])" />
+													</div>
+												</div>
+											</div>											<!-- Approval Required -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approval Required" />
+														<textbox tabindex="15" id="approvalrequired"
+															value="@bind(vm.currentTrainingGovernance.approvalrequired)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['approvalrequired'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Approvedby -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approvedby" />
+														<textbox tabindex="16" id="approvedby"
+															value="@bind(vm.currentTrainingGovernance.approvedby)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['approvedby'])" />
+													</div>
+												</div>
+											</div>											<!-- Approvedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Approvedat" />
+														<textbox tabindex="17" id="approvedat"
+															value="@bind(vm.currentTrainingGovernance.approvedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['approvedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Governance Notes -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Governance Notes" />
+														<textbox tabindex="18" id="governancenotes"
+															value="@bind(vm.currentTrainingGovernance.governancenotes)"
+															rows="4" multiline="true"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['governancenotes'])" />
+													</div>
+												</div>
+											</div>											<!-- Isactive -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Isactive" />
+														<textbox tabindex="19" id="isactive"
+															value="@bind(vm.currentTrainingGovernance.isactive)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['isactive'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="20" id="createdat"
+															value="@bind(vm.currentTrainingGovernance.createdat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['createdat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At *" />
+														<textbox tabindex="21" id="updatedat"
+															value="@bind(vm.currentTrainingGovernance.updatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['updatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

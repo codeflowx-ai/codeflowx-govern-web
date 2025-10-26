@@ -1,0 +1,296 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="training"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.training.ExperimentLineageDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-graduation-cap label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Experiment Lineage" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveExperimentLineage')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Parentexperiments -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Parentexperiments" />
+														<textbox tabindex="2" id="trnparentexperiments"
+															value="@bind(vm.currentExperimentLineage.trnparentexperiments)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnparentexperiments'])" />
+													</div>
+												</div>
+											</div>											<!-- Datasets -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Datasets" />
+														<textbox tabindex="3" id="trndatasets"
+															value="@bind(vm.currentExperimentLineage.trndatasets)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trndatasets'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Basemodels -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Basemodels" />
+														<textbox tabindex="4" id="trnbasemodels"
+															value="@bind(vm.currentExperimentLineage.trnbasemodels)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnbasemodels'])" />
+													</div>
+												</div>
+											</div>											<!-- Prompt S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Prompt S" />
+														<textbox tabindex="5" id="trnprompts"
+															value="@bind(vm.currentExperimentLineage.trnprompts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnprompts'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Agent S -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Agent S" />
+														<textbox tabindex="6" id="trnagents"
+															value="@bind(vm.currentExperimentLineage.trnagents)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnagents'])" />
+													</div>
+												</div>
+											</div>											<!-- Outputartifacts -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Outputartifacts" />
+														<textbox tabindex="7" id="trnoutputartifacts"
+															value="@bind(vm.currentExperimentLineage.trnoutputartifacts)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnoutputartifacts'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Downstreamexperiments -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Downstreamexperiments" />
+														<textbox tabindex="8" id="trndownstreamexperiments"
+															value="@bind(vm.currentExperimentLineage.trndownstreamexperiments)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trndownstreamexperiments'])" />
+													</div>
+												</div>
+											</div>											<!-- Provenancegraph -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Provenancegraph" />
+														<textbox tabindex="9" id="trnprovenancegraph"
+															value="@bind(vm.currentExperimentLineage.trnprovenancegraph)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnprovenancegraph'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Lineagedepth -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Lineagedepth" />
+														<textbox tabindex="10" id="trnlineagedepth"
+															value="@bind(vm.currentExperimentLineage.trnlineagedepth)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnlineagedepth'])" />
+													</div>
+												</div>
+											</div>											<!-- Reproducible -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Reproducible" />
+														<textbox tabindex="11" id="trnreproducible"
+															value="@bind(vm.currentExperimentLineage.trnreproducible)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnreproducible'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Reproducibilityscore -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Reproducibilityscore" />
+														<textbox tabindex="12" id="trnreproducibilityscore"
+															value="@bind(vm.currentExperimentLineage.trnreproducibilityscore)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnreproducibilityscore'])" />
+													</div>
+												</div>
+											</div>											<!-- Datasourcescompliant -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Datasourcescompliant" />
+														<textbox tabindex="13" id="trndatasourcescompliant"
+															value="@bind(vm.currentExperimentLineage.trndatasourcescompliant)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trndatasourcescompliant'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Model Slicensed -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Model Slicensed" />
+														<textbox tabindex="14" id="trnmodelslicensed"
+															value="@bind(vm.currentExperimentLineage.trnmodelslicensed)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnmodelslicensed'])" />
+													</div>
+												</div>
+											</div>											<!-- Governance Passed -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Governance Passed" />
+														<textbox tabindex="15" id="trngovernancepassed"
+															value="@bind(vm.currentExperimentLineage.trngovernancepassed)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trngovernancepassed'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Created At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Created At *" />
+														<textbox tabindex="16" id="trncreatedat"
+															value="@bind(vm.currentExperimentLineage.trncreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['trncreatedat'])" />
+													</div>
+												</div>
+											</div>											<!-- Updated At -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Updated At" />
+														<textbox tabindex="17" id="trnupdatedat"
+															value="@bind(vm.currentExperimentLineage.trnupdatedat)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['trnupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

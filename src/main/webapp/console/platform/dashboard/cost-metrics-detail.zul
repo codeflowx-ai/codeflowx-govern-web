@@ -1,0 +1,348 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="dashboard"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.dashboard.CostMetricsDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de Cost Metrics" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveCostMetrics')"
+										tooltiptext="Guardar">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+
+										<div class="form-group row">
+											<!-- Dshcosttype -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcosttype *" />
+														<combobox tabindex="2" id="dshcosttype"
+															selectedItem="@bind(vm.currentCostMetrics.dshcosttype)"
+															readonly="true"
+															constraint="no empty">
+															<comboitem label="Tipo 1" value="TYPE1"/>
+															<comboitem label="Tipo 2" value="TYPE2"/>
+															<comboitem label="Tipo 3" value="TYPE3"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['dshcosttype'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshcostcategory -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcostcategory" />
+														<textbox tabindex="3" id="dshcostcategory"
+															value="@bind(vm.currentCostMetrics.dshcostcategory)"
+															maxlength="100"
+															constraint="max 100" />
+														<label sclass="text-danger" value="@load(vmsgs['dshcostcategory'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshtotalcost -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshtotalcost *" />
+														<textbox tabindex="4" id="dshtotalcost"
+															value="@bind(vm.currentCostMetrics.dshtotalcost)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['dshtotalcost'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshcosttoday -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcosttoday" />
+														<textbox tabindex="5" id="dshcosttoday"
+															value="@bind(vm.currentCostMetrics.dshcosttoday)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshcosttoday'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshcostweek -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcostweek" />
+														<textbox tabindex="6" id="dshcostweek"
+															value="@bind(vm.currentCostMetrics.dshcostweek)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshcostweek'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshcostmonth -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcostmonth" />
+														<textbox tabindex="7" id="dshcostmonth"
+															value="@bind(vm.currentCostMetrics.dshcostmonth)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshcostmonth'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshmonthlybudget -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshmonthlybudget" />
+														<textbox tabindex="8" id="dshmonthlybudget"
+															value="@bind(vm.currentCostMetrics.dshmonthlybudget)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshmonthlybudget'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshbudgetusedpct -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshbudgetusedpct" />
+														<textbox tabindex="9" id="dshbudgetusedpct"
+															value="@bind(vm.currentCostMetrics.dshbudgetusedpct)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshbudgetusedpct'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshcurrency -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcurrency" />
+														<textbox tabindex="10" id="dshcurrency"
+															value="@bind(vm.currentCostMetrics.dshcurrency)"
+															maxlength="10"
+															constraint="max 10" />
+														<label sclass="text-danger" value="@load(vmsgs['dshcurrency'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshtrend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshtrend" />
+														<textbox tabindex="11" id="dshtrend"
+															value="@bind(vm.currentCostMetrics.dshtrend)"
+															maxlength="20"
+															constraint="max 20" />
+														<label sclass="text-danger" value="@load(vmsgs['dshtrend'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshchangepercentage -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshchangepercentage" />
+														<textbox tabindex="12" id="dshchangepercentage"
+															value="@bind(vm.currentCostMetrics.dshchangepercentage)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshchangepercentage'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshprojectedmonthly -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshprojectedmonthly" />
+														<textbox tabindex="13" id="dshprojectedmonthly"
+															value="@bind(vm.currentCostMetrics.dshprojectedmonthly)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshprojectedmonthly'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshcostbreakdown -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcostbreakdown" />
+														<textbox tabindex="14" id="dshcostbreakdown"
+															value="@bind(vm.currentCostMetrics.dshcostbreakdown)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshcostbreakdown'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshtopconsumers -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshtopconsumers" />
+														<textbox tabindex="15" id="dshtopconsumers"
+															value="@bind(vm.currentCostMetrics.dshtopconsumers)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshtopconsumers'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshperiod -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshperiod" />
+														<combobox tabindex="16" id="dshperiod"
+															selectedItem="@bind(vm.currentCostMetrics.dshperiod)"
+															readonly="true"
+															>
+															<comboitem label="Opción 1" value="OPTION1"/>
+															<comboitem label="Opción 2" value="OPTION2"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['dshperiod'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshperiodstart -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshperiodstart" />
+														<textbox tabindex="17" id="dshperiodstart"
+															value="@bind(vm.currentCostMetrics.dshperiodstart)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshperiodstart'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshperiodend -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshperiodend" />
+														<textbox tabindex="18" id="dshperiodend"
+															value="@bind(vm.currentCostMetrics.dshperiodend)"
+															maxlength="255"
+															 />
+														<label sclass="text-danger" value="@load(vmsgs['dshperiodend'])" />
+													</div>
+												</div>
+											</div>											<!-- Dshcreatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshcreatedat *" />
+														<textbox tabindex="19" id="dshcreatedat"
+															value="@bind(vm.currentCostMetrics.dshcreatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['dshcreatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form-group row">
+											<!-- Dshupdatedat -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Dshupdatedat *" />
+														<textbox tabindex="20" id="dshupdatedat"
+															value="@bind(vm.currentCostMetrics.dshupdatedat)"
+															maxlength="255"
+															constraint="no empty" />
+														<label sclass="text-danger" value="@load(vmsgs['dshupdatedat'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

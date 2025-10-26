@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="📊 Statistics Dashboard" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.StatisticsDashboardViewModel')">
+        
+        <style>
+            .kpi-card {
+                border: 2px solid #e5e7eb;
+                border-radius: 10px;
+                padding: 25px;
+                margin: 10px;
+                text-align: center;
+                background: white;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .kpi-value {
+                font-size: 42px;
+                font-weight: bold;
+                display: block;
+                margin: 15px 0;
+            }
+        </style>
+        
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="📊 Statistics Dashboard" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Document processing metrics and system health" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+            <button label="Refresh" onClick="@command('loadStatistics')" iconSclass="z-icon-refresh"
+                    style="background-color: white; color: #667eea;"/>
+        </hlayout>
+        
+        <!-- KPIs -->
+        <hlayout style="justify-content: space-around;">
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="📄" style="font-size: 36px;"/>
+                <label value="@load(vm.totalDocuments)" sclass="kpi-value" style="color: #3b82f6;"/>
+                <label value="Total Documents" style="font-size: 14px; color: #666;"/>
+            </vlayout>
+            
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="📅" style="font-size: 36px;"/>
+                <label value="@load(vm.documentsToday)" sclass="kpi-value" style="color: #22c55e;"/>
+                <label value="Processed Today" style="font-size: 14px; color: #666;"/>
+            </vlayout>
+            
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="✅" style="font-size: 36px;"/>
+                <label value="@load(vm.successRate) @converter('formatedNumber', format='##0.0')" sclass="kpi-value" style="color: #22c55e;"/>
+                <label value="Success Rate %" style="font-size: 14px; color: #666;"/>
+            </vlayout>
+            
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="⏱️" style="font-size: 36px;"/>
+                <label value="@load(vm.avgProcessingTime) @converter('formatedNumber', format='##0.0')" sclass="kpi-value" style="color: #eab308;"/>
+                <label value="Avg Time (s)" style="font-size: 14px; color: #666;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Documents by Type -->
+        <groupbox style="margin-top: 20px;" closable="false">
+            <caption label="Documents by Type"/>
+            <listbox model="@load(vm.documentsByType.entrySet())" height="300px">
+                <listhead>
+                    <listheader label="Type" width="200px"/>
+                    <listheader label="Count" width="150px"/>
+                    <listheader label="Percentage"/>
+                </listhead>
+                <template name="model" var="entry">
+                    <listitem>
+                        <listcell label="@load(entry.key.toUpperCase())" style="font-weight: bold;"/>
+                        <listcell label="@load(entry.value)"/>
+                        <listcell>
+                            <progressmeter value="@load(entry.value * 100 / vm.totalDocuments)"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </groupbox>
+        
+        <!-- System Health -->
+        <hlayout style="padding: 15px; background: #d1fae5; border-radius: 8px; margin-top: 20px;">
+            <label value="System Health:" style="font-weight: bold; margin-right: 10px;"/>
+            <label value="@load(vm.systemHealth)" 
+                   style="@load(vm.systemHealth eq 'operational' ? 'color: #065f46;' : 'color: #991b1b;') font-weight: bold;"/>
+        </hlayout>
+    </window>
+</zk>
+

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="📊 Document List" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.playground.documents.DocumentListViewModel')">
+        
+        <style>
+            .filter-panel {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 10px 0;
+            }
+            .doc-row {
+                padding: 12px;
+                border-bottom: 1px solid #e5e7eb;
+            }
+            .doc-row:hover {
+                background: #f8f9fa;
+            }
+        </style>
+        
+        <!-- Header -->
+        <hlayout style="padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 10px; margin-bottom: 20px;">
+            <vlayout hflex="1">
+                <label value="📊 Document List" style="font-size: 32px; font-weight: bold;"/>
+                <label value="Browse and manage all processed documents" 
+                       style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Search and Filters -->
+        <div sclass="filter-panel">
+            <hlayout spacing="15px">
+                <!-- Search Bar -->
+                <textbox value="@bind(vm.searchQuery)" placeholder="Search by filename..." 
+                         width="300px" style="padding: 10px; border-radius: 5px;"/>
+                <button label="Search" onClick="@command('search')" iconSclass="z-icon-search"
+                        style="background-color: #3b82f6; color: white;"/>
+                
+                <separator width="20px"/>
+                
+                <!-- File Type Filters -->
+                <checkbox label="PDF" checked="@bind(vm.filterPdf)" onChange="@command('loadDocuments')"/>
+                <checkbox label="DOCX" checked="@bind(vm.filterDocx)" onChange="@command('loadDocuments')"/>
+                <checkbox label="PPTX" checked="@bind(vm.filterPptx)" onChange="@command('loadDocuments')"/>
+                <checkbox label="XLSX" checked="@bind(vm.filterXlsx)" onChange="@command('loadDocuments')"/>
+                <checkbox label="TXT" checked="@bind(vm.filterTxt)" onChange="@command('loadDocuments')"/>
+                
+                <separator width="20px"/>
+                
+                <!-- Status Filter -->
+                <combobox value="@bind(vm.filterStatus)" onChange="@command('loadDocuments')" width="150px">
+                    <comboitem label="All Status" value="ALL"/>
+                    <comboitem label="Completed" value="COMPLETED"/>
+                    <comboitem label="Processing" value="PROCESSING"/>
+                    <comboitem label="Failed" value="FAILED"/>
+                </combobox>
+                
+                <space hflex="1"/>
+                
+                <button label="Clear Filters" onClick="@command('clearFilters')" 
+                        iconSclass="z-icon-times" style="background-color: #6c757d; color: white;"/>
+            </hlayout>
+        </div>
+        
+        <!-- Action Buttons -->
+        <hlayout spacing="10px" style="margin: 15px 0;">
+            <button label="Refresh" onClick="@command('loadDocuments')" 
+                    iconSclass="z-icon-refresh" disabled="@load(vm.loading)"/>
+            <button label="Delete Selected" onClick="@command('deleteDocument', document=vm.selectedDocument)" 
+                    disabled="@load(vm.selectedDocument eq null)" iconSclass="z-icon-trash"
+                    style="background-color: #ef4444; color: white;"/>
+        </hlayout>
+        
+        <!-- Documents Table -->
+        <listbox model="@load(vm.filteredDocuments)" selectedItem="@bind(vm.selectedDocument)"
+                 emptyMessage="No documents found" height="500px" visible="@load(not vm.loading)">
+            <listhead>
+                <listheader label="ID" width="80px"/>
+                <listheader label="Filename" width="250px" onClick="@command('changeSort', field='name')" 
+                            style="cursor: pointer;">
+                    <attribute name="label">Filename ↕</attribute>
+                </listheader>
+                <listheader label="Type" width="80px" onClick="@command('changeSort', field='type')" 
+                            style="cursor: pointer;">
+                    <attribute name="label">Type ↕</attribute>
+                </listheader>
+                <listheader label="Size" width="100px" onClick="@command('changeSort', field='size')" 
+                            style="cursor: pointer;">
+                    <attribute name="label">Size ↕</attribute>
+                </listheader>
+                <listheader label="Pages" width="80px"/>
+                <listheader label="Status" width="120px"/>
+                <listheader label="Processing Date" width="180px" onClick="@command('changeSort', field='date')" 
+                            style="cursor: pointer;">
+                    <attribute name="label">Date ↕</attribute>
+                </listheader>
+                <listheader label="Actions" width="200px"/>
+            </listhead>
+            <template name="model" var="doc">
+                <listitem>
+                    <listcell label="@load(doc.documentId.substring(0, 8))..." tooltiptext="@load(doc.documentId)"/>
+                    <listcell label="@load(doc.filename)"/>
+                    <listcell label="@load(doc.fileType.toUpperCase())" 
+                              style="font-weight: bold; color: #3b82f6;"/>
+                    <listcell label="@load(vm.formatFileSize(doc.fileSize))"/>
+                    <listcell label="@load(doc.pageCount)"/>
+                    <listcell label="@load(doc.status)"
+                              style="@load(doc.status eq 'COMPLETED' ? 'color: #22c55e;' : (doc.status eq 'FAILED' ? 'color: #ef4444;' : 'color: #eab308;'))"/>
+                    <listcell label="@load(doc.processingDate)"/>
+                    <listcell>
+                        <hlayout spacing="5px">
+                            <button label="View" iconSclass="z-icon-eye" 
+                                    style="background-color: #3b82f6; color: white;"/>
+                            <button label="Download" iconSclass="z-icon-download" 
+                                    style="background-color: #22c55e; color: white;"/>
+                            <button label="Delete" iconSclass="z-icon-trash" 
+                                    onClick="@command('deleteDocument', document=doc)"
+                                    style="background-color: #ef4444; color: white;"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+        
+        <!-- Loading Indicator -->
+        <vlayout visible="@load(vm.loading)" height="500px" style="align-items: center; justify-content: center;">
+            <label value="⏳" style="font-size: 64px;"/>
+            <label value="Loading documents..." style="font-size: 18px; margin-top: 20px;"/>
+        </vlayout>
+        
+        <!-- Error Message -->
+        <hlayout style="padding: 15px; background: #fef2f2; border-radius: 8px; margin: 20px 0;" 
+                 visible="@load(not empty vm.errorMessage)">
+            <label value="❌" style="font-size: 24px; margin-right: 15px;"/>
+            <vlayout>
+                <label value="Error" style="font-weight: bold; color: #991b1b;"/>
+                <label value="@load(vm.errorMessage)" style="color: #991b1b;"/>
+            </vlayout>
+        </hlayout>
+        
+        <!-- Pagination -->
+        <hlayout style="margin-top: 20px; align-items: center; justify-content: center;">
+            <button label="Previous" onClick="@command('previousPage')" 
+                    disabled="@load(vm.currentPage eq 0)" iconSclass="z-icon-chevron-left"/>
+            <label value="Page @load(vm.currentPage + 1) of @load(vm.totalPages)" 
+                   style="margin: 0 20px; font-weight: bold;"/>
+            <button label="Next" onClick="@command('nextPage')" 
+                    disabled="@load(vm.currentPage ge vm.totalPages - 1)" iconSclass="z-icon-chevron-right"/>
+        </hlayout>
+        
+    </window>
+</zk>
+

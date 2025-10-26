@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Dataset Quality Dashboard - Analytics" border="normal" width="100%" height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.platform.viewmodels.views.governance.DatasetQualityDashboardOverviewViewModel')">
+        
+        <style>
+            .dashboard-header { 
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                color: white; 
+                padding: 30px; 
+                border-radius: 10px; 
+                margin: 20px;
+            }
+            .kpi-card { 
+                border: 2px solid #e0e0e0; 
+                border-radius: 10px; 
+                padding: 25px; 
+                margin: 10px; 
+                text-align: center;
+                background: white;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                transition: transform 0.2s;
+            }
+            .kpi-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            }
+            .kpi-value { 
+                font-size: 42px; 
+                font-weight: bold; 
+                display: block; 
+                margin: 15px 0;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+            .kpi-label { 
+                font-size: 14px; 
+                color: #666;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            .kpi-sublabel {
+                font-size: 12px;
+                color: #999;
+                margin-top: 5px;
+            }
+        </style>
+        
+        <!-- Header -->
+        <vlayout sclass="dashboard-header">
+            <label value="Dataset Quality Dashboard" style="font-size: 32px; font-weight: bold;"/>
+            <label value="Monitor and analyze dataset quality evaluations across all projects" 
+                   style="font-size: 16px; opacity: 0.9; margin-top: 10px;"/>
+        </vlayout>
+        
+        <!-- KPIs Grid -->
+        <hlayout style="padding: 20px; justify-content: space-around; flex-wrap: wrap;">
+            
+            <!-- KPI 1: Total Evaluations -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="📊" style="font-size: 36px;"/>
+                <label value="@load(vm.totalEvaluations)" sclass="kpi-value"/>
+                <label value="Total Evaluations" sclass="kpi-label"/>
+                <label value="All time" sclass="kpi-sublabel"/>
+            </vlayout>
+            
+            <!-- KPI 2: Approved -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="✅" style="font-size: 36px;"/>
+                <label value="@load(vm.totalApproved)" sclass="kpi-value" style="color: #28a745;"/>
+                <label value="Approved" sclass="kpi-label"/>
+                <label value="@load(vm.approvalRate)" sclass="kpi-sublabel" style="color: #28a745;"/>
+            </vlayout>
+            
+            <!-- KPI 3: Rejected -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="❌" style="font-size: 36px;"/>
+                <label value="@load(vm.totalRejected)" sclass="kpi-value" style="color: #dc3545;"/>
+                <label value="Rejected" sclass="kpi-label"/>
+                <label value="@load(vm.rejectionRate)" sclass="kpi-sublabel" style="color: #dc3545;"/>
+            </vlayout>
+            
+            <!-- KPI 4: Pending Review -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="⏳" style="font-size: 36px;"/>
+                <label value="@load(vm.totalReview)" sclass="kpi-value" style="color: #ffc107;"/>
+                <label value="Pending Review" sclass="kpi-label"/>
+                <label value="HITL Required" sclass="kpi-sublabel" style="color: #ffc107;"/>
+            </vlayout>
+            
+            <!-- KPI 5: Average Quality Score -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="⭐" style="font-size: 36px;"/>
+                <label value="@load(vm.avgQualityScore) @converter('formatedNumber', format='###,##0.0')" 
+                       sclass="kpi-value" style="color: #007bff;"/>
+                <label value="Avg Quality Score" sclass="kpi-label"/>
+                <label value="0-100 scale" sclass="kpi-sublabel"/>
+            </vlayout>
+            
+            <!-- KPI 6: Overdue Items -->
+            <vlayout sclass="kpi-card" width="220px">
+                <label value="⚠️" style="font-size: 36px;"/>
+                <label value="@load(vm.overdueItems)" sclass="kpi-value" 
+                       style="@load(vm.overdueItems > 0 ? 'color: #dc3545;' : 'color: #28a745;')"/>
+                <label value="Overdue Items" sclass="kpi-label"/>
+                <label value="> 2 days pending" sclass="kpi-sublabel"/>
+            </vlayout>
+            
+        </hlayout>
+        
+        <separator height="20px"/>
+        
+        <!-- Filtros -->
+        <hlayout spacing="10px" style="padding: 10px;">
+            <combobox placeholder="Filter by Decision" value="@bind(vm.filterDecision)" 
+                      onChange="@command('filterByDecision')" width="160px">
+                <comboitem label="All Decisions" value=""/>
+                <comboitem label="APPROVED" value="APPROVED"/>
+                <comboitem label="REVIEW_REQUIRED" value="REVIEW_REQUIRED"/>
+                <comboitem label="REJECTED" value="REJECTED"/>
+            </combobox>
+            
+            <combobox placeholder="Filter by Status" value="@bind(vm.filterStatus)" 
+                      onChange="@command('filterByStatus')" width="160px">
+                <comboitem label="All Status" value=""/>
+                <comboitem label="COMPLETED" value="COMPLETED"/>
+                <comboitem label="IN_PROGRESS" value="IN_PROGRESS"/>
+                <comboitem label="FAILED" value="FAILED"/>
+            </combobox>
+        </hlayout>
+        
+        <!-- Lista de evaluaciones -->
+        <listbox model="@load(vm.dashboardData)" selectedItem="@bind(vm.selectedItem)"
+                 emptyMessage="No dataset quality evaluations" height="400px" style="margin: 10px;">
+            <listhead>
+                <listheader label="ID" width="70px"/>
+                <listheader label="Dataset" width="200px"/>
+                <listheader label="Score" width="90px"/>
+                <listheader label="Level" width="100px"/>
+                <listheader label="Decision" width="140px"/>
+                <listheader label="Status" width="110px"/>
+                <listheader label="Days Since" width="100px"/>
+                <listheader label="Overdue" width="80px"/>
+                <listheader label="Project" width="120px"/>
+            </listhead>
+            <template name="model" var="item">
+                <listitem>
+                    <listcell label="@load(item.idxdatasetquality)"/>
+                    <listcell label="@load(item.dqldatasetname)" tooltiptext="@load(item.dqldatasetpath)"/>
+                    <listcell>
+                        <hlayout>
+                            <label value="@load(item.dqloverallscore) @converter('formatedNumber', format='###,##0.0')"
+                                   style="@load(item.dqloverallscore ge 90 ? 'color: #28a745; font-weight: bold;' : (item.dqloverallscore ge 75 ? 'color: #ffc107;' : 'color: #dc3545; font-weight: bold;'))"/>
+                        </hlayout>
+                    </listcell>
+                    <listcell label="@load(item.qualitylevel)"
+                              style="@load(item.qualitylevel eq 'EXCELLENT' ? 'color: #28a745;' : (item.qualitylevel eq 'GOOD' ? 'color: #17a2b8;' : (item.qualitylevel eq 'FAIR' ? 'color: #ffc107;' : 'color: #dc3545;')))"/>
+                    <listcell label="@load(item.dqldecision)"
+                              style="@load(item.dqldecision eq 'APPROVED' ? 'color: #28a745;' : (item.dqldecision eq 'REJECTED' ? 'color: #dc3545;' : 'color: #ffc107;'))"/>
+                    <listcell label="@load(item.simplestatus)"/>
+                    <listcell label="@load(item.dayssinceeval)"/>
+                    <listcell label="@load(item.isoverdue ? 'YES' : 'NO')"
+                              style="@load(item.isoverdue ? 'background-color: #f8d7da; color: #721c24; font-weight: bold;' : '')"/>
+                    <listcell label="@load(item.dqlprojectid)"/>
+                </listitem>
+            </template>
+        </listbox>
+        
+        <!-- Footer con estadísticas adicionales -->
+        <hlayout style="padding: 20px; background-color: #f8f9fa; margin: 10px; border-radius: 5px;">
+            <label value="Quick Stats:" style="font-weight: bold; margin-right: 20px;"/>
+            <label value="Approval Rate:" style="margin-right: 5px;"/>
+            <label value="@load(vm.approvalRate)" style="font-weight: bold; color: #28a745; margin-right: 20px;"/>
+            <label value="Rejection Rate:" style="margin-right: 5px;"/>
+            <label value="@load(vm.rejectionRate)" style="font-weight: bold; color: #dc3545; margin-right: 20px;"/>
+            <label value="Avg Score:" style="margin-right: 5px;"/>
+            <label value="@load(vm.avgQualityScore) @converter('formatedNumber', format='###,##0.0')" 
+                   style="font-weight: bold; color: #007bff;"/>
+        </hlayout>
+        
+    </window>
+</zk>

@@ -1,0 +1,343 @@
+package com.codeflowx.govern.workflow.drools.rules;
+
+import com.codeflowx.govern.workflow.drools.facts.DatasetQualityFact;
+import java.util.ArrayList;
+import java.util.List;
+
+// Reglas de evaluación para calidad de datasets
+// Sistema de puntuación y clasificación de calidad de datos
+
+rule "Calculate Overall Dataset Quality Score"
+    when
+        $fact: DatasetQualityFact(
+            completenessScore != 0.0,
+            accuracyScore != 0.0,
+            consistencyScore != 0.0,
+            validityScore != 0.0,
+            uniquenessScore != 0.0,
+            timelinessScore != 0.0
+        )
+    then
+        $fact.calculateOverallQualityScore();
+        update($fact);
+end
+
+rule "Determine Quality Grade"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore != 0.0,
+            qualityGrade == null
+        )
+    then
+        $fact.determineQualityGrade();
+        update($fact);
+end
+
+rule "Determine Risk Level"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore != 0.0
+        )
+    then
+        $fact.determineRiskLevel();
+        update($fact);
+end
+
+rule "Make Final Decision"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore != 0.0,
+            decision == null
+        )
+    then
+        $fact.makeDecision();
+        update($fact);
+end
+
+rule "Excellent Dataset Quality"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore >= 0.9,
+            completenessScore >= 0.9,
+            accuracyScore >= 0.9,
+            biasScore <= 0.2,
+            !piiDetected,
+            gdprCompliant,
+            duplicateRate <= 0.05
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Dataset de excelente calidad - aprobado para uso en producción");
+        recommendations.add("Mantener monitoreo continuo de calidad");
+        recommendations.add("Documentar como benchmark de calidad");
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("LOW");
+        $fact.setRequiresReview(false);
+        update($fact);
+end
+
+rule "Good Dataset Quality with Minor Issues"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore >= 0.8,
+            overallQualityScore < 0.9,
+            biasScore <= 0.3,
+            piiCount <= ($fact.getTotalRecords() * 0.02)
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        if ($fact.getCompletenessScore() < 0.8) {
+            recommendations.add("Mejorar completitud de datos - revisar fuentes");
+            recommendations.add("Implementar validación de campos obligatorios");
+        }
+        if ($fact.getAccuracyScore() < 0.8) {
+            recommendations.add("Revisar precisión de datos - validar fuentes");
+            recommendations.add("Implementar verificaciones cruzadas");
+        }
+        if ($fact.getDuplicateRate() > 0.05) {
+            recommendations.add("Reducir duplicados - implementar deduplicación");
+        }
+        if ($fact.getBiasScore() > 0.2) {
+            recommendations.add("Revisar sesgo en datos - balancear representación");
+        }
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("LOW");
+        $fact.setRequiresReview(false);
+        update($fact);
+end
+
+rule "Moderate Dataset Quality - Requires Attention"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore >= 0.7,
+            overallQualityScore < 0.8
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Calidad moderada - requiere mejoras antes de producción");
+        recommendations.add("Revisar y limpiar datos problemáticos");
+        recommendations.add("Implementar validaciones más estrictas");
+        
+        if ($fact.getBiasScore() > 0.3) {
+            recommendations.add("CRÍTICO: Sesgo significativo detectado");
+            recommendations.add("Revisar representatividad demográfica");
+            recommendations.add("Implementar técnicas de balanceo de datos");
+        }
+        
+        if ($fact.getPiiDetected()) {
+            recommendations.add("PII detectado - revisar cumplimiento GDPR");
+            recommendations.add("Implementar anonimización o pseudonimización");
+        }
+        
+        if ($fact.getDuplicateRate() > 0.1) {
+            recommendations.add("Alto nivel de duplicados - implementar deduplicación");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("MEDIUM");
+        $fact.setRequiresReview(true);
+        update($fact);
+end
+
+rule "Poor Dataset Quality - High Risk"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore >= 0.6,
+            overallQualityScore < 0.7
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Calidad deficiente - NO recomendado para producción");
+        recommendations.add("Revisión completa de datos requerida");
+        recommendations.add("Implementar pipeline de limpieza de datos");
+        recommendations.add("Revisar fuentes de datos");
+        
+        if ($fact.getBiasScore() > 0.5) {
+            recommendations.add("CRÍTICO: Sesgo alto - riesgo de discriminación");
+            recommendations.add("Revisar completamente la representatividad");
+        }
+        
+        if ($fact.getPiiCount() > ($fact.getTotalRecords() * 0.05)) {
+            recommendations.add("CRÍTICO: PII significativo - riesgo de privacidad");
+            recommendations.add("Implementar medidas de protección inmediatas");
+        }
+        
+        if ($fact.getDuplicateRate() > 0.2) {
+            recommendations.add("CRÍTICO: Duplicados excesivos - integridad comprometida");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("HIGH");
+        $fact.setRequiresReview(true);
+        update($fact);
+end
+
+rule "Critical Dataset Quality - Immediate Action Required"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore < 0.6
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("ACCIÓN INMEDIATA: Dataset NO APTO para uso");
+        recommendations.add("Suspender uso en producción inmediatamente");
+        recommendations.add("Revisión completa del pipeline de datos");
+        recommendations.add("Auditoría de fuentes de datos");
+        recommendations.add("Implementar controles de calidad obligatorios");
+        
+        if ($fact.getBiasScore() > 0.7) {
+            recommendations.add("CRÍTICO: Sesgo extremo - riesgo legal");
+        }
+        
+        if ($fact.getPiiCount() > ($fact.getTotalRecords() * 0.1)) {
+            recommendations.add("CRÍTICO: Violación masiva de privacidad");
+        }
+        
+        if ($fact.getAccuracyScore() < 0.5) {
+            recommendations.add("CRÍTICO: Precisión inaceptable");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("CRITICAL");
+        $fact.setRequiresReview(true);
+        update($fact);
+end
+
+rule "High Bias Risk"
+    when
+        $fact: DatasetQualityFact(
+            biasScore > 0.5
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("CRÍTICO: Sesgo alto detectado");
+        recommendations.add("Revisar representatividad demográfica");
+        recommendations.add("Implementar técnicas de balanceo");
+        recommendations.add("Validar equidad en subgrupos");
+        recommendations.add("Considerar recolección de datos adicionales");
+        
+        $fact.setRecommendations(recommendations);
+        $fact.setRiskLevel("HIGH");
+        $fact.setRequiresReview(true);
+        update($fact);
+end
+
+rule "PII Compliance Risk"
+    when
+        $fact: DatasetQualityFact(
+            piiDetected == true,
+            piiCount > ($fact.getTotalRecords() * 0.02)
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("PII detectado - revisar cumplimiento");
+        recommendations.add("Implementar anonimización");
+        recommendations.add("Revisar consentimientos de usuarios");
+        recommendations.add("Validar cumplimiento GDPR/CCPA");
+        recommendations.add("Implementar controles de acceso");
+        
+        if (!$fact.isGdprCompliant()) {
+            recommendations.add("CRÍTICO: No cumple GDPR");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        if ($fact.getRiskLevel().equals("LOW")) {
+            $fact.setRiskLevel("MEDIUM");
+        }
+        update($fact);
+end
+
+rule "Data Integrity Issues"
+    when
+        $fact: DatasetQualityFact(
+            duplicateRate > 0.15 || nullRate > 0.2 || invalidRate > 0.1
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Problemas de integridad de datos");
+        
+        if ($fact.getDuplicateRate() > 0.15) {
+            recommendations.add("Duplicados excesivos - implementar deduplicación");
+        }
+        
+        if ($fact.getNullRate() > 0.2) {
+            recommendations.add("Valores nulos excesivos - revisar fuentes");
+        }
+        
+        if ($fact.getInvalidRate() > 0.1) {
+            recommendations.add("Datos inválidos - implementar validaciones");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        if ($fact.getRiskLevel().equals("LOW")) {
+            $fact.setRiskLevel("MEDIUM");
+        }
+        update($fact);
+end
+
+rule "Schema Compliance Issues"
+    when
+        $fact: DatasetQualityFact(
+            schemaViolations > 0 || missingColumns != null || extraColumns != null
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Problemas de cumplimiento de esquema");
+        
+        if ($fact.getSchemaViolations() > 0) {
+            recommendations.add("Violaciones de esquema detectadas");
+        }
+        
+        if ($fact.getMissingColumns() != null && !$fact.getMissingColumns().isEmpty()) {
+            recommendations.add("Columnas faltantes: " + $fact.getMissingColumns());
+        }
+        
+        if ($fact.getExtraColumns() != null && !$fact.getExtraColumns().isEmpty()) {
+            recommendations.add("Columnas extra detectadas: " + $fact.getExtraColumns());
+        }
+        
+        $fact.setRecommendations(recommendations);
+        if ($fact.getRiskLevel().equals("LOW")) {
+            $fact.setRiskLevel("MEDIUM");
+        }
+        update($fact);
+end
+
+rule "Statistical Anomalies"
+    when
+        $fact: DatasetQualityFact(
+            outlierPercentage > 0.1 || varianceScore < 0.3
+        )
+    then
+        List<String> recommendations = new ArrayList<>();
+        recommendations.add("Anomalías estadísticas detectadas");
+        
+        if ($fact.getOutlierPercentage() > 0.1) {
+            recommendations.add("Alto porcentaje de outliers - revisar datos");
+        }
+        
+        if ($fact.getVarianceScore() < 0.3) {
+            recommendations.add("Baja varianza - posible sobreajuste");
+        }
+        
+        $fact.setRecommendations(recommendations);
+        if ($fact.getRiskLevel().equals("LOW")) {
+            $fact.setRiskLevel("MEDIUM");
+        }
+        update($fact);
+end
+
+rule "Set Final Evaluation Status"
+    when
+        $fact: DatasetQualityFact(
+            overallQualityScore != 0.0,
+            qualityGrade != null,
+            riskLevel != null,
+            decision != null
+        )
+    then
+        // Marcar evaluación como completada
+        $fact.setEvaluationMethod("automatic");
+        update($fact);
+end
+

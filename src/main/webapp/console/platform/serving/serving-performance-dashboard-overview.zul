@@ -1,0 +1,151 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.serving.ServingPerformanceDashboardOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-cube me-2"></h:i>
+						<label value="Ving Performance Dashboard" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de Ving Performance Dashboard" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1"></div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="Buscar..."
+						class="form-control" onOK="@command('applyFilters')" />
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Buscar"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Limpiar"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.filteredItems)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="ID" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass=" text-capitalize "
+										label="Active Items" align="center"
+										width="15%" />
+
+									<column sclass=" text-capitalize "
+										label="Deployed Items" align="center"
+										width="15%" />
+
+									<column sclass=" text-capitalize "
+										label="Training Items" align="center"
+										width="15%" />
+
+									<column sclass=" text-capitalize "
+										label="Offline Items" align="center"
+										width="15%" />
+
+									<column sclass=" text-capitalize "
+										label="Avg Score" align="center"
+										width="15%" />
+
+									<column
+										label="Acciones"
+										align="center" />
+								</columns>
+
+								<template name="model" var="serving">
+									<row
+										style="text-align:right;cursor:pointer;"
+										onClick="@command('viewServingPerformanceDashboardDetails', servingId=serving.totalItems)">
+										<label
+											value="@load(serving.totalItems) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(serving.activeItems) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(serving.deployedItems) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(serving.trainingItems) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(serving.offlineItems) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(serving.avgScore) @converter(vm.fieldConverter)">
+										</label>
+										<cell align="center"
+											class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewServingPerformanceDashboardDetails', servingId=serving.totalItems)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="Ver detalles" />
+											</div>
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+									</footer>
+									<footer span="4" align="left"></footer>
+									<footer></footer>
+								</foot>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>

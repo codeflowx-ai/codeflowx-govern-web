@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-@SpringBootApplication(scanBasePackages = {"com.suinsit.webapp","com.suinsit.web.security","org.enartframework.suinsit" ,"org.enartframework.orm.jdbc.hikaricp.*"})
+@SpringBootApplication(scanBasePackages = {"com.suinsit.webapp","com.suinsit.web.security","org.enartframework.suinsit" ,"org.enartframework.orm.jdbc.hikaricp.*,codeflowx.nocode.persist.*"})
 public class Application extends SpringBootServletInitializer {
 
     @Override

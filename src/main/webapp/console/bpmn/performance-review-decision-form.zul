@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="⚠️ DECISIÓN URGENTE: Degradación de Performance (30min)" border="normal" width="850px" closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.PerformanceReviewDecisionViewModel')">
+
+        <style>
+            .decision-card { border: 1px solid #e0e0e0; padding: 15px; margin: 10px 0; border-radius: 8px; cursor: pointer; }
+            .decision-card:hover { background: #f5f5f5; border-color: #d32f2f; }
+            .decision-card.selected { background: #ffebee; border: 2px solid #d32f2f; }
+            .critical-alert { background: #d32f2f; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px;">
+
+            <!-- Alerta Crítica -->
+            <div sclass="critical-alert">
+                <hlayout spacing="10px">
+                    <label value="🚨" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="DEGRADACIÓN CRÍTICA DETECTADA" style="font-weight: bold; font-size: 16px;"/>
+                        <label value="Han transcurrido 30 minutos. Acción urgente requerida." style="font-size: 13px;"/>
+                        <label value="Modelo: ${vm.modelName} | Latency: ${vm.avgLatency}ms | Throughput: ${vm.avgThroughput} req/s" style="font-size: 12px;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Métricas -->
+            <groupbox title="📊 Métricas de Performance" mold="3d">
+                <grid>
+                    <rows>
+                        <row><label value="Latencia Promedio:"/><label value="${vm.avgLatency} ms" style="font-weight: bold; color: #d32f2f;"/></row>
+                        <row><label value="Throughput:"/><label value="${vm.avgThroughput} req/s"/></row>
+                        <row><label value="Error Rate:"/><label value="${vm.avgErrorRate}%" style="color: #d32f2f;"/></row>
+                        <row><label value="Severidad:"/><label value="${vm.severity}" style="font-weight: bold; color: #d32f2f;"/></row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <separator/>
+            <label value="DECISIÓN URGENTE REQUERIDA:" style="font-weight: bold; font-size: 16px; color: #d32f2f;"/>
+
+            <!-- Opción 1: Rollback Ahora -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'ROLLBACK_NOW' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='ROLLBACK_NOW')">
+                <hlayout spacing="15px">
+                    <label value="⏪" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Rollback Inmediato a Versión Anterior" style="font-weight: bold; font-size: 14px; color: #d32f2f;"/>
+                        <label value="Revertir a última versión estable (riesgo mínimo)" style="color: #666; font-size: 12px;"/>
+                        <label value="⚠️ Recomendado si: Error rate > 10% o Latency > 2x threshold" style="color: #d32f2f; font-size: 11px; font-weight: bold;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 2: Scale Up -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'SCALE_UP' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='SCALE_UP')">
+                <hlayout spacing="15px">
+                    <label value="📈" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Scale Up (Aumentar Recursos)" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Aumentar replicas/recursos antes de rollback" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Degradación por carga, no por bug" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 3: Investigar (dar 2h más) -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'INVESTIGATE' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='INVESTIGATE')">
+                <hlayout spacing="15px">
+                    <label value="🔍" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Investigar Causa (2 horas más)" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Diagnosticar antes de tomar acción" style="color: #666; font-size: 12px;"/>
+                        <label value="⚠️ Solo si: Tienes capacidad de diagnóstico rápido" style="color: #ff9800; font-size: 11px;"/></vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Justificación Obligatoria -->
+            <separator/>
+            <label value="Justificación (OBLIGATORIA):" style="font-weight: bold; color: #d32f2f;"/>
+            <textbox rows="3" width="100%" placeholder="Documenta tu decisión urgente..." 
+                     value="@bind(vm.justification)" constraint="no empty"/>
+
+            <!-- Botones -->
+            <separator/>
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')" iconSclass="z-icon-times"/>
+                <button label="⚠️ CONFIRMAR DECISIÓN URGENTE" onClick="@command('confirmDecision')" 
+                        disabled="@load(empty vm.selectedDecision or empty vm.justification)"
+                        style="min-width: 200px; background: #d32f2f; color: white; font-weight: bold; font-size: 14px;"/>
+            </hlayout>
+
+        </vlayout>
+    </window>
+</zk>
+
