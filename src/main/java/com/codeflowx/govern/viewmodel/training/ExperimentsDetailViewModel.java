@@ -2,7 +2,6 @@ package com.codeflowx.govern.viewmodel.training;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +10,6 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.enartframework.annotation.context.Autowired;
-import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
 import org.enartframework.web.zk.page.MasterPage;
 import org.slf4j.Logger;
@@ -32,17 +29,17 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.govern.jpa.training.Checkpoint;
-import com.codeflowx.govern.jpa.training.Experiment;
-import com.codeflowx.govern.jpa.training.HPOTrial;
-import com.codeflowx.govern.jpa.training.MetricSeries;
-import com.codeflowx.govern.jpa.training.Param;
-import com.codeflowx.govern.jpa.training.Run;
-import com.codeflowx.govern.jpa.training.TrainingArtifact;
-import com.codeflowx.govern.jpa.training.TrainingGovernance;
-import com.codeflowx.govern.jpa.training.TrainingLog;
-import com.codeflowx.govern.jpa.training.TrainingMetric;
-import com.codeflowx.govern.jpa.views.training.TrainingMetricsSummary;
+import com.codeflowx.govern.entity.training.Checkpoint;
+import com.codeflowx.govern.entity.training.Experiment;
+import com.codeflowx.govern.entity.training.HPOTrial;
+import com.codeflowx.govern.entity.training.MetricSeries;
+import com.codeflowx.govern.entity.training.Param;
+import com.codeflowx.govern.entity.training.Run;
+import com.codeflowx.govern.entity.training.TrainingArtifact;
+import com.codeflowx.govern.entity.training.TrainingGovernance;
+import com.codeflowx.govern.entity.training.TrainingLog;
+import com.codeflowx.govern.entity.training.TrainingMetric;
+import com.codeflowx.govern.entity.views.training.TrainingMetricsSummary;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -264,11 +261,11 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
             // Cargar usando SQL con JOIN o filtrar por los runs ya cargados
             String sql = "SELECT c.* FROM TRNCHECKPOINTS c " +
                         "INNER JOIN TRNRUNS r ON c.IDTRNRUNS0 = r.IDXRUN " +
-                        "WHERE r.IDTRNEXPERIMENTS0 = ? " +
+                        "WHERE r.IDTRNEXPERIMENTS0 = :experimentId " +
                         "ORDER BY c.TRNCREATEDAT DESC LIMIT 50";
             
-            List<Object> params = new ArrayList<>();
-            params.add(experimentId);
+            Map<String, Object> params = new HashMap<>();
+            params.put("experimentId", experimentId);
             
             PageParams pageParams = PageParams.builder()
                 .maxRows(50)
