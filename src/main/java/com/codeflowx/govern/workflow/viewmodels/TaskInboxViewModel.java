@@ -100,13 +100,13 @@ public class TaskInboxViewModel extends MasterPage {
     }
 
     // ========== Servicios Flowable (Opcionales para MOCK mode) ==========
-    @WireVariable(required = false)
+    @WireVariable
     private TaskManagementService taskManagementService;
 
-    @WireVariable(required = false)
+    @WireVariable
     private TaskService taskService;
 
-    @WireVariable(required = false)
+    @WireVariable
     private RuntimeService runtimeService;
 
     // ========== Modo MOCK ==========
@@ -695,6 +695,20 @@ public class TaskInboxViewModel extends MasterPage {
         if (priority >= 90) return "priority-high";
         if (priority >= 50) return "priority-medium";
         return "priority-low";
+    }
+    
+    public String getPriorityBadgeClass(Integer priority) {
+        return "priority-badge " + getPriorityClass(priority);
+    }
+    
+    public String getTaskToAssignTitle() {
+        if (taskToAssign == null) return "";
+        return "Tarea: " + (taskToAssign.getName() != null ? taskToAssign.getName() : "Sin nombre");
+    }
+    
+    public String getAvailableUsersCount() {
+        if (availableUsers == null) return "(0 usuarios)";
+        return "(" + availableUsers.size() + " usuarios)";
     }
 
     public String getProcessName(String processDefinitionId) {

@@ -9,14 +9,13 @@
     - Filtrar por proceso, prioridad, fecha
     - Acceder al formulario ZUL de la tarea
 -->
-<zk>
-    <window id="taskInboxWindow" 
-            title="📋 Bandeja de Tareas BPMN" 
-            border="normal" 
-            width="100%" 
-            height="100%"
-            apply="org.zkoss.bind.BindComposer"
-            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.TaskInboxViewModel')">
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.TaskInboxViewModel')">
         
         <style>
             .task-row-high { background-color: #ffebee !important; }
@@ -35,219 +34,255 @@
             .priority-low { background-color: #4caf50; color: white; }
         </style>
         
-        <borderlayout height="100%">
-            
-            <!-- NORTH: Filtros y estadísticas -->
-            <north size="120px" border="none">
-                <vlayout spacing="10px" style="padding: 10px;">
-                    
-                    <!-- Estadísticas rápidas -->
-                    <hlayout spacing="20px">
-                        <label value="@load(vm.totalTasks)" 
-                               style="font-size: 24px; font-weight: bold; color: #1976d2;"/>
-                        <label value="Tareas Pendientes" 
-                               style="font-size: 14px; color: #666; padding-top: 8px;"/>
-                        
-                        <separator orient="vertical" bar="true"/>
-                        
-                        <label value="@load(vm.assignedToMeCount)" 
-                               style="font-size: 20px; font-weight: bold; color: #4caf50;"/>
-                        <label value="Asignadas a Mí" 
-                               style="font-size: 12px; color: #666; padding-top: 10px;"/>
-                        
-                        <separator orient="vertical" bar="true"/>
-                        
-                        <label value="@load(vm.groupTasksCount)" 
-                               style="font-size: 20px; font-weight: bold; color: #ff9800;"/>
-                        <label value="De Mis Roles" 
-                               style="font-size: 12px; color: #666; padding-top: 10px;"/>
-                    </hlayout>
-                    
-                    <!-- Filtros -->
-                    <hlayout spacing="10px">
-                        <label value="Filtrar:" style="font-weight: bold; padding-top: 5px;"/>
-                        
-                        <combobox placeholder="Proceso..." 
-                                  width="200px"
-                                  model="@load(vm.processDefinitions)"
-                                  selectedItem="@bind(vm.selectedProcess)"
-                                  onSelect="@command('filterTasks')">
-                            <template name="model">
-                                <comboitem label="@load(each)"/>
-                            </template>
-                        </combobox>
-                        
-                        <combobox placeholder="Prioridad..." 
-                                  width="150px"
-                                  model="@load(vm.priorities)"
-                                  selectedItem="@bind(vm.selectedPriority)"
-                                  onSelect="@command('filterTasks')">
-                            <template name="model">
-                                <comboitem label="@load(each)"/>
-                            </template>
-                        </combobox>
-                        
-                        <combobox placeholder="Estado..." 
-                                  width="150px"
-                                  model="@load(vm.taskStates)"
-                                  selectedItem="@bind(vm.selectedState)"
-                                  onSelect="@command('filterTasks')">
-                            <template name="model">
-                                <comboitem label="@load(each)"/>
-                            </template>
-                        </combobox>
-                        
-                        <button label="Limpiar" onClick="@command('clearFilters')" 
-                                iconSclass="z-icon-times"/>
-                        
-                        <button label="Refrescar" onClick="@command('refreshTasks')" 
-                                iconSclass="z-icon-refresh" 
-                                style="margin-left: 20px;"/>
-                    </hlayout>
-                    
-                </vlayout>
-            </north>
-            
-            <!-- CENTER: Lista de tareas -->
-            <center border="none">
-                <listbox id="taskListbox" 
-                         model="@load(vm.filteredTasks)" 
-                         selectedItem="@bind(vm.selectedTask)"
-                         emptyMessage="No hay tareas pendientes"
-                         vflex="1">
-                    
-                    <listhead>
-                        <listheader label="Prioridad" width="100px" align="center"/>
-                        <listheader label="Tarea" width="250px"/>
-                        <listheader label="Proceso" width="200px"/>
-                        <listheader label="Asignado A" width="150px"/>
-                        <listheader label="Roles" width="180px"/>
-                        <listheader label="Fecha Creación" width="140px"/>
-                        <listheader label="Due Date" width="140px"/>
-                        <listheader label="Acciones" width="200px" align="center"/>
-                    </listhead>
-                    
-                    <template name="model" var="task">
-                        <listitem sclass="@load(vm.getTaskRowClass(task))">
-                            
-                            <!-- Prioridad -->
-                            <listcell>
-                                <label value="@load(task.priority)" 
-                                       sclass="@load(concat('priority-badge ', vm.getPriorityClass(task.priority)))"/>
-                            </listcell>
-                            
-                            <!-- Nombre tarea -->
-                            <listcell>
-                                <vlayout>
-                                    <label value="@load(task.name)" 
-                                           style="font-weight: bold;"/>
-                                    <label value="@load(task.description)" 
-                                           style="font-size: 11px; color: #666;"
-                                           visible="@load(not empty task.description)"/>
-                                </vlayout>
-                            </listcell>
-                            
-                            <!-- Proceso -->
-                            <listcell>
-                                <label value="@load(vm.getProcessName(task.processDefinitionId))" 
-                                       style="font-size: 12px;"/>
-                            </listcell>
-                            
-                            <!-- Asignado a -->
-                            <listcell>
-                                <label value="@load(empty task.assignee ? 'Sin asignar' : task.assignee)" 
-                                       sclass="@load(empty task.assignee ? 'task-group' : 'task-assigned')"/>
-                            </listcell>
-                            
-                            <!-- Roles (candidateGroups) -->
-                            <listcell>
-                                <label value="@load(vm.formatCandidateGroups(task.candidateGroups))" 
-                                       style="font-size: 11px; color: #666;"/>
-                            </listcell>
-                            
-                            <!-- Fecha creación -->
-                            <listcell>
-                                <label value="@load(task.createTime) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
-                            </listcell>
-                            
-                            <!-- Due date -->
-                            <listcell>
-                                <label value="@load(task.dueDate) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"
-                                       style="@load(vm.getDueDateStyle(task.dueDate))"/>
-                            </listcell>
-                            
-                            <!-- Acciones -->
-                            <listcell>
-                                <hlayout spacing="5px">
-                                    
-                                    <!-- Abrir formulario -->
-                                    <button label="Abrir" 
-                                            onClick="@command('openTaskForm', task=task)"
-                                            iconSclass="z-icon-external-link"
-                                            disabled="@load(empty task.formKey)"
-                                            tooltiptext="Abrir formulario de la tarea"/>
-                                    
-                                    <!-- Claim (si no asignada) -->
-                                    <button label="Reclamar" 
-                                            onClick="@command('claimTask', task=task)"
-                                            iconSclass="z-icon-hand-paper-o"
-                                            visible="@load(empty task.assignee)"
-                                            tooltiptext="Reclamar tarea para mí"/>
-                                    
-                                    <!-- Asignar a usuario -->
-                                    <button label="Asignar" 
-                                            onClick="@command('showAssignDialog', task=task)"
-                                            iconSclass="z-icon-user-plus"
-                                            tooltiptext="Asignar a usuario específico"/>
-                                    
-                                    <!-- Liberar (si asignada a mí) -->
-                                    <button label="Liberar" 
-                                            onClick="@command('releaseTask', task=task)"
-                                            iconSclass="z-icon-unlock"
-                                            visible="@load(vm.isAssignedToMe(task))"
-                                            tooltiptext="Liberar tarea"/>
-                                    
-                                </hlayout>
-                            </listcell>
-                            
-                        </listitem>
-                    </template>
-                    
-                </listbox>
-            </center>
-            
-            <!-- SOUTH: Detalle de tarea seleccionada -->
-            <south size="200px" border="normal" 
-                   title="Detalle de Tarea" 
-                   collapsible="true"
-                   visible="@load(not empty vm.selectedTask)">
-                <vlayout style="padding: 10px;" spacing="5px">
-                    <grid>
-                        <rows>
-                            <row>
-                                <label value="ID Tarea:" style="font-weight: bold;"/>
-                                <label value="@load(vm.selectedTask.id)"/>
-                                <label value="ID Proceso:" style="font-weight: bold;"/>
-                                <label value="@load(vm.selectedTask.processInstanceId)"/>
-                            </row>
-                            <row>
-                                <label value="Formulario ZUL:" style="font-weight: bold;"/>
-                                <label value="@load(vm.selectedTask.formKey)" style="color: #1976d2;"/>
-                                <label value="Owner:" style="font-weight: bold;"/>
-                                <label value="@load(vm.selectedTask.owner)"/>
-                            </row>
-                            <row spans="1,3">
-                                <label value="Variables:" style="font-weight: bold;"/>
-                                <html content="@load(vm.getTaskVariables(vm.selectedTask))"/>
-                            </row>
-                        </rows>
-                    </grid>
-                </vlayout>
-            </south>
-            
-        </borderlayout>
+        <!-- Header con título -->
+        <div class="row">
+            <div class="col-12">
+                <div class="left tittle-principal">
+                    <h:h2 class="mb-sm-0">📋 Bandeja de Tareas BPMN</h:h2>
+                </div>
+            </div>
+        </div>
         
-    </window>
+        <!-- Estadísticas y Filtros -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card cards-mkt-sf">
+                    <div class="mkt-dp" style="padding: 20px;">
+                        
+                        <!-- Estadísticas rápidas -->
+                        <div class="d-flex mb-4" style="gap: 30px;">
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <label value="@load(vm.totalTasks)" 
+                                       style="font-size: 24px; font-weight: bold; color: #1976d2;"/>
+                                <label value="Tareas Pendientes" 
+                                       class="txt-mkt" style="padding-top: 8px;"/>
+                            </div>
+                            
+                            <div style="border-left: 2px solid #ddd; height: 40px;"></div>
+                            
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <label value="@load(vm.assignedToMeCount)" 
+                                       style="font-size: 20px; font-weight: bold; color: #4caf50;"/>
+                                <label value="Asignadas a Mí" 
+                                       class="txt-mkt" style="padding-top: 8px;"/>
+                            </div>
+                            
+                            <div style="border-left: 2px solid #ddd; height: 40px;"></div>
+                            
+                            <div class="d-flex align-items-center" style="gap: 10px;">
+                                <label value="@load(vm.groupTasksCount)" 
+                                       style="font-size: 20px; font-weight: bold; color: #ff9800;"/>
+                                <label value="De Mis Roles" 
+                                       class="txt-mkt" style="padding-top: 8px;"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Filtros -->
+                        <div class="d-flex" style="gap: 10px; align-items: center;">
+                            <label value="Filtrar:" class="subtt-mkt"/>
+                            
+                            <combobox placeholder="Proceso..." 
+                                      width="200px"
+                                      model="@load(vm.processDefinitions)"
+                                      selectedItem="@bind(vm.selectedProcess)"
+                                      onSelect="@command('filterTasks')">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
+                            
+                            <combobox placeholder="Prioridad..." 
+                                      width="150px"
+                                      model="@load(vm.priorities)"
+                                      selectedItem="@bind(vm.selectedPriority)"
+                                      onSelect="@command('filterTasks')">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
+                            
+                            <combobox placeholder="Estado..." 
+                                      width="150px"
+                                      model="@load(vm.taskStates)"
+                                      selectedItem="@bind(vm.selectedState)"
+                                      onSelect="@command('filterTasks')">
+                                <template name="model">
+                                    <comboitem label="@load(each)"/>
+                                </template>
+                            </combobox>
+                            
+                            <button label="Limpiar" onClick="@command('clearFilters')" 
+                                    iconSclass="z-icon-times" class="btn btn-secondary"/>
+                            
+                            <button label="Refrescar" onClick="@command('refreshTasks')" 
+                                    iconSclass="z-icon-refresh" class="btn btn-primary"/>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Lista de Tareas -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card cards-mkt-sf">
+                    <div class="mkt-dp" style="padding: 20px;">
+                        <label class="subtt-mkt mb-3">Tareas Pendientes</label>
+                        
+                        <listbox id="taskListbox" 
+                                 model="@load(vm.filteredTasks)" 
+                                 selectedItem="@bind(vm.selectedTask)"
+                                 emptyMessage="No hay tareas pendientes"
+                                 style="border: none;">
+                            
+                            <listhead>
+                                <listheader label="Prioridad" width="100px" align="center"/>
+                                <listheader label="Tarea" width="250px"/>
+                                <listheader label="Proceso" width="200px"/>
+                                <listheader label="Asignado A" width="150px"/>
+                                <listheader label="Roles" width="180px"/>
+                                <listheader label="Fecha Creación" width="140px"/>
+                                <listheader label="Due Date" width="140px"/>
+                                <listheader label="Acciones" width="200px" align="center"/>
+                            </listhead>
+                            
+                            <template name="model" var="task">
+                                <listitem sclass="@load(vm.getTaskRowClass(task))">
+                                    
+                                    <!-- Prioridad -->
+                                    <listcell>
+                                        <label value="@load(task.priority)" 
+                                               sclass="@load(vm.getPriorityBadgeClass(task.priority))"/>
+                                    </listcell>
+                                    
+                                    <!-- Nombre tarea -->
+                                    <listcell>
+                                        <div>
+                                            <label value="@load(task.name)" 
+                                                   style="font-weight: bold; display: block;"/>
+                                            <label value="@load(task.description)" 
+                                                   style="font-size: 11px; color: #666; display: block;"
+                                                   visible="@load(not empty task.description)"/>
+                                        </div>
+                                    </listcell>
+                                    
+                                    <!-- Proceso -->
+                                    <listcell>
+                                        <label value="@load(vm.getProcessName(task.processDefinitionId))" 
+                                               style="font-size: 12px;"/>
+                                    </listcell>
+                                    
+                                    <!-- Asignado a -->
+                                    <listcell>
+                                        <label value="@load(empty task.assignee ? 'Sin asignar' : task.assignee)" 
+                                               sclass="@load(empty task.assignee ? 'task-group' : 'task-assigned')"/>
+                                    </listcell>
+                                    
+                                    <!-- Roles (candidateGroups) -->
+                                    <listcell>
+                                        <label value="@load(vm.formatCandidateGroups(task.candidateGroups))" 
+                                               class="txt-mkt"/>
+                                    </listcell>
+                                    
+                                    <!-- Fecha creación -->
+                                    <listcell>
+                                        <label value="@load(task.createTime) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    </listcell>
+                                    
+                                    <!-- Due date -->
+                                    <listcell>
+                                        <label value="@load(task.dueDate) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"
+                                               style="@load(vm.getDueDateStyle(task.dueDate))"/>
+                                    </listcell>
+                                    
+                                    <!-- Acciones -->
+                                    <listcell>
+                                        <div class="d-flex" style="gap: 5px;">
+                                            
+                                            <!-- Abrir formulario -->
+                                            <button label="Abrir" 
+                                                    onClick="@command('openTaskForm', task=task)"
+                                                    iconSclass="z-icon-external-link"
+                                                    disabled="@load(empty task.formKey)"
+                                                    tooltiptext="Abrir formulario de la tarea"
+                                                    class="btn btn-sm btn-primary"/>
+                                            
+                                            <!-- Claim (si no asignada) -->
+                                            <button label="Reclamar" 
+                                                    onClick="@command('claimTask', task=task)"
+                                                    iconSclass="z-icon-hand-paper-o"
+                                                    visible="@load(empty task.assignee)"
+                                                    tooltiptext="Reclamar tarea para mí"
+                                                    class="btn btn-sm btn-success"/>
+                                            
+                                            <!-- Asignar a usuario -->
+                                            <button label="Asignar" 
+                                                    onClick="@command('showAssignDialog', task=task)"
+                                                    iconSclass="z-icon-user-plus"
+                                                    tooltiptext="Asignar a usuario específico"
+                                                    class="btn btn-sm btn-info"/>
+                                            
+                                            <!-- Liberar (si asignada a mí) -->
+                                            <button label="Liberar" 
+                                                    onClick="@command('releaseTask', task=task)"
+                                                    iconSclass="z-icon-unlock"
+                                                    visible="@load(vm.isAssignedToMe(task))"
+                                                    tooltiptext="Liberar tarea"
+                                                    class="btn btn-sm btn-warning"/>
+                                            
+                                        </div>
+                                    </listcell>
+                                    
+                                </listitem>
+                            </template>
+                            
+                        </listbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Detalle de Tarea Seleccionada -->
+        <div class="row mt-4" visible="@load(not empty vm.selectedTask)">
+            <div class="col-12">
+                <div class="card cards-mkt-sf">
+                    <div class="mkt-dp" style="padding: 20px;">
+                        <label class="subtt-mkt mb-3">Detalle de Tarea Seleccionada</label>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label value="ID Tarea:" class="subtt-mkt" style="display: block;"/>
+                                <label value="@load(vm.selectedTask.id)" class="txt-mkt"/>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label value="ID Proceso:" class="subtt-mkt" style="display: block;"/>
+                                <label value="@load(vm.selectedTask.processInstanceId)" class="txt-mkt"/>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label value="Formulario ZUL:" class="subtt-mkt" style="display: block;"/>
+                                <label value="@load(vm.selectedTask.formKey)" class="txt-mkt" style="color: #1976d2;"/>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label value="Owner:" class="subtt-mkt" style="display: block;"/>
+                                <label value="@load(vm.selectedTask.owner)" class="txt-mkt"/>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-12">
+                                <label value="Variables:" class="subtt-mkt" style="display: block;"/>
+                                <html content="@load(vm.getTaskVariables(vm.selectedTask))"/>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
     
     <!-- DIALOG: Asignar tarea a usuario -->
     <window id="assignDialog" 
@@ -258,18 +293,18 @@
             visible="@load(vm.showAssignDialog)"
             onClose="@command('closeAssignDialog')">
         
-        <vlayout spacing="10px" style="padding: 15px;">
+        <div style="padding: 15px;">
             
-            <label value="@load(concat('Tarea: ', vm.taskToAssign.name))" 
+            <label value="@load(vm.taskToAssignTitle)" 
                    style="font-weight: bold; font-size: 14px;"/>
             
-            <separator/>
+            <h:hr />
             
-            <hlayout spacing="10px">
-                <label value="Usuarios disponibles:" style="font-weight: bold; padding-top: 5px;"/>
-                <label value="@load(concat('(', vm.availableUsers.size(), ' usuarios)'))" 
-                       style="color: #666; padding-top: 5px;"/>
-            </hlayout>
+            <div class="d-flex mb-2" style="gap: 10px;">
+                <label value="Usuarios disponibles:" class="subtt-mkt"/>
+                <label value="@load(vm.availableUsersCount)" 
+                       class="txt-mkt"/>
+            </div>
             
             <listbox model="@load(vm.availableUsers)" 
                      selectedItem="@bind(vm.selectedUserToAssign)"
@@ -288,18 +323,19 @@
                 </template>
             </listbox>
             
-            <separator/>
+            <h:hr />
             
-            <hlayout spacing="10px" style="float: right;">
-                <button label="Cancelar" onClick="@command('closeAssignDialog')"/>
+            <div class="d-flex justify-content-end" style="gap: 10px;">
+                <button label="Cancelar" onClick="@command('closeAssignDialog')" class="btn btn-secondary"/>
                 <button label="Asignar" onClick="@command('confirmAssign')" 
                         disabled="@load(empty vm.selectedUserToAssign)"
-                        style="background-color: #1976d2; color: white;"/>
-            </hlayout>
+                        class="btn btn-primary"/>
+            </div>
             
-        </vlayout>
+        </div>
         
-    </window>
+    </div>
     
+	</idspace>
 </zk>
 
