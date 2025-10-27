@@ -273,14 +273,19 @@ Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
 
 **Año 1 (España - Solo AAPP):**
 
+**Escenario Conservador (más realista):**
+
 | Concepto | Cálculo | Revenue Partner |
 |----------|---------|-----------------|
-| **Clientes** | 5-8 AAPP (mix pequeñas/medianas) | - |
-| **Servicios implantación** | 6 clientes × €200K promedio | €1.2M |
-| **Margen servicios (50%)** | €1.2M × 50% | **€600K** |
-| **Licencias (comisión 15%)** | 6 × €40K × 15% | €36K |
-| **TOTAL Año 1** | - | **€636K** |
-| **ROI Inversión** | €636K / €300K | **2.1x** |
+| **Pilotos Q1-Q2 (descuento)** | 2-3 × €10-15K licencia | €30-45K |
+| **Servicios pilotos** | 3 × €150K promedio | €450K |
+| **Margen servicios pilotos (50%)** | €450K × 50% | **€225K** |
+| **Clientes normales Q3-Q4** | 3-5 × €30-40K licencia | €100-200K |
+| **Servicios clientes normales** | 4 × €200K | €800K |
+| **Margen servicios normales (50%)** | €800K × 50% | **€400K** |
+| **TOTAL Margen Año 1** | - | **€625K** |
+| **TOTAL Revenue Licencias** | - | €130-245K |
+| **ROI Inversión (solo margen servicios)** | €625K / €300K | **2.1x** |
 
 **Año 2 (España - AAPP + Empresas):**
 
@@ -310,20 +315,26 @@ Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
 
 ### **Resumen Financiero Partner**
 
-**Solo con servicios en España (sin contar equity):**
+**Solo con servicios en España (escenario conservador):**
 
-| Año | Revenue Servicios | Margen (50%) | ROI Acumulado |
-|-----|------------------|--------------|---------------|
-| **Año 1** | €1.2M | €600K | 2x |
-| **Año 2** | €2.5M | €1.25M | 6-7x |
-| **Año 3** | €4.5M | €2.25M | 14-16x |
+| Año | Clientes | Revenue Servicios | Margen (50%) | ROI Acumulado |
+|-----|----------|------------------|--------------|---------------|
+| **Año 1** | 6-8 | €1.25M | €625K | 2.1x |
+| **Año 2** | 10-15 | €2.5-3M | €1.25-1.5M | 6-7x |
+| **Año 3** | 20-25 | €4-5M | €2-2.5M | 13-16x |
 
 **Como accionista (equity):**
 - Participación en revenue internacional (Europa + LATAM)
 - Upside en Serie A / Exit
-- Dividendos recurrentes
+- Dividendos cuando CodeflowX sea rentable (año 2+)
 
-**Conclusión:** Partner **recupera inversión en 6 meses solo con servicios**, y tiene upside ilimitado como accionista.
+**IMPORTANTE para CodeflowX:**
+- Con 6-8 clientes año 1 (licencias €130-245K), CodeflowX apenas cubre costes
+- **Necesitamos ventas en Q1-Q2** para sostenibilidad
+- Serie A año 2 probable si momentum es bueno
+- Partner es **crítico** para velocidad de cierre (su network AAPP)
+
+**Conclusión:** Partner **recupera inversión en 6-8 meses** solo con servicios. CodeflowX necesita que Partner ejecute rápido para sostener operación.
 
 ---
 
@@ -593,16 +604,24 @@ CodeflowX (AI First):      €1M ARR = 8-10 empleados, Margen 70-80%
 
 ### **Uso de Fondos €300K**
 
-**IMPORTANTE:** El producto está 100% LISTO. Los fondos NO son para desarrollo, sino para **GO-TO-MARKET y PILOTOS**.
+**IMPORTANTE:** El producto está 100% LISTO. Los fondos NO son para desarrollo, sino para **SOSTENIBILIDAD + GO-TO-MARKET + PILOTOS**.
+
+**Burn Rate Real (Honesto):**
+- Fundador/CEO: €6K/mes
+- Developer/Soporte: €1.5K/mes
+- Oficina y operaciones: €2K/mes
+- **Total:** €9.5K/mes = **€114K/año**
 
 | Concepto | Inversión | Justificación |
 |----------|-----------|---------------|
-| **Sales & Marketing** | €120K | 2 Sales Executives + Marketing + Eventos |
-| **Proyectos Piloto (3-5)** | €80K | Implantaciones referencia con descuento/gratis |
-| **Soporte Implantación** | €40K | Consultores para pilotos + onboarding clientes |
-| **Ajustes Post-Piloto** | €30K | Mejoras basadas en feedback real de clientes |
-| **Legal, Certificaciones** | €20K | Contratos, compliance, auditorías si necesarias |
+| **Operaciones Core (12 meses)** | €114K | Fundador + Developer + Oficina (supervivencia básica) |
+| **Sales Executive (Partner lado)** | €60K | 1 comercial dedicado AAPP (año 1) |
+| **Proyectos Piloto (3-5)** | €50K | Descuentos licencia + soporte implantación pilotos |
+| **Marketing & Eventos** | €30K | Materiales, web, eventos AAPP, demos |
+| **Ajustes Producto** | €20K | Mejoras basadas en feedback pilotos |
+| **Legal & Certificaciones** | €16K | Contratos, compliance, sociedad inversión |
 | **Reserva** | €10K | Imprevistos |
+| **TOTAL** | **€300K** | |
 
 **Objetivo Real de los Fondos:**
 1. ✅ Cerrar 3-5 **clientes piloto** (AAPP preferiblemente)
@@ -620,11 +639,20 @@ CodeflowX (AI First):      €1M ARR = 8-10 empleados, Margen 70-80%
 - AAPP especialmente: necesitan ver casos previos
 - Pilotos con descuento = forma rápida de ganar credibilidad
 - Partner gana desde día 1 en servicios (mientras producto madura)
-- Año 2: Con referencias, vendemos a precio completo
+- **CRÍTICO:** Necesitamos primeras ventas en Q1-Q2 para sostenibilidad más allá de 12 meses
 
-**Burn rate:** €25K/mes → **Runway 12 meses**
+**Burn Rate y Runway:**
+- **Burn rate:** €9.5K/mes (sin comercial) / €14.5K/mes (con comercial Partner)
+- **Runway con €300K:** 12 meses (ajustado)
+- **Break-even objetivo:** Mes 6-8 con primeras ventas (€30-50K/cliente)
 
-**Break-even:** Mes 8-10 (cuando pilotos se convierten en clientes pagando + nuevos cierran)
+**Escenario Realista:**
+- Meses 1-3: Setup + identificación targets + cierre primeros 2 pilotos
+- Meses 4-6: Implantación pilotos + cierre 2-3 clientes más (ya a precio normal)
+- Meses 7-9: Con referencias, cerrar 3-5 clientes adicionales
+- Meses 10-12: Flujo sostenible, preparación Serie A si aplicable
+
+**Punto crítico:** Necesitamos **cerrar 5-8 clientes en año 1** para sostener operación año 2 sin Serie A inmediata
 
 ---
 
