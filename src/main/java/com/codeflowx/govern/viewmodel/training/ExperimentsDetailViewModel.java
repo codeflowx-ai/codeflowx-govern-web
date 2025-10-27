@@ -467,22 +467,19 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
                 .filter(r -> "RUNNING".equals(r.getTrnstatus()))
                 .count();
             
-            // Encontrar mejor score
-            experimentRuns.stream()
-                .filter(r -> r.getTrnscore() != null)
-                .max((r1, r2) -> r1.getTrnscore().compareTo(r2.getTrnscore()))
-                .ifPresent(bestRun -> {
-                    bestScore = bestRun.getTrnscore();
-                    bestRunId = bestRun.getTrnrunid();
-                });
+            // NOTE: Run no tiene campo trnsc ore directo. 
+            // El score estaría en TrainingMetric asociado al Run
+            // Por ahora dejamos en 0
+            bestScore = BigDecimal.ZERO;
+            bestRunId = "";
             
-            // Calcular tiempo promedio
+            // Calcular tiempo promedio de duración (trnendtime - trnstarttime)
             if (!experimentRuns.isEmpty()) {
                 long totalTime = experimentRuns.stream()
-                    .filter(r -> r.getTrnduration() != null)
-                    .mapToLong(r -> r.getTrnduration())
+                    .filter(r -> r.getTrnstarttime() != null && r.getTrnendtime() != null)
+                    .mapToLong(r -> r.getTrnendtime().getTime() - r.getTrnstarttime().getTime())
                     .sum();
-                avgTrainingTime = (double) totalTime / experimentRuns.size();
+                avgTrainingTime = totalTime > 0 ? (double) totalTime / experimentRuns.size() / 1000.0 : 0.0; // convertir a segundos
             }
             
             log.info("KPIs calculados - Total Runs: {}, Completed: {}, Best Score: {}", 
@@ -564,7 +561,8 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         log.info("Iniciando experimento: {}", currentExperiment.getIdxexperiment());
         try {
             currentExperiment.setTrnlifecyclestage("RUNNING");
-            currentExperiment.setTrnstartedat(new Timestamp(System.currentTimeMillis()));
+            // TODO: Verificar si existe trnstartedat o es otro atributo
+            // currentExperiment.setTrnstartedat(new Timestamp(System.currentTimeMillis()));
             // trnupdatedby es UUID, no String
             // currentExperiment.setTrnupdatedby(getUser().getUsername());
             currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
@@ -586,10 +584,10 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         log.info("Deteniendo experimento: {}", currentExperiment.getIdxexperiment());
         try {
             currentExperiment.setTrnlifecyclestage("STOPPED");
-            currentExperiment.setTrnfinishedat(new Timestamp(System.currentTimeMillis()));
+            // NOTE: Experiment no tiene trnfinishedat, solo tiene trncreatedat/trnupdatedat
+            currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
             // trnupdatedby es UUID, no String
             // currentExperiment.setTrnupdatedby(getUser().getUsername());
-            currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
             
             businessService.save(currentExperiment);
             
