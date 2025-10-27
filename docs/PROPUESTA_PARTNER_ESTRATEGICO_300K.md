@@ -34,9 +34,16 @@ Buscamos un **socio tecnológico estratégico** que:
 
 **Por qué esto es WIN-WIN:**
 - **Partner:** Compite DESDE YA (producto listo) + Gana más en servicios que en licencias + Es accionista con upside
-- **CodeflowX:** Nos enfocamos en tecnología, I+D y expansión internacional
+- **CodeflowX:** Nos enfocamos 100% en producto, I+D y expansión internacional (NO servicios)
 - **Mercado:** España para Partner (exclusividad AAPP), resto del mundo para CodeflowX
 - **Estrategia pilotos:** 3-5 clientes año 1 con licencia descuento (50-70%) pero servicios precio completo = Referencias oro para escalar año 2
+
+**Visión CodeflowX (importante entender):**
+- **Somos una product company**, NO una empresa de servicios
+- **Objetivo 5 años:** Líder europeo en AI Governance self-hosted
+- **Estrategia crecimiento:** Rondas Serie A, B... para expansión internacional acelerada
+- **Foco:** Producto clase mundial + Mercado global (Europa, LATAM, USA)
+- **Partner se beneficia:** Cada ronda revaloriza equity + mantiene exclusividad España + participa del crecimiento global
 
 ---
 
@@ -410,11 +417,34 @@ Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
 - CodeflowX expande a Europa y LATAM
 - Partner se beneficia sin invertir en go-to-market internacional
 
-### **6. Exit Strategy**
+### **6. Visión de Crecimiento y Upside para Accionistas**
 
-- Serie A en 18-24 meses → Revalorización equity
-- Adquisición por grande (Oracle, SAP, IBM, Salesforce) → Exit
-- IPO largo plazo → Máximo upside
+**Estrategia de Crecimiento CodeflowX (5 años):**
+
+**Año 1-2 (Seed €300K):**
+- Validación España (Partner)
+- Primeros clientes Europa y LATAM (CodeflowX directo)
+- Product-market fit consolidado
+
+**Año 2-3 (Serie A):**
+- Objetivo: Expansión acelerada internacional
+- Uso fondos: Sales teams Europa y LATAM, I+D producto
+- Partner se beneficia: Revalorización equity, mantiene exclusividad España
+
+**Año 3-5 (Serie B/C - si necesarias):**
+- Objetivo: Escala global, dominancia en AI Governance self-hosted
+- Partner se beneficia: Máxima revalorización, dividendos crecientes
+
+**Por qué esto importa al Partner:**
+- CodeflowX tiene **ambición internacional seria** (no solo España)
+- Cada ronda de crecimiento **revaloriza equity del Partner**
+- Partner equity early → Máximo upside en futuras rondas
+- Enfoque claro: CodeflowX = Producto + Internacional, Partner = España
+
+**Exit Scenarios (5-10 años):**
+- Adquisición estratégica (Oracle, SAP, IBM, Salesforce, Red Hat)
+- IPO largo plazo (si llegamos a dominancia europea)
+- **Realista:** Adquisición en 5-7 años por grande que quiera self-hosted AI Governance
 
 ---
 
