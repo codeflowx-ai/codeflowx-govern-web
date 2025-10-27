@@ -15,10 +15,11 @@
 **Propuesta para [NOMBRE PARTNER]:**
 
 Buscamos un **socio tecnológico estratégico** que:
-1. **Invierta €300K** (o co-inversión con otros fondos)
+1. **Invierta €300K** por equity 15-25% (a negociar)
 2. **Se convierta en accionista** de CodeflowX
 3. **Tenga exclusividad comercial** en España (especialmente Administraciones Públicas)
 4. **Acceso a su red** de clientes medianas y grandes empresas
+5. **Pueda competir DESDE YA** con producto 100% listo (sin esperar desarrollo)
 
 **Nuestra propuesta de valor para el Partner:**
 
@@ -32,37 +33,59 @@ Buscamos un **socio tecnológico estratégico** que:
 | **ROI Servicios** | 3-6x la inversión solo en servicios año 1-2 |
 
 **Por qué esto es WIN-WIN:**
-- **Partner:** Gana más en servicios de implantación que vendiendo licencias a comisión + es accionista
-- **CodeflowX:** Nos enfocamos en tecnología, producto, I+D y expansión internacional
-- **Mercado:** España para Partner, resto del mundo para CodeflowX
+- **Partner:** Compite DESDE YA (producto listo) + Gana más en servicios que en licencias + Es accionista con upside
+- **CodeflowX:** Nos enfocamos en tecnología, I+D y expansión internacional
+- **Mercado:** España para Partner (exclusividad AAPP), resto del mundo para CodeflowX
+- **Estrategia pilotos:** 3-5 clientes año 1 con licencia descuento (50-70%) pero servicios precio completo = Referencias oro para escalar año 2
 
 ---
 
 ## ¿POR QUÉ CODEFLOWX ES UNA OPORTUNIDAD ÚNICA?
 
-### **Construimos una plataforma de €3-5M por €150-200K**
+### **Producto V1.0 Funcional - Necesita Validación en Cliente Real**
 
-**Lo que normalmente costaría desarrollar:**
-- **Equipo:** 20-30 personas
-- **Tiempo:** 24-36 meses
-- **Inversión:** €3.2M - €5M
-- **Stack:** Frontend (500+ pantallas) + Backend microservicios + Infraestructura IA/GPU + Training + RAG + Agentes + 200 conectores + SDKs (Java/Python) + Self-hosted/Cloud
+**Situación Real:**
+- ✅ Producto V1.0 **funcional y desplegable** técnicamente
+- ⚠️ **NO validado en cliente real** (necesitamos pilotos)
+- ✅ Stack completo construido (frontend, backend, IA, deployment)
+- ⚠️ Necesita ajustes UX/features basados en uso real
+- ✅ Arquitectura sólida enterprise-grade
+- ⚠️ Sin referencias ni casos de éxito (todavía)
 
-**Lo que hicimos con AI First 80/20:**
-- **Equipo:** 2 developers + IA
-- **Tiempo:** 12 meses
-- **Inversión:** €150-200K
-- **Resultado:** Plataforma enterprise-grade 100% funcional y desplegable
+**Por qué esto es una oportunidad:**
+- Partner entra en **fase piloto** (no desarrollo desde cero)
+- €300K para pilotos y ajustes (no para construir el producto)
+- Time-to-market: 3-6 meses a producto market-fit vs 3 años desarrollo
+- **Honestidad:** Es una V1.0 que necesita clientes reales para madurar
 
+### **¿Por qué NO intentar replicarlo?**
+
+**Tiempo y Coste Real:**
+- Desarrollo completo: **24-36 meses** mínimo
+- Inversión necesaria: **€3-5M** (equipo + infraestructura)
+- Riesgo de fracaso: **Alto** (complejidad técnica BPMN + IA + Governance)
+
+**Coste de Oportunidad:**
 ```
-RATIO DE EFICIENCIA: 16-25x vs desarrollo tradicional
+Mientras Partner desarrolla (2-3 años):
+→ Competencia (con CodeflowX u otros) captura mercado AAPP
+→ Pierde €5-10M en servicios
+→ Referencias van a competidores
+→ EU AI Act ya en vigor (urgencia perdida)
 ```
 
-**Implicación para el Partner:**
-- Producto **MADURO y LISTO** para vender e implantar HOY
-- Sin riesgo técnico (ya está construido)
-- Sin riesgo de mercado (EU AI Act obliga governance desde 2025)
-- **Solo ejecución comercial** (donde el Partner es fuerte)
+**Complejidad Real:**
+- No es solo "una app": Es BPMN + Rules Engine + IA/ML + RAG + Multi-GPU + Governance
+- Know-how especializado: 12 meses solo en R&D y arquitectura
+- Certificaciones y compliance: 6-12 meses adicionales
+- **Total realista: 3-4 años para producto equivalente**
+
+**Conclusión:** Partner puede intentar replicar, pero cuando esté listo (3-4 años):
+1. Mercado AAPP ya capturado por quien se movió primero
+2. Inversión de €3-5M sin retorno
+3. Referencias perdidas (efecto dominó en AAPP)
+
+**Alianza = Time-to-market inmediato + Coste 10x menor + Riesgo cero**
 
 ---
 
@@ -106,33 +129,32 @@ RATIO DE EFICIENCIA: 16-25x vs desarrollo tradicional
 Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
 ```
 
-### **Stack Técnico Completo**
+### **Capacidades de Alto Nivel**
 
-**Frontend:**
-- 500+ pantallas funcionales (ZK Framework)
-- Gestión completa de workflows
-- Auto-instalable
+**Cobertura Funcional:**
+- ✅ 22 procesos BPMN de governance implementados
+- ✅ Interfaz web completa (gestión, workflows, dashboards)
+- ✅ APIs REST para integración
+- ✅ Governance end-to-end (Datasets → Modelos → Producción)
+- ✅ Auto-instalable self-hosted + cloud-ready
 
-**Backend (Microservicios):**
-- Java + Spring Boot + Flowable (BPMN) + Drools (Rules Engine)
-- APIs REST completas
-- 22 procesos implementados
-- Sistema de agentes IA
-- RAG avanzado
-- Training de modelos
-- ~200 conectores
+**Capacidades IA/ML:**
+- ✅ Inferencia multi-modal (texto, imagen, video)
+- ✅ Training y fine-tuning de modelos
+- ✅ RAG (Retrieval Augmented Generation)
+- ✅ Sistema de agentes inteligentes
+- ✅ Adaptación de modelos (Adapters, Merge, Quantization)
 
-**Infraestructura IA:**
-- Inferencia multi-GPU (texto → video)
-- Training distribuido
-- RAG avanzado con vector DBs
-- Sistema de agentes inteligentes
+**Integraciones:**
+- ✅ ~200 conectores (clouds, databases, APIs, herramientas)
+- ✅ SDKs para extensibilidad (Java, Python)
+- ✅ Autenticación enterprise (OAuth2, SAML, LDAP)
 
-**SDKs y Deployment:**
-- SDK Java completo
-- SDK Python completo
-- Auto-instalable self-hosted
-- Cloud-ready (multi-tenant)
+**Deployment:**
+- ✅ On-premise (self-hosted)
+- ✅ Cloud (multi-tenant)
+- ✅ Híbrido
+- ✅ Auto-instalación guiada
 
 ---
 
@@ -400,71 +422,77 @@ Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
 
 ### **Por qué CodeflowX tiene unit economics excepcionales**
 
-No es solo el producto, **es cómo operamos:**
+Aplicamos metodología **AI First 80/20** en toda la operación:
 
-**Empresa SaaS Tradicional:**
+**Resultado:**
 ```
-€1M ARR = 20-25 empleados
-Margen bruto: 40-50%
-Escalabilidad: Lineal (contratar más gente)
-```
-
-**CodeflowX (AI First 80/20):**
-```
-€1M ARR = 8-10 empleados (80% automatizado)
-Margen bruto: 70-80%
-Escalabilidad: Exponencial (sin aumentar headcount)
+Empresa SaaS Tradicional:  €1M ARR = 20-25 empleados, Margen 40-50%
+CodeflowX (AI First):      €1M ARR = 8-10 empleados, Margen 70-80%
 ```
 
-**Aplicamos 80% IA / 20% Humano en TODO:**
-- ✅ Desarrollo: 80% code generation con IA
-- ✅ Onboarding: 80% scripts automatizados
-- ✅ Soporte: 80% self-service + chatbot IA
-- ✅ DevOps: 80% CI/CD automatizado
-- ✅ Operaciones: 80% monitoring automatizado
+**Implicación para Partner como accionista:**
+- ✅ CodeflowX **rentable desde día 1** con pocos clientes
+- ✅ No necesitamos Series B, C, D... para crecer
+- ✅ **Dividendos predecibles** más rápido que startup tradicional
+- ✅ Burn rate bajísimo → Runway largo → Menor riesgo inversión
+- ✅ Escalabilidad sin aumentar headcount linealmente
 
-**Implicación para Partner:**
-- CodeflowX es **rentable desde día 1** con pocos clientes
-- No necesitamos Series B, C, D... para crecer
-- **Dividendos predecibles** para accionistas
-- Burn rate bajísimo → Runway largo → Menor riesgo
+**Por qué esto importa:**
+- Margen bruto 70-80% → Más cash disponible para dividendos
+- Burn bajo → Menor dilución en futuras rondas
+- Eficiencia → Valoraciones mejores en Serie A (si aplicable)
 
 ---
 
 ## ROADMAP 12 MESES POST-INVERSIÓN
 
-### **Q1 (Meses 1-3): Setup + Go-to-Market**
+### **Q1 (Meses 1-3): Setup + Go-to-Market + Pilotos**
 
 **CodeflowX:**
-- Onboarding Partner (formación técnica y comercial)
-- Adaptaciones específicas mercado España (si necesarias)
+- Onboarding Partner (formación técnica y comercial: 1 semana intensiva)
 - Materiales comerciales co-branded
 - Setup infraestructura soporte compartido
+- Preparación entorno demo y POC
 
 **Partner:**
 - Contratación 2 Sales Executives AAPP
 - Identificación primeros 10-15 targets AAPP
-- Primeras reuniones exploratorias
+- **Cierre 2-3 pilotos** (con descuento 50-70% licencia año 1)
 - Setup equipo implantación (2-3 consultores)
 
-**Meta Q1:** Pipeline de €1.5-2M identificado
+**Estrategia Pilotos Q1:**
+- Licencia: €10-15K (vs €30-50K precio normal)
+- Servicios implantación: **Precio completo** €150-300K
+- Partner gana €75-150K margen en cada piloto
+- **Objetivo:** Referencias verificables para Q2-Q3
+
+**Meta Q1:** 
+- 2-3 pilotos cerrados
+- Pipeline €1.5-2M identificado
 
 ---
 
-### **Q2 (Meses 4-6): Primeros Clientes**
+### **Q2 (Meses 4-6): Referencias + Escala**
 
 **CodeflowX:**
-- Soporte técnico nivel 3 en implantaciones
-- Mejoras producto basadas en feedback
-- Desarrollo conectores específicos si necesarios
+- Soporte técnico nivel 3 en pilotos
+- Ajustes basados en feedback pilotos
+- Casos de éxito documentados
 
 **Partner:**
-- Cierre primeros 2-3 clientes AAPP
-- Inicio implantaciones
-- Casos de estudio y referencias
-- Ampliación pipeline
+- **Cierre 3-4 clientes nuevos** (ya a precio normal, con referencias pilotos)
+- Marketing casos éxito pilotos Q1
+- Eventos y webinars con testimonios clientes
+- Ampliación pipeline aprovechando referencias
 
-**Meta Q2:** 2-3 clientes cerrados, €400-600K en servicios
+**Pricing Q2:**
+- Licencias: Precio normal €30-50K (pilotos Q1 ya demostraron valor)
+- Servicios: €150-300K por cliente
+
+**Meta Q2:** 
+- 3-4 clientes nuevos cerrados
+- €600-900K servicios acumulado (Q1+Q2)
+- 5-7 clientes total
 
 ---
 
@@ -535,17 +563,38 @@ Escalabilidad: Exponencial (sin aumentar headcount)
 
 ### **Uso de Fondos €300K**
 
+**IMPORTANTE:** El producto está 100% LISTO. Los fondos NO son para desarrollo, sino para **GO-TO-MARKET y PILOTOS**.
+
 | Concepto | Inversión | Justificación |
 |----------|-----------|---------------|
-| **Sales & Marketing** | €120K | 2 Sales Executives (Partner + CodeflowX) + Marketing |
-| **Producto y Desarrollo** | €80K | Mejoras, conectores, certificaciones |
-| **Operaciones y Soporte** | €40K | Infraestructura, herramientas, soporte |
-| **Legal y Admin** | €30K | Contratos, compliance, contabilidad |
-| **Reserva** | €30K | Imprevistos, oportunidades |
+| **Sales & Marketing** | €120K | 2 Sales Executives + Marketing + Eventos |
+| **Proyectos Piloto (3-5)** | €80K | Implantaciones referencia con descuento/gratis |
+| **Soporte Implantación** | €40K | Consultores para pilotos + onboarding clientes |
+| **Ajustes Post-Piloto** | €30K | Mejoras basadas en feedback real de clientes |
+| **Legal, Certificaciones** | €20K | Contratos, compliance, auditorías si necesarias |
+| **Reserva** | €10K | Imprevistos |
+
+**Objetivo Real de los Fondos:**
+1. ✅ Cerrar 3-5 **clientes piloto** (AAPP preferiblemente)
+   - **Realidad:** Licencia con descuento 50-70% año 1 (€10-15K)
+   - **Por qué:** Necesitamos validar producto en cliente real
+   - **Partner:** Cobra servicios implantación precio completo (€150-300K)
+   - **Ganar-Ganar:** Partner gana en servicios, nosotros validamos producto
+2. ✅ Ajustar producto basado en feedback real (no teoría)
+3. ✅ Casos de éxito y referencias (necesarios para vender después)
+4. ✅ Madurar V1.0 → V1.5 con input clientes reales
+5. ✅ Pipeline identificado para año 2 (con referencias ya disponibles)
+
+**Por qué esto es honesto y realista:**
+- V1.0 funciona técnicamente, pero **nadie compra sin referencias**
+- AAPP especialmente: necesitan ver casos previos
+- Pilotos con descuento = forma rápida de ganar credibilidad
+- Partner gana desde día 1 en servicios (mientras producto madura)
+- Año 2: Con referencias, vendemos a precio completo
 
 **Burn rate:** €25K/mes → **Runway 12 meses**
 
-**Break-even:** Mes 8-10 (con 6-8 clientes)
+**Break-even:** Mes 8-10 (cuando pilotos se convierten en clientes pagando + nuevos cierran)
 
 ---
 
@@ -555,20 +604,25 @@ Escalabilidad: Exponencial (sin aumentar headcount)
 
 | Riesgo | Probabilidad | Impacto | Mitigación |
 |--------|--------------|---------|------------|
+| **Producto V1.0 necesita ajustes** | **Alta** | Medio | €30K budget ajustes, feedback pilotos rápido |
+| **Sin referencias/casos éxito** | **Alta** | Alto | Estrategia pilotos con descuento Q1-Q2 |
 | **Ciclos venta AAPP largos** | Alta | Medio | Pipeline amplio, cashflow servicios, Partner con contactos |
-| **Competencia reacciona** | Media | Medio | Barrera técnica self-hosted, 12-18 meses ventaja |
-| **Adopción IA más lenta** | Baja | Alto | EU AI Act obliga, no es opcional |
-| **Dependencia tecnológica** | Media | Medio | CodeflowX IP completa, documentación, Partner participa en roadmap |
+| **Product-market fit no perfecto** | Media | Medio | Pilotos para validar, iteración rápida |
+| **Competencia reacciona** | Media | Medio | Ventaja 12-18 meses, barrera técnica self-hosted |
+| **Dependencia 1-2 personas clave** | Media | Alto | Documentación, Partner aprende tecnología, contratación |
 
-### **Ventajas de Riesgo**
+### **Riesgos Reales (sin marketing)**
 
-**Lo que NO es riesgo (vs startup típica):**
-- ✅ Riesgo técnico: **CERO** (producto listo)
-- ✅ Riesgo product-market fit: **BAJO** (mercado validado)
-- ✅ Riesgo regulatorio: **BAJO** (EU AI Act favorable)
-- ✅ Riesgo competencia: **BAJO** (ventaja defendible)
+**Lo que SÍ es riesgo:**
+- ⚠️ **Producto V1.0:** Funcional pero sin validación cliente real
+- ⚠️ **Sin casos éxito:** Necesitamos pilotos para credibilidad
+- ⚠️ **Team pequeño:** Dependencia de personas clave (mitigable con inversión)
+- ⚠️ **Ciclos AAPP largos:** 6-12 meses típico (pero Partner tiene contactos)
 
-**Único riesgo real:** Ejecución comercial (donde Partner es fuerte)
+**Lo que NO es riesgo:**
+- ✅ Tecnología funciona (V1.0 desplegable)
+- ✅ Mercado existe (EU AI Act obliga)
+- ✅ Diferenciación clara (self-hosted único)
 
 ---
 
@@ -670,53 +724,7 @@ Escalabilidad: Exponencial (sin aumentar headcount)
 
 ## ANEXOS
 
-### **Anexo A: Stack Técnico Detallado**
-
-**Frontend:**
-- Framework: ZK 10.x (Java-based)
-- Pantallas: 500+ auto-generadas
-- UX: Responsive, moderna, accesible
-- Deployment: War/Docker
-
-**Backend:**
-- Lenguaje: Java 17+, Python 3.10+
-- Framework: Spring Boot 3.x
-- BPMN Engine: Flowable 7.x
-- Rules Engine: Drools 8.x
-- APIs: REST + OpenAPI 3.0
-- Microservicios: 15+ servicios
-- Conectores: ~200 (cloud, on-premise, databases, APIs)
-
-**Data Layer:**
-- Database: PostgreSQL 14+
-- Vector DB: pgvector / Qdrant
-- Cache: Redis
-- Storage: S3-compatible
-
-**IA/ML:**
-- Frameworks: PyTorch, TensorFlow, Transformers
-- RAG: LangChain, LlamaIndex
-- LLM Integration: OpenAI, Anthropic, Mistral, Llama, etc.
-- Training: Distributed training multi-GPU
-- Inference: vLLM, TGI, Triton
-- Adapters: LoRA, QLoRA, PEFT
-
-**DevOps:**
-- Containers: Docker, Kubernetes
-- CI/CD: GitLab CI, GitHub Actions
-- Monitoring: Prometheus, Grafana
-- Logging: ELK Stack
-- Auto-install: Scripts Ansible + Terraform
-
-**Security:**
-- Auth: OAuth2, SAML, LDAP
-- Encryption: TLS 1.3, AES-256
-- Auditing: Completo end-to-end
-- Compliance: GDPR, ENS (España), ISO 27001 ready
-
----
-
-### **Anexo B: Casos de Uso AAPP**
+### **Anexo A: Casos de Uso AAPP**
 
 **Caso 1: Ministerio - Chatbots Ciudadanos**
 - Problema: 50+ chatbots sin governance, riesgo alucinaciones
@@ -740,23 +748,29 @@ Escalabilidad: Exponencial (sin aumentar headcount)
 
 ---
 
-### **Anexo C: Referencias y Validación Mercado**
+### **Anexo C: Validación Mercado (Honesta)**
 
 **Prospección 12 meses (España + LATAM):**
-- Reuniones con: 30+ clientes potenciales
+- Reuniones exploratorias: ~30 contactos
 - Sectores: AAPP (40%), Banca (25%), Telco (15%), Seguros (10%), Otros (10%)
-- Feedback: 85% considera self-hosted crítico
-- Pain points validados: Soberanía (90%), Compliance (85%), Costos (75%)
+- **Realidad:** Conversaciones iniciales, NO clientes comprometidos
+- Feedback recurrente: Self-hosted es crítico, pero todos piden referencias
+- Pain points confirmados: Soberanía, Compliance, Costos
 
-**Partners interesados:**
-- Integradores TI: 5+ con access a AAPP
-- Consultoras: 3+ con practice IA
-- Cloud providers: 2+ para marketplace
+**Partners interesados (conversaciones):**
+- Integradores TI: 5+ han mostrado interés
+- Consultoras: 3+ interesadas en alianza
+- **Realidad:** Interés ≠ Compromiso (necesitan ver producto en cliente real)
 
 **Competencia analizada:**
-- Vertex AI, SageMaker, Azure ML: Cloud-only, no competencia en self-hosted
-- MLflow, Kubeflow: Open source, no governance completa, no soporte enterprise
-- Startups: Sin producto maduro, sin soporte enterprise
+- Vertex AI, SageMaker, Azure ML: Cloud-only (no compiten en self-hosted)
+- MLflow, Kubeflow: Open source (sin governance completa ni soporte)
+- **Ventana de oportunidad:** 12-18 meses antes de que reaccionen
+
+**Conclusión honesta:**
+- Mercado existe y es real
+- Pain points validados en conversaciones
+- **Falta:** Clientes reales y referencias (por eso los €300K)
 
 ---
 
