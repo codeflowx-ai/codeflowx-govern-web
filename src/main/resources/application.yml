@@ -117,13 +117,21 @@ spring:
   kafka:
      bootstrap-servers: ${KAFKA_SERVER:51.68.86.22:31807}
      
+# BPMN Microservice Configuration
+bpmn:
+  service:
+    # URL del microservicio BPMN (cuando esté desplegado)
+    url: http://codeflowx-bpmn-service:8081
+    # Modo MOCK para demos (sin microservicio real)
+    mock-mode: true
+    
+# Flowable Engine (DESHABILITADO para demo)
+# Los procesos BPMN se ejecutarán en microservicio separado
 flowable:
-  # Auto-detecta BPMNs en classpath:/processes/
-  process-definition-location-prefix: classpath*:/processes/
-  process-definition-location-suffixes: "**.bpmn20.bpmn,**.bpmn20.xml,**.bpmn"
+  enabled: false  # Deshabilita Flowable embebido
   
-  # Crea/actualiza tablas ACT_* automáticamente
-  database-schema-update: true
-  
-  # Async executor para jobs
-  async-executor-activate: true
+  # Configuración comentada - se usará en microservicio BPMN
+  # process-definition-location-prefix: classpath*:/processes/
+  # process-definition-location-suffixes: "**.bpmn20.bpmn,**.bpmn20.xml,**.bpmn"
+  # database-schema-update: true
+  # async-executor-activate: true
