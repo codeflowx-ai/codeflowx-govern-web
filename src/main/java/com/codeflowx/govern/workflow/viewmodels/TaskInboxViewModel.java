@@ -203,7 +203,7 @@ public class TaskInboxViewModel extends MasterPage {
      * Cargar tareas pendientes del usuario
      */
     @Command
-    @NotifyChange({"allTasks", "filteredTasks", "totalTasks", "assignedToMeCount", "groupTasksCount", "processDefinitions"})
+    @NotifyChange({"allTasks", "filteredTasks", "totalTasks", "assignedToMeCount", "groupTasksCount", "processDefinitions", "labelTotal"})
     public void loadTasks() {
         // Auto-detectar MOCK mode si Flowable no está disponible
         if (mockMode || taskManagementService == null) {
