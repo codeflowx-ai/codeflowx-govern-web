@@ -762,7 +762,7 @@ public class DashboardUI extends MasterHandler {
 		if (item.isDesktop()) {
 			item.getPage();
 			item.getPageUrl();
-			if (item.getNamespace() != null) {
+			if (item.getNamespace() != null && !item.getPageUrl().startsWith("/")){
 				appendDashboard(item.getNamespace(), item.getPageUrl(), container);
 			} else if (item.getPageUrl() != null) {
 				appendDashboard(null, item.getPageUrl(), container);
