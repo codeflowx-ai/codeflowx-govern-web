@@ -1,0 +1,248 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.DashboardViewModel')">
+        
+        <!-- Header -->
+        <div class="row">
+            <div>
+                <div class="left tittle-principal">
+                    <h:h2 class="mb-sm-0">Dashboard AI Governance</h:h2>
+                    <label value="Resumen de tu sistema de gobierno IA" style="color: var(--second-aux);"/>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Métricas principales -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <label value="Total Tareas" style="color: var(--second-aux); font-size: 14px;"/>
+                                <h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.totalTasks)
+                                </h3>
+                            </div>
+                            <div style="font-size: 40px; color: var(--first-aux);">
+                                <i class="fa-duotone fa-tasks"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <label value="Asignadas a Mí" style="color: var(--second-aux); font-size: 14px;"/>
+                                <h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.assignedToMeCount)
+                                </h3>
+                            </div>
+                            <div style="font-size: 40px; color: #28a745;">
+                                <i class="fa-duotone fa-user"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <label value="Tareas Críticas" style="color: var(--second-aux); font-size: 14px;"/>
+                                <h3 style="margin: 0; font-weight: bold; color: #dc3545;">
+                                    @load(vm.criticalTasksCount)
+                                </h3>
+                            </div>
+                            <div style="font-size: 40px; color: #dc3545;">
+                                <i class="fa-duotone fa-exclamation-triangle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <div class="flex-grow-1">
+                                <label value="De Mis Roles" style="color: var(--second-aux); font-size: 14px;"/>
+                                <h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.groupTasksCount)
+                                </h3>
+                            </div>
+                            <div style="font-size: 40px; color: #6c757d;">
+                                <i class="fa-duotone fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Otras métricas -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <label value="Modelos Activos" style="color: var(--second-aux); font-size: 12px;"/>
+                        <h4 style="margin: 5px 0; font-weight: bold;">@load(vm.activeModels)</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <label value="Agentes Activos" style="color: var(--second-aux); font-size: 12px;"/>
+                        <h4 style="margin: 5px 0; font-weight: bold;">@load(vm.activeAgents)</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <label value="Checks Compliance" style="color: var(--second-aux); font-size: 12px;"/>
+                        <h4 style="margin: 5px 0; font-weight: bold;">@load(vm.totalComplianceChecks)</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <label value="Aprobaciones Pendientes" style="color: var(--second-aux); font-size: 12px;"/>
+                        <h4 style="margin: 5px 0; font-weight: bold;">@load(vm.pendingApprovals)</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tareas Urgentes -->
+        <div class="row">
+            <div class="col-lg-8 s-bot">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 style="margin: 0; font-weight: bold;">Tareas Urgentes (CRITICAL)</h5>
+                        <button onClick="@command('openTaskInbox')" 
+                                class="btn btn-sm btn-outline-primary">
+                            <i class="fa-duotone fa-external-link"></i> Ver Todas
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <grid model="@load(vm.urgentTasks)" 
+                              emptyMessage="No hay tareas urgentes"
+                              style="border: none;">
+                            <columns>
+                                <column label="Prioridad" width="100px" align="center"/>
+                                <column label="Tarea" width="250px"/>
+                                <column label="Asignado" width="150px"/>
+                                <column label="Roles" width="200px"/>
+                                <column label="Vencimiento" width="130px" align="center"/>
+                                <column label="Acción" align="center" width="80px"/>
+                            </columns>
+                            <template name="model" var="task">
+                                <row style="cursor: pointer;"
+                                     onClick="@command('openTask', task=task)">
+                                    
+                                    <!-- Prioridad -->
+                                    <cell align="center">
+                                        <span class="@load(vm.getPriorityBadgeClass(task.priority))">
+                                            @load(vm.getPriorityText(task.priority))
+                                        </span>
+                                    </cell>
+                                    
+                                    <!-- Tarea -->
+                                    <cell>
+                                        <label value="@load(task.name)" 
+                                               style="font-weight: 500; display: block;"/>
+                                        <label value="@load(task.description)" 
+                                               style="font-size: 11px; color: var(--second-aux); display: block;"
+                                               visible="@load(not empty task.description)"/>
+                                    </cell>
+                                    
+                                    <!-- Asignado -->
+                                    <cell>
+                                        <label value="@load(empty task.assignee ? 'Sin asignar' : task.assignee)" 
+                                               style="@load(empty task.assignee ? 'color: var(--second-aux); font-style: italic;' : 'font-weight: 500;')"/>
+                                    </cell>
+                                    
+                                    <!-- Roles -->
+                                    <cell>
+                                        <label value="@load(vm.formatCandidateGroups(task.candidateGroups))" 
+                                               style="font-size: 11px; color: var(--second-aux);"/>
+                                    </cell>
+                                    
+                                    <!-- Vencimiento -->
+                                    <cell align="center">
+                                        <label value="@load(task.dueDate) @converter('formatedDate', format='dd/MM HH:mm')"
+                                               style="color: #dc3545; font-weight: bold;"/>
+                                    </cell>
+                                    
+                                    <!-- Acción -->
+                                    <cell align="center">
+                                        <a onClick="@command('openTask', task=task)"
+                                           iconSclass="fa-duotone fa-eye"
+                                           style="color: var(--first-aux); cursor: pointer;"
+                                           tooltiptext="Ver detalles"
+                                           visible="@load(not empty task.formKey)"/>
+                                    </cell>
+                                </row>
+                            </template>
+                        </grid>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Accesos Rápidos -->
+            <div class="col-lg-4 s-bot">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 style="margin: 0; font-weight: bold;">Accesos Rápidos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <button onClick="@command('openTaskInbox')" 
+                                    class="btn btn-outline-primary"
+                                    style="justify-content: flex-start; text-align: left;">
+                                <i class="fa-duotone fa-tasks" style="margin-right: 10px;"></i>
+                                Bandeja de Tareas
+                            </button>
+                            <button class="btn btn-outline-secondary"
+                                    style="justify-content: flex-start; text-align: left;">
+                                <i class="fa-duotone fa-shield-halved" style="margin-right: 10px;"></i>
+                                Compliance Dashboard
+                            </button>
+                            <button class="btn btn-outline-secondary"
+                                    style="justify-content: flex-start; text-align: left;">
+                                <i class="fa-duotone fa-robot" style="margin-right: 10px;"></i>
+                                Modelos IA
+                            </button>
+                            <button class="btn btn-outline-secondary"
+                                    style="justify-content: flex-start; text-align: left;">
+                                <i class="fa-duotone fa-flask" style="margin-right: 10px;"></i>
+                                Training & Experiments
+                            </button>
+                            <button class="btn btn-outline-secondary"
+                                    style="justify-content: flex-start; text-align: left;">
+                                <i class="fa-duotone fa-server" style="margin-right: 10px;"></i>
+                                Infrastructure
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+	</idspace>
+</zk>
+
