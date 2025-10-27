@@ -1,0 +1,134 @@
+<zk xmlns:h="native">
+	<div class="row">
+		<h:div class="card border-1 border-indigo col-lg-12">
+			<div class="card">
+				<div
+					class="card-header header-elements-inline bg-indigo">
+					<h:h6 class="card-title">Select Fields</h:h6>
+				</div>
+				<div class="card-body">
+					<listbox model="@load(vm.atts)"
+						selectedItems="@bind(vm.bean.atts)" checkmark="true" multiple="true"
+						height="400px" pagingPosition="top">
+						<listhead>
+							<listheader label="Field" width="12%"></listheader>
+							<listheader label="Tabla" width="10%"></listheader>
+							<listheader label="Alias" width="15%"></listheader>
+							<listheader label="is Criteria"
+								width="50px">
+							</listheader>
+							<listheader label="show form"
+								width="50px">
+							</listheader>
+							<listheader label="Totalizar"
+								width="65px">
+							</listheader>
+							<listheader label="Agupar por" width="65px"></listheader>
+							<listheader label="Order" width="65px"></listheader>
+							<listheader label="Group" width="50px"></listheader>
+							<listheader label="Cube" width="50px"></listheader>
+							<listheader label="Duplicar" width="50px"></listheader>
+							<listheader label="Borrar" width="50px"></listheader>
+						</listhead>
+						<template name="model" var="item" varStatus="status">
+							<listitem value="${item}">
+								<listcell label="${item.asociar}"></listcell>
+								<listcell label="${item.entitynamedb}"></listcell>
+								<listcell>
+									<textbox
+										value="@bind(item.aliasField)"
+										  width="95%"/>
+								</listcell>
+								
+								
+								
+								<listcell>
+									<checkbox
+										value="@bind(item.criteria)"
+										checked="@bind(item.criteria)" />
+								</listcell>
+								<listcell>
+									<checkbox
+										value="@bind(item.render)" checked="@bind(item.render)" />
+								</listcell>
+								<listcell>
+									<combobox
+										selectedItem="@bind(item.totalizar)"
+										value="@bind(item.totalizar)">
+										<comboitem label="Count"
+											value="Count" />
+										<comboitem label="Sum"
+											value="Sum" />
+										<comboitem label="Avg"
+											value="Avg" />
+										<comboitem label="Max"
+											value="Max" />
+										<comboitem label="Min"
+											value="Min" />
+									</combobox>
+								</listcell>
+								<listcell>
+									<combobox
+										selectedItem="@bind(item.functionSQL)">
+										<comboitem label="Día" value="DATE_PART('day', field)" />
+										<comboitem label="Mes" value="DATE_PART('month', field)" />
+										<comboitem label="Trimestre" value="DATE_PART('quarter', field)" />
+										<comboitem label="Año" value="DATE_PART('year', field)" />
+									</combobox>
+								</listcell>
+								<listcell>
+									<combobox
+										selectedItem="@bind(item.orden)"
+										value="@bind(item.orden)">
+										<comboitem label="Asc"
+											value="ASC" />
+										<comboitem label="Desc"
+											value="DESC" />
+									</combobox>
+								</listcell>
+								<listcell>
+									<checkbox
+										value="@bind(item.grouping)" checked="@bind(item.grouping)" />
+								</listcell>
+								<listcell>
+									<checkbox
+										value="@bind(item.cube)" checked="@bind(item.cube)" />
+								</listcell>
+								<listcell>
+	                                       <button
+												onClick="@command('duplicarField',item=item,index=status.index+1)"
+												tooltiptext="Clone Field"
+												iconSclass="mdi mdi-data-matrix-plus fs-2x"
+												sclass="btn btn-outline-success waves-effect waves-light shadow-none" />
+											
+																
+<!-- 									<button label="duplicar" onClick="@command('duplicarField',item=item,index=status.index+1)"> </button> -->
+								</listcell>
+								<listcell>
+									<button
+												onClick="@command('removeField',index=status.index+1)"
+												tooltiptext="Remove Field"
+												iconSclass="bx bx-trash fs-2x"
+												sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />	
+							
+<!-- 									<button label="borrar" onClick="@command('removeField',index=status.index+1)"> </button> -->
+								</listcell>
+							
+							</listitem>
+
+						</template>
+					</listbox>
+				</div>
+				<div class="card-footer">
+									<button zclass="pull-left"
+								sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill" 
+								onClick="@command('back')" iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" label="Anterior" />
+	
+									<button zclass="pull-right" sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"  
+			onClick="@command('addCalculate')" label="Siguiente" />
+					
+				</div>
+			</div>
+		</h:div>
+	</div>
+</zk>

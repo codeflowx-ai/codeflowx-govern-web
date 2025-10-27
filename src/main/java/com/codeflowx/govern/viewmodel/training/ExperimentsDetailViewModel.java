@@ -32,17 +32,17 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.govern.entity.training.Checkpoint;
-import com.codeflowx.govern.entity.training.Experiment;
-import com.codeflowx.govern.entity.training.HPOTrial;
-import com.codeflowx.govern.entity.training.MetricSeries;
-import com.codeflowx.govern.entity.training.Param;
-import com.codeflowx.govern.entity.training.Run;
-import com.codeflowx.govern.entity.training.TrainingArtifact;
-import com.codeflowx.govern.entity.training.TrainingGovernance;
-import com.codeflowx.govern.entity.training.TrainingLog;
-import com.codeflowx.govern.entity.training.TrainingMetric;
-import com.codeflowx.govern.entity.views.training.TrainingMetricsSummary;
+import com.codeflowx.govern.jpa.training.Checkpoint;
+import com.codeflowx.govern.jpa.training.Experiment;
+import com.codeflowx.govern.jpa.training.HPOTrial;
+import com.codeflowx.govern.jpa.training.MetricSeries;
+import com.codeflowx.govern.jpa.training.Param;
+import com.codeflowx.govern.jpa.training.Run;
+import com.codeflowx.govern.jpa.training.TrainingArtifact;
+import com.codeflowx.govern.jpa.training.TrainingGovernance;
+import com.codeflowx.govern.jpa.training.TrainingLog;
+import com.codeflowx.govern.jpa.training.TrainingMetric;
+import com.codeflowx.govern.jpa.views.training.TrainingMetricsSummary;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -291,6 +291,14 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         try {
             log.debug("Cargando métricas");
             
+            PageParams params = PageParams.builder()
+                .maxRows(100)
+                .pageActual(1)
+                .rowActual(0)
+                .ascending(false)
+                .sortField("trncreatedat")
+                .build();
+            
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<TrainingMetric> result = businessService.findAllEntity(TrainingMetric.class, params, new Criterias());
             
@@ -306,6 +314,14 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
     private void loadTrainingLogs(Long experimentId) {
         try {
             log.debug("Cargando logs de training");
+            
+            PageParams params = PageParams.builder()
+                .maxRows(200)
+                .pageActual(1)
+                .rowActual(0)
+                .ascending(false)
+                .sortField("trncreatedat")
+                .build();
             
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<TrainingLog> result = businessService.findAllEntity(TrainingLog.class, params, new Criterias());
@@ -323,6 +339,14 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         try {
             log.debug("Cargando artifacts");
             
+            PageParams params = PageParams.builder()
+                .maxRows(50)
+                .pageActual(1)
+                .rowActual(0)
+                .ascending(false)
+                .sortField("trncreatedat")
+                .build();
+            
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<TrainingArtifact> result = businessService.findAllEntity(TrainingArtifact.class, params, new Criterias());
             
@@ -338,6 +362,14 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
     private void loadParameters(Long experimentId) {
         try {
             log.debug("Cargando parámetros");
+            
+            PageParams params = PageParams.builder()
+                .maxRows(100)
+                .pageActual(1)
+                .rowActual(0)
+                .ascending(false)
+                .sortField("trnkey")
+                .build();
             
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<Param> result = businessService.findAllEntity(Param.class, params, new Criterias());
@@ -355,6 +387,14 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         try {
             log.debug("Cargando series de métricas");
             
+            PageParams params = PageParams.builder()
+                .maxRows(100)
+                .pageActual(1)
+                .rowActual(0)
+                .ascending(false)
+                .sortField("trntimestamp")
+                .build();
+            
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<MetricSeries> result = businessService.findAllEntity(MetricSeries.class, params, new Criterias());
             
@@ -370,6 +410,12 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
     private void loadGovernanceInfo(Long experimentId) {
         try {
             log.debug("Cargando información de governance");
+            
+            PageParams params = PageParams.builder()
+                .maxRows(1)
+                .pageActual(1)
+                .rowActual(0)
+                .build();
             
             // TODO: Filtrar correctamente por FK de Run relacionado a este Experiment
             PageResult<TrainingGovernance> result = businessService.findAllEntity(TrainingGovernance.class, params, new Criterias());
@@ -458,11 +504,13 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
         try {
             if (validateExperiment()) {
                 if (isNewExperiment) {
-                    currentExperiment.setTrncreatedby(getUser().getUsername());
+                    // trncreatedby es UUID, no String
+                    // currentExperiment.setTrncreatedby(getUser().getUsername());
                     currentExperiment.setTrncreatedat(new Timestamp(System.currentTimeMillis()));
                 }
                 
-                currentExperiment.setTrnupdatedby(getUser().getUsername());
+                // trnupdatedby es UUID, no String
+                // currentExperiment.setTrnupdatedby(getUser().getUsername());
                 currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
                 
                 businessService.save(currentExperiment);
@@ -518,9 +566,10 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
     public void startExperiment() {
         log.info("Iniciando experimento: {}", currentExperiment.getIdxexperiment());
         try {
-            currentExperiment.setTrnstatus("RUNNING");
+            currentExperiment.setTrnlifecyclestage("RUNNING");
             currentExperiment.setTrnstartedat(new Timestamp(System.currentTimeMillis()));
-            currentExperiment.setTrnupdatedby(getUser().getUsername());
+            // trnupdatedby es UUID, no String
+            // currentExperiment.setTrnupdatedby(getUser().getUsername());
             currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
             
             businessService.save(currentExperiment);
@@ -539,9 +588,10 @@ public class ExperimentsDetailViewModel extends MasterPage implements Serializab
     public void stopExperiment() {
         log.info("Deteniendo experimento: {}", currentExperiment.getIdxexperiment());
         try {
-            currentExperiment.setTrnstatus("STOPPED");
+            currentExperiment.setTrnlifecyclestage("STOPPED");
             currentExperiment.setTrnfinishedat(new Timestamp(System.currentTimeMillis()));
-            currentExperiment.setTrnupdatedby(getUser().getUsername());
+            // trnupdatedby es UUID, no String
+            // currentExperiment.setTrnupdatedby(getUser().getUsername());
             currentExperiment.setTrnupdatedat(new Timestamp(System.currentTimeMillis()));
             
             businessService.save(currentExperiment);

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Advanced Analytics Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .analytics-container {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .chart-container {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .refresh-button {
+            margin: 20px;
+            padding: 8px 16px;
+        }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.AdvancedAnalyticsViewModel')"
+         sclass="analytics-container">
+        
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="predictiveChart"
+                       model="@bind(vm.predictiveChart)"
+                       height="400px"/>
+            </div>
+            <div sclass="chart-container" width="48%">
+                <charts id="patternsChart"
+                       model="@bind(vm.patternsChart)"
+                       height="400px"/>
+            </div>
+        </hlayout>
+        
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="optimizationChart"
+                       model="@bind(vm.optimizationChart)"
+                       height="400px"/>
+            </div>
+            <div sclass="chart-container" width="48%">
+                <charts id="roiChart"
+                       model="@bind(vm.roiChart)"
+                       height="400px"/>
+            </div>
+        </hlayout>
+        
+        <button label="Refresh Analytics"
+                sclass="refresh-button"
+                onClick="@command('refreshAnalytics')"/>
+    </div>
+</zk>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="alert-response-process" name="Alert Response Process (85% IA)" isExecutable="true">
+    
+    <startEvent id="alert-created-event" name="Alerta Creada">
+      <messageEventDefinition messageRef="alertCreatedMessage"/>
+    </startEvent>
+    
+    <serviceTask id="classify-alert" 
+                 name="Clasificar Alerta"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ClassifyAlertDelegate"/>
+    
+    <exclusiveGateway id="severity-gateway" name="Severidad?"/>
+    
+    <serviceTask id="auto-escalate-critical" 
+                 name="Auto-escalar (CRITICAL)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoEscalateCriticalDelegate"/>
+    
+    <userTask id="oncall-response" 
+              name="Respuesta On-call"
+              flowable:candidateGroups="mlops-engineers"
+              flowable:formKey="plataforma/workflow/alert-response-form.zul"
+              flowable:dueDate="PT15M"/>
+    
+    <serviceTask id="notify-high-alert" 
+                 name="Notificar (HIGH)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyHighAlertDelegate"/>
+    
+    <serviceTask id="log-low-alert" 
+                 name="Log (MEDIUM/LOW)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.LogLowAlertDelegate"/>
+    
+    <serviceTask id="update-alert-status" 
+                 name="Actualizar Estado"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.UpdateAlertStatusDelegate"/>
+    
+    <endEvent id="alert-resolved" name="Alerta Resuelta"/>
+    
+    <!-- Flows -->
+    <sequenceFlow id="flow1" sourceRef="alert-created-event" targetRef="classify-alert"/>
+    <sequenceFlow id="flow2" sourceRef="classify-alert" targetRef="severity-gateway"/>
+    
+    <sequenceFlow id="flow3-critical" sourceRef="severity-gateway" targetRef="auto-escalate-critical">
+      <conditionExpression xsi:type="tFormalExpression">${severity == 'CRITICAL'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3-high" sourceRef="severity-gateway" targetRef="notify-high-alert">
+      <conditionExpression xsi:type="tFormalExpression">${severity == 'HIGH'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3-low" sourceRef="severity-gateway" targetRef="log-low-alert">
+      <conditionExpression xsi:type="tFormalExpression">${severity == 'MEDIUM' || severity == 'LOW'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow4" sourceRef="auto-escalate-critical" targetRef="oncall-response"/>
+    <sequenceFlow id="flow5" sourceRef="oncall-response" targetRef="update-alert-status"/>
+    <sequenceFlow id="flow6" sourceRef="notify-high-alert" targetRef="update-alert-status"/>
+    <sequenceFlow id="flow7" sourceRef="log-low-alert" targetRef="update-alert-status"/>
+    <sequenceFlow id="flow8" sourceRef="update-alert-status" targetRef="alert-resolved"/>
+    
+  </process>
+  
+  <message id="alertCreatedMessage" name="alert_created"/>
+
+</definitions>
+
+

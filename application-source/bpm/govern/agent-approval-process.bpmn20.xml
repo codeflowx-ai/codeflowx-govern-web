@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/workflows">
+
+  <process id="agent-approval-process" name="Agent Approval Workflow" isExecutable="true">
+    
+    <!-- START EVENT -->
+    <startEvent id="startEvent" name="Start Agent Approval"/>
+    
+    <!-- USER TASK 1: Request Agent Approval -->
+    <userTask id="requestApproval" name="Request Agent Approval" 
+              flowable:candidateGroups="ml-engineers"
+              flowable:formKey="plataforma/workflow/agent-approval-request-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="agentId" name="Agent ID" type="long" required="true"/>
+        <flowable:formProperty id="approvalType" name="Approval Type" type="enum" required="true">
+          <flowable:value id="NEW_AGENT" name="New Agent"/>
+          <flowable:value id="UPDATE" name="Update Existing"/>
+          <flowable:value id="REDEPLOYMENT" name="Redeployment"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="requestReason" name="Request Reason" type="string" required="true"/>
+        <flowable:formProperty id="requestDetails" name="Request Details (JSON)" type="string"/>
+      </extensionElements>
+    </userTask>
+    
+    <!-- SERVICE TASK 1: Risk Assessment -->
+    <serviceTask id="riskAssessment" name="Risk Assessment" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RiskAssessmentDelegate"/>
+    
+    <!-- SERVICE TASK 2: Compliance Check -->
+    <serviceTask id="complianceCheck" name="Compliance Check" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ComplianceCheckDelegate"/>
+    
+    <!-- USER TASK 2: Technical Review -->
+    <userTask id="technicalReview" name="Technical Review" 
+              flowable:candidateGroups="tech-reviewers,ml-engineers"
+              flowable:formKey="plataforma/workflow/agent-technical-review-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="codeQuality" name="Code Quality" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="ISSUES" name="Has Issues"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="testCoverage" name="Test Coverage %" type="long"/>
+        <flowable:formProperty id="performanceCheck" name="Performance Check" type="enum">
+          <flowable:value id="PASS" name="Pass"/>
+          <flowable:value id="FAIL" name="Fail"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="securityCheck" name="Security Check" type="enum">
+          <flowable:value id="PASS" name="Pass"/>
+          <flowable:value id="FAIL" name="Fail"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="reviewNotes" name="Review Notes" type="string"/>
+        <flowable:formProperty id="technicalApproval" name="Technical Approval" type="enum" required="true">
+          <flowable:value id="APPROVED" name="Approved"/>
+          <flowable:value id="REJECTED" name="Rejected"/>
+          <flowable:value id="NEEDS_CHANGES" name="Needs Changes"/>
+        </flowable:formProperty>
+      </extensionElements>
+    </userTask>
+    
+    <!-- USER TASK 3: Ethical Review -->
+    <userTask id="ethicalReview" name="Ethical Review" 
+              flowable:candidateGroups="ethics-committee,governance-admins"
+              flowable:formKey="plataforma/workflow/agent-ethical-review-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="fairnessCheck" name="Fairness" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="CONCERNS" name="Has Concerns"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="transparencyCheck" name="Transparency" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="CONCERNS" name="Has Concerns"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="accountabilityCheck" name="Accountability" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="CONCERNS" name="Has Concerns"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="humanOversight" name="Human Oversight" type="enum" required="true">
+          <flowable:value id="ADEQUATE" name="Adequate"/>
+          <flowable:value id="INADEQUATE" name="Inadequate"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="ethicalNotes" name="Ethical Notes" type="string"/>
+        <flowable:formProperty id="ethicalApproval" name="Ethical Approval" type="enum" required="true">
+          <flowable:value id="APPROVED" name="Approved"/>
+          <flowable:value id="REJECTED" name="Rejected"/>
+          <flowable:value id="CONDITIONAL" name="Conditional"/>
+        </flowable:formProperty>
+      </extensionElements>
+    </userTask>
+    
+    <!-- GATEWAY: Approval Decision -->
+    <exclusiveGateway id="approvalDecision" name="Approved?"/>
+    
+    <!-- SERVICE TASK 3: Notify Approval (Branch: Approved) -->
+    <serviceTask id="notifyApproval" name="Notify Approval" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+    
+    <!-- USER TASK 4: Rejection Reason (Branch: Rejected) -->
+    <userTask id="rejectionReason" name="Document Rejection Reason" 
+              flowable:candidateGroups="governance-admins"
+              flowable:formKey="plataforma/workflow/agent-rejection-reason-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="rejectionReason" name="Rejection Reason" type="string" required="true"/>
+        <flowable:formProperty id="rejectionCategory" name="Category" type="enum" required="true">
+          <flowable:value id="TECHNICAL" name="Technical Issues"/>
+          <flowable:value id="ETHICAL" name="Ethical Concerns"/>
+          <flowable:value id="COMPLIANCE" name="Compliance Violation"/>
+          <flowable:value id="RISK" name="High Risk"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="actionItems" name="Action Items" type="string"/>
+      </extensionElements>
+    </userTask>
+    
+    <!-- END EVENTS -->
+    <endEvent id="endApproved" name="Agent Approved"/>
+    <endEvent id="endRejected" name="Agent Rejected"/>
+    
+    <!-- SEQUENCE FLOWS -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="requestApproval"/>
+    <sequenceFlow id="flow2" sourceRef="requestApproval" targetRef="riskAssessment"/>
+    <sequenceFlow id="flow3" sourceRef="riskAssessment" targetRef="complianceCheck"/>
+    <sequenceFlow id="flow4" sourceRef="complianceCheck" targetRef="technicalReview"/>
+    <sequenceFlow id="flow5" sourceRef="technicalReview" targetRef="ethicalReview"/>
+    <sequenceFlow id="flow6" sourceRef="ethicalReview" targetRef="approvalDecision"/>
+    
+    <!-- Branch: Approved -->
+    <sequenceFlow id="flowApproved" name="Approved" sourceRef="approvalDecision" targetRef="notifyApproval">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${technicalApproval == 'APPROVED' && ethicalApproval == 'APPROVED'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowApprovedEnd" sourceRef="notifyApproval" targetRef="endApproved"/>
+    
+    <!-- Branch: Rejected -->
+    <sequenceFlow id="flowRejected" name="Rejected" sourceRef="approvalDecision" targetRef="rejectionReason">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${technicalApproval != 'APPROVED' || ethicalApproval != 'APPROVED'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRejectedEnd" sourceRef="rejectionReason" targetRef="endRejected"/>
+    
+  </process>
+  
+  <!-- BPMN DIAGRAM (opcional, para visualización) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_agent-approval-process">
+    <bpmndi:BPMNPlane bpmnElement="agent-approval-process" id="BPMNPlane_agent-approval-process">
+      
+      <!-- Start Event -->
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- User Task: Request Approval -->
+      <bpmndi:BPMNShape bpmnElement="requestApproval" id="BPMNShape_requestApproval">
+        <omgdc:Bounds height="80.0" width="100.0" x="130.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- Service Task: Risk Assessment -->
+      <bpmndi:BPMNShape bpmnElement="riskAssessment" id="BPMNShape_riskAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="280.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- Service Task: Compliance Check -->
+      <bpmndi:BPMNShape bpmnElement="complianceCheck" id="BPMNShape_complianceCheck">
+        <omgdc:Bounds height="80.0" width="100.0" x="430.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- User Task: Technical Review -->
+      <bpmndi:BPMNShape bpmnElement="technicalReview" id="BPMNShape_technicalReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="580.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- User Task: Ethical Review -->
+      <bpmndi:BPMNShape bpmnElement="ethicalReview" id="BPMNShape_ethicalReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="730.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- Gateway: Approval Decision -->
+      <bpmndi:BPMNShape bpmnElement="approvalDecision" id="BPMNShape_approvalDecision">
+        <omgdc:Bounds height="40.0" width="40.0" x="880.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- Service Task: Notify Approval -->
+      <bpmndi:BPMNShape bpmnElement="notifyApproval" id="BPMNShape_notifyApproval">
+        <omgdc:Bounds height="80.0" width="100.0" x="970.0" y="50.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- User Task: Rejection Reason -->
+      <bpmndi:BPMNShape bpmnElement="rejectionReason" id="BPMNShape_rejectionReason">
+        <omgdc:Bounds height="80.0" width="100.0" x="970.0" y="230.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- End Events -->
+      <bpmndi:BPMNShape bpmnElement="endApproved" id="BPMNShape_endApproved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1120.0" y="72.0"/>
+      </bpmndi:BPMNShape>
+      
+      <bpmndi:BPMNShape bpmnElement="endRejected" id="BPMNShape_endRejected">
+        <omgdc:Bounds height="35.0" width="35.0" x="1120.0" y="252.0"/>
+      </bpmndi:BPMNShape>
+      
+      <!-- Sequence Flows (edges) -->
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="167.0"/>
+        <omgdi:waypoint x="130.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="230.0" y="170.0"/>
+        <omgdi:waypoint x="280.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="380.0" y="170.0"/>
+        <omgdi:waypoint x="430.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="530.0" y="170.0"/>
+        <omgdi:waypoint x="580.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="680.0" y="170.0"/>
+        <omgdi:waypoint x="730.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="830.0" y="170.0"/>
+        <omgdi:waypoint x="880.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flowApproved" id="BPMNEdge_flowApproved">
+        <omgdi:waypoint x="900.0" y="150.0"/>
+        <omgdi:waypoint x="900.0" y="90.0"/>
+        <omgdi:waypoint x="970.0" y="90.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flowApprovedEnd" id="BPMNEdge_flowApprovedEnd">
+        <omgdi:waypoint x="1070.0" y="90.0"/>
+        <omgdi:waypoint x="1120.0" y="90.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flowRejected" id="BPMNEdge_flowRejected">
+        <omgdi:waypoint x="900.0" y="190.0"/>
+        <omgdi:waypoint x="900.0" y="270.0"/>
+        <omgdi:waypoint x="970.0" y="270.0"/>
+      </bpmndi:BPMNEdge>
+      
+      <bpmndi:BPMNEdge bpmnElement="flowRejectedEnd" id="BPMNEdge_flowRejectedEnd">
+        <omgdi:waypoint x="1070.0" y="270.0"/>
+        <omgdi:waypoint x="1120.0" y="270.0"/>
+      </bpmndi:BPMNEdge>
+      
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

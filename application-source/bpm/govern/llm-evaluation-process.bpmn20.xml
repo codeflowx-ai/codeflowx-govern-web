@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="llm-evaluation-process" name="LLM Evaluation Process (80% IA)" isExecutable="true">
+    
+    <!-- ===== START EVENT ===== -->
+    <startEvent id="start" name="Evaluación Solicitada"/>
+    
+    <!-- ===== 1. PREPARAR EVALUACIÓN ===== -->
+    <serviceTask id="prepare-evaluation" 
+                 name="Preparar Evaluación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.PrepareLlmEvaluationDelegate"/>
+    
+    <!-- ===== 2. EJECUTAR EVALUACIÓN (Python Server) ===== -->
+    <serviceTask id="execute-llm-evaluation" 
+                 name="Ejecutar Evaluación LLM"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ExecuteLlmEvaluationDelegate"/>
+    
+    <!-- ===== 3. GATEWAY: ¿EVALUACIÓN ASÍNCRONA? ===== -->
+    <exclusiveGateway id="is-async-gateway" name="¿Async?"/>
+    
+    <!-- ===== 4a. ESPERAR RABBITMQ (si async) ===== -->
+    <receiveTask id="wait-rabbitmq-results" 
+                 name="Esperar Resultados Async"
+                 messageRef="evaluationCompletedMessage"/>
+    
+    <!-- ===== 4b. CONTINUAR DIRECTO (si sync) ===== -->
+    <!-- Sin task adicional, fluye directamente -->
+    
+    <!-- ===== 5. GUARDAR RESULTADOS ===== -->
+    <serviceTask id="save-evaluation-results" 
+                 name="Guardar Resultados en BBDD"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.SaveLlmEvaluationResultsDelegate"/>
+    
+    <!-- ===== 6. GATEWAY: ¿CUMPLE UMBRALES? ===== -->
+    <exclusiveGateway id="meets-threshold-gateway" name="Score >= 80%?"/>
+    
+    <!-- ===== 7a. AUTO-APROBAR (si score >= 80%) ===== -->
+    <serviceTask id="auto-approve-evaluation" 
+                 name="Auto-aprobar Evaluación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoApproveLlmEvaluationDelegate"/>
+    
+    <!-- ===== 7b. REVISIÓN HUMANA (si score < 80%) ===== -->
+    <userTask id="review-low-score-evaluation" 
+              name="Revisar Resultados"
+              flowable:candidateGroups="ml-engineers,data-scientists"
+              flowable:formKey="plataforma/workflow/llm-evaluation-review-form.zul">
+      <documentation>
+        Evaluación LLM con score inferior al umbral (80%).
+        Acciones: aprobar (con justificación), rechazar, o re-ejecutar.
+      </documentation>
+    </userTask>
+    
+    <!-- ===== 8. GATEWAY: ACCIÓN DEL REVISOR ===== -->
+    <exclusiveGateway id="reviewer-action-gateway" name="Acción?"/>
+    
+    <!-- ===== 9a. APROBAR MANUALMENTE ===== -->
+    <serviceTask id="manual-approve-evaluation" 
+                 name="Aprobar Manualmente"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ManualApproveLlmEvaluationDelegate"/>
+    
+    <!-- ===== 9b. RECHAZAR ===== -->
+    <serviceTask id="reject-evaluation" 
+                 name="Rechazar Evaluación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RejectLlmEvaluationDelegate"/>
+    
+    <!-- ===== 10. NOTIFICAR RESULTADOS ===== -->
+    <serviceTask id="notify-evaluation-results" 
+                 name="Notificar Resultados"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyLlmEvaluationDelegate"/>
+    
+    <!-- ===== END EVENT ===== -->
+    <endEvent id="evaluation-completed" name="Evaluación Completada"/>
+    <endEvent id="evaluation-rejected" name="Evaluación Rechazada"/>
+    
+    <!-- ===== SEQUENCE FLOWS ===== -->
+    
+    <!-- Start → Preparar -->
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="prepare-evaluation"/>
+    
+    <!-- Preparar → Ejecutar -->
+    <sequenceFlow id="flow2" sourceRef="prepare-evaluation" targetRef="execute-llm-evaluation"/>
+    
+    <!-- Ejecutar → Gateway Async -->
+    <sequenceFlow id="flow3" sourceRef="execute-llm-evaluation" targetRef="is-async-gateway"/>
+    
+    <!-- Gateway Async → Esperar RabbitMQ (si async) -->
+    <sequenceFlow id="flow4-async" sourceRef="is-async-gateway" targetRef="wait-rabbitmq-results">
+      <conditionExpression xsi:type="tFormalExpression">${is_async == true}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Async → Guardar (si sync) -->
+    <sequenceFlow id="flow4-sync" sourceRef="is-async-gateway" targetRef="save-evaluation-results">
+      <conditionExpression xsi:type="tFormalExpression">${is_async == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Esperar RabbitMQ → Guardar -->
+    <sequenceFlow id="flow5" sourceRef="wait-rabbitmq-results" targetRef="save-evaluation-results"/>
+    
+    <!-- Guardar → Gateway Umbrales -->
+    <sequenceFlow id="flow6" sourceRef="save-evaluation-results" targetRef="meets-threshold-gateway"/>
+    
+    <!-- Gateway Umbrales → Auto-aprobar (si >=80%) -->
+    <sequenceFlow id="flow7-auto" sourceRef="meets-threshold-gateway" targetRef="auto-approve-evaluation">
+      <conditionExpression xsi:type="tFormalExpression">${overall_score >= threshold_overall_score}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Umbrales → Revisión Humana (si <80%) -->
+    <sequenceFlow id="flow7-review" sourceRef="meets-threshold-gateway" targetRef="review-low-score-evaluation">
+      <conditionExpression xsi:type="tFormalExpression">${overall_score &lt; threshold_overall_score}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Auto-aprobar → Notificar -->
+    <sequenceFlow id="flow8" sourceRef="auto-approve-evaluation" targetRef="notify-evaluation-results"/>
+    
+    <!-- Revisión Humana → Gateway Acción -->
+    <sequenceFlow id="flow9" sourceRef="review-low-score-evaluation" targetRef="reviewer-action-gateway"/>
+    
+    <!-- Gateway Acción → Aprobar Manualmente -->
+    <sequenceFlow id="flow10-approve" sourceRef="reviewer-action-gateway" targetRef="manual-approve-evaluation">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'approve'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Rechazar -->
+    <sequenceFlow id="flow10-reject" sourceRef="reviewer-action-gateway" targetRef="reject-evaluation">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'reject'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Re-ejecutar (loop back) -->
+    <sequenceFlow id="flow10-rerun" sourceRef="reviewer-action-gateway" targetRef="execute-llm-evaluation">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'rerun'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Aprobar Manualmente → Notificar -->
+    <sequenceFlow id="flow11" sourceRef="manual-approve-evaluation" targetRef="notify-evaluation-results"/>
+    
+    <!-- Notificar → End -->
+    <sequenceFlow id="flow12" sourceRef="notify-evaluation-results" targetRef="evaluation-completed"/>
+    
+    <!-- Rechazar → End (Rejected) -->
+    <sequenceFlow id="flow13" sourceRef="reject-evaluation" targetRef="evaluation-rejected"/>
+    
+  </process>
+  
+  <!-- ===== MESSAGE DEFINITION (for RabbitMQ) ===== -->
+  <message id="evaluationCompletedMessage" name="evaluation_completed"/>
+
+</definitions>
+
+

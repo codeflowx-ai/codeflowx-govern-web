@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://codeflowx.com/govern/workflows">
+
+  <process id="model-approval-process" name="Model Approval Workflow" isExecutable="true">
+    
+    <startEvent id="startEvent" name="Start Model Approval"/>
+    
+    <userTask id="submitModelApproval" name="Submit Model for Approval" 
+              flowable:candidateGroups="ml-engineers"
+              flowable:formKey="plataforma/workflow/model-approval-request-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="modelId" name="Model ID" type="long" required="true"/>
+        <flowable:formProperty id="versionId" name="Version ID" type="long" required="true"/>
+        <flowable:formProperty id="approvalType" name="Approval Type" type="enum" required="true">
+          <flowable:value id="NEW_MODEL" name="New Model"/>
+          <flowable:value id="VERSION_UPDATE" name="Version Update"/>
+          <flowable:value id="REDEPLOYMENT" name="Redeployment"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="targetEnvironment" name="Target Environment" type="enum" required="true">
+          <flowable:value id="STAGING" name="Staging"/>
+          <flowable:value id="PRODUCTION" name="Production"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="businessJustification" name="Business Justification" type="string" required="true"/>
+      </extensionElements>
+    </userTask>
+    
+    <serviceTask id="performanceValidation" name="Performance Validation" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ModelValidationDelegate"/>
+    
+    <serviceTask id="biasDetection" name="Bias Detection" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.BiasDetectionDelegate"/>
+    
+    <serviceTask id="complianceCheck" name="Compliance Check" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ComplianceCheckDelegate"/>
+    
+    <userTask id="mlEngineerReview" name="ML Engineer Review" 
+              flowable:candidateGroups="ml-engineers,senior-ml-engineers"
+              flowable:formKey="plataforma/workflow/model-ml-review-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="architectureReview" name="Architecture Review" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="ISSUES" name="Has Issues"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="codeQuality" name="Code Quality" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="ISSUES" name="Has Issues"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="reviewNotes" name="Review Notes" type="string"/>
+        <flowable:formProperty id="mlApproval" name="ML Approval" type="enum" required="true">
+          <flowable:value id="APPROVED" name="Approved"/>
+          <flowable:value id="REJECTED" name="Rejected"/>
+          <flowable:value id="NEEDS_CHANGES" name="Needs Changes"/>
+        </flowable:formProperty>
+      </extensionElements>
+    </userTask>
+    
+    <userTask id="governanceReview" name="Governance Review" 
+              flowable:candidateGroups="governance-admins"
+              flowable:formKey="plataforma/workflow/model-governance-review-form.zul">
+      <extensionElements>
+        <flowable:formProperty id="ethicsCheck" name="Ethics Check" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="CONCERNS" name="Has Concerns"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="regulatoryCompliance" name="Regulatory Compliance" type="enum" required="true">
+          <flowable:value id="OK" name="OK"/>
+          <flowable:value id="CONCERNS" name="Has Concerns"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="riskAssessment" name="Risk Assessment" type="enum" required="true">
+          <flowable:value id="LOW" name="Low"/>
+          <flowable:value id="MEDIUM" name="Medium"/>
+          <flowable:value id="HIGH" name="High"/>
+        </flowable:formProperty>
+        <flowable:formProperty id="governanceApproval" name="Governance Approval" type="enum" required="true">
+          <flowable:value id="APPROVED" name="Approved"/>
+          <flowable:value id="REJECTED" name="Rejected"/>
+          <flowable:value id="CONDITIONAL" name="Conditional"/>
+        </flowable:formProperty>
+      </extensionElements>
+    </userTask>
+    
+    <exclusiveGateway id="approvalDecision" name="Approved?"/>
+    
+    <serviceTask id="markProductionReady" name="Mark as Production-Ready" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.MarkModelProductionDelegate"/>
+    
+    <serviceTask id="rejectModel" name="Reject Model" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RejectModelDelegate"/>
+    
+    <endEvent id="endApproved" name="Model Approved"/>
+    <endEvent id="endRejected" name="Model Rejected"/>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="submitModelApproval"/>
+    <sequenceFlow id="flow2" sourceRef="submitModelApproval" targetRef="performanceValidation"/>
+    <sequenceFlow id="flow3" sourceRef="performanceValidation" targetRef="biasDetection"/>
+    <sequenceFlow id="flow4" sourceRef="biasDetection" targetRef="complianceCheck"/>
+    <sequenceFlow id="flow5" sourceRef="complianceCheck" targetRef="mlEngineerReview"/>
+    <sequenceFlow id="flow6" sourceRef="mlEngineerReview" targetRef="governanceReview"/>
+    <sequenceFlow id="flow7" sourceRef="governanceReview" targetRef="approvalDecision"/>
+    
+    <sequenceFlow id="flowApproved" name="Approved" sourceRef="approvalDecision" targetRef="markProductionReady">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${mlApproval == 'APPROVED' && governanceApproval == 'APPROVED'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowApprovedEnd" sourceRef="markProductionReady" targetRef="endApproved"/>
+    
+    <sequenceFlow id="flowRejected" name="Rejected" sourceRef="approvalDecision" targetRef="rejectModel">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${mlApproval != 'APPROVED' || governanceApproval != 'APPROVED'}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRejectedEnd" sourceRef="rejectModel" targetRef="endRejected"/>
+    
+  </process>
+  
+</definitions>
+

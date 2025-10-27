@@ -1,0 +1,57 @@
+app:
+   external-classes: /opt/suinsit/data/classes 
+   timezone: ${TZ:Europe/Madrid}
+   locale: ${LANG:es_ES.UTF-8}
+   upload:
+      dir:   /opt/apps-tmp/upload
+      max-file-size: 10MB
+      allowed-types:
+        - application/json
+        - text/plain
+        - multipart/form-data
+suinsit:
+  customer:
+    name: ${SUINSIT_CUSTOMER_NAME}
+    uid: ${SUINSIT_CUSTOMER_UID}
+    label: ${SUINSIT_CUSTOMER_LABEL}
+    namespace: ${NAMESPACE}
+  paths:
+    home: /opt/suinsit
+    logs: /opt/suinsit/logs
+    root: /opt/suinsit
+    studio: /opt/suinsit/studio
+    deploy: /opt/suinsit/apps
+  application:
+     version: ${SUINSIT_PRODUCTO_VERSION:0.0.1}
+     product: leka-web
+     mode: ${SUINSIT_PRODUCTO_LICENCE:PROFESIONAL}
+     server:
+       host: ${SUINSIT_SERVER:https://console.suinsit.ai}
+server:
+     port: 8080
+     
+spring:
+  main:
+    banner-mode: off
+    lazy-initialization: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+ 
+     
+
+
+logging:
+  level:
+    org.springframework.cloud.kubernetes: ${ROOT_LOG}
+    org.springframework.boot.autoconfigure: ${ROOT_LOG}
+    org.springframework.cloud.bootstrap: ${ROOT_LOG}
+    com.suinsit: ${TECHNICAL_LOG}
+    org.springframework.boot.context.config: ${ROOT_LOG}
+
+performance:
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,application/javascript,application/json
+    min-response-size: 1024

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://codeflowx.com/govern/rag-evaluation">
+
+  <process id="rag-evaluation-process" name="RAG Evaluation Process" isExecutable="true">
+
+    <startEvent id="startEvent" name="Start RAG Evaluation"/>
+
+    <serviceTask id="executeEvaluation" name="Execute RAG Evaluation" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RagEvaluationDelegate"/>
+
+    <serviceTask id="storeResults" name="Store Evaluation Results" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.StoreRagEvaluationDelegate"/>
+
+    <exclusiveGateway id="thresholdGateway" name="Performance Below Threshold?"/>
+
+    <serviceTask id="createAlert" name="Create RAG Alert" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CreateRagAlertDelegate"/>
+
+    <serviceTask id="updateDashboard" name="Update Dashboard" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate"/>
+
+    <endEvent id="endSuccess" name="Evaluation Complete"/>
+    <endEvent id="endAlert" name="Alert Created"/>
+
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="executeEvaluation"/>
+    <sequenceFlow id="flow2" sourceRef="executeEvaluation" targetRef="storeResults"/>
+    <sequenceFlow id="flow3" sourceRef="storeResults" targetRef="thresholdGateway"/>
+
+    <sequenceFlow id="flowBelowThreshold" name="Below Threshold" sourceRef="thresholdGateway" targetRef="createAlert">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${belowThreshold == true}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowAboveThreshold" name="Above Threshold" sourceRef="thresholdGateway" targetRef="updateDashboard">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${belowThreshold == false}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowAlertToEnd" sourceRef="createAlert" targetRef="endAlert"/>
+    <sequenceFlow id="flowDashboardToEnd" sourceRef="updateDashboard" targetRef="endSuccess"/>
+
+  </process>
+
+</definitions>
+
+

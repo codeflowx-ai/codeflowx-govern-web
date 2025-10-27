@@ -1,0 +1,305 @@
+<?page title="Agent Marketplace" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.agent.marketplace.AgentMarketplaceVM')">
+        
+        <!-- Marketplace Overview -->
+        <hlayout sclass="marketplace-header">
+            <div sclass="metric-box">
+                <label value="Available Agents"/>
+                <label value="@load(vm.availableAgents)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Total Downloads"/>
+                <label value="@load(vm.totalDownloads)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Average Rating"/>
+                <label value="@load(vm.averageRating)/5" 
+                       sclass="@load(vm.ratingStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Active Subscriptions"/>
+                <label value="@load(vm.activeSubscriptions)"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Agent Catalog"/>
+                <tab label="Skills Market"/>
+                <tab label="Reviews & Ratings"/>
+                <tab label="My Subscriptions"/>
+            </tabs>
+            <tabpanels>
+                <!-- Agent Catalog Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Search and Filters -->
+                        <hlayout sclass="marketplace-filters">
+                            <textbox value="@bind(vm.searchTerm)" 
+                                    placeholder="Search agents..."
+                                    onOK="@command('searchAgents')"/>
+                            <combobox model="@load(vm.categories)" 
+                                     selectedItem="@bind(vm.selectedCategory)"
+                                     onChange="@command('filterAgents')"/>
+                            <combobox model="@load(vm.capabilities)" 
+                                     selectedItem="@bind(vm.selectedCapability)"
+                                     onChange="@command('filterAgents')"/>
+                            <button label="Search" 
+                                    onClick="@command('searchAgents')"/>
+                            <button label="Advanced Search" 
+                                    onClick="@command('showAdvancedSearch')"/>
+                        </hlayout>
+
+                        <!-- Featured Agents Carousel -->
+                        <carousel id="featuredAgents" 
+                                 model="@load(vm.featuredAgents)"
+                                 selectedItem="@bind(vm.selectedFeaturedAgent)">
+                            <template name="model" var="agent">
+                                <div sclass="featured-agent-card" 
+                                     onClick="@command('viewAgentDetails', agent=agent)">
+                                    <image src="@load(agent.imageUrl)"/>
+                                    <label value="@load(agent.name)" sclass="agent-name"/>
+                                    <label value="@load(agent.shortDescription)" sclass="agent-desc"/>
+                                    <label value="@load(agent.rating) stars" sclass="agent-rating"/>
+                                </div>
+                            </template>
+                        </carousel>
+
+                        <!-- Agent Grid -->
+                        <grid model="@load(vm.agents)" 
+                              mold="paging" pageSize="9"
+                              sclass="agent-grid">
+                            <template name="model" var="agent">
+                                <row>
+                                    <div sclass="agent-card">
+                                        <image src="@load(agent.imageUrl)"/>
+                                        <div sclass="agent-info">
+                                            <label value="@load(agent.name)" sclass="agent-name"/>
+                                            <label value="@load(agent.version)" sclass="agent-version"/>
+                                            <label value="@load(agent.description)" sclass="agent-desc"/>
+                                            <div sclass="agent-tags">
+                                                <forEach items="@load(agent.tags)" var="tag">
+                                                    <label value="@load(tag)" sclass="tag"/>
+                                                </forEach>
+                                            </div>
+                                            <div sclass="agent-metrics">
+                                                <label value="@load(agent.rating) ★"/>
+                                                <label value="@load(agent.downloads) downloads"/>
+                                                <label value="@load(agent.price)"/>
+                                            </div>
+                                            <div sclass="agent-actions">
+                                                <button label="Details" 
+                                                        onClick="@command('viewAgentDetails', agent=agent)"/>
+                                                <button label="Try Demo" 
+                                                        onClick="@command('tryAgentDemo', agent=agent)"/>
+                                                <button label="Subscribe" 
+                                                        onClick="@command('subscribeToAgent', agent=agent)"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Skills Market Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Skills Categories -->
+                        <hlayout>
+                            <forEach items="@load(vm.skillCategories)" var="category">
+                                <button label="@load(category)" 
+                                        sclass="@load(vm.isSelectedCategory(category) ? 'selected' : '')"
+                                        onClick="@command('selectSkillCategory', category=category)"/>
+                            </forEach>
+                        </hlayout>
+
+                        <!-- Skills Grid -->
+                        <grid model="@load(vm.skills)" 
+                              mold="paging" pageSize="12">
+                            <columns>
+                                <column label="Skill Name"/>
+                                <column label="Category"/>
+                                <column label="Compatibility"/>
+                                <column label="Rating"/>
+                                <column label="Price"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="skill">
+                                <row>
+                                    <label value="@load(skill.name)"/>
+                                    <label value="@load(skill.category)"/>
+                                    <div>
+                                        <forEach items="@load(skill.compatibleAgents)" 
+                                                 var="agent">
+                                            <label value="@load(agent)" 
+                                                   sclass="compatibility-tag"/>
+                                        </forEach>
+                                    </div>
+                                    <label value="@load(skill.rating) ★"/>
+                                    <label value="@load(skill.price)"/>
+                                    <hlayout>
+                                        <button label="Details" 
+                                                onClick="@command('viewSkillDetails', skill=skill)"/>
+                                        <button label="Purchase" 
+                                                onClick="@command('purchaseSkill', skill=skill)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Reviews & Ratings Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Rating Statistics -->
+                        <hlayout>
+                            <div sclass="rating-summary">
+                                <label value="Overall Rating"/>
+                                <label value="@load(vm.overallRating)" 
+                                       sclass="large-rating"/>
+                                <div sclass="rating-bars">
+                                    <forEach items="@load(vm.ratingDistribution)" 
+                                             var="dist">
+                                        <div sclass="rating-bar">
+                                            <label value="@load(dist.stars) stars"/>
+                                            <progressmeter value="@load(dist.percentage)"/>
+                                            <label value="@load(dist.count)"/>
+                                        </div>
+                                    </forEach>
+                                </div>
+                            </div>
+                            
+                            <charts id="ratingTrendsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Rating Trends"
+                                   model="@load(vm.ratingTrendsData)"/>
+                        </hlayout>
+
+                        <!-- Reviews List -->
+                        <listbox model="@load(vm.reviews)" 
+                                mold="paging" pageSize="10">
+                            <listhead>
+                                <listheader label="User"/>
+                                <listheader label="Agent/Skill"/>
+                                <listheader label="Rating"/>
+                                <listheader label="Review"/>
+                                <listheader label="Date"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="review">
+                                <listitem>
+                                    <listcell>
+                                        <image src="@load(review.userAvatar)"/>
+                                        <label value="@load(review.userName)"/>
+                                    </listcell>
+                                    <listcell label="@load(review.itemName)"/>
+                                    <listcell>
+                                        <label value="@load(review.rating) ★" 
+                                               sclass="@load(review.ratingStyle)"/>
+                                    </listcell>
+                                    <listcell>
+                                        <label value="@load(review.comment)"/>
+                                        <label value="@load(review.pros)" 
+                                               if="@load(not empty review.pros)"/>
+                                        <label value="@load(review.cons)" 
+                                               if="@load(not empty review.cons)"/>
+                                    </listcell>
+                                    <listcell label="@load(review.date)"/>
+                                    <listcell>
+                                        <button label="Helpful" 
+                                                onClick="@command('markHelpful', review=review)"/>
+                                        <button label="Report" 
+                                                onClick="@command('reportReview', review=review)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- My Subscriptions Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Subscription Summary -->
+                        <hlayout>
+                            <div sclass="subscription-summary">
+                                <label value="Active Subscriptions: @load(vm.activeSubscriptions)"/>
+                                <label value="Total Spent: @load(vm.totalSpent)"/>
+                                <label value="Next Billing: @load(vm.nextBillingDate)"/>
+                            </div>
+                            
+                            <charts id="usageChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Usage Trends"
+                                   model="@load(vm.usageTrendsData)"/>
+                        </hlayout>
+
+                        <!-- Subscriptions Grid -->
+                        <grid model="@load(vm.subscriptions)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Agent/Skill"/>
+                                <column label="Plan"/>
+                                <column label="Status"/>
+                                <column label="Usage"/>
+                                <column label="Next Billing"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="sub">
+                                <row>
+                                    <label value="@load(sub.itemName)"/>
+                                    <label value="@load(sub.plan)"/>
+                                    <label value="@load(sub.status)" 
+                                           sclass="@load(sub.statusStyle)"/>
+                                    <progressmeter value="@load(sub.usagePercentage)"/>
+                                    <label value="@load(sub.nextBilling)"/>
+                                    <hlayout>
+                                        <button label="Manage" 
+                                                onClick="@command('manageSubscription', sub=sub)"/>
+                                        <button label="Cancel" 
+                                                onClick="@command('cancelSubscription', sub=sub)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="agentDetailsWindow" 
+                title="Agent Details" 
+                visible="false" 
+                mode="modal"
+                width="80%"
+                height="80%">
+            <!-- Agent Details Content -->
+        </window>
+
+        <window id="skillDetailsWindow" 
+                title="Skill Details" 
+                visible="false" 
+                mode="modal"
+                width="70%"
+                height="70%">
+            <!-- Skill Details Content -->
+        </window>
+
+        <window id="subscriptionWindow" 
+                title="Subscription Management" 
+                visible="false" 
+                mode="modal"
+                width="600px">
+            <!-- Subscription Management Content -->
+        </window>
+    </div>
+</zk>

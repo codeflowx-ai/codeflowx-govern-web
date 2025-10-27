@@ -370,7 +370,7 @@ public class TaskManagementService {
         private String description;
         private String assignee;
         private String owner;
-        private String priority;
+        private Integer priority;
         private Date createTime;
         private Date dueDate;
         private String processInstanceId;
@@ -394,8 +394,8 @@ public class TaskManagementService {
         public String getOwner() { return owner; }
         public void setOwner(String owner) { this.owner = owner; }
 
-        public String getPriority() { return priority; }
-        public void setPriority(String priority2) { this.priority = priority2; }
+        public Integer getPriority() { return priority; }
+        public void setPriority(Integer priority) { this.priority = priority; }
 
         public Date getCreateTime() { return createTime; }
         public void setCreateTime(Date createTime) { this.createTime = createTime; }
@@ -418,7 +418,7 @@ public class TaskManagementService {
 			this.processVariables=vars;
 			
 		}
-		public Map getProcessVariables() {
+		public Map<String, Object> getProcessVariables() {
 			return processVariables;
 		}
     }

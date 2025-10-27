@@ -403,14 +403,18 @@ public class TaskInboxViewModel extends MasterPage {
      * Crear tarea MOCK para demo
      */
     private TaskDTO createMockTask(String id, String processDefId, String name, String description, 
-                                    String assignee, String priority, String status, String formKey) {
+                                    String assignee, String priorityStr, String status, String formKey) {
         TaskDTO task = new TaskDTO();
         task.setId(id);
         task.setProcessDefinitionId(processDefId);
         task.setName(name);
         task.setDescription(description);
         task.setAssignee(assignee);
+        
+        // Convertir String a Integer para priority
+        Integer priority = convertPriorityToInt(priorityStr);
         task.setPriority(priority);
+        
         task.setCreateTime(new java.util.Date(System.currentTimeMillis() - (long)(Math.random() * 86400000))); // Random en último 24h
         task.setFormKey(formKey);
         
@@ -422,6 +426,27 @@ public class TaskInboxViewModel extends MasterPage {
         task.setProcessVariables(vars);
         
         return task;
+    }
+    
+    /**
+     * Convierte String de prioridad a Integer
+     * Soporta: "CRITICAL", "HIGH", "MEDIUM", "LOW"
+     */
+    private Integer convertPriorityToInt(String priorityStr) {
+        if (priorityStr == null) return 50;
+        
+        switch (priorityStr.toUpperCase()) {
+            case "CRITICAL": return 100;
+            case "HIGH": return 90;
+            case "MEDIUM": return 50;
+            case "LOW": return 10;
+            default:
+                try {
+                    return Integer.parseInt(priorityStr);
+                } catch (NumberFormatException e) {
+                    return 50;
+                }
+        }
     }
 
     /**
@@ -631,7 +656,7 @@ public class TaskInboxViewModel extends MasterPage {
 
         // Filtro por prioridad
         if (!"Todas".equals(selectedPriority)) {
-            int priority = task.getPriority() != null ? Integer.parseInt(task.getPriority()) : 50;
+            int priority = task.getPriority() != null ? task.getPriority() : 50;
             if ("Alta (90-100)".equals(selectedPriority) && priority < 90) return false;
             if ("Media (50-89)".equals(selectedPriority) && (priority < 50 || priority >= 90)) return false;
             if ("Baja (0-49)".equals(selectedPriority) && priority >= 50) return false;
@@ -654,14 +679,14 @@ public class TaskInboxViewModel extends MasterPage {
     }
 
     public String getTaskRowClass(TaskDTO task) {
-        int priority = task.getPriority() != null ? Integer.parseInt(task.getPriority()) : 50;
+        int priority = task.getPriority() != null ? task.getPriority() : 50;
         if (priority >= 90) return "task-row-high";
         if (priority >= 50) return "task-row-medium";
         return "task-row-low";
     }
 
-    public String getPriorityClass(String priorityStr) {
-        int priority = priorityStr != null ? Integer.parseInt(priorityStr) : 50;
+    public String getPriorityClass(Integer priority) {
+        if (priority == null) priority = 50;
         if (priority >= 90) return "priority-high";
         if (priority >= 50) return "priority-medium";
         return "priority-low";

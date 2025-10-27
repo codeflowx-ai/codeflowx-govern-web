@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/compliance-monitoring">
+
+  <process id="compliance-monitoring-process" name="Compliance Monitoring Process" isExecutable="true">
+
+    <!-- TIMER START EVENT: Ejecuta cada 24 horas -->
+    <startEvent id="timerStart" name="Scheduled Check (24h)">
+      <timerEventDefinition>
+        <!-- Repeat indefinitely every 24 hours -->
+        <timeCycle>R/PT24H</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+
+    <!-- SERVICE TASK: Execute Compliance Check -->
+    <serviceTask id="executeComplianceCheck" name="Execute Compliance Check" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ScheduledComplianceDelegate"/>
+
+    <!-- EXCLUSIVE GATEWAY: Non-Compliance Detected? -->
+    <exclusiveGateway id="nonComplianceGateway" name="Non-Compliance Detected?"/>
+
+    <!-- SERVICE TASK: Create Alerts (if issues detected) -->
+    <serviceTask id="createAlerts" name="Create Compliance Alerts" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CreateComplianceAlertsDelegate"/>
+
+    <!-- USER TASK: Review Compliance Issues -->
+    <userTask id="reviewIssues" name="Review Compliance Issues" flowable:candidateGroups="compliance-officers">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/compliance-issues-review-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- EXCLUSIVE GATEWAY: Critical Issue? -->
+    <exclusiveGateway id="criticalIssueGateway" name="Critical Issue?"/>
+
+    <!-- USER TASK: Create Compliance Incident -->
+    <userTask id="createIncident" name="Create Compliance Incident" flowable:candidateGroups="compliance-officers">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/compliance-incident-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- SERVICE TASK: Schedule Review (for non-critical issues) -->
+    <serviceTask id="scheduleReview" name="Schedule Review" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ScheduleReviewDelegate"/>
+
+    <!-- SERVICE TASK: Update Dashboard (all compliant path) -->
+    <serviceTask id="updateDashboardSuccess" name="Update Dashboard (Success)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate"/>
+
+    <!-- SERVICE TASK: Update Dashboard (after incident created) -->
+    <serviceTask id="updateDashboardIncident" name="Update Dashboard (Incident)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate"/>
+
+    <!-- END EVENTS -->
+    <endEvent id="endSuccess" name="All Compliant"/>
+    <endEvent id="endReviewScheduled" name="Review Scheduled"/>
+    <endEvent id="endIncidentCreated" name="Incident Created"/>
+
+    <!-- SEQUENCE FLOWS -->
+    <sequenceFlow id="flow1" sourceRef="timerStart" targetRef="executeComplianceCheck"/>
+    <sequenceFlow id="flow2" sourceRef="executeComplianceCheck" targetRef="nonComplianceGateway"/>
+
+    <!-- Non-Compliance Gateway Decision -->
+    <sequenceFlow id="flowCompliant" name="All Compliant" sourceRef="nonComplianceGateway" targetRef="updateDashboardSuccess">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${nonCompliantSystems == 0}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowNonCompliant" name="Issues Detected" sourceRef="nonComplianceGateway" targetRef="createAlerts">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${nonCompliantSystems > 0}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Alerts to Review -->
+    <sequenceFlow id="flowAlertsToReview" sourceRef="createAlerts" targetRef="reviewIssues"/>
+
+    <!-- From Review to Critical Gateway -->
+    <sequenceFlow id="flowReviewToGateway" sourceRef="reviewIssues" targetRef="criticalIssueGateway"/>
+
+    <!-- Critical Issue Gateway Decision -->
+    <sequenceFlow id="flowCritical" name="Critical" sourceRef="criticalIssueGateway" targetRef="createIncident">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${isCritical == true}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowNonCritical" name="Non-Critical" sourceRef="criticalIssueGateway" targetRef="scheduleReview">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${isCritical == false}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Incident to Dashboard -->
+    <sequenceFlow id="flowIncidentToDashboard" sourceRef="createIncident" targetRef="updateDashboardIncident"/>
+
+    <!-- From Schedule Review to End -->
+    <sequenceFlow id="flowScheduleToEnd" sourceRef="scheduleReview" targetRef="endReviewScheduled"/>
+
+    <!-- From Dashboard to Ends -->
+    <sequenceFlow id="flowDashboardSuccessToEnd" sourceRef="updateDashboardSuccess" targetRef="endSuccess"/>
+    <sequenceFlow id="flowDashboardIncidentToEnd" sourceRef="updateDashboardIncident" targetRef="endIncidentCreated"/>
+
+  </process>
+
+  <!-- BPMN DI (Diagram Interchange) for visual representation -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_compliance-monitoring-process">
+    <bpmndi:BPMNPlane id="BPMNPlane_compliance-monitoring-process" bpmnElement="compliance-monitoring-process">
+      
+      <!-- Timer Start Event -->
+      <bpmndi:BPMNShape id="BPMNShape_timerStart" bpmnElement="timerStart">
+        <omgdc:Bounds x="100" y="200" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Execute Compliance Check -->
+      <bpmndi:BPMNShape id="BPMNShape_executeComplianceCheck" bpmnElement="executeComplianceCheck">
+        <omgdc:Bounds x="200" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway: Non-Compliance -->
+      <bpmndi:BPMNShape id="BPMNShape_nonComplianceGateway" bpmnElement="nonComplianceGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="360" y="193" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Update Dashboard (Success Path) -->
+      <bpmndi:BPMNShape id="BPMNShape_updateDashboardSuccess" bpmnElement="updateDashboardSuccess">
+        <omgdc:Bounds x="335" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Create Alerts -->
+      <bpmndi:BPMNShape id="BPMNShape_createAlerts" bpmnElement="createAlerts">
+        <omgdc:Bounds x="335" y="300" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Review Issues -->
+      <bpmndi:BPMNShape id="BPMNShape_reviewIssues" bpmnElement="reviewIssues">
+        <omgdc:Bounds x="500" y="300" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway: Critical Issue -->
+      <bpmndi:BPMNShape id="BPMNShape_criticalIssueGateway" bpmnElement="criticalIssueGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="660" y="315" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Create Incident -->
+      <bpmndi:BPMNShape id="BPMNShape_createIncident" bpmnElement="createIncident">
+        <omgdc:Bounds x="780" y="420" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Schedule Review -->
+      <bpmndi:BPMNShape id="BPMNShape_scheduleReview" bpmnElement="scheduleReview">
+        <omgdc:Bounds x="780" y="200" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Update Dashboard (Incident Path) -->
+      <bpmndi:BPMNShape id="BPMNShape_updateDashboardIncident" bpmnElement="updateDashboardIncident">
+        <omgdc:Bounds x="940" y="420" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Events -->
+      <bpmndi:BPMNShape id="BPMNShape_endSuccess" bpmnElement="endSuccess">
+        <omgdc:Bounds x="500" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_endReviewScheduled" bpmnElement="endReviewScheduled">
+        <omgdc:Bounds x="940" y="222" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_endIncidentCreated" bpmnElement="endIncidentCreated">
+        <omgdc:Bounds x="1100" y="442" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges (Sequence Flows) -->
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="136" y="218"/>
+        <omgdi:waypoint x="200" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="300" y="218"/>
+        <omgdi:waypoint x="360" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCompliant" bpmnElement="flowCompliant">
+        <omgdi:waypoint x="385" y="193"/>
+        <omgdi:waypoint x="385" y="160"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNonCompliant" bpmnElement="flowNonCompliant">
+        <omgdi:waypoint x="385" y="243"/>
+        <omgdi:waypoint x="385" y="300"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAlertsToReview" bpmnElement="flowAlertsToReview">
+        <omgdi:waypoint x="435" y="340"/>
+        <omgdi:waypoint x="500" y="340"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReviewToGateway" bpmnElement="flowReviewToGateway">
+        <omgdi:waypoint x="600" y="340"/>
+        <omgdi:waypoint x="660" y="340"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCritical" bpmnElement="flowCritical">
+        <omgdi:waypoint x="685" y="365"/>
+        <omgdi:waypoint x="685" y="460"/>
+        <omgdi:waypoint x="780" y="460"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNonCritical" bpmnElement="flowNonCritical">
+        <omgdi:waypoint x="685" y="315"/>
+        <omgdi:waypoint x="685" y="240"/>
+        <omgdi:waypoint x="780" y="240"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowIncidentToDashboard" bpmnElement="flowIncidentToDashboard">
+        <omgdi:waypoint x="880" y="460"/>
+        <omgdi:waypoint x="940" y="460"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowScheduleToEnd" bpmnElement="flowScheduleToEnd">
+        <omgdi:waypoint x="880" y="240"/>
+        <omgdi:waypoint x="940" y="240"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDashboardSuccessToEnd" bpmnElement="flowDashboardSuccessToEnd">
+        <omgdi:waypoint x="435" y="120"/>
+        <omgdi:waypoint x="500" y="120"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDashboardIncidentToEnd" bpmnElement="flowDashboardIncidentToEnd">
+        <omgdi:waypoint x="1040" y="460"/>
+        <omgdi:waypoint x="1100" y="460"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>
+
+

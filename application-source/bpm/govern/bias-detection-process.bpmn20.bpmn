@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="bias-detection-process" name="Bias Detection Process (80% IA)" isExecutable="true">
+    
+    <!-- ===== START EVENT ===== -->
+    <startEvent id="start" name="Análisis de Sesgo Solicitado"/>
+    
+    <!-- ===== 1. PREPARAR DATOS DEMOGRÁFICOS ===== -->
+    <serviceTask id="prepare-demographic-data" 
+                 name="Preparar Datos Demográficos"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.PrepareDemographicDataDelegate"/>
+    
+    <!-- ===== 2. EJECUTAR ANÁLISIS DE SESGOS ===== -->
+    <serviceTask id="execute-bias-detection" 
+                 name="Ejecutar Análisis de Sesgos"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ExecuteBiasDetectionDelegate"/>
+    
+    <!-- ===== 3. GATEWAY: ¿SESGO DETECTADO? ===== -->
+    <exclusiveGateway id="bias-detected-gateway" name="¿Sesgo Detectado?"/>
+    
+    <!-- ===== 4a. AUTO-APROBAR (sin sesgo) ===== -->
+    <serviceTask id="auto-approve-no-bias" 
+                 name="Auto-aprobar (Sin Sesgo)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoApproveNoBiasDelegate"/>
+    
+    <!-- ===== 4b. REVISIÓN HUMANA (con sesgo) ===== -->
+    <userTask id="review-detected-biases" 
+              name="Revisar Sesgos Detectados"
+              flowable:candidateGroups="ml-engineers,data-scientists,governance-admins"
+              flowable:formKey="plataforma/workflow/bias-review-form.zul">
+      <documentation>
+        Sesgos detectados en el modelo que requieren revisión.
+        Acciones: aceptar riesgo, mitigar, o rechazar modelo.
+      </documentation>
+    </userTask>
+    
+    <!-- ===== 5. GATEWAY: ACCIÓN DEL REVISOR ===== -->
+    <exclusiveGateway id="reviewer-action-gateway" name="Acción?"/>
+    
+    <!-- ===== 6a. ACEPTAR RIESGO ===== -->
+    <serviceTask id="accept-residual-risk" 
+                 name="Aceptar Riesgo Residual"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AcceptResidualRiskDelegate"/>
+    
+    <!-- ===== 6b. GENERAR RECOMENDACIONES DE MITIGACIÓN ===== -->
+    <serviceTask id="generate-mitigation-recommendations" 
+                 name="Generar Recomendaciones"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.GenerateMitigationRecommendationsDelegate"/>
+    
+    <!-- ===== 6c. RECHAZAR MODELO ===== -->
+    <serviceTask id="reject-biased-model" 
+                 name="Rechazar Modelo"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RejectBiasedModelDelegate"/>
+    
+    <!-- ===== 7. NOTIFICAR RESULTADOS ===== -->
+    <serviceTask id="notify-bias-analysis-results" 
+                 name="Notificar Resultados"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyBiasAnalysisDelegate"/>
+    
+    <!-- ===== END EVENTS ===== -->
+    <endEvent id="bias-analysis-completed" name="Análisis Completado"/>
+    <endEvent id="model-rejected" name="Modelo Rechazado"/>
+    
+    <!-- ===== SEQUENCE FLOWS ===== -->
+    
+    <!-- Start → Preparar Datos -->
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="prepare-demographic-data"/>
+    
+    <!-- Preparar Datos → Ejecutar Análisis -->
+    <sequenceFlow id="flow2" sourceRef="prepare-demographic-data" targetRef="execute-bias-detection"/>
+    
+    <!-- Ejecutar Análisis → Gateway Sesgo -->
+    <sequenceFlow id="flow3" sourceRef="execute-bias-detection" targetRef="bias-detected-gateway"/>
+    
+    <!-- Gateway Sesgo → Auto-aprobar (sin sesgo) -->
+    <sequenceFlow id="flow4-no-bias" sourceRef="bias-detected-gateway" targetRef="auto-approve-no-bias">
+      <conditionExpression xsi:type="tFormalExpression">${bias_detected == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Sesgo → Revisión Humana (con sesgo) -->
+    <sequenceFlow id="flow4-with-bias" sourceRef="bias-detected-gateway" targetRef="review-detected-biases">
+      <conditionExpression xsi:type="tFormalExpression">${bias_detected == true}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Auto-aprobar → Notificar -->
+    <sequenceFlow id="flow5" sourceRef="auto-approve-no-bias" targetRef="notify-bias-analysis-results"/>
+    
+    <!-- Revisión Humana → Gateway Acción -->
+    <sequenceFlow id="flow6" sourceRef="review-detected-biases" targetRef="reviewer-action-gateway"/>
+    
+    <!-- Gateway Acción → Aceptar Riesgo -->
+    <sequenceFlow id="flow7-accept" sourceRef="reviewer-action-gateway" targetRef="accept-residual-risk">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'accept'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Generar Recomendaciones -->
+    <sequenceFlow id="flow7-mitigate" sourceRef="reviewer-action-gateway" targetRef="generate-mitigation-recommendations">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'mitigate'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Rechazar Modelo -->
+    <sequenceFlow id="flow7-reject" sourceRef="reviewer-action-gateway" targetRef="reject-biased-model">
+      <conditionExpression xsi:type="tFormalExpression">${action == 'reject'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Aceptar Riesgo → Notificar -->
+    <sequenceFlow id="flow8" sourceRef="accept-residual-risk" targetRef="notify-bias-analysis-results"/>
+    
+    <!-- Generar Recomendaciones → Notificar -->
+    <sequenceFlow id="flow9" sourceRef="generate-mitigation-recommendations" targetRef="notify-bias-analysis-results"/>
+    
+    <!-- Notificar → End -->
+    <sequenceFlow id="flow10" sourceRef="notify-bias-analysis-results" targetRef="bias-analysis-completed"/>
+    
+    <!-- Rechazar Modelo → End (Rejected) -->
+    <sequenceFlow id="flow11" sourceRef="reject-biased-model" targetRef="model-rejected"/>
+    
+  </process>
+
+</definitions>
+
+

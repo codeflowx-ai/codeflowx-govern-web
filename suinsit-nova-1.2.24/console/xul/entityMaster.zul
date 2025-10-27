@@ -1,0 +1,750 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace
+		viewModel="@id('vm') @init('com.enartsystems.webapp.mapping.database.ui.EditEntityUI')"
+		validationMessages="@id('vmsgs')">
+		<div id="notificacion"></div>
+		<div class="row">
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a
+									iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('toSearch')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+									
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a
+										tooltiptext="Actualizar Schema de otro modelo"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('store')"
+										sclass="waves-effect waves-light">
+										
+									</a>
+									<a
+										tooltiptext="Importar la Tabla"
+										iconSclass="fa-duotone fa-solid fa-database align-middle fs-16 me-2"
+										onClick="@command('importar')"
+										sclass="waves-effect waves-light">
+										
+									</a>
+									<a
+										onClick="@command('removeAllData')" tooltiptext="Borrar Datos"
+										iconSclass="fa-duotone fa-solid fa-circle-xmark label-icon align-middle fs-16 me-2"
+										sclass="waves-effect waves-light">
+										
+									</a>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+		</div>
+		<div class="row">
+			<h:div class="col-lg-2 ">
+				<div class="card" >
+					<div class="card-body pad-0">
+						<vlayout id="vComponents" spacing="5px"
+							height="675px" class="scrollable-barra colum-tab" />
+					</div>
+				</div>
+			</h:div>
+			<h:div class="col-lg-8 ">
+				<!-- propiedades -->
+				<div class="row">
+					<div class="card " style="overflow:auto;">
+						<div class="card-body entity-pl">
+							<div class="form-group row ">
+							
+								<h:div class="col-md-3 border-field">
+									
+										<label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  " value="${labels.EntityMaster.tablename}" />
+									
+									<textbox
+										value="@bind(vm.entidad.namesql) @save(vm.entidad.namesql, before={'action','store'}) @validator(vm.validator,maxl=30,minl=10,required=true)"
+										placeholder="${labels.MddMentity.coentityname}"
+										id="coentityname1" width="85%"
+										sclass="margin-field form-control border-danger"
+										onChange="@command('onchangeTable',evento=event)" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+								
+								<div sclass="col-md-3 border-field spc-none">
+									
+										<label value="Cifrar Datos"> </label>
+									
+									<checkbox mold="switch"
+										sclass="spc-none"
+										value="@bind(vm.entidad.encriptar)"
+										checked="@bind(vm.entidad.encriptar)" />
+								</div>
+								
+								<h:div class="col-md-3 border-field"> 
+										<label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+											style="  " value="Atributo clave encriptación" />
+									
+									<textbox
+										value="@bind(vm.entidad.fieldValueKeyCipher) @save(vm.entidad.fieldValueKeyCipher, before={'action','store'}) "
+										placeholder="Ingresar atributo" width="85%"
+										sclass="margin-field form-control  form-control" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+								
+								
+								<h:div class="col-md-3 border-field"> 
+									
+									<span sclass="d-flex">
+										<label sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle spc-none"
+											style="  " value="Palabra clave encriptar" /> 
+										<a
+											iconSclass="mdi mdi-shield-lock" sclass="btn"
+											onClick="@command('keyCipher')"
+											tooltiptext="Generar clave de encripctación">
+										</a>
+									</span>
+										
+									
+									<textbox
+										value="@bind(vm.entidad.keyCipher) @save(vm.entidad.keyCipher, before={'action','store'}) "
+										placeholder="Ingresar palabra" width="80%"
+										sclass="margin-field form-control  form-control"
+										type="password" disabled="true" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+								
+							</div>
+							
+							
+							<div class="form-group row ">
+							
+								<h:div sclass="col-md-4 border-field">
+										<label
+											class="text-danger font-weight-bold"
+											value="@bind(vmsgs['coentityname1'])" />
+
+										<label 
+											value="Namespace">
+										</label>
+									<textbox
+										value="@bind(vm.entidad.namespace) @save(vm.entidad.namespace, before={'action','store'}) @validator(vm.validator,maxl=30,minl=1,required=true)"
+										sclass="margin-field form-control"
+										placeholder="namespace" width="80%" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+								
+								<h:div sclass="col-md-4 border-field">
+										<label
+											value="Etiqueta Mensajes">
+										</label>
+									<textbox
+										value="@bind(vm.entidad.labelMonitor) @save(vm.entidad.labelMonitor, before={'action','store'}) "
+										sclass="margin-field form-control"
+										placeholder="labelMonitor" width="85%" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+								
+								<h:div sclass="col-md-4 border-field">
+										<label value="Campo mensajes">
+										</label>
+									<textbox
+										value="@bind(vm.entidad.fieldMonitor) @save(vm.entidad.fieldMonitor, before={'action','store'}) "
+										sclass="margin-field form-control"
+										placeholder="fieldMonitor" width="85%" />
+									<label sclass="text-danger"
+										value="@load(vmsgs['nameapp'])">
+									</label>
+								</h:div>
+							</div>
+							
+							
+							
+							<div class="form-group row ">
+								
+								<div sclass="col-md-3 border-field">
+									<label 
+										value="is System"> 
+									</label>
+									<checkbox 
+										mold="switch"
+										value="@bind(vm.entidad.system)"
+										checked="@bind(vm.entidad.system)" />
+								</div>
+								
+								<div sclass="col-md-3 border-field">
+									<label 
+										value="Auditar">
+									</label>
+									<checkbox 
+										mold="switch"
+										value="@bind(vm.entidad.auditable)"
+										checked="@load(vm.entidad.auditable eq true)"
+										onCheck="@command('onAudit')" />
+								</div>
+								
+								<div sclass="col-md-3 border-field">
+									<label 
+										value="Crear Historico"> 
+									</label>
+									<checkbox 
+										mold="switch"
+										value="@bind(vm.entidad.historic)"
+										checked="@bind(vm.entidad.historic)"
+										disabled="@load(vm.entidad.historic)" />
+								</div>
+								
+								<div sclass="col-md-3 border-field">
+									<label
+										value="Registrar Actividad">
+									</label>
+									<checkbox
+										mold="switch"
+										value="@bind(vm.entidad.monitorAccion)"
+										checked="@bind(vm.entidad.monitorAccion)" />
+								</div>
+							
+							</div>
+							
+							
+							
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<tabbox>
+						<tabs>
+							<tab label="${labels.EntityMaster.fields}"
+								iconSclass="mdi mdi-database-edit-outline" />
+							<tab
+								label="${labels.EntityMaster.relations}"
+								iconSclass="mdi mdi-relation-one-or-many-to-one" />
+							<tab
+								label="${labels.EntityMaster.subtables}"
+								iconSclass="mdi mdi-relation-zero-or-many-to-one-or-many" />
+							<tab
+								label="${labels.EntityMaster.documentation}"
+								iconSclass="mdi mdi-file-document" />
+							<tab label="Reglas IA"
+								iconSclass="mdi mdi-semantic-web" />
+							<tab label="Sinonimos para Suinless"
+								iconSclass="mdi mdi-semantic-web" />	
+						</tabs>
+						<tabpanels>
+							<tabpanel>
+								<div>
+									<label
+										value="${labels.EntityMaster.drag}" droppable="true"
+										onDrop="@command('dragField',dragged=event.dragged)"
+										style="font-size:12px;color:#707070;">
+									</label>
+									<listbox id="atributtes"
+										class="barra"
+										height="300px" model="@bind(vm.entidad.fields)"
+										onSelect="@command('onSelectList',event=event)"
+										selectedItem="@bind(vm.att)" sizedByContent="true">
+										<listhead>
+											<listheader
+												label="${labels.EntityMaster.type}" width="50px" />
+											<listheader
+												label="${labels.EntityMaster.name}" width="150px" />
+											<listheader
+												label="${labels.EntityMaster.unique}" width="80px" />
+											<listheader
+												label="${labels.EntityMaster.primarykey}" />
+
+											<listheader
+												label="admite null" />
+											<listheader
+												label="${labels.EntityMaster.criteria}" width="80px" />
+											<listheader
+												label="Mostrar en Combo" />
+											<listheader
+												label="Mostrar en lista" />	
+											<listheader
+												label="${labels.EntityMaster.increment}" />
+											<listheader
+												label="Encriptar" width="80px" />
+											<listheader
+												label="uuid" width="80px" />
+											<listheader 
+												label="Sistema" width="80px" />
+											<listheader 
+												label="Ocultar" width="80px" />
+											<listheader 
+												label="Auditar" width="80px" />
+											<listheader
+												label="Historico" width="80px" />
+											<listheader
+												label="Modificable" />
+											<listheader
+												label="Puede Borrar" />
+											<listheader
+												label="Puede Filtrar" />
+											
+											<listheader
+												label="${labels.EntityMaster.size}" width="150px" />
+											<listheader label=""
+												width="60px" />
+										</listhead>
+										
+										<template name="model"
+											var="item" status="s">
+											<listitem>
+												<listcell>
+													<image
+														src="@load(item.fieldBean.icono)">
+													</image>
+												</listcell>
+												<listcell>
+													
+														<textbox
+															sclass="name-textbox"
+															value="@bind(item.columnname) @save(item.columnname, before={'action','store'}) @validator(vm.validator,maxl=30,minl=10,required=true) "
+															disabled="@load(item.pk eq true or item.system eq true)"
+															onChange="@command('onchange',evento=event,item=item,field='name')">
+														</textbox>
+														<label
+															class="text-danger font-weight-bold"
+															value="@bind(vmsgs[self.previousSibling])" />
+													
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.unique) "
+														disabled="@load(item.pk eq true)"
+														onCheck="@command('oncheck',item=item,field='unique')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<label
+														sclass="@load(item.pk?'icon-checkmark2 btn btn-outline bg-primary ml-2 legitRipple':'icon-cross3 btn btn-link legitRipple')"
+														style="font-size: 16px;">
+													</label>
+												</listcell>
+
+												<listcell>
+													<checkbox
+														checked="@bind(item.nullable) "
+														disabled="@load(item.pk eq true or item.system eq true)"
+														onCheck="@command('oncheck',item=item,field='required')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.criteria) "
+														disabled="@load(item.pk eq true or item.system eq true)"
+														onCheck="@command('oncheck',item=item,field='criteria')" />
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.combo) "
+														
+														onCheck="@command('oncheck',item=item,field='combo')" />
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.showList) "
+														
+														onCheck="@command('oncheck',item=item,field='showList')" />
+												</listcell>
+												<listcell>
+													<choose>
+														<when
+															test="@load(item.fieldBean.idx eq 6)">
+															<checkbox
+																checked="@bind(item.increment) "
+																disabled="@load(item.pk eq true or item.system eq true)"
+																onCheck="@command('oncheck',item=item,field='increment')">
+															</checkbox>
+														</when>
+														<otherwise>
+															<label
+																sclass="icon-cross3 btn btn-pure"
+																style="font-size: 16px;">
+															</label>
+														</otherwise>
+													</choose>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.encriptar) ">
+													</checkbox>
+
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.uuid) "
+														onCheck="@command('oncheck',item=item,field='uuid')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.system) "
+														onCheck="@command('oncheck',item=item,field='system')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.hidden) "
+														onCheck="@command('oncheck',item=item,field='hidden')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.auditable) "
+														onCheck="@command('oncheck',item=item,field='auditable')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.historic) "
+														onCheck="@command('oncheck',item=item,field='historic')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.updatable) "
+														onCheck="@command('oncheck',item=item,field='updatable')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.deletable) "
+														onCheck="@command('oncheck',item=item,field='deletable')">
+													</checkbox>
+												</listcell>
+												<listcell>
+													<checkbox
+														checked="@bind(item.filter)"
+														onCheck="@command('oncheck',item=item,field='filter')">
+													</checkbox>
+												</listcell>
+												 
+												<listcell>
+													<combobox
+														model="@load(item.fieldBean.sizes)"
+														selectedItem="@bind(item.fieldBean.size)" width="90%"
+														disabled="@load(item.pk eq true or item.columnsize gt 0 or item.system eq true)">
+														<template
+															name="model" var="item1">
+															<comboitem
+																label="@load(item1)" value="@bind(item1)" />
+														</template>
+													</combobox>
+												</listcell>
+												<listcell>
+													<hbox>
+														<button
+															onClick="@command('removeField',item=item)"
+															tooltiptext="${labels.MddMentity.remove}"
+															iconSclass="bx bx-trash fs-2x"
+															sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />
+
+
+													</hbox>
+												</listcell>
+											</listitem>
+										</template>
+									</listbox>
+								</div>
+							</tabpanel>
+							<tabpanel>
+								<div>
+									<label
+										value="${labels.EntityMaster.drag2}" droppable="true"
+										onDrop="@command('dragEntity',dragged=event.dragged)"
+										style="font-size:12px;color:#707070;">
+									</label>
+									<grid height="550px"
+										model="@bind(vm.entidad.foreings)" sizedByContent="true">
+										<columns>
+											<column
+												label="${labels.EntityMaster.entity}" width="150px" />
+											<column
+												label="${labels.EntityMaster.alias}" width="150px" />
+											<column
+												label="${labels.EntityMaster.required}" width="60px" />
+											<column
+												label="${labels.EntityMaster.criteria}" width="60px" />
+											<column
+												label="${labels.EntityMaster.one}" width="60px" />
+											<column label="Api"
+												width="60px" />
+											<column label="aliasApi" />
+											<column label="namedApi" />
+											<column label="Etiqueta"
+												width="150px" />
+											<column label="Filtrar"
+												width="60px" />
+											<column
+												label="Añadir Tablas" width="60px" />
+											<column label="Sistema"
+												width="60px" />
+											<column label="Ocultar"
+												width="60px" />
+											<column
+												label="${labels.EntityMaster.description}" />
+											<column label=""
+												width="150px">
+											</column>
+										</columns>
+										<rows>
+											<template name="model"
+												var="item" status="s">
+												<row>
+													<label
+														value="@load(item.fkentitynamedb)">
+													</label>
+													<cell>
+														<textbox
+															width="95%"
+															value="@bind(item.alias) @validator(vm.validator,maxl=30,minl=10,required=true)">
+														</textbox>
+														<label
+															class="text-danger font-weight-bold"
+															value="@bind(vmsgs[self.previousSibling])" />
+													</cell>
+													<checkbox
+														checked="@bind(item.required)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.criteria)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.onetoone)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.api)">
+													</checkbox>
+													<textbox width="95%"
+														value="@bind(item.aliasApi) @validator(vm.validator,maxl=40,minl=5)" />
+													<textbox width="95%"
+														value="@bind(item.namedApi) @validator(vm.validator,maxl=40,minl=5)" />
+													<cell>
+														<textbox
+															width="95%"
+															value="@bind(item.label) @validator(vm.validator,maxl=30,minl=10,required=true)">
+														</textbox>
+														<label
+															class="text-danger font-weight-bold"
+															value="@bind(vmsgs[self.previousSibling])" />
+													</cell>
+													<checkbox
+														checked="@bind(item.filter)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.columns)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.system)">
+													</checkbox>
+													<checkbox
+														checked="@bind(item.hidden)">
+													</checkbox>
+
+													<cell>
+														<textbox
+															width="95%"
+															value="@bind(item.comment) @validator(vm.validator,maxl=50,minl=10)"
+															placeholder="${labels.EntityMaster.inputdes}">
+														</textbox>
+														<label
+															class="text-danger font-weight-bold"
+															value="@bind(vmsgs[self.previousSibling])" />
+													</cell>
+													<cell>
+														<button
+															onClick="@command('removeForeing',item=item)"
+															tooltiptext="${labels.MddMentity.remove}"
+															iconSclass="bx bx-trash fs-2x"
+															sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />
+
+													</cell>
+												</row>
+											</template>
+										</rows>
+									</grid>
+								</div>
+							</tabpanel>
+							<tabpanel>
+								<div>
+									<button
+										label="Verificar descendientes"
+										onClick="@command('verificarDes', label=msg)">
+									</button>
+									<label id="msg" style="color:red"
+										value="">
+									</label>
+									<grid height="550px"
+										model="@bind(vm.entidad.descendens)">
+										<columns>
+											<column
+												label="${labels.EntityMaster.entity}" width="150px" />
+											<column
+												label="${labels.EntityMaster.alias}" width="150px" />
+
+
+										</columns>
+										<rows>
+											<template name="model"
+												var="item" status="s">
+												<row>
+													<label
+														value="@load(item.fktablename)" />
+
+													<label
+														value="@load(item.coname)" />
+
+
+												</row>
+											</template>
+										</rows>
+									</grid>
+								</div>
+							</tabpanel>
+							<tabpanel>
+								<tbeditor
+									value="@bind(vm.entidad.dscomment)" height="550px" />
+							</tabpanel>
+							<tabpanel>
+								<div>
+									<button tooltiptext="Evaluar"
+									iconSclass="mdi mdi-motion-play-outline label-icon align-middle fs-16 me-2"
+									onClick="@command('addRule' )"
+									sclass="btn btn-label btn-secondary waves-effect waves-light">
+									Append Rule
+								</button>
+									<listbox id="rules" height="550px"
+										model="@bind(vm.entidad.rules)"
+										onSelect="@command('onSelectRules',event=event)" >
+										<listhead>
+											<listheader label="Evento"
+												width="20%" />
+											<listheader label="Regla"
+												width="60%" />
+											<listheader label=""
+												width="20%" />
+										</listhead>
+										<template name="model"
+											var="item" status="s">
+											<listitem>
+												<listcell label="@load(item.event)">
+												</listcell>
+												<listcell label="@load(item.nameRule)">
+												</listcell>
+												<listcell >
+												<hbox>
+												<button
+															onClick="@command('editRule',item=item)"
+															tooltiptext="${labels.MddMentity.remove}"
+															iconSclass="mdi mdi-grease-pencil fs-2x"
+															sclass="btn btn-outline-info waves-effect waves-light shadow-none" />
+														<button
+															onClick="@command('removeRule',item=item)"
+															tooltiptext="${labels.MddMentity.remove}"
+															iconSclass="bx bx-trash fs-2x"
+															sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />
+												</hbox>
+												</listcell>
+											</listitem>
+										</template>
+									</listbox>
+								</div>
+							</tabpanel>
+							<tabpanel>
+							  <div sclass="row">
+							     <div sclass="col-lg-8">
+							       <h:p>Incluye los sinonimos de esta tabla que se trataran durante, la importación de requisitos, por ejemplo si es una tabla que contiene los paises, se definirian así:<h:br/></h:p>
+							        <h:p>Pais,Paises,Country,Countries,paisos .  Clientes, Cliente, Customers, Sujetos, personas, person ...<h:br/></h:p>
+							     </div>
+							   <div sclass="col-lg-8">
+							     <textbox value="@bind(vm.entidad.semanticAliases)" width="100%" multiline="true" rows="4"></textbox>
+							   </div>
+							  </div>
+							</tabpanel>
+						</tabpanels>
+					</tabbox>
+
+
+				</div>
+			</h:div>
+			<h:div class="col-lg-2 ">
+				<!-- tablas y propiedades -->
+				<div class="card" height="700px">
+					<div class="card-body pad-0 prop" >
+						<tabbox id="propent" class="barra-act">
+							<tabs>
+								<tab label="Propiedades" />
+								<tab label="Entidades Schema" />
+								<tab label="Todas entidades" />
+							</tabs>
+							<tabpanels>
+								<tabpanel>
+									<grid style="align:top"
+										id="propiedades" width="99%" height="850px">
+										<columns>
+											<column label="Property"
+												width="25%" />
+											<column label="Value"
+												width="75%" />
+										</columns>
+										<rows>
+											<row></row>
+											<row></row>
+											<row></row>
+										</rows>
+									</grid>
+								</tabpanel>
+								<!-- 								<tabpanel> -->
+
+								<!-- 																		<grid style="align:top" -->
+								<!-- 																			id="props" width="99%" oddRowSclass="sinestilo" -->
+								<!-- 																			height="675px" model="@bind(vm.att.propsBeans)" -->
+								<!-- 																			rowRenderer="@load(vm.propRender)"> -->
+								<!-- 																			<columns> -->
+								<!-- 																				<column -->
+								<!-- 																					label="${labels.EntityMaster.property}" width="25%" /> -->
+								<!-- 																				<column -->
+								<!-- 																					label="${labels.EntityMaster.value}" width="75%" /> -->
+								<!-- 																			</columns> -->
+
+								<!-- 																		</grid> -->
+								<!-- 								</tabpanel> -->
+								<tabpanel>
+									<vlayout id="vEntitys" spacing="5px"
+										height="675px" class="scrollable-barra" />
+								</tabpanel>
+								<tabpanel>
+									<vlayout id="vAllEntitys"
+										spacing="5px" height="675px" style="overflow:auto;" />
+								</tabpanel>
+							</tabpanels>
+						</tabbox>
+
+					</div>
+				</div>
+			</h:div>
+		</div>
+	</idspace>
+</zk>

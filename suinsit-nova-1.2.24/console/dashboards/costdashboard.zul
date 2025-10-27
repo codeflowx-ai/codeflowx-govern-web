@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Cost Optimization Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .cost-container { 
+            padding: 20px; 
+            background: #f8f9fa; 
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metrics-container {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .cost-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .cost-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        .saving-positive { color: #27ae60; }
+        .saving-negative { color: #c0392b; }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 10px;
+            color: #34495e;
+        }
+        .optimization-alert {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 5px 0;
+        }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.CostOptimizationViewModel')"
+         sclass="cost-container">
+        
+        <!-- Cost Overview Section -->
+        <label value="Cost Overview" sclass="section-title"/>
+        <hlayout>
+            <div sclass="chart-container" width="65%">
+                <charts id="costTrendChart"
+                       model="@bind(vm.costTrendChart)"
+                       height="400px"/>
+            </div>
+            
+            <div sclass="metrics-container" width="32%">
+                <grid model="@bind(vm.costOverviewList)"
+                      emptyMessage="No cost data available">
+                    <columns>
+                        <column label="Model" width="120px"/>
+                        <column label="Total Cost"/>
+                        <column label="Daily Avg"/>
+                        <column label="Tokens Used"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="$@load(each.total_cost)"
+                                   sclass="cost-value"/>
+                            <label value="$@load(each.avg_daily_cost)"/>
+                            <label value="@load(each.total_tokens_used)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+        </hlayout>
+
+        <!-- Token Usage and Predictions -->
+        <label value="Usage Analysis & Predictions" sclass="section-title"/>
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="tokenUsageChart"
+                       model="@bind(vm.tokenUsageChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.tokenAnalysisList)"
+                      emptyMessage="No token analysis available"
+                      sclass="metrics-container">
+                    <columns>
+                        <column label="Model"/>
+                        <column label="Efficiency"/>
+                        <column label="Cost/Token"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="@load(each.avg_efficiency)+'%'"
+                                   sclass="@load(each.avg_efficiency gt 80 ? 'saving-positive' : 'saving-negative')"/>
+                            <label value="$@load(each.total_cost div each.total_tokens)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            
+            <div sclass="chart-container" width="48%">
+                <charts id="predictionChart"
+                       model="@bind(vm.predictionChart)"
+                       height="300px"/>
+            </div>
+        </hlayout>
+
+        <!-- Optimization Results -->
+        <label value="Optimization & Savings" sclass="section-title"/>
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="optimizationChart"
+                       model="@bind(vm.optimizationChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.optimizationMetricsList)"
+                      emptyMessage="No optimization metrics available"
+                      sclass="metrics-container">
+                    <columns>
+                        <column label="Model"/>
+                        <column label="Total Savings"/>
+                        <column label="Active Optimizations"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="$@load(each.total_savings)"
+                                   sclass="saving-positive"/>
+                            <label value="@load(each.active_optimizations)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            
+            <vlayout width="48%" spacing="10px">
+                <div sclass="metrics-container">
+                    <label value="Resource Optimization" style="font-weight: bold;"/>
+                    <grid model="@bind(vm.resourceOptimizationList)"
+                          emptyMessage="No resource optimization data available">
+                        <columns>
+                            <column label="Resource Type"/>
+                            <column label="Savings"/>
+                            <column label="Efficiency Gain"/>
+                        </columns>
+                        <template name="model">
+                            <row>
+                                <label value="@load(each.resourcetype)"/>
+                                <label value="$@load(each.total_savings)"
+                                       sclass="saving-positive"/>
+                                <label value="@load(each.efficiency_gain)+'%'"/>
+                            </row>
+                        </template>
+                    </grid>
+                </div>
+                
+                <div sclass="metrics-container">
+                    <label value="Optimization Recommendations" style="font-weight: bold;"/>
+                    <grid model="@bind(vm.optimizationMetricsList)"
+                          emptyMessage="No recommendations available">
+                        <columns>
+                            <column label="Model"/>
+                            <column label="Recommendation"/>
+                        </columns>
+                        <template name="model">
+                            <row>
+                                <label value="@load(each.model_name)"/>
+                                <div sclass="optimization-alert">
+                                    <label value="@load(each.optimization_recommendations)"/>
+                                </div>
+                            </row>
+                        </template>
+                    </grid>
+                </div>
+            </vlayout>
+        </hlayout>
+
+        <!-- Actions Section -->
+        <div sclass="metrics-container">
+            <hlayout spacing="20px">
+                <button label="Export Cost Report"
+                        iconSclass="z-icon-download"
+                        sclass="refresh-button"/>
+                <button label="Schedule Optimization"
+                        iconSclass="z-icon-calendar"
+                        sclass="refresh-button"/>
+                <button label="Refresh Metrics"
+                        iconSclass="z-icon-refresh"
+                        onClick="@command('refreshCostOptimization')"
+                        sclass="refresh-button"/>
+            </hlayout>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+            <label value="Last Updated: "/>
+            <label value="@load(new java.util.Date())" />
+            <label value=" | Data refreshes every 5 minutes"/>
+        </div>
+    </div>
+</zk>

@@ -1,0 +1,186 @@
+<?page title="Model Analytics Dashboard" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.analytics.ModelAnalyticsVM')">
+        
+        <!-- Analytics Overview -->
+        <hlayout sclass="analytics-header">
+            <div sclass="metric-box">
+                <label value="Total Requests"/>
+                <label value="@load(vm.totalRequests)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Success Rate"/>
+                <label value="@load(vm.successRate)%" 
+                       sclass="@load(vm.successRateStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Avg. Response Time"/>
+                <label value="@load(vm.avgResponseTime)ms"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Daily Cost"/>
+                <label value="$@load(vm.dailyCost)"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Performance Analytics"/>
+                <tab label="Usage Patterns"/>
+                <tab label="Quality Metrics"/>
+                <tab label="Cost Analysis"/>
+            </tabs>
+            <tabpanels>
+                <!-- Performance Analytics Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Time Series Performance -->
+                        <charts id="performanceChart" 
+                               type="line"
+                               height="300px"
+                               title="Performance Trends"
+                               model="@load(vm.performanceData)"/>
+                        
+                        <!-- Model Comparison -->
+                        <listbox model="@load(vm.modelPerformance)" 
+                                mold="paging" pageSize="10">
+                            <listhead>
+                                <listheader label="Model"/>
+                                <listheader label="Latency (p95)"/>
+                                <listheader label="Throughput"/>
+                                <listheader label="Error Rate"/>
+                                <listheader label="SLA Compliance"/>
+                                <listheader label="Trend"/>
+                            </listhead>
+                            <template name="model" var="perf">
+                                <listitem>
+                                    <listcell label="@load(perf.modelName)"/>
+                                    <listcell label="@load(perf.latency)ms"/>
+                                    <listcell label="@load(perf.throughput)/s"/>
+                                    <listcell>
+                                        <label value="@load(perf.errorRate)%" 
+                                               sclass="@load(perf.errorRateStyle)"/>
+                                    </listcell>
+                                    <listcell>
+                                        <progressmeter value="@load(perf.slaCompliance)"/>
+                                        <label value="@load(perf.slaCompliance)%"/>
+                                    </listcell>
+                                    <listcell>
+                                        <label value="@load(perf.trend)" 
+                                               sclass="@load(perf.trendStyle)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Usage Patterns Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <hlayout>
+                            <!-- Usage Distribution -->
+                            <groupbox title="Usage Distribution" width="50%">
+                                <charts id="usageChart" 
+                                       type="pie"
+                                       height="300px"
+                                       model="@load(vm.usageDistribution)"/>
+                            </groupbox>
+                            
+                            <!-- Peak Usage Times -->
+                            <groupbox title="Peak Usage Times" width="50%">
+                                <charts id="peakUsageChart" 
+                                       type="heatmap"
+                                       height="300px"
+                                       model="@load(vm.peakUsageData)"/>
+                            </groupbox>
+                        </hlayout>
+
+                        <!-- Usage Insights -->
+                        <groupbox title="Usage Insights">
+                            <listbox model="@load(vm.usageInsights)">
+                                <listhead>
+                                    <listheader label="Pattern"/>
+                                    <listheader label="Frequency"/>
+                                    <listheader label="Impact"/>
+                                    <listheader label="Recommendation"/>
+                                </listhead>
+                                <template name="model" var="insight">
+                                    <listitem>
+                                        <listcell label="@load(insight.pattern)"/>
+                                        <listcell label="@load(insight.frequency)"/>
+                                        <listcell label="@load(insight.impact)"/>
+                                        <listcell label="@load(insight.recommendation)"/>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Quality Metrics Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Quality Score Cards -->
+                        <hlayout>
+                            <div sclass="quality-card" width="25%">
+                                <label value="Accuracy"/>
+                                <label value="@load(vm.accuracyScore)%"/>
+                            </div>
+                            <div sclass="quality-card" width="25%">
+                                <label value="Consistency"/>
+                                <label value="@load(vm.consistencyScore)%"/>
+                            </div>
+                            <div sclass="quality-card" width="25%">
+                                <label value="Relevance"/>
+                                <label value="@load(vm.relevanceScore)%"/>
+                            </div>
+                            <div sclass="quality-card" width="25%">
+                                <label value="Bias Score"/>
+                                <label value="@load(vm.biasScore)"/>
+                            </div>
+                        </hlayout>
+
+                        <!-- Quality Trends -->
+                        <charts id="qualityTrendsChart" 
+                               type="line"
+                               height="300px"
+                               title="Quality Trends"
+                               model="@load(vm.qualityTrendsData)"/>
+
+                        <!-- Detailed Quality Metrics -->
+                        <listbox model="@load(vm.qualityMetrics)">
+                            <listhead>
+                                <listheader label="Metric"/>
+                                <listheader label="Score"/>
+                                <listheader label="Threshold"/>
+                                <listheader label="Trend"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="metric">
+                                <listitem>
+                                    <listcell label="@load(metric.name)"/>
+                                    <listcell>
+                                        <label value="@load(metric.score)" 
+                                               sclass="@load(metric.scoreStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(metric.threshold)"/>
+                                    <listcell>
+                                        <label value="@load(metric.trend)" 
+                                               sclass="@load(metric.trendStyle)"/>
+                                    </listcell>
+                                    <listcell>
+                                        <button label="Details" 
+                                                onClick="@command('showMetricDetails', metric=metric)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </div>
+</zk>

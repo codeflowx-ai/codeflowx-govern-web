@@ -1,0 +1,187 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<idspace
+		viewModel="@id('vm') @init('com.suinsit.compliance.web.RiskMonitoringUI')">
+		<custom-attributes namespace="compliance" />
+
+		<div class="container-fluid">
+			<!-- Header -->
+			<div class="row mb-3">
+				<div class="col-12">
+					<h:h2 class="text-primary">
+						Monitorización de Riesgos
+					</h:h2>
+				</div>
+			</div>
+
+			<!-- Filtros -->
+			<div class="row mb-4">
+				<div class="col-md-3">
+					<div class="form-group">
+						<h:label>Sector</h:label>
+						<combobox model="@load(vm.sectors)"
+							selectedItem="@bind(vm.selectedSector)"
+							onSelect="@command('onSectorSelect')" class="form-control">
+							<template name="model">
+								<comboitem label="@load(each.name)" />
+							</template>
+						</combobox>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<h:label>Nivel de Riesgo</h:label>
+						<combobox model="@load(vm.riskLevels)"
+							selectedItem="@bind(vm.selectedRiskLevel)"
+							onSelect="@command('onRiskLevelSelect')" class="form-control">
+							<template name="model">
+								<comboitem label="@load(each)" />
+							</template>
+						</combobox>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="form-group">
+						<h:label>Período</h:label>
+						<combobox model="@load(vm.periods)"
+							selectedItem="@bind(vm.selectedPeriod)"
+							onSelect="@command('onPeriodSelect')" class="form-control">
+							<template name="model">
+								<comboitem label="@load(each)" />
+							</template>
+						</combobox>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<h:button class="btn btn-primary mt-4"
+						onClick="@command('refreshData')">
+						Actualizar
+					</h:button>
+				</div>
+			</div>
+
+			<!-- KPIs -->
+			<div class="row mb-4">
+				<div class="col-md-3">
+					<div class="card bg-primary text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								Total Evaluaciones
+							</h5>
+							<h2 class="card-text">
+								@load(vm.kpis.totalAssessments)
+							</h2>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="card bg-success text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								Tasa de Cumplimiento
+							</h5>
+							<h2 class="card-text">
+								@load(vm.kpis.complianceRate)%
+							</h2>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="card bg-warning text-white">
+						<div class="card-body">
+							<h5 class="card-title">Alertas Activas</h5>
+							<h2 class="card-text">
+								@load(vm.kpis.activeAlerts)
+							</h2>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-3">
+					<div class="card bg-info text-white">
+						<div class="card-body">
+							<h5 class="card-title">
+								Empresas Evaluadas
+							</h5>
+							<h2 class="card-text">
+								@load(vm.kpis.evaluatedCompanies)
+							</h2>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Gráficos -->
+			<div class="row mb-4">
+				<div class="col-md-6">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">
+								Tendencia de Riesgos
+							</h5>
+							<charts id="riskTrendChart" type="line"
+								title="Tendencia de Riesgos" model="@load(vm.riskTrendModel)"
+								height="300px" />
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">
+								Distribución por Categoría
+							</h5>
+							<charts id="categoryDistChart" type="pie"
+								title="Distribución por Categoría"
+								model="@load(vm.categoryDistModel)" height="300px" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabla de Alertas -->
+			<div class="row">
+				<div class="col-12">
+					<div class="card">
+						<div class="card-body">
+							<h5 class="card-title">
+								Alertas Recientes
+							</h5>
+							<grid model="@load(vm.alerts)" mold="paging"
+								pageSize="5">
+								<columns>
+									<column label="Fecha" />
+									<column label="Empresa" />
+									<column label="Tipo" />
+									<column label="Nivel" />
+									<column label="Estado" />
+									<column label="Acciones" />
+								</columns>
+								<template name="model">
+									<row>
+										<cell>${each.date}</cell>
+										<cell>${each.company}</cell>
+										<cell>${each.type}</cell>
+										<cell>${each.level}</cell>
+										<cell>${each.status}</cell>
+										<cell>
+											<h:button
+												class="btn btn-sm btn-info"
+												onClick="@command('viewAlert', alert=each)">
+												Ver
+											</h:button>
+										</cell>
+									</row>
+								</template>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

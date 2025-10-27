@@ -1,0 +1,264 @@
+
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div sclass="col-lg-12">
+		<hbox id="toolbar2" spacing="5px" align="start"
+			style="margin-top: 7px;margin-bottom: 5px;">
+		</hbox>
+		<nodom
+			viewModel="@id('vm') @init('com.enartsystems.designer.ViewModelDesigner')">
+			<custom-attributes queue="design" />
+			<custom-attributes scopeView="DESIGNER" />
+			<tabbox>
+				<tabs>
+					<tab id="ids" label="Designer"
+						 image="img/icons/svg/web-design.svg"/>
+					<tab id="tbpreview" label="Preview"
+						onClick="@command('onPreview')" image="img/icons/svg/preview.svg" />
+					<tab id="tbcomponent" label="Help-Component"
+						image="img/icons/svg/apoyo.svg" disabled="true" />
+					<tab id="tblogs" label="logs"
+						onSelect="@command('onLoadLogs')" image="img/icons/svg/log.svg"/>
+				</tabs>
+				<tabpanels>
+					<tabpanel>
+						<div sclass="row">
+							<div sclass="col-lg-1 designer-ttl">
+								<tabbox>
+									<tabs>
+										<tab label="Basic" id="Cpbasic" />
+										<tab label="Custom"
+											id="Cpcustom" />
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<vlayout id="vComponents"
+												spacing="10px" />
+										</tabpanel>
+										<tabpanel>
+											<vlayout id="vCustoms"
+												spacing="10px" />
+										</tabpanel>
+									</tabpanels>
+								</tabbox>
+							</div>
+							<div sclass="col-lg-8 col-xlg-8 col-md-8">
+								<tabbox>
+									<tabs>
+										<tab label="Designer"
+											iconSclass="icon wb-desktop" />
+										<tab id="context"
+											label="Context" iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+
+										<tab id="pageprops"
+											label="Properties Page"
+											iconSclass="icon glyphicon glyphicon-cog" />
+
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+										    <div sclass="row">
+											<div id="drawingpane"
+												sclass="col-lg-12 col-xlg-12 col-md-12">
+											</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<vbox spacing="5px"
+												widths="40%,60%">
+												<h:div
+													class="panel panel-line panel-primary">
+													<hbox spacing="5px"
+														width="100%" align="end">
+														<space></space>
+														<h:h5>
+															Fields /
+															Properties
+														</h:h5>
+													</hbox>
+
+													<h:div
+														class="panel-body">
+														<grid
+															style="align:top" id="atts" height="350px"
+															droppable="true" onDrop="@command('dropField',evt=event)"
+															model="@bind(vm.fieldsCtx)">
+															<columns>
+																<column
+																	label="Entity" width="100px" />
+																<column
+																	label="Attribute" width="100px" />
+																<column
+																	label="Type" width="100px" />
+																<column
+																	label="Default value" width="150px" />
+																<column
+																	label="Assign value of" width="150px" />
+																<column
+																	label="" width="50px" />
+															</columns>
+															<rows>
+																<template
+																	name="model" var="item">
+																	<row
+																		droppable="true"
+																		onDrop="@command('dropAtt',dragged=event.dragged,att=self.value)">
+
+																		<label
+																			value="@load(item.entidad.entidad)">
+																		</label>
+																		<label
+																			value="@load(item.atribute)">
+																		</label>
+																		<label
+																			value="@load(item.modelType.name)">
+																		</label>
+																		<zk
+																			switch="${item.modelType.name}">
+																			<zk
+																				case="VARCHAR*,CLOB">
+																				<textbox
+																					value="@bind(item.defString)" width="140px">
+																				</textbox>
+																			</zk>
+																			<zk
+																				case="NUMBER,DECIMAL,FLOAT">
+																				<decimalbox
+																					value="@bind(item.defDecimal)">
+																				</decimalbox>
+																			</zk>
+																			<zk
+																				case="INTEGER,INT,LONG">
+																				<intbox
+																					value="@bind(item.defDecimal)">
+																				</intbox>
+																			</zk>
+																			<zk
+																				case="DATE">
+																				<datebox
+																					value="@bind(item.defDate)">
+																				</datebox>
+																			</zk>
+																			<zk>
+																				<textbox
+																					value="@bind(item.defString)" width="140px">
+																				</textbox>
+																			</zk>
+																		</zk>
+																		<label
+																			value="@load(item.asignFrom.atribute ne null? item.asignFrom.atribute : item.variable.name)">
+																		</label>
+
+																		<button
+																			onClick="@command('removeAtt',att=item)"
+																			tooltiptext="Delete" iconSclass="icon wb-trash"
+																			sclass="btn btn-pure btn-danger">
+																		</button>
+																	</row>
+																</template>
+															</rows>
+														</grid>
+													</h:div>
+												</h:div>
+											</vbox>
+										</tabpanel>
+										<tabpanel>
+
+											<grid style="align:top"
+												id="propiedadesPage" width="70%" height="750px">
+												<columns>
+													<column
+														label="Property" width="25%" />
+													<column
+														label="Value" width="75%" />
+												</columns>
+												<rows>
+													<row></row>
+													<row></row>
+													<row></row>
+												</rows>
+											</grid>
+										</tabpanel>
+									</tabpanels>
+								</tabbox>
+							</div>
+							<div sclass="col-lg-3">
+								<tabbox>
+									<tabs>
+										<tab id="props"
+											label="Properties" />
+										<tab label="Data" />
+
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<grid style="align:top"
+												id="propiedades" width="99%" height="850px">
+												<columns>
+													<column
+														label="Property" width="25%" />
+													<column
+														label="Value" width="75%" />
+												</columns>
+												<rows>
+													<row></row>
+													<row></row>
+													<row></row>
+												</rows>
+											</grid>
+										</tabpanel>
+										<tabpanel>
+											<tree width="99%"
+												id="treeentidades" height="850px">
+												<treecols>
+													<treecol
+														label="Data Model" />
+												</treecols>
+											</tree>
+										</tabpanel>
+
+									</tabpanels>
+								</tabbox>
+							</div>
+
+						</div>
+
+
+					</tabpanel>
+
+					<tabpanel id="tbprevio">
+						<iframe id="include" src="" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel id="tbcompon">
+						<iframe id="includecomp"
+							src="/peview/mylescrm/help/index.zhtml" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel>
+						<div sclass="col-lg-12 col-xlg-12 col-md-12">
+							<grid model="@load(vm.logVersion)"
+								height="900px" width="100%">
+								<columns>
+									<column label="logs" width="100%" />
+								</columns>
+								<rows>
+									<template name="model">
+										<row>
+											<label value="@load(each)" />
+										</row>
+									</template>
+								</rows>
+							</grid>
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</nodom>
+	</div>
+</zk>

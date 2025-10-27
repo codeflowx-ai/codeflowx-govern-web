@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="drift-detection-process" name="Model Drift Detection Process (90% IA)" isExecutable="true">
+    
+    <!-- ===== START EVENT: TIMER (cada 1 hora) ===== -->
+    <startEvent id="start-drift-check" name="Drift Check Scheduled">
+      <timerEventDefinition>
+        <timeCycle>R/PT1H</timeCycle>  <!-- Repetir cada 1 hora -->
+      </timerEventDefinition>
+    </startEvent>
+    
+    <!-- ===== 1. CARGAR BASELINE METRICS ===== -->
+    <serviceTask id="load-baseline-metrics" 
+                 name="Cargar Métricas Baseline"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.LoadBaselineMetricsDelegate"/>
+    
+    <!-- ===== 2. CAPTURAR MÉTRICAS ACTUALES (wrapper) ===== -->
+    <serviceTask id="capture-current-metrics" 
+                 name="Capturar Métricas Actuales"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CaptureCurrentMetricsDelegate"/>
+    
+    <!-- ===== 3. ANALIZAR DRIFT (evaluation server) ===== -->
+    <serviceTask id="analyze-drift" 
+                 name="Analizar Drift"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AnalyzeDriftDelegate"/>
+    
+    <!-- ===== 4. GATEWAY: ¿DRIFT DETECTADO? ===== -->
+    <exclusiveGateway id="drift-detected-gateway" name="Drift > 20%?"/>
+    
+    <!-- ===== 5a. GUARDAR MÉTRICAS (sin drift) ===== -->
+    <serviceTask id="save-metrics-no-drift" 
+                 name="Guardar Métricas"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.SaveDriftResultsDelegate"/>
+    
+    <!-- ===== 5b. CREAR ALERTA (con drift) ===== -->
+    <serviceTask id="create-drift-alert" 
+                 name="Crear Alerta de Drift"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CreateDriftAlertDelegate"/>
+    
+    <!-- ===== 6. NOTIFICAR DRIFT CRÍTICO ===== -->
+    <serviceTask id="notify-drift-critical" 
+                 name="Notificar Drift Crítico"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyDriftDelegate"/>
+    
+    <!-- ===== 7. USER TASK: ANALIZAR CAUSA ===== -->
+    <userTask id="analyze-drift-cause" 
+              name="Analizar Causa del Drift"
+              flowable:candidateGroups="ml-engineers,mlops-engineers"
+              flowable:formKey="plataforma/workflow/drift-analysis-form.zul"
+              flowable:dueDate="PT2H">  <!-- SLA: 2 horas -->
+      <documentation>
+        Drift crítico detectado. Analizar causa raíz y decidir acción:
+        - Retrain: Re-entrenar modelo
+        - Rollback: Volver a versión anterior
+        - Tune: Ajustar umbrales
+        - Investigate: Investigar más
+      </documentation>
+    </userTask>
+    
+    <!-- ===== 8. GATEWAY: ACCIÓN DECIDIDA ===== -->
+    <exclusiveGateway id="action-gateway" name="Acción?"/>
+    
+    <!-- ===== 9a. TRIGGER RE-TRAINING ===== -->
+    <serviceTask id="trigger-retraining" 
+                 name="Iniciar Re-training"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.TriggerRetrainingDelegate"/>
+    
+    <!-- ===== 9b. ROLLBACK VERSIÓN ===== -->
+    <serviceTask id="rollback-model-version" 
+                 name="Rollback a Versión Anterior"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RollbackModelDelegate"/>
+    
+    <!-- ===== 9c. AJUSTAR UMBRALES ===== -->
+    <serviceTask id="tune-thresholds" 
+                 name="Ajustar Umbrales"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.TuneThresholdsDelegate"/>
+    
+    <!-- ===== 10. GUARDAR RESULTADOS ===== -->
+    <serviceTask id="save-drift-results" 
+                 name="Guardar Resultados Finales"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.SaveDriftResultsDelegate"/>
+    
+    <!-- ===== END EVENT ===== -->
+    <endEvent id="drift-check-completed" name="Drift Check Completado"/>
+    
+    <!-- ===== SEQUENCE FLOWS ===== -->
+    
+    <!-- Start → Cargar Baseline -->
+    <sequenceFlow id="flow1" sourceRef="start-drift-check" targetRef="load-baseline-metrics"/>
+    
+    <!-- Cargar Baseline → Capturar Actuales -->
+    <sequenceFlow id="flow2" sourceRef="load-baseline-metrics" targetRef="capture-current-metrics"/>
+    
+    <!-- Capturar Actuales → Analizar Drift -->
+    <sequenceFlow id="flow3" sourceRef="capture-current-metrics" targetRef="analyze-drift"/>
+    
+    <!-- Analizar Drift → Gateway -->
+    <sequenceFlow id="flow4" sourceRef="analyze-drift" targetRef="drift-detected-gateway"/>
+    
+    <!-- Gateway → Guardar (sin drift) -->
+    <sequenceFlow id="flow5-no-drift" sourceRef="drift-detected-gateway" targetRef="save-metrics-no-drift">
+      <conditionExpression xsi:type="tFormalExpression">${drift_detected == false || drift_score &lt;= drift_threshold}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway → Crear Alerta (con drift) -->
+    <sequenceFlow id="flow5-with-drift" sourceRef="drift-detected-gateway" targetRef="create-drift-alert">
+      <conditionExpression xsi:type="tFormalExpression">${drift_detected == true &amp;&amp; drift_score &gt; drift_threshold}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Guardar (sin drift) → End -->
+    <sequenceFlow id="flow6" sourceRef="save-metrics-no-drift" targetRef="drift-check-completed"/>
+    
+    <!-- Crear Alerta → Notificar -->
+    <sequenceFlow id="flow7" sourceRef="create-drift-alert" targetRef="notify-drift-critical"/>
+    
+    <!-- Notificar → Analizar Causa (User Task) -->
+    <sequenceFlow id="flow8" sourceRef="notify-drift-critical" targetRef="analyze-drift-cause"/>
+    
+    <!-- Analizar Causa → Gateway Acción -->
+    <sequenceFlow id="flow9" sourceRef="analyze-drift-cause" targetRef="action-gateway"/>
+    
+    <!-- Gateway Acción → Re-training -->
+    <sequenceFlow id="flow10-retrain" sourceRef="action-gateway" targetRef="trigger-retraining">
+      <conditionExpression xsi:type="tFormalExpression">${action_plan == 'retrain'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Rollback -->
+    <sequenceFlow id="flow10-rollback" sourceRef="action-gateway" targetRef="rollback-model-version">
+      <conditionExpression xsi:type="tFormalExpression">${action_plan == 'rollback'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Tune Thresholds -->
+    <sequenceFlow id="flow10-tune" sourceRef="action-gateway" targetRef="tune-thresholds">
+      <conditionExpression xsi:type="tFormalExpression">${action_plan == 'tune_threshold'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Gateway Acción → Guardar (investigate) -->
+    <sequenceFlow id="flow10-investigate" sourceRef="action-gateway" targetRef="save-drift-results">
+      <conditionExpression xsi:type="tFormalExpression">${action_plan == 'investigate'}</conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Re-training → Guardar -->
+    <sequenceFlow id="flow11" sourceRef="trigger-retraining" targetRef="save-drift-results"/>
+    
+    <!-- Rollback → Guardar -->
+    <sequenceFlow id="flow12" sourceRef="rollback-model-version" targetRef="save-drift-results"/>
+    
+    <!-- Tune → Guardar -->
+    <sequenceFlow id="flow13" sourceRef="tune-thresholds" targetRef="save-drift-results"/>
+    
+    <!-- Guardar → End -->
+    <sequenceFlow id="flow14" sourceRef="save-drift-results" targetRef="drift-check-completed"/>
+    
+  </process>
+
+</definitions>
+
+

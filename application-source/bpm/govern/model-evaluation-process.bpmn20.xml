@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/model-evaluation">
+
+  <process id="model-evaluation-process" name="Model Evaluation Process" isExecutable="true">
+
+    <!-- START EVENT -->
+    <startEvent id="startEvent" name="Start Model Evaluation"/>
+
+    <!-- SERVICE TASK: Execute Model Evaluation -->
+    <serviceTask id="executeEvaluation" name="Execute Model Evaluation" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.ModelEvaluationDelegate"/>
+
+    <!-- SERVICE TASK: Store Evaluation Results -->
+    <serviceTask id="storeResults" name="Store Evaluation Results" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.StoreEvaluationDelegate"/>
+
+    <!-- EXCLUSIVE GATEWAY: Below Threshold? -->
+    <exclusiveGateway id="thresholdGateway" name="Performance Below Threshold?"/>
+
+    <!-- SERVICE TASK: Create Alert -->
+    <serviceTask id="createAlert" name="Create Model Alert" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CreateModelAlertDelegate"/>
+
+    <!-- SERVICE TASK: Update Dashboard -->
+    <serviceTask id="updateDashboard" name="Update Dashboard" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate"/>
+
+    <!-- END EVENTS -->
+    <endEvent id="endSuccess" name="Evaluation Complete"/>
+    <endEvent id="endAlert" name="Alert Created"/>
+
+    <!-- SEQUENCE FLOWS -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="executeEvaluation"/>
+    <sequenceFlow id="flow2" sourceRef="executeEvaluation" targetRef="storeResults"/>
+    <sequenceFlow id="flow3" sourceRef="storeResults" targetRef="thresholdGateway"/>
+
+    <!-- Threshold Gateway Decision -->
+    <sequenceFlow id="flowBelowThreshold" name="Below Threshold" sourceRef="thresholdGateway" targetRef="createAlert">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${belowThreshold == true}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowAboveThreshold" name="Above Threshold" sourceRef="thresholdGateway" targetRef="updateDashboard">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${belowThreshold == false}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Alert/Dashboard to End -->
+    <sequenceFlow id="flowAlertToEnd" sourceRef="createAlert" targetRef="endAlert"/>
+    <sequenceFlow id="flowDashboardToEnd" sourceRef="updateDashboard" targetRef="endSuccess"/>
+
+  </process>
+
+  <!-- BPMN DI (Diagram Interchange) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_model-evaluation-process">
+    <bpmndi:BPMNPlane id="BPMNPlane_model-evaluation-process" bpmnElement="model-evaluation-process">
+      
+      <bpmndi:BPMNShape id="BPMNShape_startEvent" bpmnElement="startEvent">
+        <omgdc:Bounds x="100" y="200" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_executeEvaluation" bpmnElement="executeEvaluation">
+        <omgdc:Bounds x="200" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_storeResults" bpmnElement="storeResults">
+        <omgdc:Bounds x="360" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_thresholdGateway" bpmnElement="thresholdGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="520" y="193" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_createAlert" bpmnElement="createAlert">
+        <omgdc:Bounds x="495" y="300" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_updateDashboard" bpmnElement="updateDashboard">
+        <omgdc:Bounds x="495" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_endSuccess" bpmnElement="endSuccess">
+        <omgdc:Bounds x="660" y="102" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <bpmndi:BPMNShape id="BPMNShape_endAlert" bpmnElement="endAlert">
+        <omgdc:Bounds x="660" y="322" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges -->
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="136" y="218"/>
+        <omgdi:waypoint x="200" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="300" y="218"/>
+        <omgdi:waypoint x="360" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="460" y="218"/>
+        <omgdi:waypoint x="520" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowBelowThreshold" bpmnElement="flowBelowThreshold">
+        <omgdi:waypoint x="545" y="243"/>
+        <omgdi:waypoint x="545" y="300"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAboveThreshold" bpmnElement="flowAboveThreshold">
+        <omgdi:waypoint x="545" y="193"/>
+        <omgdi:waypoint x="545" y="160"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAlertToEnd" bpmnElement="flowAlertToEnd">
+        <omgdi:waypoint x="595" y="340"/>
+        <omgdi:waypoint x="660" y="340"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDashboardToEnd" bpmnElement="flowDashboardToEnd">
+        <omgdi:waypoint x="595" y="120"/>
+        <omgdi:waypoint x="660" y="120"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>
+
+

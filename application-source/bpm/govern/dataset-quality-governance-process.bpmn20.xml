@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.codeflowx.com/processes/dataset-quality">
+
+    <!-- ========================================================================= -->
+    <!-- Proceso BPMN #13: Dataset Quality Governance -->
+    <!-- Descripción: Evaluación de calidad, fairness y compliance de datasets -->
+    <!-- Automatización: 75% IA / 25% HITL -->
+    <!-- ========================================================================= -->
+
+    <process id="datasetQualityGovernanceProcess" name="Dataset Quality Governance Process" isExecutable="true">
+
+        <!-- START EVENT -->
+        <startEvent id="startEvent" name="Start Dataset Quality Check"/>
+
+        <!-- SEQUENCE FLOW -->
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="validateFormat"/>
+
+        <!-- SERVICE TASK 1: Validar Formato del Dataset -->
+        <serviceTask id="validateFormat" name="Validate Dataset Format"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.dataset.ValidateDatasetFormatDelegate"/>
+
+        <sequenceFlow id="flow2" sourceRef="validateFormat" targetRef="formatGateway"/>
+
+        <!-- GATEWAY: Formato válido? -->
+        <exclusiveGateway id="formatGateway" name="Format Valid?"/>
+
+        <sequenceFlow id="formatInvalid" name="Invalid" sourceRef="formatGateway" targetRef="endRejected">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${!formatValid}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="formatValid" name="Valid" sourceRef="formatGateway" targetRef="datasetProfiling">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${formatValid}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- SERVICE TASK 2: Data Profiling (calidad) -->
+        <serviceTask id="datasetProfiling" name="Data Profiling (Quality Metrics)"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.dataset.DataProfilingDelegate"/>
+
+        <sequenceFlow id="flow3" sourceRef="datasetProfiling" targetRef="parallelGatewayFork"/>
+
+        <!-- PARALLEL GATEWAY: Fork (ejecutar bias y PII en paralelo) -->
+        <parallelGateway id="parallelGatewayFork"/>
+
+        <sequenceFlow id="flowToBias" sourceRef="parallelGatewayFork" targetRef="detectBias"/>
+        <sequenceFlow id="flowToPII" sourceRef="parallelGatewayFork" targetRef="validateCompliance"/>
+
+        <!-- SERVICE TASK 3: Detect Bias -->
+        <serviceTask id="detectBias" name="Detect Dataset Bias (Fairness)"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.dataset.DetectDatasetBiasDelegate"/>
+
+        <!-- SERVICE TASK 4: Validate Compliance (PII) -->
+        <serviceTask id="validateCompliance" name="Validate Compliance (PII Detection)"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.dataset.ValidateComplianceDelegate"/>
+
+        <!-- PARALLEL GATEWAY: Join (esperar que bias y PII terminen) -->
+        <parallelGateway id="parallelGatewayJoin"/>
+
+        <sequenceFlow id="flowFromBias" sourceRef="detectBias" targetRef="parallelGatewayJoin"/>
+        <sequenceFlow id="flowFromPII" sourceRef="validateCompliance" targetRef="parallelGatewayJoin"/>
+
+        <sequenceFlow id="flow4" sourceRef="parallelGatewayJoin" targetRef="calculateScore"/>
+
+        <!-- SERVICE TASK 5: Calculate Score (Drools) -->
+        <serviceTask id="calculateScore" name="Calculate Dataset Score (Drools)"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.dataset.CalculateDatasetScoreDelegate"/>
+
+        <sequenceFlow id="flow5" sourceRef="calculateScore" targetRef="decisionGateway"/>
+
+        <!-- GATEWAY: Decisión basada en Drools -->
+        <exclusiveGateway id="decisionGateway" name="Decision Gateway"/>
+
+        <!-- Flujo 1: Auto-aprobado -->
+        <sequenceFlow id="flowApproved" name="Approved" sourceRef="decisionGateway" targetRef="notifyApproval">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${decision == 'APPROVED'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Flujo 2: Rechazado -->
+        <sequenceFlow id="flowRejected" name="Rejected" sourceRef="decisionGateway" targetRef="notifyRejection">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${decision == 'REJECTED'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Flujo 3: Requiere revisión humana (HITL) -->
+        <sequenceFlow id="flowReview" name="Review Required" sourceRef="decisionGateway" targetRef="humanReview">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${decision == 'REVIEW_REQUIRED'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- USER TASK: Human Review (HITL - 25%) -->
+        <userTask id="humanReview" name="Human Review - Dataset Quality"
+                  flowable:assignee="${initiator}"
+                  flowable:formKey="dataset-quality-review-form"
+                  flowable:priority="50">
+            <documentation>
+                Review dataset quality evaluation results and make final decision.
+                
+                Quality Score: ${qualityScore}%
+                Bias Score: ${biasScore}%
+                PII Found: ${piiFound}
+                GDPR Compliant: ${gdprCompliant}
+                
+                Justification: ${justification}
+            </documentation>
+        </userTask>
+
+        <sequenceFlow id="flow6" sourceRef="humanReview" targetRef="humanDecisionGateway"/>
+
+        <!-- GATEWAY: Decisión humana -->
+        <exclusiveGateway id="humanDecisionGateway" name="Human Decision?"/>
+
+        <sequenceFlow id="humanApproved" name="Approved by Human" sourceRef="humanDecisionGateway" targetRef="notifyApproval">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${humanDecision == 'APPROVE'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="humanRejected" name="Rejected by Human" sourceRef="humanDecisionGateway" targetRef="notifyRejection">
+            <conditionExpression xsi:type="tFormalExpression">
+                <![CDATA[${humanDecision == 'REJECT'}]]>
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- SERVICE TASK: Notify Approval -->
+        <serviceTask id="notifyApproval" name="Notify Dataset Approved"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+
+        <sequenceFlow id="flowToApprovedEnd" sourceRef="notifyApproval" targetRef="endApproved"/>
+
+        <!-- SERVICE TASK: Notify Rejection -->
+        <serviceTask id="notifyRejection" name="Notify Dataset Rejected"
+                     flowable:async="true"
+                     flowable:class="com.codeflowx.govern.workflow.delegates.NotifyRejectionDelegate"/>
+
+        <sequenceFlow id="flowToRejectedEnd" sourceRef="notifyRejection" targetRef="endRejected"/>
+
+        <!-- END EVENTS -->
+        <endEvent id="endApproved" name="Dataset Approved"/>
+        <endEvent id="endRejected" name="Dataset Rejected"/>
+
+    </process>
+
+</definitions>
+

@@ -1,0 +1,56 @@
+<?component name="stepbar" templateURI="stepApp/shadow_elements/step_bar/stepbar.zul"?>
+<zk xmlns:h="native">
+<window border="none" mode="popup" action="show: slideDown;hide: slideUp" position="center,top" width="95%">
+<style src="stepApp/shadow_elements/step_bar/stepbar.css" />
+	<style>
+		.z-window{ background-color:transparent; } .z-window-content{
+		background-color:transparent; }
+	</style>
+	<div class="row">
+	<nodom
+		viewModel="@id('vm') @init('com.suinsit.webapp.wizzars.query.CreateViewUI')"
+		validationMessages="@id('vmsgs')" form="@id('fx') @load(vm.bean) @save(vm.bean,before={'next','create'})">
+		<div id="rootDiv" class="col-xl-12">
+			<div class="card border card-border-primary border-opacity-75">
+				<div class="card-header pop-header">
+					<h:h4 class="mb-sm-0">Create View or Query</h:h4>
+					  <div class="list-icons">
+					  <a zclass="pull-right" class="btn btn-dark btn-icon waves-effect waves-light" iconSclass="fa-duotone fa-light fa-xmark fa-3x" onClick="@command('closeWizzar')"/>
+					 </div>
+				</div>
+				<div class="card-body pop-body">
+					<stepbar stepBarModel="@init(vm.stepBarModel)"
+						gotoStepCommand="gotoStep" />
+
+					<div style="padding: 0 57px; margin-top: 16px;">
+						<label sclass="page-title"
+							value="@load(vm.stepBarModel.current.label)" />
+						<div style="margin-top: 26px;"
+							sclass="stepbar-content">
+							<apply
+								templateURI="@load(vm.stepBarModel.current.uri)"
+								step="@load(vm.stepBarModel.current)" />
+						</div>
+					</div>
+				</div>
+<!-- 				<div class="card-footer"> -->
+<!-- 					<div style="padding: 0 57px; position: relative; margin-top: 32px;"> -->
+<!-- 						<if test="@load(!vm.stepBarModel.first and !vm.stepBarModel.last)"> -->
+<!-- 							<button zclass="pull-left" -->
+<!-- 								sclass="btn btn-outline bg-secondary text-primary-800 btn-icon ml-2 legitRipple" onClick="@command('back')" iconSclass="icon-arrow-left13 icon-2x" label="Back" /> -->
+<!-- 						</if> -->
+<!-- 						<if test="@load(!vm.stepBarModel.last and !vm.stepBarModel.first and vm.shownext)"> -->
+<!-- 							<button zclass="pull-right" sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple" iconSclass="icon-arrow-right14 icon-2x" onClick="@command('next')" label="Next" /> -->
+<!-- 						</if> -->
+<!-- 						<if test="@load(vm.stepBarModel.last)"> -->
+<!-- 							<button zclass="pull-right" sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"  onClick="@command('create')" label="Confirm" /> -->
+<!-- 						</if> -->
+<!-- 					</div> -->
+					
+<!-- 				</div> -->
+			</div>
+		</div>
+	</nodom>
+	</div>
+</window>
+</zk>

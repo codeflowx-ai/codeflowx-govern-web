@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="http://codeflowx.com/govern/agent-approval-v2">
+
+  <process id="agent-approval-process-v2" name="Agent Approval Process v2.0 (80% AI)" isExecutable="true">
+
+    <!-- START EVENT -->
+    <startEvent id="startEvent" name="Agent Created"/>
+
+    <!-- SERVICE TASK 1: AI Risk Assessment -->
+    <serviceTask id="aiRiskAssessment" name="AI Risk Assessment (EU AI Act)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AIRiskAssessmentDelegate"/>
+
+    <!-- SERVICE TASK 2: AI Compliance Check -->
+    <serviceTask id="aiComplianceCheck" name="AI Compliance Check (AI Act, GDPR, DSA)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AIComplianceCheckDelegate"/>
+
+    <!-- SERVICE TASK 3: AI Ethical Review -->
+    <serviceTask id="aiEthicalReview" name="AI Ethical Review" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AIEthicalReviewDelegate"/>
+
+    <!-- SERVICE TASK: Calculate Min Score with Drools -->
+    <serviceTask id="calculateMinScore" name="Calculate Confidence Score (Drools)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CalculateAgentScoreDelegate"/>
+
+    <!-- EXCLUSIVE GATEWAY: Confidence Score -->
+    <exclusiveGateway id="confidenceGateway" name="AI Confidence Level"/>
+
+    <!-- SERVICE TASK: Auto-Approve (High Confidence) -->
+    <serviceTask id="autoApprove" name="Auto-Approve (AI Decision)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoApproveAgentDelegate"/>
+
+    <!-- USER TASK: Human Override (Medium Confidence - HITL) -->
+    <userTask id="humanOverride" name="Human Override Decision (HITL)" 
+              flowable:candidateGroups="governance-admins">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/human-override-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- SERVICE TASK: Auto-Reject (Low Confidence) -->
+    <serviceTask id="autoReject" name="Auto-Reject (AI Decision)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoRejectAgentDelegate"/>
+
+    <!-- SERVICE TASK: Notify Approval -->
+    <serviceTask id="notifyApproval" name="Notify Approval" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+
+    <!-- SERVICE TASK: Notify Rejection -->
+    <serviceTask id="notifyRejection" name="Notify Rejection" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+
+    <!-- END EVENTS -->
+    <endEvent id="endApproved" name="Approved"/>
+    <endEvent id="endRejected" name="Rejected"/>
+
+    <!-- SEQUENCE FLOWS -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="aiRiskAssessment"/>
+    <sequenceFlow id="flow2" sourceRef="aiRiskAssessment" targetRef="aiComplianceCheck"/>
+    <sequenceFlow id="flow3" sourceRef="aiComplianceCheck" targetRef="aiEthicalReview"/>
+    <sequenceFlow id="flow4" sourceRef="aiEthicalReview" targetRef="calculateMinScore"/>
+    <sequenceFlow id="flow5" sourceRef="calculateMinScore" targetRef="confidenceGateway"/>
+
+    <!-- Confidence Gateway Decisions -->
+    <sequenceFlow id="flowHighConfidence" name="High Confidence (90-100)" sourceRef="confidenceGateway" targetRef="autoApprove">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${minScore >= 90}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowMediumConfidence" name="Medium Confidence (70-89) - HITL" sourceRef="confidenceGateway" targetRef="humanOverride">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${minScore >= 70 && minScore < 90}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowLowConfidence" name="Low Confidence (0-69)" sourceRef="confidenceGateway" targetRef="autoReject">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${minScore < 70}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Auto-Approve to Notify -->
+    <sequenceFlow id="flowAutoApproveToNotify" sourceRef="autoApprove" targetRef="notifyApproval"/>
+
+    <!-- From Human Override to Gateway -->
+    <exclusiveGateway id="humanDecisionGateway" name="Human Decision"/>
+    <sequenceFlow id="flowHumanToGateway" sourceRef="humanOverride" targetRef="humanDecisionGateway"/>
+
+    <sequenceFlow id="flowHumanApprove" name="Approved" sourceRef="humanDecisionGateway" targetRef="notifyApproval">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${humanApproved == true}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowHumanReject" name="Rejected" sourceRef="humanDecisionGateway" targetRef="notifyRejection">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${humanApproved == false}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Auto-Reject to Notify -->
+    <sequenceFlow id="flowAutoRejectToNotify" sourceRef="autoReject" targetRef="notifyRejection"/>
+
+    <!-- From Notify to End -->
+    <sequenceFlow id="flowNotifyApprovalToEnd" sourceRef="notifyApproval" targetRef="endApproved"/>
+    <sequenceFlow id="flowNotifyRejectionToEnd" sourceRef="notifyRejection" targetRef="endRejected"/>
+
+  </process>
+
+</definitions>
+

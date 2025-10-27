@@ -1,0 +1,37 @@
+<zk xmlns:h="native">
+	<div sclass="row">
+		<div sclass="col-md-6">
+			<div sclass="form-group">
+              <label value="Tipo de tabla de datos......."></label>
+              <radiogroup id="sv1"
+				onCheck="@command('selectTipoTabla',app=self.selectedItem.value,label=self.selectedItem.label,form=fx) " >
+				<radio label="Subtabla de la pantalla" selected="true"></radio>  
+				<radio label="Tabla Independiente"></radio>
+				</radiogroup>
+			</div>
+		</div>
+		<div sclass="col-md-6">
+		 <div sclass="form-group">
+              <label sclass="form-label"
+						value="Seleccione Entidad Base de datos" />
+					<combobox model="@load(vm.beans)"
+						disabled="@load(vm.disabled)" value="@bind(vm.entidad)"
+						onSelect="@command('selectEntity')">
+						<template name="model" var="item">
+							<comboitem value="${item.namesql}"
+								label="${item.namesql}" />
+						</template>
+					</combobox>  
+			</div>
+		</div>
+	</div>
+	<div sclass="row">
+		<div sclass="col-md-6">
+			<div sclass="form-group">
+              <label value="Descripcion"></label>
+              <textbox id="desc" multiline="true" rows="3" sclass="form-control required" value="@bind(fx.projectBase.dsdescription) @validator(vm.validator,required=true,minl=5,maxl=1000)"></textbox>
+              <label sclass="text-danger" value="@load(vmsgs['desc'])"></label>
+			</div>
+		</div>
+	</div>
+</zk>

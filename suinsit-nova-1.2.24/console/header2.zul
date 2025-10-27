@@ -1,0 +1,64 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('header') @init('com.suinsit.webapp.nocode.HeaderUI')">
+	<div class="banner banner-high"
+		style="background: url('img/ban-bg-4.jpg') center center no-repeat;">
+		<h:img src="img/lh-suinsit.png" alt="" />
+		<div class="empresa">
+			<fragment exps="@load(ds.ctxBean.customerLabel)">
+				<![CDATA[ <h3 textContent='@load(exps)'></h3> ]]>
+			</fragment>
+		</div>
+		<div class="nav">
+			<div class="dropdown">
+				<h:button  >
+				<h:i class="fas fa-envelope"></h:i>
+<!-- 					<h:span>Mensaje</h:span> -->
+				</h:button>
+				<div class="dropdown-content">
+					<a href="#">Mensaje 1</a>
+					<a href="#">Mensaje 2</a>
+					<a href="#">Mensaje 3</a>
+				</div>
+			</div>
+			<div class="dropdown">
+			<h:button  >
+				<h:i class="fa-solid fa-bell"></h:i>
+<!-- 					<h:span>Notificaciones</h:span> -->
+				</h:button>
+			
+				<div class="dropdown-content">
+					<a href="#">Notificación 1</a>
+					<a href="#">Notificación 2</a>
+					<a href="#">Notificación 3</a>
+				</div>
+			</div>
+			<div class="dropdown user-dropdown">
+			<h:button  >
+				<h:img src="img/perfil.jpg" alt="Usuario"
+						class="user-image" />
+						 
+						<h:span>Bienvenid@ ${header.user.firstname} !</h:span>
+				</h:button>
+				<div class="dropdown-content">
+				<a href="#">
+						<span>${header.ctxBean.config.product}-${header.ctxBean.config.name}</span>
+					</a>
+					<a href="#">
+						<span>V.${header.ctxBean.config.version}</span>
+					</a>
+					<a href="/login.zhtml?logout">
+						<span>Cerrar Sesión</span>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+</idspace>
+</zk>

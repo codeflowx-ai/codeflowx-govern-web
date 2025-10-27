@@ -1,0 +1,281 @@
+<?page title="Integration Hub" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.integration.IntegrationHubVM')">
+        
+        <!-- Integration Overview -->
+        <hlayout sclass="integration-header">
+            <div sclass="metric-box">
+                <label value="Active Integrations"/>
+                <label value="@load(vm.activeIntegrations)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Health Status"/>
+                <label value="@load(vm.healthStatus)" 
+                       sclass="@load(vm.healthStatusStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Success Rate"/>
+                <label value="@load(vm.successRate)%"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Data Synced"/>
+                <label value="@load(vm.dataSynced)"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Integration Manager"/>
+                <tab label="API Management"/>
+                <tab label="Data Sync"/>
+                <tab label="Monitoring"/>
+            </tabs>
+            <tabpanels>
+                <!-- Integration Manager Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Integration Types -->
+                        <hlayout>
+                            <combobox model="@load(vm.integrationTypes)" 
+                                     selectedItem="@bind(vm.selectedType)"
+                                     onChange="@command('filterIntegrations')"/>
+                            <button label="New Integration" 
+                                    onClick="@command('createIntegration')"/>
+                            <button label="Import Configuration" 
+                                    onClick="@command('importConfig')"/>
+                        </hlayout>
+
+                        <!-- Integrations Grid -->
+                        <grid model="@load(vm.integrations)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Name"/>
+                                <column label="Type"/>
+                                <column label="Status"/>
+                                <column label="Last Sync"/>
+                                <column label="Health"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="integration">
+                                <row>
+                                    <label value="@load(integration.name)"/>
+                                    <label value="@load(integration.type)"/>
+                                    <label value="@load(integration.status)" 
+                                           sclass="@load(integration.statusStyle)"/>
+                                    <label value="@load(integration.lastSync)"/>
+                                    <progressmeter value="@load(integration.health)" 
+                                                 sclass="@load(integration.healthStyle)"/>
+                                    <hlayout>
+                                        <button label="Configure" 
+                                                onClick="@command('configureIntegration', integration=integration)"/>
+                                        <button label="Test" 
+                                                onClick="@command('testIntegration', integration=integration)"/>
+                                        <button label="Logs" 
+                                                onClick="@command('viewLogs', integration=integration)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- API Management Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- API Endpoints -->
+                        <groupbox title="API Endpoints">
+                            <grid model="@load(vm.apiEndpoints)">
+                                <columns>
+                                    <column label="Endpoint"/>
+                                    <column label="Method"/>
+                                    <column label="Rate Limit"/>
+                                    <column label="Usage"/>
+                                    <column label="Status"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="endpoint">
+                                    <row>
+                                        <label value="@load(endpoint.path)"/>
+                                        <label value="@load(endpoint.method)" 
+                                               sclass="@load(endpoint.methodStyle)"/>
+                                        <label value="@load(endpoint.rateLimit)"/>
+                                        <progressmeter value="@load(endpoint.usage)"/>
+                                        <label value="@load(endpoint.status)" 
+                                               sclass="@load(endpoint.statusStyle)"/>
+                                        <hlayout>
+                                            <button label="Edit" 
+                                                    onClick="@command('editEndpoint', endpoint=endpoint)"/>
+                                            <button label="Monitor" 
+                                                    onClick="@command('monitorEndpoint', endpoint=endpoint)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+
+                        <!-- Webhooks -->
+                        <groupbox title="Webhooks">
+                            <grid model="@load(vm.webhooks)">
+                                <columns>
+                                    <column label="Name"/>
+                                    <column label="URL"/>
+                                    <column label="Events"/>
+                                    <column label="Last Triggered"/>
+                                    <column label="Status"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="webhook">
+                                    <row>
+                                        <label value="@load(webhook.name)"/>
+                                        <label value="@load(webhook.url)"/>
+                                        <label value="@load(webhook.events)"/>
+                                        <label value="@load(webhook.lastTriggered)"/>
+                                        <label value="@load(webhook.status)" 
+                                               sclass="@load(webhook.statusStyle)"/>
+                                        <hlayout>
+                                            <button label="Edit" 
+                                                    onClick="@command('editWebhook', webhook=webhook)"/>
+                                            <button label="Test" 
+                                                    onClick="@command('testWebhook', webhook=webhook)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Data Sync Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Sync Status -->
+                        <hlayout>
+                            <charts id="syncStatusChart" 
+                                   type="pie"
+                                   height="300px"
+                                   title="Sync Status Distribution"
+                                   model="@load(vm.syncStatusData)"/>
+                            
+                            <charts id="syncTrendsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Sync Trends"
+                                   model="@load(vm.syncTrendsData)"/>
+                        </hlayout>
+
+                        <!-- Sync Jobs -->
+                        <grid model="@load(vm.syncJobs)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Job ID"/>
+                                <column label="Source"/>
+                                <column label="Target"/>
+                                <column label="Status"/>
+                                <column label="Progress"/>
+                                <column label="Last Run"/>
+                                <column label="Next Run"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="job">
+                                <row>
+                                    <label value="@load(job.id)"/>
+                                    <label value="@load(job.source)"/>
+                                    <label value="@load(job.target)"/>
+                                    <label value="@load(job.status)" 
+                                           sclass="@load(job.statusStyle)"/>
+                                    <progressmeter value="@load(job.progress)"/>
+                                    <label value="@load(job.lastRun)"/>
+                                    <label value="@load(job.nextRun)"/>
+                                    <hlayout>
+                                        <button label="Run Now" 
+                                                onClick="@command('runSyncJob', job=job)"/>
+                                        <button label="History" 
+                                                onClick="@command('viewJobHistory', job=job)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Monitoring Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Real-time Metrics -->
+                        <hlayout>
+                            <charts id="performanceChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Performance Metrics"
+                                   model="@load(vm.performanceData)"/>
+                            
+                            <charts id="errorRateChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Error Rates"
+                                   model="@load(vm.errorRateData)"/>
+                        </hlayout>
+
+                        <!-- Integration Logs -->
+                        <groupbox title="Integration Logs">
+                            <listbox model="@load(vm.integrationLogs)" 
+                                    mold="paging" pageSize="20">
+                                <listhead>
+                                    <listheader label="Timestamp"/>
+                                    <listheader label="Integration"/>
+                                    <listheader label="Event"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Message"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="log">
+                                    <listitem sclass="@load(log.levelStyle)">
+                                        <listcell label="@load(log.timestamp)"/>
+                                        <listcell label="@load(log.integration)"/>
+                                        <listcell label="@load(log.event)"/>
+                                        <listcell>
+                                            <label value="@load(log.status)" 
+                                                   sclass="@load(log.statusStyle)"/>
+                                        </listcell>
+                                        <listcell label="@load(log.message)"/>
+                                        <listcell>
+                                            <button label="Details" 
+                                                    onClick="@command('viewLogDetails', log=log)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="integrationConfigWindow" 
+                title="Integration Configuration" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Integration Config Content -->
+        </window>
+
+        <window id="endpointEditorWindow" 
+                title="API Endpoint Editor" 
+                visible="false" 
+                mode="modal"
+                width="600px">
+            <!-- Endpoint Editor Content -->
+        </window>
+
+        <window id="logDetailsWindow" 
+                title="Log Details" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Log Details Content -->
+        </window>
+    </div>
+</zk>

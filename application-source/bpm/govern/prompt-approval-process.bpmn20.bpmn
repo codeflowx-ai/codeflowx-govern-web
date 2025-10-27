@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/prompt-approval">
+
+  <process id="prompt-approval-process" name="Prompt Approval Process" isExecutable="true">
+
+    <!-- START EVENT -->
+    <startEvent id="startEvent" name="Start Prompt Approval"/>
+
+    <!-- USER TASK: Request Prompt Approval -->
+    <userTask id="requestApproval" name="Request Prompt Approval" flowable:candidateGroups="ml-engineers">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/prompt-approval-request-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- SERVICE TASK: Prompt Safety Check -->
+    <serviceTask id="safetyCheck" name="Prompt Safety Check" flowable:class="com.codeflowx.govern.workflow.delegates.PromptSafetyDelegate"/>
+
+    <!-- SERVICE TASK: Compliance Check -->
+    <serviceTask id="complianceCheck" name="Compliance Check" flowable:class="com.codeflowx.govern.workflow.delegates.ComplianceCheckDelegate"/>
+
+    <!-- EXCLUSIVE GATEWAY: Auto-Approve Eligible? -->
+    <exclusiveGateway id="autoApproveGateway" name="Auto-Approve Eligible?"/>
+
+    <!-- USER TASK: Human Review -->
+    <userTask id="humanReview" name="Human Review" flowable:candidateGroups="prompt-engineers,ml-engineers">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/prompt-human-review-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- EXCLUSIVE GATEWAY: Approved? -->
+    <exclusiveGateway id="approvalDecisionGateway" name="Approved?"/>
+
+    <!-- SERVICE TASK: Auto-Approve -->
+    <serviceTask id="autoApprove" name="Auto-Approve" flowable:class="com.codeflowx.govern.workflow.delegates.AutoApprovePromptDelegate"/>
+
+    <!-- SERVICE TASK: Notify Approval -->
+    <serviceTask id="notifyApproval" name="Notify Approval" flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+
+    <!-- USER TASK: Provide Rejection Reason -->
+    <userTask id="provideRejectionReason" name="Provide Rejection Reason" flowable:candidateGroups="prompt-engineers,ml-engineers">
+      <extensionElements>
+        <flowable:formKey>plataforma/workflow/prompt-rejection-form.zul</flowable:formKey>
+      </extensionElements>
+    </userTask>
+
+    <!-- SERVICE TASK: Notify Rejection -->
+    <serviceTask id="notifyRejection" name="Notify Rejection" flowable:class="com.codeflowx.govern.workflow.delegates.NotifyApprovalDelegate"/>
+
+    <!-- END EVENTS -->
+    <endEvent id="endApproved" name="Prompt Approved"/>
+    <endEvent id="endRejected" name="Prompt Rejected"/>
+
+    <!-- SEQUENCE FLOWS -->
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="requestApproval"/>
+    <sequenceFlow id="flow2" sourceRef="requestApproval" targetRef="safetyCheck"/>
+    <sequenceFlow id="flow3" sourceRef="safetyCheck" targetRef="complianceCheck"/>
+    <sequenceFlow id="flow4" sourceRef="complianceCheck" targetRef="autoApproveGateway"/>
+
+    <!-- Auto-Approve Gateway Decision -->
+    <sequenceFlow id="flowAutoApprove" name="Low Risk (Auto-Approve)" sourceRef="autoApproveGateway" targetRef="autoApprove">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${safetyScore >= 90 && complianceScore == 100}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowHumanReview" name="Requires Human Review" sourceRef="autoApproveGateway" targetRef="humanReview">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${safetyScore < 90 || complianceScore < 100}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- From Auto-Approve to Notify -->
+    <sequenceFlow id="flowAutoToNotify" sourceRef="autoApprove" targetRef="notifyApproval"/>
+
+    <!-- Human Review to Approval Decision Gateway -->
+    <sequenceFlow id="flowHumanToGateway" sourceRef="humanReview" targetRef="approvalDecisionGateway"/>
+
+    <!-- Approval Decision Gateway -->
+    <sequenceFlow id="flowApproved" name="Approved" sourceRef="approvalDecisionGateway" targetRef="notifyApproval">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${approved == true}]]>
+      </conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRejected" name="Rejected" sourceRef="approvalDecisionGateway" targetRef="provideRejectionReason">
+      <conditionExpression xsi:type="tFormalExpression">
+        <![CDATA[${approved == false}]]>
+      </conditionExpression>
+    </sequenceFlow>
+
+    <!-- Notify Approval to End -->
+    <sequenceFlow id="flowNotifyToEnd" sourceRef="notifyApproval" targetRef="endApproved"/>
+
+    <!-- Rejection flow -->
+    <sequenceFlow id="flowRejectionToNotify" sourceRef="provideRejectionReason" targetRef="notifyRejection"/>
+    <sequenceFlow id="flowNotifyRejectionToEnd" sourceRef="notifyRejection" targetRef="endRejected"/>
+
+  </process>
+
+  <!-- BPMN DI (Diagram Interchange) for visual representation -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_prompt-approval-process">
+    <bpmndi:BPMNPlane id="BPMNPlane_prompt-approval-process" bpmnElement="prompt-approval-process">
+      
+      <!-- Start Event -->
+      <bpmndi:BPMNShape id="BPMNShape_startEvent" bpmnElement="startEvent">
+        <omgdc:Bounds x="100" y="200" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Request Approval -->
+      <bpmndi:BPMNShape id="BPMNShape_requestApproval" bpmnElement="requestApproval">
+        <omgdc:Bounds x="200" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Safety Check -->
+      <bpmndi:BPMNShape id="BPMNShape_safetyCheck" bpmnElement="safetyCheck">
+        <omgdc:Bounds x="360" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Compliance Check -->
+      <bpmndi:BPMNShape id="BPMNShape_complianceCheck" bpmnElement="complianceCheck">
+        <omgdc:Bounds x="520" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway: Auto-Approve -->
+      <bpmndi:BPMNShape id="BPMNShape_autoApproveGateway" bpmnElement="autoApproveGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="680" y="193" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Auto-Approve -->
+      <bpmndi:BPMNShape id="BPMNShape_autoApprove" bpmnElement="autoApprove">
+        <omgdc:Bounds x="655" y="80" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Human Review -->
+      <bpmndi:BPMNShape id="BPMNShape_humanReview" bpmnElement="humanReview">
+        <omgdc:Bounds x="655" y="300" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Gateway: Approval Decision -->
+      <bpmndi:BPMNShape id="BPMNShape_approvalDecisionGateway" bpmnElement="approvalDecisionGateway" isMarkerVisible="true">
+        <omgdc:Bounds x="820" y="315" width="50" height="50"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Notify Approval -->
+      <bpmndi:BPMNShape id="BPMNShape_notifyApproval" bpmnElement="notifyApproval">
+        <omgdc:Bounds x="920" y="178" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- User Task: Rejection Reason -->
+      <bpmndi:BPMNShape id="BPMNShape_provideRejectionReason" bpmnElement="provideRejectionReason">
+        <omgdc:Bounds x="920" y="420" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Service Task: Notify Rejection -->
+      <bpmndi:BPMNShape id="BPMNShape_notifyRejection" bpmnElement="notifyRejection">
+        <omgdc:Bounds x="1080" y="420" width="100" height="80"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Event: Approved -->
+      <bpmndi:BPMNShape id="BPMNShape_endApproved" bpmnElement="endApproved">
+        <omgdc:Bounds x="1080" y="200" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- End Event: Rejected -->
+      <bpmndi:BPMNShape id="BPMNShape_endRejected" bpmnElement="endRejected">
+        <omgdc:Bounds x="1240" y="442" width="36" height="36"/>
+      </bpmndi:BPMNShape>
+
+      <!-- Edges (Sequence Flows) -->
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="136" y="218"/>
+        <omgdi:waypoint x="200" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="300" y="218"/>
+        <omgdi:waypoint x="360" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="460" y="218"/>
+        <omgdi:waypoint x="520" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="620" y="218"/>
+        <omgdi:waypoint x="680" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAutoApprove" bpmnElement="flowAutoApprove">
+        <omgdi:waypoint x="705" y="193"/>
+        <omgdi:waypoint x="705" y="160"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowHumanReview" bpmnElement="flowHumanReview">
+        <omgdi:waypoint x="705" y="243"/>
+        <omgdi:waypoint x="705" y="300"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAutoToNotify" bpmnElement="flowAutoToNotify">
+        <omgdi:waypoint x="755" y="120"/>
+        <omgdi:waypoint x="970" y="120"/>
+        <omgdi:waypoint x="970" y="178"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowHumanToGateway" bpmnElement="flowHumanToGateway">
+        <omgdi:waypoint x="755" y="340"/>
+        <omgdi:waypoint x="820" y="340"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproved" bpmnElement="flowApproved">
+        <omgdi:waypoint x="845" y="315"/>
+        <omgdi:waypoint x="845" y="218"/>
+        <omgdi:waypoint x="920" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejected" bpmnElement="flowRejected">
+        <omgdi:waypoint x="845" y="365"/>
+        <omgdi:waypoint x="845" y="460"/>
+        <omgdi:waypoint x="920" y="460"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNotifyToEnd" bpmnElement="flowNotifyToEnd">
+        <omgdi:waypoint x="1020" y="218"/>
+        <omgdi:waypoint x="1080" y="218"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejectionToNotify" bpmnElement="flowRejectionToNotify">
+        <omgdi:waypoint x="1020" y="460"/>
+        <omgdi:waypoint x="1080" y="460"/>
+      </bpmndi:BPMNEdge>
+
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNotifyRejectionToEnd" bpmnElement="flowNotifyRejectionToEnd">
+        <omgdi:waypoint x="1180" y="460"/>
+        <omgdi:waypoint x="1240" y="460"/>
+      </bpmndi:BPMNEdge>
+
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>
+
+

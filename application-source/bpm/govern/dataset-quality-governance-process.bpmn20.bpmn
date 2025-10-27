@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.codeflowx.com/processes/dataset-quality">
+  <process id="datasetQualityGovernanceProcess" name="Dataset Quality Governance Process" isExecutable="true">
+    <startEvent id="startEvent" name="Start Dataset Quality Check"></startEvent>
+    <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="validateFormat"></sequenceFlow>
+    <serviceTask id="validateFormat" name="Validate Dataset Format"></serviceTask>
+    <sequenceFlow id="flow2" sourceRef="validateFormat" targetRef="formatGateway"></sequenceFlow>
+    <exclusiveGateway id="formatGateway" name="Format Valid?"></exclusiveGateway>
+    <sequenceFlow id="formatInvalid" name="Invalid" sourceRef="formatGateway" targetRef="endRejected">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!formatValid}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="formatValid" name="Valid" sourceRef="formatGateway" targetRef="datasetProfiling">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${formatValid}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="datasetProfiling" name="Data Profiling (Quality Metrics)"></serviceTask>
+    <sequenceFlow id="flow3" sourceRef="datasetProfiling" targetRef="parallelGatewayFork"></sequenceFlow>
+    <parallelGateway id="parallelGatewayFork"></parallelGateway>
+    <sequenceFlow id="flowToBias" sourceRef="parallelGatewayFork" targetRef="detectBias"></sequenceFlow>
+    <sequenceFlow id="flowToPII" sourceRef="parallelGatewayFork" targetRef="validateCompliance"></sequenceFlow>
+    <serviceTask id="detectBias" name="Detect Dataset Bias (Fairness)"></serviceTask>
+    <serviceTask id="validateCompliance" name="Validate Compliance (PII Detection)"></serviceTask>
+    <parallelGateway id="parallelGatewayJoin"></parallelGateway>
+    <sequenceFlow id="flowFromBias" sourceRef="detectBias" targetRef="parallelGatewayJoin"></sequenceFlow>
+    <sequenceFlow id="flowFromPII" sourceRef="validateCompliance" targetRef="parallelGatewayJoin"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="parallelGatewayJoin" targetRef="calculateScore"></sequenceFlow>
+    <serviceTask id="calculateScore" name="Calculate Dataset Score (Drools)"></serviceTask>
+    <sequenceFlow id="flow5" sourceRef="calculateScore" targetRef="decisionGateway"></sequenceFlow>
+    <exclusiveGateway id="decisionGateway" name="Decision Gateway"></exclusiveGateway>
+    <sequenceFlow id="flowApproved" name="Approved" sourceRef="decisionGateway" targetRef="notifyApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRejected" name="Rejected" sourceRef="decisionGateway" targetRef="notifyRejection">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowReview" name="Review Required" sourceRef="decisionGateway" targetRef="humanReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'REVIEW_REQUIRED'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="humanReview" name="Human Review - Dataset Quality" xmlns:flowable="http://flowable.org/bpmn" flowable:assignee="${initiator}" flowable:formKey="dataset-quality-review-form" flowable:priority="50">
+      <documentation>Review dataset quality evaluation results and make final decision.
+                
+                Quality Score: ${qualityScore}%
+                Bias Score: ${biasScore}%
+                PII Found: ${piiFound}
+                GDPR Compliant: ${gdprCompliant}
+                
+                Justification: ${justification}</documentation>
+    </userTask>
+    <sequenceFlow id="flow6" sourceRef="humanReview" targetRef="humanDecisionGateway"></sequenceFlow>
+    <exclusiveGateway id="humanDecisionGateway" name="Human Decision?"></exclusiveGateway>
+    <sequenceFlow id="humanApproved" name="Approved by Human" sourceRef="humanDecisionGateway" targetRef="notifyApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${humanDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="humanRejected" name="Rejected by Human" sourceRef="humanDecisionGateway" targetRef="notifyRejection">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${humanDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="notifyApproval" name="Notify Dataset Approved"></serviceTask>
+    <sequenceFlow id="flowToApprovedEnd" sourceRef="notifyApproval" targetRef="endApproved"></sequenceFlow>
+    <serviceTask id="notifyRejection" name="Notify Dataset Rejected"></serviceTask>
+    <sequenceFlow id="flowToRejectedEnd" sourceRef="notifyRejection" targetRef="endRejected"></sequenceFlow>
+    <endEvent id="endApproved" name="Dataset Approved"></endEvent>
+    <endEvent id="endRejected" name="Dataset Rejected"></endEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_datasetQualityGovernanceProcess">
+    <bpmndi:BPMNPlane bpmnElement="datasetQualityGovernanceProcess" id="BPMNPlane_datasetQualityGovernanceProcess">
+      <bpmndi:BPMNShape bpmnElement="startEvent" id="BPMNShape_startEvent">
+        <omgdc:Bounds height="35.0" width="35.0" x="41.0" y="301.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validateFormat" id="BPMNShape_validateFormat">
+        <omgdc:Bounds height="72.0" width="105.0" x="110.0" y="275.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="formatGateway" id="BPMNShape_formatGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="260.0" y="288.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="datasetProfiling" id="BPMNShape_datasetProfiling">
+        <omgdc:Bounds height="81.0" width="105.0" x="350.0" y="141.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelGatewayFork" id="BPMNShape_parallelGatewayFork">
+        <omgdc:Bounds height="40.0" width="40.0" x="500.0" y="226.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="detectBias" id="BPMNShape_detectBias">
+        <omgdc:Bounds height="101.0" width="105.0" x="611.0" y="319.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="validateCompliance" id="BPMNShape_validateCompliance">
+        <omgdc:Bounds height="91.0" width="105.0" x="570.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelGatewayJoin" id="BPMNShape_parallelGatewayJoin">
+        <omgdc:Bounds height="40.0" width="40.0" x="740.0" y="222.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="calculateScore" id="BPMNShape_calculateScore">
+        <omgdc:Bounds height="76.0" width="105.0" x="820.0" y="213.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="decisionGateway" id="BPMNShape_decisionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="980.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="humanReview" id="BPMNShape_humanReview">
+        <omgdc:Bounds height="85.0" width="130.0" x="1080.0" y="273.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="humanDecisionGateway" id="BPMNShape_humanDecisionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1250.0" y="295.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notifyApproval" id="BPMNShape_notifyApproval">
+        <omgdc:Bounds height="60.0" width="100.0" x="1472.0" y="289.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notifyRejection" id="BPMNShape_notifyRejection">
+        <omgdc:Bounds height="60.0" width="100.0" x="1410.0" y="135.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endApproved" id="BPMNShape_endApproved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1630.0" y="308.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endRejected" id="BPMNShape_endRejected">
+        <omgdc:Bounds height="35.0" width="35.0" x="1700.0" y="470.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="76.0" y="318.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="311.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="215.0" y="311.0"></omgdi:waypoint>
+        <omgdi:waypoint x="244.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="308.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="formatInvalid" id="BPMNEdge_formatInvalid">
+        <omgdi:waypoint x="300.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="312.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="312.0" y="488.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1700.0" y="487.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="250.0" y="362.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="formatValid" id="BPMNEdge_formatValid">
+        <omgdi:waypoint x="300.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="312.0" y="308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="312.0" y="182.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="181.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="269.0" y="235.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="455.0" y="181.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="226.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToBias" id="BPMNEdge_flowToBias">
+        <omgdi:waypoint x="520.0" y="266.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="368.0"></omgdi:waypoint>
+        <omgdi:waypoint x="611.0" y="369.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToPII" id="BPMNEdge_flowToPII">
+        <omgdi:waypoint x="520.0" y="226.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="76.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="75.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowFromBias" id="BPMNEdge_flowFromBias">
+        <omgdi:waypoint x="716.0" y="369.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="369.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="262.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowFromPII" id="BPMNEdge_flowFromPII">
+        <omgdi:waypoint x="675.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="50.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="50.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="222.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="780.0" y="242.0"></omgdi:waypoint>
+        <omgdi:waypoint x="792.0" y="242.0"></omgdi:waypoint>
+        <omgdi:waypoint x="792.0" y="242.0"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="251.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="872.0" y="213.0"></omgdi:waypoint>
+        <omgdi:waypoint x="872.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="912.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="999.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="999.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowApproved" id="BPMNEdge_flowApproved">
+        <omgdi:waypoint x="1000.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="994.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="994.0" y="439.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1519.0" y="439.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1522.0" y="349.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="999.0" y="286.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowRejected" id="BPMNEdge_flowRejected">
+        <omgdi:waypoint x="1020.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1032.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1032.0" y="166.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1410.0" y="165.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1120.0" y="120.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowReview" id="BPMNEdge_flowReview">
+        <omgdi:waypoint x="1020.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1032.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1032.0" y="316.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1080.0" y="315.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="1084.0" y="189.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="1210.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1250.0" y="315.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="humanApproved" id="BPMNEdge_humanApproved">
+        <omgdi:waypoint x="1290.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1472.0" y="319.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="1181.0" y="357.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="humanRejected" id="BPMNEdge_humanRejected">
+        <omgdi:waypoint x="1270.0" y="295.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1269.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1269.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1269.0" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1410.0" y="165.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="1320.0" y="241.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToApprovedEnd" id="BPMNEdge_flowToApprovedEnd">
+        <omgdi:waypoint x="1572.0" y="319.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1630.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowToRejectedEnd" id="BPMNEdge_flowToRejectedEnd">
+        <omgdi:waypoint x="1510.0" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1484.0" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1717.0" y="165.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1717.0" y="470.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="ethics-review-process" name="Ethics Review Process (70% IA)" isExecutable="true">
+    
+    <startEvent id="start" name="Revisión Ética Solicitada"/>
+    
+    <userTask id="request-ethics-review" 
+              name="Solicitar Revisión Ética"
+              flowable:candidateGroups="ml-engineers,governance-admins"
+              flowable:formKey="plataforma/workflow/ethics-review-request-form.zul"/>
+    
+    <serviceTask id="ai-impact-assessment" 
+                 name="IA Impact Assessment"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AIImpactAssessmentDelegate"/>
+    
+    <exclusiveGateway id="violations-gateway" name="¿Violaciones?"/>
+    
+    <userTask id="ethics-committee-review" 
+              name="Comité de Ética Review"
+              flowable:candidateGroups="ethics-committee"
+              flowable:formKey="plataforma/workflow/ethics-committee-review-form.zul"/>
+    
+    <exclusiveGateway id="committee-decision-gateway" name="Decisión?"/>
+    
+    <userTask id="define-mitigation-plan" 
+              name="Plan de Mitigación"
+              flowable:candidateGroups="governance-admins"
+              flowable:formKey="plataforma/workflow/ethics-mitigation-plan-form.zul"/>
+    
+    <serviceTask id="save-ethics-evidence" 
+                 name="Guardar Evidencia"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.SaveEthicsEvidenceDelegate"/>
+    
+    <serviceTask id="reject-ethics-review" 
+                 name="Rechazar Sistema IA"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.RejectEthicsDelegate"/>
+    
+    <endEvent id="ethics-review-completed" name="Revisión Completada"/>
+    <endEvent id="ethics-review-rejected" name="Sistema Rechazado"/>
+    
+    <!-- Flows -->
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="request-ethics-review"/>
+    <sequenceFlow id="flow2" sourceRef="request-ethics-review" targetRef="ai-impact-assessment"/>
+    <sequenceFlow id="flow3" sourceRef="ai-impact-assessment" targetRef="violations-gateway"/>
+    
+    <sequenceFlow id="flow4-no-violations" sourceRef="violations-gateway" targetRef="save-ethics-evidence">
+      <conditionExpression xsi:type="tFormalExpression">${violations_detected == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow4-violations" sourceRef="violations-gateway" targetRef="ethics-committee-review">
+      <conditionExpression xsi:type="tFormalExpression">${violations_detected == true}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow5" sourceRef="ethics-committee-review" targetRef="committee-decision-gateway"/>
+    
+    <sequenceFlow id="flow6-approve" sourceRef="committee-decision-gateway" targetRef="save-ethics-evidence">
+      <conditionExpression xsi:type="tFormalExpression">${committee_decision == 'approve'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow6-conditional" sourceRef="committee-decision-gateway" targetRef="define-mitigation-plan">
+      <conditionExpression xsi:type="tFormalExpression">${committee_decision == 'conditional_approve'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow6-reject" sourceRef="committee-decision-gateway" targetRef="reject-ethics-review">
+      <conditionExpression xsi:type="tFormalExpression">${committee_decision == 'reject'}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow7" sourceRef="define-mitigation-plan" targetRef="save-ethics-evidence"/>
+    <sequenceFlow id="flow8" sourceRef="save-ethics-evidence" targetRef="ethics-review-completed"/>
+    <sequenceFlow id="flow9" sourceRef="reject-ethics-review" targetRef="ethics-review-rejected"/>
+    
+  </process>
+  
+  <message id="alertCreatedMessage" name="alert_created"/>
+
+</definitions>
+
+

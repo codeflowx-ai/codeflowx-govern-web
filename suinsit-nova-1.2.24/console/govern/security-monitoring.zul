@@ -1,0 +1,194 @@
+<?page title="Security Monitoring" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.security.SecurityMonitoringVM')">
+        
+        <!-- Security Overview -->
+        <hlayout sclass="security-header">
+            <div sclass="security-status ${vm.securityStatusClass}">
+                <label value="Security Status"/>
+                <label value="@load(vm.securityStatus)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Active Threats"/>
+                <label value="@load(vm.activeThreats)" 
+                       sclass="@load(vm.threatLevelStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Blocked Attempts"/>
+                <label value="@load(vm.blockedAttempts)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Risk Score"/>
+                <label value="@load(vm.riskScore)/10"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Real-time Monitoring"/>
+                <tab label="Threat Detection"/>
+                <tab label="Prompt Security"/>
+                <tab label="Access Control"/>
+            </tabs>
+            <tabpanels>
+                <!-- Real-time Monitoring Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Security Events Stream -->
+                        <listbox model="@load(vm.securityEvents)" 
+                                mold="paging" pageSize="10"
+                                sclass="security-events">
+                            <listhead>
+                                <listheader label="Timestamp"/>
+                                <listheader label="Event Type"/>
+                                <listheader label="Source"/>
+                                <listheader label="Severity"/>
+                                <listheader label="Details"/>
+                                <listheader label="Actions"/>
+                            </listhead>
+                            <template name="model" var="event">
+                                <listitem sclass="@load(event.severityClass)">
+                                    <listcell label="@load(event.timestamp)"/>
+                                    <listcell label="@load(event.type)"/>
+                                    <listcell label="@load(event.source)"/>
+                                    <listcell>
+                                        <label value="@load(event.severity)" 
+                                               sclass="@load(event.severityStyle)"/>
+                                    </listcell>
+                                    <listcell label="@load(event.details)"/>
+                                    <listcell>
+                                        <button label="Investigate" 
+                                                onClick="@command('investigateEvent', event=event)"/>
+                                        <button label="Block" visible="@load(event.blockable)"
+                                                onClick="@command('blockSource', event=event)"/>
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+
+                        <!-- Security Metrics Charts -->
+                        <hlayout>
+                            <charts id="threatTrendsChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Threat Trends"
+                                   width="50%"
+                                   model="@load(vm.threatTrendsData)"/>
+                            
+                            <charts id="securityIncidentsChart" 
+                                   type="bar"
+                                   height="300px"
+                                   title="Security Incidents by Type"
+                                   width="50%"
+                                   model="@load(vm.incidentsData)"/>
+                        </hlayout>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Threat Detection Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Threat Detection Rules -->
+                        <groupbox title="Detection Rules">
+                            <listbox model="@load(vm.detectionRules)">
+                                <listhead>
+                                    <listheader label="Rule Name"/>
+                                    <listheader label="Type"/>
+                                    <listheader label="Pattern"/>
+                                    <listheader label="Severity"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="rule">
+                                    <listitem>
+                                        <listcell label="@load(rule.name)"/>
+                                        <listcell label="@load(rule.type)"/>
+                                        <listcell label="@load(rule.pattern)"/>
+                                        <listcell>
+                                            <label value="@load(rule.severity)" 
+                                                   sclass="@load(rule.severityStyle)"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="@load(rule.status)" 
+                                                   sclass="@load(rule.statusStyle)"/>
+                                        </listcell>
+                                        <listcell>
+                                            <button label="Edit" 
+                                                    onClick="@command('editRule', rule=rule)"/>
+                                            <button label="Toggle" 
+                                                    onClick="@command('toggleRule', rule=rule)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+
+                        <!-- Detected Threats -->
+                        <groupbox title="Detected Threats">
+                            <listbox model="@load(vm.detectedThreats)">
+                                <listhead>
+                                    <listheader label="Threat"/>
+                                    <listheader label="Detection Time"/>
+                                    <listheader label="Risk Level"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Actions Taken"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="threat">
+                                    <listitem>
+                                        <listcell label="@load(threat.name)"/>
+                                        <listcell label="@load(threat.detectionTime)"/>
+                                        <listcell>
+                                            <label value="@load(threat.riskLevel)" 
+                                                   sclass="@load(threat.riskLevelStyle)"/>
+                                        </listcell>
+                                        <listcell label="@load(threat.status)"/>
+                                        <listcell label="@load(threat.actionsTaken)"/>
+                                        <listcell>
+                                            <button label="Mitigate" 
+                                                    onClick="@command('mitigateThreat', threat=threat)"/>
+                                            <button label="Details" 
+                                                    onClick="@command('showThreatDetails', threat=threat)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Prompt Security Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Prompt Security Analysis -->
+                        <groupbox title="Prompt Security Analysis">
+                            <textbox rows="4" 
+                                    width="100%" 
+                                    placeholder="Enter prompt to analyze..."
+                                    value="@bind(vm.promptToAnalyze)"/>
+                            <button label="Analyze Security" 
+                                    onClick="@command('analyzePromptSecurity')"/>
+                            
+                            <listbox model="@load(vm.promptSecurityResults)"
+                                    visible="@load(not empty vm.promptSecurityResults)">
+                                <listhead>
+                                    <listheader label="Check Type"/>
+                                    <listheader label="Result"/>
+                                    <listheader label="Risk Level"/>
+                                    <listheader label="Recommendation"/>
+                                </listhead>
+                                <template name="model" var="result">
+                                    <listitem>
+                                        <listcell label="@load(result.checkType)"/>
+                                        <listcell>
+                                            <label value="@load(result.result)" 
+                                                   sclass="@load(result.resultStyle)"/>
+                                        </listcell>
+                                        <listcell>
+                                            <label value="@load(result.riskLevel)" 
+                                                   sclass="@load(result.riskLevelStyle)"/>
+                                        </listcell>
+                                        <listcell label="@load(result.recommendation)"/>
+                                    </listitem>

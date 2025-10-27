@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/bpmn">
+
+  <process id="performance-degradation-process" name="Performance Degradation Process (95% IA)" isExecutable="true">
+    
+    <startEvent id="start-performance-check" name="Performance Check">
+      <timerEventDefinition>
+        <timeCycle>R/PT5M</timeCycle>  <!-- Cada 5 minutos -->
+      </timerEventDefinition>
+    </startEvent>
+    
+    <serviceTask id="check-performance-metrics" 
+                 name="Check Performance"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CheckPerformanceMetricsDelegate"/>
+    
+    <exclusiveGateway id="degradation-gateway" name="¿Degradación?"/>
+    
+    <serviceTask id="check-autoscaling" 
+                 name="Check Auto-scaling"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.CheckAutoScalingDelegate"/>
+    
+    <exclusiveGateway id="can-autoscale-gateway" name="¿Puede Scale?"/>
+    
+    <serviceTask id="autoscale-deployment" 
+                 name="Auto-scale"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.AutoScaleDeploymentDelegate"/>
+    
+    <userTask id="manual-intervention" 
+              name="Intervención Manual"
+              flowable:candidateGroups="mlops-engineers"
+              flowable:formKey="plataforma/workflow/performance-intervention-form.zul"
+              flowable:dueDate="PT30M"/>
+    
+    <serviceTask id="save-metrics" 
+                 name="Guardar Métricas"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.SavePerformanceMetricsDelegate"/>
+    
+    <endEvent id="performance-check-completed" name="Check Completado"/>
+    
+    <!-- Flows -->
+    <sequenceFlow id="flow1" sourceRef="start-performance-check" targetRef="check-performance-metrics"/>
+    <sequenceFlow id="flow2" sourceRef="check-performance-metrics" targetRef="degradation-gateway"/>
+    
+    <sequenceFlow id="flow3-no-degradation" sourceRef="degradation-gateway" targetRef="save-metrics">
+      <conditionExpression xsi:type="tFormalExpression">${degradation_detected == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3-degradation" sourceRef="degradation-gateway" targetRef="check-autoscaling">
+      <conditionExpression xsi:type="tFormalExpression">${degradation_detected == true}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow4" sourceRef="check-autoscaling" targetRef="can-autoscale-gateway"/>
+    
+    <sequenceFlow id="flow5-can-scale" sourceRef="can-autoscale-gateway" targetRef="autoscale-deployment">
+      <conditionExpression xsi:type="tFormalExpression">${can_autoscale == true}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow5-manual" sourceRef="can-autoscale-gateway" targetRef="manual-intervention">
+      <conditionExpression xsi:type="tFormalExpression">${can_autoscale == false}</conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow6" sourceRef="autoscale-deployment" targetRef="save-metrics"/>
+    <sequenceFlow id="flow7" sourceRef="manual-intervention" targetRef="save-metrics"/>
+    <sequenceFlow id="flow8" sourceRef="save-metrics" targetRef="performance-check-completed"/>
+    
+  </process>
+
+</definitions>
+
+
