@@ -1,0 +1,88 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div id="editDeskop">
+	 <idspace viewModel="@id('vm') @init('com.suinsit.webapp.wizzars.reports.FindReportUI')"	>
+	 
+		<div id="notificacion"></div>
+	
+		<div class="row">
+		<div class="col-lg-12">
+							<div class="card">
+								<div class="card-header">
+									<div
+										class="d-flex align-items-center flex-wrap gap-2">
+										<div class="flex-grow-1">
+											<button
+												iconSclass=" bx bxs-window-alt label-icon align-middle fs-16 me-2"
+												onClick="@command('addData')"
+												sclass="btn btn-label btn-success waves-effect waves-light"
+												tooltiptext="New Report">
+												New Report
+											</button>
+										</div>
+										<div class="flex-shrink-0">
+
+										</div>
+									</div>
+								</div>
+							</div>
+						</div><!--end col-->
+			<h:div class="col-lg-9 ">
+			
+			<div class="card">
+					
+						<h:div class="card-body" style="overflow:auto;">
+							<grid id="gr" model="@bind(vm.beans)"
+								style="align:center" width="98%" height="500px"
+								emptyMessage="${labels.paging.nodata}" mold="paging" pageSize="25" pagingPosition="both" autopaging="true">
+								<columns columnsgroup="false"
+									menupopup="auto" columnshide="false" sizable="true">
+									<column
+										label="name"/>
+									<column
+										label="Title" />
+									<column
+										label="${labels.MddMentity.fxalta}" sort="auto(lastModif)" />
+									<column label="" />
+								</columns>
+								<rows>
+									<template name="model" var="item">
+										<row value="@bind(item)">
+											<label
+												value="@load(item.name)" />
+											<label
+												value="@load(item.title)" />
+											
+											<label
+												value="@load(item.lastModif)" />
+											<cell align="center">
+<!-- 												<button -->
+<!-- 													onClick="@command('editData',item=item)" -->
+<!-- 													tooltiptext="${labels.MddMentity.edit}" -->
+<!-- 													iconSclass="icon-pencil7" sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple" /> -->
+												<space></space>
+												<button
+												onClick="@command('removeData',item=item)"
+												tooltiptext="${labels.MddMentity.remove}"
+												iconSclass="bx bx-trash fs-2x"
+												sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />
+											</cell>
+										</row>
+									</template>
+								</rows>
+								
+							</grid>
+						</h:div>
+					
+				</div>
+			</h:div>
+
+		
+		</div>
+	</idspace>
+	
+	</div>
+	
+</zk>

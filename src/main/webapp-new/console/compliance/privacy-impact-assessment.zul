@@ -1,0 +1,327 @@
+<?page title="Privacy Impact Assessment" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.compliance.PrivacyImpactAssessmentVM')">
+        
+        <hlayout sclass="assessment-header">
+            <div sclass="metric-box">
+                <label value="Pending Assessments"/>
+                <label value="@load(vm.pendingAssessments)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="High Risk Systems"/>
+                <label value="@load(vm.highRiskSystems)"/>
+            </div>
+            <div sclass="actions-box">
+                <button label="New Assessment" 
+                        onClick="@command('startNewAssessment')"
+                        sclass="primary"/>
+                <button label="Export Reports" 
+                        onClick="@command('exportAssessments')"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Assessments"/>
+                <tab label="Data Flow Analysis"/>
+                <tab label="Risk Matrix"/>
+                <tab label="Mitigation Plans"/>
+            </tabs>
+            <tabpanels>
+                <!-- Assessments Panel -->
+                <tabpanel>
+                    <listbox model="@load(vm.assessments)" 
+                            mold="paging" pageSize="10">
+                        <listhead>
+                            <listheader label="System Name"/>
+                            <listheader label="Assessment Date"/>
+                            <listheader label="Data Categories"/>
+                            <listheader label="Risk Level"/>
+                            <listheader label="Status"/>
+                            <listheader label="DPO Approval"/>
+                            <listheader label="Actions"/>
+                        </listhead>
+                        <template name="model" var="assessment">
+                            <listitem>
+                                <listcell label="@load(assessment.systemName)"/>
+                                <listcell label="@load(assessment.assessmentDate)"/>
+                                <listcell>
+                                    <forEach items="@load(assessment.dataCategories)" 
+                                            var="category">
+                                        <label value="@load(category)" 
+                                               sclass="category-tag"/>
+                                    </forEach>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(assessment.riskLevel)" 
+                                           sclass="@load(assessment.riskLevelStyle)"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(assessment.status)" 
+                                           sclass="@load(assessment.statusStyle)"/>
+                                </listcell>
+                                <listcell>
+                                    <label value="@load(assessment.dpoApproval)" 
+                                           sclass="@load(assessment.approvalStyle)"/>
+                                </listcell>
+                                <listcell>
+                                    <button label="View" 
+                                            onClick="@command('viewAssessment', assessment=assessment)"/>
+                                    <button label="Update" 
+                                            onClick="@command('updateAssessment', assessment=assessment)"/>
+                                    <button label="Request Approval" 
+                                            visible="@load(assessment.canRequestApproval)"
+                                            onClick="@command('requestApproval', assessment=assessment)"/>
+                                </listcell>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </tabpanel>
+
+                <!-- Data Flow Analysis Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Data Flow Diagram -->
+                        <div sclass="data-flow-diagram" 
+                             height="400px">
+                            <!-- Integrar componente de visualización de flujo de datos -->
+                        </div>
+
+                        <!-- Data Flow Details -->
+                        <grid model="@load(vm.dataFlows)">
+                            <columns>
+                                <column label="Source"/>
+                                <column label="Destination"/>
+                                <column label="Data Type"/>
+                                <column label="Transfer Method"/>
+                                <column label="Security Measures"/>
+                                <column label="Risk Level"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="flow">
+                                <row>
+                                    <label value="@load(flow.source)"/>
+                                    <label value="@load(flow.destination)"/>
+                                    <label value="@load(flow.dataType)"/>
+                                    <label value="@load(flow.transferMethod)"/>
+                                    <label value="@load(flow.securityMeasures)"/>
+                                    <label value="@load(flow.riskLevel)" 
+                                           sclass="@load(flow.riskLevelStyle)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editDataFlow', flow=flow)"/>
+                                        <button label="Review" 
+                                                onClick="@command('reviewDataFlow', flow=flow)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Risk Matrix Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Risk Matrix Visualization -->
+                        <div sclass="risk-matrix" 
+                             height="500px">
+                            <!-- Matriz de riesgo interactiva -->
+                        </div>
+
+                        <!-- Risk Details -->
+                        <grid model="@load(vm.risks)">
+                            <columns>
+                                <column label="Risk Category"/>
+                                <column label="Likelihood"/>
+                                <column label="Impact"/>
+                                <column label="Overall Risk"/>
+                                <column label="Controls"/>
+                                <column label="Residual Risk"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="risk">
+                                <row>
+                                    <label value="@load(risk.category)"/>
+                                    <label value="@load(risk.likelihood)"/>
+                                    <label value="@load(risk.impact)"/>
+                                    <label value="@load(risk.overallRisk)" 
+                                           sclass="@load(risk.riskStyle)"/>
+                                    <label value="@load(risk.controls)"/>
+                                    <label value="@load(risk.residualRisk)" 
+                                           sclass="@load(risk.residualRiskStyle)"/>
+                                    <hlayout>
+                                        <button label="Update" 
+                                                onClick="@command('updateRisk', risk=risk)"/>
+                                        <button label="Add Control" 
+                                                onClick="@command('addControl', risk=risk)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Mitigation Plans Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.mitigationPlans)">
+                            <columns>
+                                <column label="Risk Area"/>
+                                <column label="Mitigation Measure"/>
+                                <column label="Status"/>
+                                <column label="Responsible"/>
+                                <column label="Deadline"/>
+                                <column label="Progress"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="plan">
+                                <row>
+                                    <label value="@load(plan.riskArea)"/>
+                                    <label value="@load(plan.measure)"/>
+                                    <label value="@load(plan.status)" 
+                                           sclass="@load(plan.statusStyle)"/>
+                                    <label value="@load(plan.responsible)"/>
+                                    <label value="@load(plan.deadline)"/>
+                                    <progressmeter value="@load(plan.progress)"/>
+                                    <hlayout>
+                                        <button label="Update" 
+                                                onClick="@command('updatePlan', plan=plan)"/>
+                                        <button label="Complete" 
+                                                visible="@load(plan.canComplete)"
+                                                onClick="@command('completePlan', plan=plan)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Assessment Form Window -->
+        <window id="assessmentFormWindow" 
+                title="Privacy Impact Assessment" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="90%">
+            <vlayout>
+                <!-- System Information -->
+                <groupbox title="System Information">
+                    <grid>
+                        <rows>
+                            <row>
+                                <label value="System Name"/>
+                                <textbox value="@bind(vm.currentAssessment.systemName)"/>
+                            </row>
+                            <row>
+                                <label value="Description"/>
+                                <textbox value="@bind(vm.currentAssessment.description)" 
+                                        rows="3"/>
+                            </row>
+                            <row>
+                                <label value="Purpose"/>
+                                <textbox value="@bind(vm.currentAssessment.purpose)" 
+                                        rows="2"/>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+
+                <!-- Data Processing -->
+                <groupbox title="Data Processing Activities">
+                    <grid model="@load(vm.currentAssessment.dataProcessing)">
+                        <columns>
+                            <column label="Activity"/>
+                            <column label="Data Categories"/>
+                            <column label="Legal Basis"/>
+                            <column label="Purpose"/>
+                            <column label="Recipients"/>
+                            <column label="Retention"/>
+                            <column label="Actions"/>
+                        </columns>
+                        <template name="model" var="activity">
+                            <row>
+                                <textbox value="@bind(activity.name)"/>
+                                <combobox selectedItem="@bind(activity.dataCategories)" 
+                                         multiple="true"/>
+                                <combobox selectedItem="@bind(activity.legalBasis)"/>
+                                <textbox value="@bind(activity.purpose)"/>
+                                <textbox value="@bind(activity.recipients)"/>
+                                <textbox value="@bind(activity.retention)"/>
+                                <button label="Remove" 
+                                        onClick="@command('removeActivity', activity=activity)"/>
+                            </row>
+                        </template>
+                    </grid>
+                    <button label="Add Activity" 
+                            onClick="@command('addActivity')"/>
+                </groupbox>
+
+                <!-- Risk Assessment -->
+                <groupbox title="Risk Assessment">
+                    <grid model="@load(vm.currentAssessment.risks)">
+                        <columns>
+                            <column label="Risk"/>
+                            <column label="Likelihood"/>
+                            <column label="Impact"/>
+                            <column label="Existing Controls"/>
+                            <column label="Additional Controls"/>
+                            <column label="Actions"/>
+                        </columns>
+                        <template name="model" var="risk">
+                            <row>
+                                <textbox value="@bind(risk.description)"/>
+                                <combobox selectedItem="@bind(risk.likelihood)"/>
+                                <combobox selectedItem="@bind(risk.impact)"/>
+                                <textbox value="@bind(risk.existingControls)" 
+                                        rows="2"/>
+                                <textbox value="@bind(risk.additionalControls)" 
+                                        rows="2"/>
+                                <button label="Remove" 
+                                        onClick="@command('removeRisk', risk=risk)"/>
+                            </row>
+                        </template>
+                    </grid>
+                    <button label="Add Risk" 
+                            onClick="@command('addRisk')"/>
+                </groupbox>
+
+                <!-- DPO Review -->
+                <groupbox title="DPO Review">
+                    <grid>
+                        <rows>
+                            <row>
+                                <label value="DPO Comments"/>
+                                <textbox value="@bind(vm.currentAssessment.dpoComments)" 
+                                        rows="3"/>
+                            </row>
+                            <row>
+                                <label value="Recommendations"/>
+                                <textbox value="@bind(vm.currentAssessment.recommendations)" 
+                                        rows="3"/>
+                            </row>
+                            <row>
+                                <label value="Decision"/>
+                                <combobox selectedItem="@bind(vm.currentAssessment.dpoDecision)">
+                                    <comboitem label="Approved"/>
+                                    <comboitem label="Rejected"/>
+                                    <comboitem label="Needs Revision"/>
+                                </combobox>
+                            </row>
+                        </rows>
+                    </grid>
+                </groupbox>
+
+                <hlayout>
+                    <button label="Save" onClick="@command('saveAssessment')"/>
+                    <button label="Submit for Review" 
+                            onClick="@command('submitForReview')"/>
+                    <button label="Cancel" onClick="@command('cancelAssessment')"/>
+                </hlayout>
+            </vlayout>
+        </window>
+    </div>
+</zk>

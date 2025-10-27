@@ -1,0 +1,60 @@
+
+<zk xmlns:h="native">
+	<div class="row">
+	<h:div class="col-md-3">
+	</h:div>
+		<h:div class="col-md-6">
+			<grid>
+				<rows>
+					<row>
+						<label sclass="form-label"
+							value="Seleccione Tipo Data Table" />
+						<combobox
+							onSelect=" @command('onChanging',event=event)" id="tipoCompo"
+							value="@bind(vm.bean.tipoComponenteSelect)"
+							selectedItem="@load(vm.bean.tipoComponente)"
+							model="@load(vm.tipoRelation)">
+							<template name="model" var="item">
+								<comboitem label="${item.label}"
+									value="${item.tipo}" />
+							</template>
+						</combobox>
+					</row>
+					<row>
+						<label sclass="form-label" value="Seleccione una Sub-Tabla" />
+						<combobox model="@load(vm.subtables)"
+							 value="@bind(vm.entidad)"
+							onSelect="@command('selectSubtable',item=event.data)">
+							<template name="model" var="item">
+								<comboitem value="${item.namesql}"
+									label="${item.namesql}" />
+							</template>
+						</combobox>
+					</row>
+					<row>
+						<label sclass="form-label"
+							value="Crear nueva Sub-Tabla" />
+						<combobox model="@load(vm.beans)"
+							value="@bind(vm.entidad)"
+							onSelect="@command('selectEntity',item=event.data)">
+							<template name="model" var="item">
+								<comboitem value="${item.namesql}"
+									label="${item.namesql}" />
+							</template>
+						</combobox>
+					</row>
+				</rows>
+			</grid>
+		</h:div>
+		
+	</div>
+	<div >
+<!-- 				<button zclass="pull-left" -->
+<!-- 					sclass="btn btn-outline bg-secondary text-primary-800 btn-icon ml-2 legitRipple" -->
+<!-- 					onClick="@command('back')" iconSclass="icon-arrow-left13 icon-2x" -->
+<!-- 					label="Back" /> -->
+				<button zclass="pull-right"
+					sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" 
+					onClick="@command('nextConfig',form=fx)" label="Next" />
+			</div>
+</zk>

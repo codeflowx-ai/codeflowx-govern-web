@@ -1,0 +1,127 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    
+    <div sclass="container-fluid" 
+         viewModel="@id('vm') @init('com.suinsit.compliance.web.SectorManagementVM')">
+        
+        <!-- Título y botón de nuevo -->
+        <div sclass="row mb-3">
+            <div sclass="col">
+                <h4>Gestión de Sectores</h4>
+            </div>
+            <div sclass="col-auto">
+                <button sclass="btn btn-primary" 
+                        onClick="@command('showNewSectorDialog')">
+                    Nuevo Sector
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de sectores -->
+        <div sclass="card">
+            <div sclass="card-body">
+                <div sclass="table-responsive">
+                    <table sclass="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre</th>
+                                <th>Nivel de Riesgo</th>
+                                <th>Sector Padre</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr forEach="@load(vm.sectors)">
+                                <td>
+                                    <label value="@load(each.sectorCode)" />
+                                </td>
+                                <td>
+                                    <label value="@load(each.name)" />
+                                </td>
+                                <td>
+                                    <label value="@load(each.riskLevel)" />
+                                </td>
+                                <td>
+                                    <label value="@load(each.parentSector.name)" />
+                                </td>
+                                <td>
+                                    <span sclass="@load(each.active ? 'badge bg-success' : 'badge bg-danger')">
+                                        <label value="@load(each.active ? 'Activo' : 'Inactivo')" />
+                                    </span>
+                                </td>
+                                <td>
+                                    <button sclass="btn btn-sm btn-info me-2"
+                                            onClick="@command('editSector', sector=each)">
+                                        Editar
+                                    </button>
+                                    <button sclass="btn btn-sm btn-danger"
+                                            onClick="@command('confirmDeactivate', sector=each)"
+                                            visible="@load(each.active)">
+                                        Desactivar
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de edición/creación -->
+        <div id="sectorModal" visible="false" 
+             sclass="modal" tabindex="-1">
+            <div sclass="modal-dialog">
+                <div sclass="modal-content">
+                    <div sclass="modal-header">
+                        <h5 sclass="modal-title">
+                            <label value="@load(vm.editingSector.idxcmpsector eq null ? 'Nuevo Sector' : 'Editar Sector')" />
+                        </h5>
+                        <button type="button" sclass="btn-close" 
+                                onClick="@command('closeSectorDialog')" />
+                    </div>
+                    <div sclass="modal-body">
+                        <div sclass="mb-3">
+                            <label sclass="form-label">Nombre</label>
+                            <textbox value="@bind(vm.editingSector.name)" 
+                                    sclass="form-control" />
+                        </div>
+                        <div sclass="mb-3">
+                            <label sclass="form-label">Nivel de Riesgo</label>
+                            <combobox selectedItem="@bind(vm.editingSector.riskLevel)" 
+                                     sclass="form-select">
+                                <comboitem label="CRITICAL" value="CRITICAL" />
+                                <comboitem label="HIGH" value="HIGH" />
+                                <comboitem label="MEDIUM" value="MEDIUM" />
+                                <comboitem label="LOW" value="LOW" />
+                            </combobox>
+                        </div>
+                        <div sclass="mb-3">
+                            <label sclass="form-label">Sector Padre</label>
+                            <combobox model="@load(vm.parentSectors)"
+                                     selectedItem="@bind(vm.editingSector.parentSector)"
+                                     sclass="form-select">
+                                <template name="model">
+                                    <comboitem label="@load(each.name)" />
+                                </template>
+                            </combobox>
+                        </div>
+                    </div>
+                    <div sclass="modal-footer">
+                        <button sclass="btn btn-secondary" 
+                                onClick="@command('closeSectorDialog')">
+                            Cancelar
+                        </button>
+                        <button sclass="btn btn-primary" 
+                                onClick="@command('saveSector')">
+                            Guardar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</zk>

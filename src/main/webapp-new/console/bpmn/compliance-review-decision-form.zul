@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <window id="complianceReviewDecisionWindow" 
+            title="Decisión de Revisión de Compliance"
+            border="normal" 
+            width="800px" 
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.ComplianceReviewDecisionViewModel')">
+
+        <style>
+            .decision-card { 
+                border: 1px solid #e0e0e0; 
+                padding: 15px; 
+                margin: 10px 0; 
+                border-radius: 8px; 
+                cursor: pointer;
+                transition: all 0.2s;
+            }
+            .decision-card:hover { 
+                background: #f5f5f5; 
+                border-color: #1976d2;
+            }
+            .decision-card.selected { 
+                background: #e3f2fd; 
+                border: 2px solid #1976d2;
+            }
+            .info-section {
+                background: #fff3e0;
+                padding: 12px;
+                border-left: 4px solid #ff9800;
+                margin-bottom: 20px;
+            }
+        </style>
+
+        <vlayout spacing="15px" style="padding: 20px;">
+
+            <!-- Información del Timer -->
+            <div sclass="info-section">
+                <hlayout spacing="10px">
+                    <label value="⏰" style="font-size: 24px;"/>
+                    <vlayout>
+                        <label value="Han transcurrido ${vm.reviewDaysDelay} días desde la programación" 
+                               style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Fecha programada: ${vm.reviewScheduledFor}" 
+                               style="color: #666; font-size: 12px;"/>
+                        <label value="Sistemas no conformes: ${vm.nonCompliantSystems}" 
+                               style="color: #d32f2f; font-weight: bold;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opciones de Decisión -->
+            <label value="Por favor, selecciona una acción:" style="font-weight: bold; font-size: 16px; margin-bottom: 10px;"/>
+
+            <!-- Opción 1: Reiniciar Revisión -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'RESTART' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='RESTART')">
+                <hlayout spacing="15px">
+                    <label value="🔄" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Reiniciar Revisión Completa" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Volver a ejecutar compliance check desde el inicio" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Hubo cambios en los sistemas" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 2: Postergar -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'POSTPONE' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='POSTPONE')">
+                <hlayout spacing="15px">
+                    <label value="⏸️" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Postergar Revisión" style="font-weight: bold; font-size: 14px;"/>
+                        <hlayout spacing="10px">
+                            <label value="Esperar" style="color: #666; font-size: 12px;"/>
+                            <intbox value="@bind(vm.postponeDays)" width="60px" constraint="no empty, min 1 max 30"/>
+                            <label value="días más" style="color: #666; font-size: 12px;"/>
+                        </hlayout>
+                        <label value="Recomendado si: Se necesita más tiempo para corregir" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Opción 3: Finalizar -->
+            <div sclass="decision-card ${vm.selectedDecision eq 'FINISH' ? 'selected' : ''}"
+                 onClick="@command('selectDecision', decision='FINISH')">
+                <hlayout spacing="15px">
+                    <label value="✅" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="Finalizar y Archivar" style="font-weight: bold; font-size: 14px;"/>
+                        <label value="Cerrar el proceso sin acciones adicionales" style="color: #666; font-size: 12px;"/>
+                        <label value="Recomendado si: Los issues no son relevantes o fueron resueltos externamente" style="color: #1976d2; font-size: 11px; font-style: italic;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+
+            <!-- Notas Adicionales -->
+            <separator/>
+            <label value="Notas (opcional):" style="font-weight: bold;"/>
+            <textbox rows="3" width="100%" placeholder="Justificación de la decisión..." 
+                     value="@bind(vm.reviewNotes)"/>
+
+            <!-- Botones de Acción -->
+            <separator/>
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')" 
+                        iconSclass="z-icon-times" style="min-width: 100px;"/>
+                <button label="Confirmar Decisión" onClick="@command('confirmDecision')" 
+                        iconSclass="z-icon-check" 
+                        disabled="@load(empty vm.selectedDecision)"
+                        style="min-width: 150px; background: #1976d2; color: white; font-weight: bold;"/>
+            </hlayout>
+
+        </vlayout>
+
+    </window>
+
+</zk>
+

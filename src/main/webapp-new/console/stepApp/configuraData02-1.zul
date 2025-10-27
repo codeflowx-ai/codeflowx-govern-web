@@ -1,0 +1,58 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:h="native">
+	<div>
+		<div class="row">
+			<div class="col-xl-10">
+			---
+				<hlayout spacing="5px" style="padding:10px">
+					<listbox  height="400px"
+						model="@bind(vm.selected)" multiple="true">
+						<listhead>
+							<listheader label="Field"></listheader>
+							<listheader label="Foreing"></listheader>
+							<listheader label="Etiqueta"></listheader>
+						</listhead>
+						<template name="model">
+							<listitem>
+								<listcell label="${each.columnname }" />
+								<listcell label="${each.fktablename }" />
+								<listcell >
+								 <textbox value="@bind(each.label)"></textbox>
+								</listcell>
+							</listitem>
+						</template>
+					</listbox>
+					<zscript><![CDATA[
+	String imgPath = "xul/component/icons";
+]]></zscript>
+					
+				</hlayout>
+			</div>
+			<div class="col-xl-2">
+			<vbox spacing="10px" width="50px">
+						<image style="cursor:pointer"
+							src="${imgPath}/double-up-arrow.png"
+							onClick="@command('topBtn')" />
+						<image style="cursor:pointer"
+							src="${imgPath}/navigate-up-arrow.png"
+							onClick="@command('upBtn')" />
+						<image style="cursor:pointer"
+							src="${imgPath}/arrow-down-sign-to-navigate.png"
+							onClick="@command('downBtn')" />
+						<image style="cursor:pointer"
+							src="${imgPath}/double-down-arrows.png"
+							onClick="@command('bottomBtn')" />
+					</vbox>
+			</div>
+		
+		</div>
+
+		<button zclass="pull-left"
+								sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill" 
+								onClick="@command('back')" iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" label="Anterior" />
+
+		<button zclass="pull-right"
+			sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" 
+			onClick="@command('nextToOrder',form=fx)" label="Siguiente" />
+	</div>
+</zk>

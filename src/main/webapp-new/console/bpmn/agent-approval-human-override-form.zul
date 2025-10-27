@@ -1,0 +1,154 @@
+<!-- 
+    Agent Approval - Human Override Review Form
+    
+    BPMN Process: agent-approval-v1
+    User Task: hitlTask
+    CandidateGroups: governance-admins
+    
+    Input Variables:
+    - agentId, agentName
+    - riskScore, complianceScore, ethicsScore
+    - minScore, confidenceLevel, justification
+    
+    Output Variables:
+    - human_decision: 'approve' o 'reject'
+    - human_notes: String
+-->
+<zk>
+    <window id="humanOverrideWindow" 
+            title="Human Override Review - Agent Approval" 
+            border="normal" 
+            width="800px"
+            closable="false"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.AgentApprovalHumanOverrideViewModel')">
+        
+        <style>
+            .score-high { color: #4caf50; font-weight: bold; }
+            .score-medium { color: #ff9800; font-weight: bold; }
+            .score-low { color: #f44336; font-weight: bold; }
+            .info-section { background-color: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        </style>
+        
+        <vlayout spacing="15px" style="padding: 20px;">
+            
+            <!-- Header -->
+            <hlayout>
+                <label value="⚠️" style="font-size: 24px;"/>
+                <vlayout>
+                    <label value="Revisión Humana Requerida" 
+                           style="font-size: 18px; font-weight: bold;"/>
+                    <label value="El Agent requiere aprobación manual debido a scores borderline" 
+                           style="font-size: 12px; color: #666;"/>
+                </vlayout>
+            </hlayout>
+            
+            <separator bar="true"/>
+            
+            <!-- Agent Info -->
+            <div sclass="info-section">
+                <label value="📦 Información del Agent" style="font-weight: bold; font-size: 14px;"/>
+                <grid>
+                    <rows>
+                        <row>
+                            <label value="Agent ID:" style="width: 150px;"/>
+                            <label value="@load(vm.agentId)"/>
+                        </row>
+                        <row>
+                            <label value="Agent Name:"/>
+                            <label value="@load(vm.agentName)" style="font-weight: bold;"/>
+                        </row>
+                    </rows>
+                </grid>
+            </div>
+            
+            <!-- Scores -->
+            <div sclass="info-section">
+                <label value="📊 Scores de Evaluación" style="font-weight: bold; font-size: 14px;"/>
+                <grid>
+                    <rows>
+                        <row>
+                            <label value="Risk Score:" style="width: 150px;"/>
+                            <label value="@load(vm.riskScore)" 
+                                   sclass="@load(vm.getScoreClass(vm.riskScore))"/>
+                            <label value="/100"/>
+                        </row>
+                        <row>
+                            <label value="Compliance Score:"/>
+                            <label value="@load(vm.complianceScore)" 
+                                   sclass="@load(vm.getScoreClass(vm.complianceScore))"/>
+                            <label value="/100"/>
+                        </row>
+                        <row>
+                            <label value="Ethics Score:"/>
+                            <label value="@load(vm.ethicsScore)" 
+                                   sclass="@load(vm.getScoreClass(vm.ethicsScore))"/>
+                            <label value="/100"/>
+                        </row>
+                        <row>
+                            <label value="Score Mínimo:"/>
+                            <label value="@load(vm.minScore)" 
+                                   style="font-size: 16px; font-weight: bold;"
+                                   sclass="@load(vm.getScoreClass(vm.minScore))"/>
+                            <label value="/100"/>
+                        </row>
+                    </rows>
+                </grid>
+            </div>
+            
+            <!-- Drools Decision -->
+            <div sclass="info-section">
+                <label value="🤖 Decisión de Drools" style="font-weight: bold; font-size: 14px;"/>
+                <grid>
+                    <rows>
+                        <row>
+                            <label value="Confianza:" style="width: 150px;"/>
+                            <label value="@load(vm.confidenceLevel)"/>
+                        </row>
+                        <row spans="2">
+                            <vlayout>
+                                <label value="Justificación:" style="font-weight: bold;"/>
+                                <label value="@load(vm.justification)" 
+                                       style="white-space: pre-wrap; color: #333;"/>
+                            </vlayout>
+                        </row>
+                    </rows>
+                </grid>
+            </div>
+            
+            <separator bar="true"/>
+            
+            <!-- Decision Section -->
+            <vlayout spacing="10px">
+                <label value="🎯 Tu Decisión" style="font-weight: bold; font-size: 14px;"/>
+                
+                <radiogroup id="decisionGroup" selectedItem="@bind(vm.humanDecision)">
+                    <hlayout spacing="20px">
+                        <radio label="✅ Aprobar Agent" value="approve"/>
+                        <radio label="❌ Rechazar Agent" value="reject"/>
+                    </hlayout>
+                </radiogroup>
+                
+                <label value="Notas (requerido):" style="font-weight: bold;"/>
+                <textbox multiline="true" 
+                         rows="4" 
+                         width="100%" 
+                         value="@bind(vm.humanNotes)"
+                         placeholder="Explica tu decisión..."/>
+            </vlayout>
+            
+            <separator bar="true"/>
+            
+            <!-- Actions -->
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')"/>
+                <button label="Confirmar Decisión" 
+                        onClick="@command('confirm')" 
+                        disabled="@load(empty vm.humanDecision or empty vm.humanNotes)"
+                        style="background-color: #1976d2; color: white;"/>
+            </hlayout>
+            
+        </vlayout>
+        
+    </window>
+</zk>

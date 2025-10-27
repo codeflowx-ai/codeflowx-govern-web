@@ -1,0 +1,228 @@
+<?page title="Data Processing Registry" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.compliance.DataProcessingRegistryVM')">
+        
+        <hlayout sclass="registry-header">
+            <div sclass="metric-box">
+                <label value="Active Processes"/>
+                <label value="@load(vm.activeProcesses)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Special Categories"/>
+                <label value="@load(vm.specialCategoryProcesses)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Cross-border Transfers"/>
+                <label value="@load(vm.crossBorderTransfers)"/>
+            </div>
+            <div sclass="actions-box">
+                <button label="New Process" 
+                        onClick="@command('createProcess')"
+                        sclass="primary"/>
+                <button label="Generate Report" 
+                        onClick="@command('generateReport')"/>
+                <button label="Export Registry" 
+                        onClick="@command('exportRegistry')"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Processing Activities"/>
+                <tab label="Data Categories"/>
+                <tab label="Legal Basis"/>
+                <tab label="Data Transfers"/>
+            </tabs>
+            <tabpanels>
+                <!-- Processing Activities Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Filters -->
+                        <hlayout sclass="filter-container">
+                            <textbox value="@bind(vm.searchTerm)" 
+                                    placeholder="Search activities..."/>
+                            <combobox model="@load(vm.departments)" 
+                                     selectedItem="@bind(vm.selectedDepartment)"/>
+                            <combobox model="@load(vm.categories)" 
+                                     selectedItem="@bind(vm.selectedCategory)"/>
+                            <button label="Apply Filters" 
+                                    onClick="@command('applyFilters')"/>
+                        </hlayout>
+
+                        <!-- Activities Grid -->
+                        <grid model="@load(vm.processingActivities)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Process Name"/>
+                                <column label="Department"/>
+                                <column label="Purpose"/>
+                                <column label="Data Categories"/>
+                                <column label="Legal Basis"/>
+                                <column label="Status"/>
+                                <column label="Last Review"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="process">
+                                <row>
+                                    <label value="@load(process.name)"/>
+                                    <label value="@load(process.department)"/>
+                                    <label value="@load(process.purpose)"/>
+                                    <cell>
+                                        <forEach items="@load(process.dataCategories)" 
+                                                var="category">
+                                            <label value="@load(category)" 
+                                                   sclass="category-tag"/>
+                                        </forEach>
+                                    </cell>
+                                    <label value="@load(process.legalBasis)"/>
+                                    <label value="@load(process.status)" 
+                                           sclass="@load(process.statusStyle)"/>
+                                    <label value="@load(process.lastReview)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editProcess', process=process)"/>
+                                        <button label="Review" 
+                                                onClick="@command('reviewProcess', process=process)"/>
+                                        <button label="History" 
+                                                onClick="@command('showHistory', process=process)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Data Categories Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Category Tree -->
+                        <tree model="@load(vm.categoryTree)" 
+                              multiple="true">
+                            <treecols>
+                                <treecol label="Category"/>
+                                <treecol label="Description"/>
+                                <treecol label="Sensitivity Level"/>
+                                <treecol label="Retention Period"/>
+                                <treecol label="Processes"/>
+                                <treecol label="Actions"/>
+                            </treecols>
+                            <template name="model" var="category">
+                                <treeitem>
+                                    <treerow>
+                                        <treecell label="@load(category.name)"/>
+                                        <treecell label="@load(category.description)"/>
+                                        <treecell>
+                                            <label value="@load(category.sensitivityLevel)" 
+                                                   sclass="@load(category.sensitivityStyle)"/>
+                                        </treecell>
+                                        <treecell label="@load(category.retentionPeriod)"/>
+                                        <treecell label="@load(category.processCount)"/>
+                                        <treecell>
+                                            <button label="Edit" 
+                                                    onClick="@command('editCategory', category=category)"/>
+                                            <button label="View Processes" 
+                                                    onClick="@command('viewCategoryProcesses', category=category)"/>
+                                        </treecell>
+                                    </treerow>
+                                </treeitem>
+                            </template>
+                        </tree>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Legal Basis Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.legalBases)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Legal Basis"/>
+                                <column label="Description"/>
+                                <column label="Applicable Processes"/>
+                                <column label="Documentation"/>
+                                <column label="Last Validated"/>
+                                <column label="Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="basis">
+                                <row>
+                                    <label value="@load(basis.name)"/>
+                                    <label value="@load(basis.description)"/>
+                                    <label value="@load(basis.processCount)"/>
+                                    <button label="View Docs" 
+                                            onClick="@command('viewDocumentation', basis=basis)"/>
+                                    <label value="@load(basis.lastValidated)"/>
+                                    <label value="@load(basis.status)" 
+                                           sclass="@load(basis.statusStyle)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editLegalBasis', basis=basis)"/>
+                                        <button label="Validate" 
+                                                onClick="@command('validateLegalBasis', basis=basis)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Data Transfers Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <grid model="@load(vm.dataTransfers)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Transfer Type"/>
+                                <column label="Source"/>
+                                <column label="Destination"/>
+                                <column label="Data Categories"/>
+                                <column label="Transfer Mechanism"/>
+                                <column label="Safeguards"/>
+                                <column label="Status"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="transfer">
+                                <row>
+                                    <label value="@load(transfer.type)"/>
+                                    <label value="@load(transfer.source)"/>
+                                    <label value="@load(transfer.destination)"/>
+                                    <cell>
+                                        <forEach items="@load(transfer.dataCategories)" 
+                                                var="category">
+                                            <label value="@load(category)" 
+                                                   sclass="category-tag"/>
+                                        </forEach>
+                                    </cell>
+                                    <label value="@load(transfer.mechanism)"/>
+                                    <label value="@load(transfer.safeguards)"/>
+                                    <label value="@load(transfer.status)" 
+                                           sclass="@load(transfer.statusStyle)"/>
+                                    <hlayout>
+                                        <button label="Edit" 
+                                                onClick="@command('editTransfer', transfer=transfer)"/>
+                                        <button label="Review" 
+                                                onClick="@command('reviewTransfer', transfer=transfer)"/>
+                                        <button label="Documents" 
+                                                onClick="@command('viewTransferDocs', transfer=transfer)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Process Registration Window -->
+        <window id="processRegistrationWindow" 
+                title="Process Registration" 
+                visible="false" 
+                mode="modal"
+                width="80%"
+                height="80%">
+            <!-- Process Registration Form Content -->
+        </window>
+    </div>
+</zk>

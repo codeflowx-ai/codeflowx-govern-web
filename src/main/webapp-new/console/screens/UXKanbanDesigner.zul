@@ -1,0 +1,536 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div sclass="col-lg-12">
+		<hbox id="toolbar2" spacing="5px" align="start"
+			style="margin-top: 7px;margin-bottom: 5px;">
+		</hbox>
+		<nodom
+			viewModel="@id('vm') @init('com.enartsystems.designer.KanbanModelDesigner')">
+						<div class="card">
+				<div class="card-header">
+					<div
+						class="d-flex align-items-center flex-wrap gap-2">
+						<div class="flex-grow-1">
+							<button
+								iconSclass="mdi mdi-content-save label-icon align-middle fs-16 me-2"
+								onClick="@command('onSave')"
+								sclass="btn btn-label btn-info waves-effect waves-light"
+								tooltiptext="Save">
+								Save
+							</button>
+							<button
+								iconSclass="mdi mdi-motion-play label-icon align-middle fs-16 me-2"
+								onClick="@command('onSaveAndPublish')"
+								sclass="btn btn-label btn-primary waves-effect waves-light"
+								tooltiptext="Save and Publish">
+								Save and Publish
+							</button>
+						</div>
+						<div class="flex-shrink-0">
+							<div class="hstack text-nowrap gap-2">
+								<!-- 									<button -->
+								<!-- 										tooltiptext="Create template" -->
+								<!-- 										iconSclass="mdi mdi-content-save-cog label-icon align-middle fs-16 me-2" -->
+								<!-- 										onClick="@command('store')" -->
+								<!-- 										sclass="btn btn-label btn-dark waves-effect waves-light"> -->
+								<!-- 										Create template -->
+								<!-- 	
+									</button> -->
+								<!-- 									<button -->
+								<!-- 										tooltiptext="Create widgget" -->
+								<!-- 										iconSclass="mdi mdi-content-save-all label-icon align-middle fs-16 me-2" -->
+								<!-- 										onClick="@command('store')" -->
+								<!-- 										sclass="btn btn-label btn-dark waves-effect waves-light"> -->
+								<!-- 										Widgget -->
+								<!-- 									</button> -->
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<tabbox>
+				<tabs>
+					<tab id="ids" label="Designer"
+						image="img/icons/svg/web-design.svg" />
+					<tab id="tbpreview" label="Preview"
+						onClick="@command('onPreview')" image="img/icons/svg/preview.svg" />
+					<tab id="tbcomponent" label="Help-Component"
+						image="img/icons/svg/apoyo.svg" disabled="true" />
+					<tab id="tblogs" label="logs"
+						onSelect="@command('onLoadLogs')" image="img/icons/svg/log.svg" />
+				</tabs>
+				<tabpanels>
+					<tabpanel>
+						<div sclass="row">
+							<div sclass="col-lg-1">
+								<tabbox>
+									<tabs>
+										<tab label="Basic" id="Cpbasic" />
+										<tab label="Custom"
+											id="Cpcustom" />
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<vlayout id="vComponents"
+												spacing="10px" />
+										</tabpanel>
+										<tabpanel>
+											<vlayout id="vCustoms"
+												spacing="10px" />
+										</tabpanel>
+									</tabpanels>
+								</tabbox>
+							</div>
+							<div sclass="col-lg-8 col-xlg-8 col-md-8">
+								<tabbox>
+									<tabs>
+										<tab label="Form Designer"
+											iconSclass="icon wb-desktop" />
+										<tab id="context"
+											label="Configure List Screen"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="card"
+											label="Configure Card Screen"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="search"
+											label="Configure Search Screen"
+											iconSclass="icon glyphicon glyphicon-cog"
+											onSelect="@command('onLoadContext')" />
+										<tab id="pageprops"
+											label="Propiedades generales pagina"
+											iconSclass="icon glyphicon glyphicon-cog" />
+                                        <tab id="chartsprops"
+											label="Properties Kanban Charts"
+											iconSclass="icon glyphicon glyphicon-cog" />
+										 <tab id="kanbanprops"
+											label="Configuración del Kanban"
+											iconSclass="icon glyphicon glyphicon-cog" />	
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<div sclass="row">
+												<div id="drawingpane"
+													sclass="col-lg-12 col-xlg-12 col-md-12">
+												</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+											<!-- list screen -->
+											<div sclass="row">
+												<div
+													sclass="col-lg-8">
+													<hbox spacing="2px"
+														align="center" width="85%">
+														<!-- onSelect="@command('onSelectList',item=self.selectedItem.value)" -->
+														<listbox
+															height="450px" id="lists" model="@bind(vm.list)"
+															width="95%" droppable="true"
+															onDrop="@command('dragField',dragged=event,list='list')">
+															<listhead>
+																<listheader
+																	label="${labels.EntityMaster.name}"  />
+																<listheader
+																	label="" width="15%"/>
+															</listhead>
+															<template
+																name="model" var="item" status="s">
+																<listitem>
+																	<listcell>
+																		<label
+																			class="text-primary font-weight-bold"
+																			value="@bind(item.label)" />
+																	</listcell>
+																	<listcell>
+																		<hbox>
+																			<button
+																				onClick="@command('removeField',item=item,list='list')"
+																				tooltiptext="Delete" iconSclass="icon-trash"
+																				sclass="btn btn-outline bg-danger text-primary-800 btn-icon ml-2 legitRipple"
+																				visible="@load(item.pk eq false) ">
+																			</button>
+																		</hbox>
+																	</listcell>
+																</listitem>
+															</template>
+														</listbox>
+														<vbox
+															spacing="10px" width="24px" align="center">
+															<a
+																iconSclass="icon-arrow-up16 " id="upBtn"
+																tooltiptext="move up field">
+															</a>
+															<a
+																iconSclass="icon-arrow-down16 " id="downBtn"
+																tooltiptext="move down field">
+															</a>
+														</vbox>
+													</hbox>
+												</div>
+
+												<div
+													sclass="col-lg-4">
+<!-- 													<includeHTML -->
+<!-- 														src="viewdesigner_listscreen.zhtml" /> -->
+												</div>
+
+											</div>
+
+										</tabpanel>
+
+										<tabpanel>
+											<!-- list card -->
+											<div sclass="row">
+												<div
+													sclass="col-lg-8">
+													<hbox spacing="2px"
+														align="center" width="85%">
+														<!-- onSelect="@command('onSelectList',item=self.selectedItem.value)" -->
+														<listbox
+															height="450px" id="cards" model="@bind(vm.cards)"
+															width="95%" droppable="true"
+															onDrop="@command('dragField',dragged=event,list='cards')">
+															<listhead>
+																<listheader
+																	label="${labels.EntityMaster.name}"  />
+																<listheader
+																	label="" width="15%"/>
+															</listhead>
+															<template
+																name="model" var="item" status="s">
+																<listitem>
+																	<listcell>
+																		<label
+																			class="text-primary font-weight-bold"
+																			value="@bind(item.label)" />
+																	</listcell>
+																	<listcell>
+																		<hbox>
+																			<button
+																				onClick="@command('removeField',item=item,list='cards')"
+																				tooltiptext="Delete" iconSclass="icon-trash"
+																				sclass="btn btn-outline bg-danger text-primary-800 btn-icon ml-2 legitRipple"
+																				visible="@load(item.pk eq false) ">
+																			</button>
+																		</hbox>
+																	</listcell>
+																</listitem>
+															</template>
+														</listbox>
+														<vbox
+															spacing="10px" width="24px" align="center">
+															<a
+																iconSclass="icon-arrow-up16 " id="cardsupBtn"
+																tooltiptext="move up field">
+															</a>
+															<a
+																iconSclass="icon-arrow-down16 " id="cardsdownBtn"
+																tooltiptext="move down field">
+															</a>
+														</vbox>
+													</hbox>
+												</div>
+
+												<div
+													sclass="col-lg-4">
+<!-- 													<includeHTML -->
+<!-- 														src="viewdesigner_cardscreen.zhtml" /> -->
+												</div>
+
+											</div>
+
+										</tabpanel>
+
+
+										<tabpanel>
+											<!-- list search -->
+											<div sclass="row">
+												<div
+													sclass="col-lg-8">
+													<hbox spacing="2px"
+														align="center" width="85%">
+														<!-- onSelect="@command('onSelectList',item=self.selectedItem.value)" -->
+														<listbox
+															height="450px" id="search1" model="@bind(vm.search)"
+															width="95%" droppable="true"
+															onDrop="@command('dragField',dragged=event,list='search')">
+															<listhead>
+																<listheader
+																	label="${labels.EntityMaster.name}"  />
+																<listheader
+																	label="" width="15%"/>
+															</listhead>
+															<template
+																name="model" var="item" status="s">
+																<listitem>
+																	<listcell>
+																		<label
+																			class="text-primary font-weight-bold"
+																			value="@bind(item.label)" />
+																	</listcell>
+																	<listcell>
+																		<hbox>
+																			<button
+																				onClick="@command('removeField',item=item,list='search')"
+																				tooltiptext="Delete" iconSclass="icon-trash"
+																				sclass="btn btn-outline bg-danger text-primary-800 btn-icon ml-2 legitRipple"
+																				visible="@load(item.pk eq false) ">
+																			</button>
+																		</hbox>
+																	</listcell>
+																</listitem>
+															</template>
+														</listbox>
+														<vbox
+															spacing="10px" width="24px" align="center">
+															<a
+																iconSclass="icon-arrow-up16 " id="searchupBtn"
+																tooltiptext="move up field">
+															</a>
+															<a
+																iconSclass="icon-arrow-down16 " id="searchdownBtn"
+																tooltiptext="move down field">
+															</a>
+														</vbox>
+													</hbox>
+												</div>
+
+												<div
+													sclass="col-lg-4">
+<!-- 													<includeHTML -->
+<!-- 														src="viewdesigner_searchscreen.zhtml" /> -->
+												</div>
+
+											</div>
+
+										</tabpanel>
+										<tabpanel>
+											<div class="col-lg-9">
+													<grid
+														style="align:top:scroll:auto" id="propiedadesPage"
+														width="90%" height="750px">
+														<columns>
+															<column
+																label="Property" width="25%" />
+															<column
+																label="Value" width="75%" />
+														</columns>
+														<rows>
+															<row></row>
+															<row></row>
+															<row></row>
+														</rows>
+													</grid>
+
+												</div>
+										</tabpanel>
+										<tabpanel>
+											<div sclass="card">
+											<div sclass="card-body">
+											 <div sclass="row">
+											  <div sclass="col-lg-3">
+											  <vbox spacing="5px">
+											  <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Category Pie Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='category',chart='pie')"></label>
+											    <a  iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='category',chart='pie')" tooltiptext="remove this field"></a> 
+											  </hbox> 
+											   <label sclass="text-secondary" value="@bind(vm.categoryPie)" ></label>
+											  </vbox>
+											  </div>
+											  <div sclass="col-lg-3">
+											  <vbox spacing="5px">
+											  <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Serie Pie Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='serie',chart='pie')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='serie',chart='pie')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.seriePie)" ></label>
+											   </vbox>
+											  </div>
+											  
+											 </div>
+											 <div sclass="row">
+											  <div sclass="col-lg-3">
+											 
+											  <vbox spacing="5px">
+											   <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Category Bar Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='category',chart='bar')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='category',chart='bar')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.categoryBar)" ></label>
+											</vbox>
+											  </div>
+											  <div sclass="col-lg-3">
+											  <vbox spacing="5px">
+											   <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Serie Bar Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='serie',chart='bar')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='serie',chart='bar')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.serieBar)" ></label>
+											</vbox>
+											   
+											  </div>
+											 </div>
+											 <div sclass="row">
+											 <div sclass="col-lg-3">
+											 <vbox spacing="5px">
+											  <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Category Funnel Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='category',chart='funnel')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='category',chart='funnel')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.categoryFunnel)" ></label>
+											</vbox>
+											
+											  </div>
+											  <div sclass="col-lg-3">
+											  <vbox spacing="5px">
+											   <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field Serie Funnel Chart" droppable="true" onDrop="@command('dragFieldChart',dragged=event,type='serie',chart='funnel')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveFieldChart',type='serie',chart='funnel')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.serieFunnel)" ></label>
+											</vbox>
+											 
+											  </div>
+											 </div>
+											</div>
+											</div>
+										</tabpanel>
+										<tabpanel>
+										   <div sclass="row">
+										    <div sclass="col-lg-12">
+										       <vbox spacing="5px">
+										        <label sclass="text-secondary" value="Campo que muestra el titulo" ></label>
+											    <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field pipeline field" droppable="true" onDrop="@command('dragFieldITitle',dragged=event)"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemovePipeline',type='pipeline')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.kanban.title)" ></label>
+											</vbox>
+										      </div>
+										      <div sclass="col-lg-12">
+										       <vbox spacing="5px">
+										        <label sclass="text-secondary" value="Indica el campo que agrupa los tableros por pipeline" ></label>
+											    <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field pipeline field" droppable="true" onDrop="@command('dragFieldPipeline',dragged=event)"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemovePipeline',type='pipeline')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.kanban.pipeline)" ></label>
+											</vbox>
+										      </div>
+										      <div sclass="col-lg-12">
+										       <vbox spacing="5px">
+										        <label sclass="text-secondary" value="Indica el campo que segmenta los led por etapas" ></label>
+											    <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field etapa/estado field" droppable="true" onDrop="@command('dragFieldEtapa',dragged=event)"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveEtapa',type='etapa',chart='funnel')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.kanban.etapa)" ></label>
+											</vbox>
+										      </div>
+										      <div sclass="col-lg-12">
+										       <vbox spacing="5px">
+										        <label sclass="text-secondary" value="Indica el campo que define el color de las etapas" ></label>
+											    <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field color etapa/estado field" droppable="true" onDrop="@command('dragFieldColor',dragged=event,type='pipeline')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveColor',type='etapa',chart='funnel')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.kanban.colorEtapa)" ></label>
+											</vbox>
+										      </div>
+										      <div sclass="col-lg-12">
+										       <vbox spacing="5px">
+										        <label sclass="text-secondary" value="Indica el campo que indica los importes para totalizar" ></label>
+											    <hbox spacing="3px">
+											  <label sclass="badge bg-primary" value="Drag me Field importe" droppable="true" onDrop="@command('dragFieldImporte',dragged=event,type='pipeline')"></label>
+											  <a iconSclass="icon-trash" onClick="@command('onRemoveImporte',type='etapa',chart='funnel')" tooltiptext="remove this field"></a>
+											  </hbox>
+											   <label sclass="text-secondary" value="@bind(vm.kanban.totalizar)" ></label>
+											</vbox>
+										      </div>
+										   </div>
+										</tabpanel>
+									</tabpanels>
+								</tabbox>
+							</div>
+							<div sclass="col-lg-3">
+								<tabbox>
+									<tabs>
+										<tab id="props"
+											label="Properties" />
+										<tab label="Data" />
+
+									</tabs>
+									<tabpanels>
+										<tabpanel>
+											<grid style="align:top"
+												id="propiedades" width="99%" height="850px">
+												<columns>
+													<column
+														label="Property" width="25%" />
+													<column
+														label="Value" width="75%" />
+												</columns>
+												<rows>
+													<row></row>
+													<row></row>
+													<row></row>
+												</rows>
+											</grid>
+										</tabpanel>
+										<tabpanel>
+											<tree width="99%"
+												id="treeentidades" height="850px">
+												<treecols>
+													<treecol
+														label="Data Model" />
+												</treecols>
+											</tree>
+										</tabpanel>
+
+									</tabpanels>
+								</tabbox>
+							</div>
+
+						</div>
+
+
+					</tabpanel>
+
+					<tabpanel id="tbprevio">
+						<iframe id="include" src="" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel id="tbcompon">
+						<iframe id="includecomp"
+							src="/peview/mylescrm/help/index.zhtml" width="100%"
+							height="900px" scrolling="auto" />
+
+					</tabpanel>
+					<tabpanel>
+						<div sclass="col-lg-12 col-xlg-12 col-md-12">
+							<grid model="@load(vm.logVersion)"
+								height="900px" width="100%">
+								<columns>
+									<column label="logs" width="100%" />
+								</columns>
+								<rows>
+									<template name="model">
+										<row>
+											<label value="@load(each)" />
+										</row>
+									</template>
+								</rows>
+							</grid>
+						</div>
+					</tabpanel>
+				</tabpanels>
+			</tabbox>
+		</nodom>
+	</div>
+</zk>

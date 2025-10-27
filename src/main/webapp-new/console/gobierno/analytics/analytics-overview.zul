@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="native"
+    xmlns:x="xhtml">
+    
+    <div viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.analytics.AnalyticsOverviewViewModel')">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 col-md-8">
+                    <h:h1 class="h2 fw-bold mb-1">
+                        <h:i class="bi bi-speedometer2 me-2"></h:i>
+                        <label value="${labels.analytics.overview.title}" />
+                    </h:h1>
+                    <h:p class="text-muted mb-0">${labels.analytics.overview.subtitle}</h:p>
+                </h:div>
+                <h:div class="col-12 col-md-4 text-end">
+                    <button class="btn btn-outline-secondary" onClick="@command('refresh')">
+                        <h:i class="bi bi-arrow-clockwise me-2"></h:i>
+                        <label value="${labels.common.refresh}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Métricas Principales -->
+            <h:div class="row mb-4">
+                
+                <!-- Total Items -->
+                <h:div class="col-12 col-md-6 col-xl-3 mb-3">
+                    <h:div class="card border-0 shadow-sm h-100">
+                        <h:div class="card-body">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:h6 class="text-muted mb-2">${labels.analytics.overview.total}</h:h6>
+                                    <h:h2 class="mb-0 fw-bold">
+                                        <label value="@load(vm.totalItems)"/>
+                                    </h:h2>
+                                </h:div>
+                                <h:div>
+                                    <h:i class="bi bi-list-ul text-primary" style="font-size: 3rem; opacity: 0.3;"></h:i>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Active Items -->
+                <h:div class="col-12 col-md-6 col-xl-3 mb-3">
+                    <h:div class="card border-0 shadow-sm h-100 border-start border-success border-4">
+                        <h:div class="card-body">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:h6 class="text-muted mb-2">${labels.analytics.overview.active}</h:h6>
+                                    <h:h2 class="mb-0 fw-bold text-success">
+                                        <label value="@load(vm.activeItems)"/>
+                                    </h:h2>
+                                    <h:small class="text-muted">
+                                        <label value="@load(vm.getActivePercentage())"/>%
+                                    </h:small>
+                                </h:div>
+                                <h:div>
+                                    <h:i class="bi bi-check-circle text-success" style="font-size: 3rem; opacity: 0.3;"></h:i>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Deployed Items -->
+                <h:div class="col-12 col-md-6 col-xl-3 mb-3">
+                    <h:div class="card border-0 shadow-sm h-100 border-start border-info border-4">
+                        <h:div class="card-body">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:h6 class="text-muted mb-2">${labels.analytics.overview.deployed}</h:h6>
+                                    <h:h2 class="mb-0 fw-bold text-info">
+                                        <label value="@load(vm.deployedItems)"/>
+                                    </h:h2>
+                                    <h:small class="text-muted">
+                                        <label value="@load(vm.getDeployedPercentage())"/>%
+                                    </h:small>
+                                </h:div>
+                                <h:div>
+                                    <h:i class="bi bi-rocket-takeoff text-info" style="font-size: 3rem; opacity: 0.3;"></h:i>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Score Promedio -->
+                <h:div class="col-12 col-md-6 col-xl-3 mb-3">
+                    <h:div class="card border-0 shadow-sm h-100 border-start border-4"
+                           class="@load(c:cat('border-', vm.scoreColor))">
+                        <h:div class="card-body">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:h6 class="text-muted mb-2">${labels.analytics.overview.score}</h:h6>
+                                    <h:h2 class="mb-0 fw-bold" class="@load(c:cat('text-', vm.scoreColor))">
+                                        <label value="@load(vm.avgScore)"/>
+                                    </h:h2>
+                                    <h:small>
+                                        <h:span class="@load(c:cat('badge bg-', vm.scoreColor))">
+                                            <label value="@load(vm.scoreLevel)"/>
+                                        </h:span>
+                                    </h:small>
+                                </h:div>
+                                <h:div>
+                                    <h:i class="bi bi-star-fill" class="@load(c:cat('text-', vm.scoreColor))" 
+                                         style="font-size: 3rem; opacity: 0.3;"></h:i>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+            <!-- Detalles Adicionales -->
+            <h:div class="row">
+                
+                <!-- Training Items -->
+                <h:div class="col-12 col-md-4 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body text-center">
+                            <h:i class="bi bi-arrow-clockwise text-warning" style="font-size: 2rem;"></h:i>
+                            <h:h5 class="mt-2 mb-1">
+                                <label value="@load(vm.trainingItems)"/>
+                            </h:h5>
+                            <h:small class="text-muted">${labels.analytics.overview.training}</h:small>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Offline Items -->
+                <h:div class="col-12 col-md-4 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body text-center">
+                            <h:i class="bi bi-x-circle text-danger" style="font-size: 2rem;"></h:i>
+                            <h:h5 class="mt-2 mb-1">
+                                <label value="@load(vm.offlineItems)"/>
+                            </h:h5>
+                            <h:small class="text-muted">${labels.analytics.overview.offline}</h:small>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Score General -->
+                <h:div class="col-12 col-md-4 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body text-center">
+                            <h:i class="bi bi-graph-up text-primary" style="font-size: 2rem;"></h:i>
+                            <h:h5 class="mt-2 mb-1">
+                                <label value="@load(vm.scoreLevel)"/>
+                            </h:h5>
+                            <h:small class="text-muted">${labels.analytics.overview.level}</h:small>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+        </h:div>
+    </div>
+</zk>
+

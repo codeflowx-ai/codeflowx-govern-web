@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Executive AI Governance Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .executive-container { 
+            padding: 20px; 
+            background: #f8f9fa; 
+        }
+        .metric-tile {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .metric-label {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .alert-critical { background-color: #ffe6e6; }
+        .alert-high { background-color: #fff3e6; }
+        .alert-list { border: none; }
+        .refresh-button {
+            margin: 10px;
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+        }
+        .metric-trend-positive { color: #27ae60; }
+        .metric-trend-negative { color: #c0392b; }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 10px;
+            color: #34495e;
+        }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.ExecutiveDashboardViewModel')"
+         sclass="executive-container">
+        
+        <!-- Key Metrics Section -->
+        <label value="Key Performance Indicators" sclass="section-title"/>
+        <hlayout>
+            <div sclass="metric-tile" width="19%">
+                <label value="Total Models" sclass="metric-label"/>
+                <label value="@load(vm.keyMetrics['total_models'])" sclass="metric-value"/>
+                <label value="Active Models" sclass="metric-label"/>
+            </div>
+            <div sclass="metric-tile" width="19%">
+                <label value="Average Accuracy" sclass="metric-label"/>
+                <label value="@load(vm.keyMetrics['avg_accuracy'])+'%'" sclass="metric-value"/>
+                <label value="@load(vm.keyMetrics['avg_accuracy'] gt 95 ? '↑' : '↓')" 
+                       sclass="@load(vm.keyMetrics['avg_accuracy'] gt 95 ? 'metric-trend-positive' : 'metric-trend-negative')"/>
+            </div>
+            <div sclass="metric-tile" width="19%">
+                <label value="Compliance Score" sclass="metric-label"/>
+                <label value="@load(vm.keyMetrics['compliance_score'])+'%'" sclass="metric-value"/>
+                <label value="@load(vm.keyMetrics['compliance_score'] gt 90 ? '↑' : '↓')"
+                       sclass="@load(vm.keyMetrics['compliance_score'] gt 90 ? 'metric-trend-positive' : 'metric-trend-negative')"/>
+            </div>
+            <div sclass="metric-tile" width="19%">
+                <label value="High Risk Models" sclass="metric-label"/>
+                <label value="@load(vm.keyMetrics['high_risks'])" sclass="metric-value"/>
+                <label value="Requiring Attention" sclass="metric-label"/>
+            </div>
+            <div sclass="metric-tile" width="19%">
+                <label value="Cost Savings" sclass="metric-label"/>
+                <label value="$@load(vm.keyMetrics['total_savings'])" sclass="metric-value"/>
+                <label value="Last 24 Hours" sclass="metric-label"/>
+            </div>
+        </hlayout>
+
+        <!-- Charts Section -->
+        <label value="Performance Analytics" sclass="section-title"/>
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="performanceChart"
+                       model="@bind(vm.performanceChart)"
+                       height="400px"/>
+            </div>
+            <div sclass="chart-container" width="48%">
+                <charts id="costTrendChart"
+                       model="@bind(vm.costTrendChart)"
+                       height="400px"/>
+            </div>
+        </hlayout>
+
+        <!-- Critical Alerts Section -->
+        <label value="Critical Alerts & Notifications" sclass="section-title"/>
+        <div sclass="chart-container">
+            <listbox model="@bind(vm.alertsList)"
+                     emptyMessage="No critical alerts"
+                     sclass="alert-list"
+                     rows="5">
+                <listhead>
+                    <listheader label="Alert Type" width="120px"/>
+                    <listheader label="Model" width="200px"/>
+                    <listheader label="Severity" width="100px"/>
+                    <listheader label="Date" width="150px"/>
+                    <listheader label="Status"/>
+                </listhead>
+                <template name="model">
+                    <listitem sclass="@load(each.severity eq 'CRITICAL' ? 'alert-critical' : 'alert-high')">
+                        <listcell>
+                            <label value="@load(each.alert_type)"/>
+                        </listcell>
+                        <listcell>
+                            <label value="@load(each.model_name)"/>
+                        </listcell>
+                        <listcell>
+                            <label value="@load(each.severity)"/>
+                        </listcell>
+                        <listcell>
+                            <label value="@load(each.alert_date)"/>
+                        </listcell>
+                        <listcell>
+                            <label value="Active"/>
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+
+        <!-- Quick Links Section -->
+        <div sclass="chart-container">
+            <hlayout spacing="20px">
+                <button label="View Detailed Analytics"
+                        onClick='Executions.sendRedirect("/analytics.zul")'
+                        sclass="refresh-button"/>
+                <button label="Risk Management Dashboard"
+                        onClick='Executions.sendRedirect("/risk-management.zul")'
+                        sclass="refresh-button"/>
+                <button label="Compliance Reports"
+                        onClick='Executions.sendRedirect("/compliance.zul")'
+                        sclass="refresh-button"/>
+                <button label="Cost Optimization"
+                        onClick='Executions.sendRedirect("/cost-optimization.zul")'
+                        sclass="refresh-button"/>
+                <button label="Refresh Dashboard"
+                        onClick="@command('refreshDashboard')"
+                        sclass="refresh-button"/>
+            </hlayout>
+        </div>
+
+        <!-- Footer Section -->
+        <div style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+            <label value="Last Updated: "/>
+            <label value="@load(new java.util.Date())" />
+        </div>
+    </div>
+</zk>

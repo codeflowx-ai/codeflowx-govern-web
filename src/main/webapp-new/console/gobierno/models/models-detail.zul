@@ -1,0 +1,571 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="models"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.ModelsDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-microchip label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de modelos de Machine Learning" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('saveModel')"
+										tooltiptext="Guardar modelo">
+									</a>
+									
+									<a class="waves-effect waves-light"
+										onClick="@command('validateModel')"
+										iconSclass="fa-sharp-duotone fa-solid fa-badge-check label-icon align-middle fs-16 me-2"
+										tooltiptext="Validar modelo" 
+										visible="@load(vm.editing)"/>
+									
+									<a class="waves-effect waves-light"
+										iconSclass="fa-sharp-duotone fa-solid fa-chart-waterfall label-icon align-middle fs-16 me-2"
+										onClick="@command('calculateDrift')"
+										tooltiptext="Calcular drift" 
+										visible="@load(vm.editing)"/>
+									
+									<a class="waves-effect waves-light"
+										iconSclass="fa-sharp-duotone fa-solid fa-code-branch label-icon align-middle fs-16 me-2"
+										onClick="@command('createNewVersion')"
+										tooltiptext="Crear nueva versión" 
+										visible="@load(vm.editing)"/>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<div class="form-group row">
+											<!-- Nombre -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Nombre del Modelo" />
+														<textbox tabindex="1" id="modname"
+															value="@bind(vm.currentModel.modname)"
+															sclass="border-danger" maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['modname'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Versión -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Versión" />
+														<textbox tabindex="2" id="modversion"
+															value="@bind(vm.currentModel.modversion)"
+															maxlength="50" />
+														<label sclass="text-danger" value="@load(vmsgs['modversion'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Tipo -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tipo de Modelo" />
+														<combobox tabindex="3" id="modtype"
+															selectedItem="@bind(vm.currentModel.modtype)"
+															readonly="true">
+															<comboitem label="LLM (Lenguaje)" value="LLM"/>
+															<comboitem label="Visión" value="VISION"/>
+															<comboitem label="Audio" value="AUDIO"/>
+															<comboitem label="Embedding" value="EMBEDDING"/>
+															<comboitem label="Multimodal" value="MULTIMODAL"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modtype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Proveedor -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Proveedor" />
+														<combobox tabindex="4" id="modprovider"
+															selectedItem="@bind(vm.currentModel.modelProvider)"
+															readonly="true">
+															<template name="model">
+																<comboitem label="@load(each.moddisplayname)" value="@load(each)"/>
+															</template>
+															<forEach items="@load(vm.availableProviders)">
+																<comboitem label="@load(each.moddisplayname)" />
+															</forEach>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modprovider'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Framework -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Framework" />
+														<textbox tabindex="5" id="modframework"
+															value="@bind(vm.currentModel.modframework)"
+															maxlength="100" />
+														<label sclass="text-danger" value="@load(vmsgs['modframework'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Descripción -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Descripción" />
+														<textbox tabindex="6" id="moddescription"
+															value="@bind(vm.currentModel.moddescription)"
+															rows="3" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['moddescription'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Estado -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estado" />
+														<combobox tabindex="7" id="modstatus"
+															selectedItem="@bind(vm.currentModel.modstatus)"
+															readonly="true">
+															<comboitem label="Activo" value="ACTIVE"/>
+															<comboitem label="Inactivo" value="INACTIVE"/>
+															<comboitem label="Desarrollo" value="DEVELOPMENT"/>
+															<comboitem label="Producción" value="PRODUCTION"/>
+															<comboitem label="Retirado" value="RETIRED"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modstatus'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Estado de Aprobación -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Estado de Aprobación" />
+														<combobox tabindex="8" id="modapprovalstatus"
+															selectedItem="@bind(vm.currentModel.modapprovalstatus)"
+															readonly="true">
+															<comboitem label="Pendiente" value="PENDING_APPROVAL"/>
+															<comboitem label="Aprobado" value="APPROVED"/>
+															<comboitem label="Rechazado" value="REJECTED"/>
+															<comboitem label="En Revisión" value="UNDER_REVIEW"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['modapprovalstatus'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Metadata JSON -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Metadata (JSON)" />
+														<textbox tabindex="9" id="modmetadata"
+															value="@bind(vm.currentModel.modmetadata)"
+															rows="4" multiline="true" />
+														<label sclass="text-danger" value="@load(vmsgs['modmetadata'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Tabs de Información Descendente -->
+							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<tabbox>
+											<tabs>
+												<tab label="Versiones" />
+												<tab label="Artefactos" />
+												<tab label="Rendimiento" />
+												<tab label="Análisis de Sesgo" />
+												<tab label="Estadísticas" />
+											</tabs>
+											<tabpanels>
+												
+												<!-- Panel 1: Versiones -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Historial de Versiones"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalVersions)"/> 
+															<label value="versiones"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Versión"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
+																	<h:th><label value="Creado"/></h:th>
+																	<h:th><label value="Estado"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.modelVersions)" var="version">
+																	<h:tr>
+																		<h:td><label value="@load(version.idxmodelversion)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-info">
+																				v<label value="@load(version.modversionnumber)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(version.modversiondescription)"/></h:td>
+																		<h:td><label value="@load(version.modcreatedat)"/></h:td>
+																		<h:td>
+																			<h:span class="badge ${version.modstatus eq 'ACTIVE' ? 'bg-success' : 'bg-secondary'}">
+																				<label value="@load(version.modstatus)"/>
+																			</h:span>
+																		</h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.modelVersions)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay versiones registradas"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 2: Artifacts -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Artefactos del Modelo"/>
+														</h:h5>
+														<h:span class="badge bg-primary">
+															<label value="@load(vm.totalArtifacts)"/> 
+															<label value="artefactos"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Nombre"/></h:th>
+																	<h:th><label value="Tipo"/></h:th>
+																	<h:th><label value="Ruta"/></h:th>
+																	<h:th><label value="Tamaño"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.modelArtifacts)" var="artifact">
+																	<h:tr>
+																		<h:td><label value="@load(artifact.idxmodelartifact)"/></h:td>
+																		<h:td><label value="@load(artifact.modartifactname)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-secondary">
+																				<label value="@load(artifact.modartifacttype)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td>
+																			<h:code class="text-muted small">
+																				<label value="@load(artifact.modstoragepath)"/>
+																			</h:code>
+																		</h:td>
+																		<h:td><label value="@load(artifact.modfilesize)"/></h:td>
+																		<h:td><label value="@load(artifact.modcreatedat)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.modelArtifacts)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay artefactos registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 3: Performance -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Métricas de Rendimiento"/>
+														</h:h5>
+														<h:span class="badge bg-success">
+															<label value="Precisión"/>: 
+															<label value="@load(vm.currentAccuracy)"/>%
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Métrica"/></h:th>
+																	<h:th><label value="Valor"/></h:th>
+																	<h:th><label value="Unidad"/></h:th>
+																	<h:th><label value="Dataset"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.performanceMetrics)" var="metric">
+																	<h:tr>
+																		<h:td><label value="@load(metric.idxmodelperformance)"/></h:td>
+																		<h:td><h:strong><label value="@load(metric.modmetricname)"/></h:strong></h:td>
+																		<h:td>
+																			<h:span class="badge bg-primary">
+																				<label value="@load(metric.modmetricvalue)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(metric.modmetricunit)"/></h:td>
+																		<h:td><label value="@load(metric.moddatasettype)"/></h:td>
+																		<h:td><label value="@load(metric.modcreatedat)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.performanceMetrics)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay métricas registradas"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 4: Bias -->
+												<tabpanel>
+													<h:div class="d-flex justify-content-between align-items-center mb-3">
+														<h:h5 class="mb-0">
+															<label value="Análisis de Sesgo"/>
+														</h:h5>
+														<h:span class="badge bg-warning">
+															<label value="Score"/>: 
+															<label value="@load(vm.currentBiasScore)"/>
+														</h:span>
+													</h:div>
+													
+													<h:div class="table-responsive">
+														<h:table class="table table-hover table-sm">
+															<h:thead class="table-light">
+																<h:tr>
+																	<h:th><label value="ID"/></h:th>
+																	<h:th><label value="Tipo"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
+																	<h:th><label value="Severidad"/></h:th>
+																	<h:th><label value="Score"/></h:th>
+																	<h:th><label value="Fecha"/></h:th>
+																</h:tr>
+															</h:thead>
+															<h:tbody>
+																<forEach items="@load(vm.biasAnalysis)" var="bias">
+																	<h:tr>
+																		<h:td><label value="@load(bias.idxmodelbiasanalysis)"/></h:td>
+																		<h:td>
+																			<h:span class="badge bg-warning">
+																				<label value="@load(bias.modbiastype)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(bias.modbiasdescription)" maxlength="60"/></h:td>
+																		<h:td>
+																			<h:span class="badge ${bias.modseverity eq 'CRITICAL' ? 'bg-danger' : (bias.modseverity eq 'HIGH' ? 'bg-warning' : 'bg-info')}">
+																				<label value="@load(bias.modseverity)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td>
+																			<h:span class="badge ${bias.modbiasscore > 0.5 ? 'bg-danger' : 'bg-success'}">
+																				<label value="@load(bias.modbiasscore)"/>
+																			</h:span>
+																		</h:td>
+																		<h:td><label value="@load(bias.modcreatedat)"/></h:td>
+																	</h:tr>
+																</forEach>
+															</h:tbody>
+														</h:table>
+													</h:div>
+													
+													<h:div class="text-center text-muted py-3" visible="@load(empty vm.biasAnalysis)">
+														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
+														<h:p class="mt-2">
+															<label value="No hay análisis de sesgo registrados"/>
+														</h:p>
+													</h:div>
+												</tabpanel>
+												
+												<!-- Panel 5: Estadísticas -->
+												<tabpanel>
+													<h:div class="row g-3">
+														<h:div class="col-md-3">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-layers" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.totalVersions)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Versiones"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-3">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-archive" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.totalArtifacts)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Artefactos"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-3">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-activity" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.totalInferences)"/>
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Inferencias"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-3">
+															<h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+																<h:div class="card-body text-center p-4">
+																	<h:i class="fas fa-check-circle" style="font-size: 36px;"></h:i>
+																	<h:h3 class="mt-3 mb-1">
+																		<label value="@load(vm.currentAccuracy)"/>%
+																	</h:h3>
+																	<h:p class="mb-0">
+																		<label value="Precisión"/>
+																	</h:p>
+																</h:div>
+															</h:div>
+														</h:div>
+														
+														<h:div class="col-md-12">
+															<h:div class="card shadow-sm border-0">
+																<h:div class="card-body">
+																	<h:h5 class="mb-3">
+																		<label value="Información del Modelo"/>
+																	</h:h5>
+																	<h:div class="row">
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Creado por"/>:</h:strong> 
+																				<label value="@load(vm.currentModel.modcreatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Fecha de creación"/>:</h:strong> 
+																				<label value="@load(vm.currentModel.modcreatedat)"/>
+																			</h:p>
+																		</h:div>
+																		<h:div class="col-md-6">
+																			<h:p>
+																				<h:strong><label value="Actualizado por"/>:</h:strong> 
+																				<label value="@load(vm.currentModel.modupdatedby)"/>
+																			</h:p>
+																			<h:p>
+																				<h:strong><label value="Última actualización"/>:</h:strong> 
+																				<label value="@load(vm.currentModel.modupdatedat)"/>
+																			</h:p>
+																		</h:div>
+																	</h:div>
+																</h:div>
+															</h:div>
+														</h:div>
+													</h:div>
+												</tabpanel>
+												
+											</tabpanels>
+										</tabbox>
+									</div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div><!--card-->
+			</div><!--lg-->
+		</div><!--row-->
+	</idspace>
+</zk>

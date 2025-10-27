@@ -2,234 +2,140 @@
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
 <zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
-	xmlns:h="xhtml"
-	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	xmlns:h="xhtml">
 	<idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.DashboardViewModel')">
         
-        <!-- Partículas de fondo flotantes -->
-        <style>
-            .floating-particles {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                pointer-events: none;
-                overflow: hidden;
-            }
-            .particle {
-                position: absolute;
-                background: rgba(59, 130, 246, 0.2);
-                border-radius: 50%;
-                animation: float 3s ease-in-out infinite;
-            }
-            @keyframes float {
-                0%, 100% { transform: translateY(0px) scale(1); opacity: 0.7; }
-                50% { transform: translateY(-20px) scale(1.1); opacity: 1; }
-            }
-            .glass-card {
-                background: rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.1);
-                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-            }
-            .shimmer {
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-                background-size: 200% 100%;
-                animation: shimmer 2s infinite;
-            }
-            @keyframes shimmer {
-                0% { background-position: -200% 0; }
-                100% { background-position: 200% 0; }
-            }
-        </style>
-        
-        <div class="floating-particles">
-            <div class="particle" style="top: 80px; left: 10%; width: 8px; height: 8px; animation-delay: 0s;"></div>
-            <div class="particle" style="top: 160px; right: 8%; width: 4px; height: 4px; animation-delay: 1s;"></div>
-            <div class="particle" style="top: 240px; left: 25%; width: 6px; height: 6px; animation-delay: 2s;"></div>
-            <div class="particle" style="top: 320px; right: 12%; width: 4px; height: 4px; animation-delay: 3s;"></div>
-            <div class="particle" style="top: 128px; left: 50%; width: 8px; height: 8px; animation-delay: 4s;"></div>
-        </div>
-        
         <!-- Header -->
-        <div class="row" style="position: relative; z-index: 10;">
-            <div>
+        <div class="row">
+            <div class="col-lg-12">
                 <div class="left tittle-principal">
                     <h:h2 class="mb-sm-0">Dashboard AI Governance</h:h2>
-                    <label value="Resumen de tu sistema de gobierno IA" style="color: var(--second-aux);"/>
+                    <label value="@load(vm.subtitle)" style="color: var(--second-aux); display: block; margin-top: 8px;"/>
                 </div>
             </div>
         </div>
         
-        <!-- Métricas principales con efectos modernos -->
-        <div class="row" style="margin-top: 20px;">
+        <!-- Métricas principales -->
+        <div class="row">
             <div class="col-lg-3 col-md-6 s-bot">
-                <div class="card glass-card" style="position: relative; overflow: hidden; cursor: pointer;" 
-                     onMouseOver="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(59, 130, 246, 0.3)'"
-                     onMouseOut="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 32px rgba(31, 38, 135, 0.37)'">
-                    <div style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent); opacity: 0; transition: opacity 0.3s;" 
-                         class="card-hover-overlay"></div>
+                <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <label value="Total Tareas" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
-                                <div style="display: flex; align-items: baseline; gap: 4px;">
-                                    <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text); font-size: 32px;">
-                                        @load(vm.totalTasks)
-                                    </h:h3>
-                                    <label value=" pendientes" style="color: var(--second-aux); font-size: 12px;"/>
-                                </div>
-                                <label value="+4 este mes" style="color: #3b82f6; font-size: 12px; font-weight: 500; margin-top: 4px; display: block;"/>
+                                <label value="@load(vm.stat1Title)" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
+                                <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.totalTasks)
+                                </h:h3>
+                                <label value="@load(vm.stat1Description)" style="color: #3b82f6; font-size: 12px; display: block; margin-top: 4px;"/>
                             </div>
-                            <div style="font-size: 48px; color: #3b82f6; padding: 12px; border-radius: 12px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.1)); border: 2px solid rgba(59, 130, 246, 0.3);">
-                                <h:i class="fa-duotone fa-tasks"></h:i>
-                            </div>
+                            <h:i class="fa-duotone fa-tasks" style="font-size: 40px; color: #3b82f6;"></h:i>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-3 col-md-6 s-bot">
-                <div class="card glass-card" style="position: relative; overflow: hidden; cursor: pointer;"
-                     onMouseOver="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(16, 185, 129, 0.3)'"
-                     onMouseOut="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 32px rgba(31, 38, 135, 0.37)'">
+                <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <label value="Asignadas a Mí" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
-                                <div style="display: flex; align-items: baseline; gap: 4px;">
-                                    <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text); font-size: 32px;">
-                                        @load(vm.assignedToMeCount)
-                                    </h:h3>
-                                </div>
-                                <label value="@load(vm.assignedToMeCount) de @load(vm.totalTasks)" style="color: #10b981; font-size: 12px; font-weight: 500; margin-top: 4px; display: block;"/>
+                                <label value="@load(vm.stat2Title)" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
+                                <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.assignedToMeCount)
+                                </h:h3>
+                                <label value="@load(vm.stat2Description)" style="color: #10b981; font-size: 12px; display: block; margin-top: 4px;"/>
                             </div>
-                            <div style="font-size: 48px; color: #10b981; padding: 12px; border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1)); border: 2px solid rgba(16, 185, 129, 0.3);">
-                                <h:i class="fa-duotone fa-user"></h:i>
-                            </div>
+                            <h:i class="fa-duotone fa-user" style="font-size: 40px; color: #10b981;"></h:i>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-3 col-md-6 s-bot">
-                <div class="card glass-card" style="position: relative; overflow: hidden; cursor: pointer;"
-                     onMouseOver="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(220, 53, 69, 0.3)'"
-                     onMouseOut="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 32px rgba(31, 38, 135, 0.37)'">
+                <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <label value="Tareas Críticas" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
-                                <div style="display: flex; align-items: baseline; gap: 4px;">
-                                    <h:h3 style="margin: 0; font-weight: bold; color: #dc3545; font-size: 32px;">
-                                        @load(vm.criticalTasksCount)
-                                    </h:h3>
-                                </div>
-                                <label value="Requieren acción urgente" style="color: #dc3545; font-size: 12px; font-weight: 500; margin-top: 4px; display: block;"/>
+                                <label value="@load(vm.stat3Title)" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
+                                <h:h3 style="margin: 0; font-weight: bold; color: #dc3545;">
+                                    @load(vm.criticalTasksCount)
+                                </h:h3>
+                                <label value="@load(vm.stat3Description)" style="color: #dc3545; font-size: 12px; display: block; margin-top: 4px;"/>
                             </div>
-                            <div style="font-size: 48px; color: #dc3545; padding: 12px; border-radius: 12px; background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(220, 53, 69, 0.1)); border: 2px solid rgba(220, 53, 69, 0.3);">
-                                <h:i class="fa-duotone fa-exclamation-triangle"></h:i>
-                            </div>
+                            <h:i class="fa-duotone fa-exclamation-triangle" style="font-size: 40px; color: #dc3545;"></h:i>
                         </div>
                     </div>
                 </div>
             </div>
             
             <div class="col-lg-3 col-md-6 s-bot">
-                <div class="card glass-card" style="position: relative; overflow: hidden; cursor: pointer;"
-                     onMouseOver="this.style.transform='scale(1.05)'; this.style.boxShadow='0 20px 40px rgba(108, 117, 125, 0.3)'"
-                     onMouseOut="this.style.transform='scale(1)'; this.style.boxShadow='0 8px 32px rgba(31, 38, 135, 0.37)'">
+                <div class="card">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div class="flex-grow-1">
-                                <label value="De Mis Roles" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
-                                <div style="display: flex; align-items: baseline; gap: 4px;">
-                                    <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text); font-size: 32px;">
-                                        @load(vm.groupTasksCount)
-                                    </h:h3>
-                                </div>
-                                <label value="Avalidadas para roles" style="color: #6c757d; font-size: 12px; font-weight: 500; margin-top: 4px; display: block;"/>
+                                <label value="@load(vm.stat4Title)" style="color: var(--second-aux); font-size: 14px; display: block; margin-bottom: 8px;"/>
+                                <h:h3 style="margin: 0; font-weight: bold; color: var(--primary-text);">
+                                    @load(vm.groupTasksCount)
+                                </h:h3>
+                                <label value="@load(vm.stat4Description)" style="color: #6c757d; font-size: 12px; display: block; margin-top: 4px;"/>
                             </div>
-                            <div style="font-size: 48px; color: #6c757d; padding: 12px; border-radius: 12px; background: linear-gradient(135deg, rgba(108, 117, 125, 0.2), rgba(108, 117, 125, 0.1)); border: 2px solid rgba(108, 117, 125, 0.3);">
-                                <h:i class="fa-duotone fa-users"></h:i>
-                            </div>
+                            <h:i class="fa-duotone fa-users" style="font-size: 40px; color: #6c757d;"></h:i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Tareas Urgentes con diseño moderno -->
-        <div class="row" style="margin-top: 30px;">
+        <!-- Tareas Urgentes y Accesos Rápidos -->
+        <div class="row">
             <div class="col-lg-8 s-bot">
-                <div class="card glass-card" style="overflow: hidden;">
-                    <div class="card-header d-flex justify-content-between align-items-center" style="background: transparent; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 20px;">
-                        <h:h5 style="margin: 0; font-weight: bold; color: var(--primary-text); display: flex; align-items: center; gap: 10px;">
-                            <h:i class="fa-duotone fa-fire" style="color: #f59e0b;"></h:i>
-                            Tareas Urgentes (CRITICAL)
-                        </h:h5>
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h:h5 style="margin: 0; font-weight: bold;">Tareas Urgentes</h:h5>
                         <button onClick="@command('openTaskInbox')" 
-                                class="btn btn-sm" 
-                                style="background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; color: white; font-weight: 500; transition: all 0.3s;"
-                                onMouseOver="this.style.transform='scale(1.05)';"
-                                onMouseOut="this.style.transform='scale(1)';">
-                            <h:i class="fa-duotone fa-external-link"></h:i> Ver Todas
+                                class="btn btn-sm btn-outline-primary">
+                            Ver Todas
                         </button>
                     </div>
-                    <div class="card-body" style="padding: 20px;">
+                    <div class="card-body">
                         <grid model="@load(vm.urgentTasks)" 
-                              emptyMessage="No hay tareas urgentes"
-                              style="border: none;">
+                              emptyMessage="No hay tareas urgentes">
                             <columns>
-                                <column width="80px" align="center"/>
-                                <column width="280px"/>
-                                <column width="140px"/>
-                                <column width="150px"/>
-                                <column width="100px" align="center"/>
+                                <column label="Prioridad" width="100px" align="center"/>
+                                <column label="Tarea" width="280px"/>
+                                <column label="Asignado" width="140px"/>
+                                <column label="Roles" width="150px"/>
+                                <column label="Vencimiento" width="100px" align="center"/>
                             </columns>
                             <template name="model" var="task">
-                                <row style="cursor: pointer; padding: 12px; border-radius: 8px; margin-bottom: 8px; transition: all 0.3s;"
-                                     onMouseOver="this.style.background='rgba(255, 255, 255, 0.05)'; this.style.transform='translateX(5px)';"
-                                     onMouseOut="this.style.background='transparent'; this.style.transform='translateX(0)';"
-                                     onClick="@command('openTask', task=task)">
-                                    
-                                    <!-- Prioridad Badge -->
+                                <row style="cursor: pointer;" onClick="@command('openTask', task=task)">
                                     <cell align="center">
                                         <span class="@load(vm.getPriorityBadgeClass(task.priority))" 
-                                              style="padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 600;">
+                                              style="padding: 4px 10px; border-radius: 12px; font-size: 10px;">
                                             @load(vm.getPriorityText(task.priority))
                                         </span>
                                     </cell>
-                                    
-                                    <!-- Tarea -->
                                     <cell>
                                         <label value="@load(task.name)" 
-                                               style="font-weight: 600; display: block; margin-bottom: 4px; color: var(--primary-text);"/>
+                                               style="font-weight: 600; display: block;"/>
                                         <label value="@load(task.description)" 
-                                               style="font-size: 11px; color: var(--second-aux); display: block;"
+                                               style="font-size: 11px; color: var(--second-aux);"
                                                visible="@load(not empty task.description)"/>
                                     </cell>
-                                    
-                                    <!-- Asignado -->
                                     <cell>
                                         <label value="@load(empty task.assignee ? 'Sin asignar' : task.assignee)" 
-                                               style="@load(empty task.assignee ? 'color: #f59e0b; font-style: italic; font-size: 13px;' : 'font-weight: 500; font-size: 13px; color: var(--primary-text);')"/>
+                                               style="@load(empty task.assignee ? 'color: var(--second-aux);' : 'font-weight: 500;')"/>
                                     </cell>
-                                    
-                                    <!-- Roles -->
                                     <cell>
                                         <label value="@load(vm.formatCandidateGroups(task.candidateGroups))" 
                                                style="font-size: 11px; color: var(--second-aux);"/>
                                     </cell>
-                                    
-                                    <!-- Vencimiento -->
                                     <cell align="center">
-                                        <label value="@load(task.dueDate) @converter('formatedDate', format='HH:mm')"
-                                               style="color: #dc3545; font-weight: bold; font-size: 13px;"
+                                        <label value="@load(task.dueDate) @converter('formatedDate', format='dd/MM HH:mm')"
+                                               style="color: #dc3545; font-size: 12px;"
                                                visible="@load(not empty task.dueDate)"/>
-                                        <label value="Hoy" 
-                                               style="color: #f59e0b; font-weight: 500; font-size: 12px;"
+                                        <label value="Pendiente" 
+                                               style="color: var(--second-aux); font-size: 12px;"
                                                visible="@load(empty task.dueDate)"/>
                                     </cell>
                                 </row>
@@ -239,42 +145,35 @@
                 </div>
             </div>
             
-            <!-- Accesos Rápidos con diseño moderno -->
+            <!-- Accesos Rápidos -->
             <div class="col-lg-4 s-bot">
-                <div class="card glass-card" style="overflow: hidden;">
-                    <div class="card-header" style="background: transparent; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding: 20px;">
-                        <h:h5 style="margin: 0; font-weight: bold; display: flex; align-items: center; gap: 10px;">
-                            <h:i class="fa-duotone fa-bolt" style="color: #f59e0b;"></h:i>
-                            Accesos Rápidos
-                        </h:h5>
+                <div class="card">
+                    <div class="card-header">
+                        <h:h5 style="margin: 0; font-weight: bold;">Accesos Rápidos</h:h5>
                     </div>
-                    <div class="card-body" style="padding: 20px;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-                            <button onClick="@command('openTaskInbox')" 
-                                    style="padding: 16px; border: 2px dashed rgba(59, 130, 246, 0.3); border-radius: 12px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); cursor: pointer; transition: all 0.3s; text-align: center; color: white;"
-                                    onMouseOver="this.style.borderColor='rgba(59, 130, 246, 0.6)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 16px rgba(59, 130, 246, 0.3)';"
-                                    onMouseOut="this.style.borderColor='rgba(59, 130, 246, 0.3)'; this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                                <h:i class="fa-duotone fa-tasks" style="font-size: 24px; color: #3b82f6; margin-bottom: 8px;"></h:i>
-                                <div style="font-size: 11px; font-weight: 500;">Bandeja de Tareas</div>
-                            </button>
-                            <button style="padding: 16px; border: 2px dashed rgba(139, 92, 246, 0.3); border-radius: 12px; background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(139, 92, 246, 0.05)); cursor: pointer; transition: all 0.3s; text-align: center; color: white;"
-                                    onMouseOver="this.style.borderColor='rgba(139, 92, 246, 0.6)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 16px rgba(139, 92, 246, 0.3)';"
-                                    onMouseOut="this.style.borderColor='rgba(139, 92, 246, 0.3)'; this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                                <h:i class="fa-duotone fa-robot" style="font-size: 24px; color: #8b5cf6; margin-bottom: 8px;"></h:i>
-                                <div style="font-size: 11px; font-weight: 500;">Modelos IA</div>
-                            </button>
-                            <button style="padding: 16px; border: 2px dashed rgba(16, 185, 129, 0.3); border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); cursor: pointer; transition: all 0.3s; text-align: center; color: white;"
-                                    onMouseOver="this.style.borderColor='rgba(16, 185, 129, 0.6)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 16px rgba(16, 185, 129, 0.3)';"
-                                    onMouseOut="this.style.borderColor='rgba(16, 185, 129, 0.3)'; this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                                <h:i class="fa-duotone fa-flask" style="font-size: 24px; color: #10b981; margin-bottom: 8px;"></h:i>
-                                <div style="font-size: 11px; font-weight: 500;">Training &amp; Experiments</div>
-                            </button>
-                            <button style="padding: 16px; border: 2px dashed rgba(16, 185, 129, 0.3); border-radius: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); cursor: pointer; transition: all 0.3s; text-align: center; color: white;"
-                                    onMouseOver="this.style.borderColor='rgba(16, 185, 129, 0.6)'; this.style.transform='scale(1.05)'; this.style.boxShadow='0 8px 16px rgba(16, 185, 129, 0.3)';"
-                                    onMouseOut="this.style.borderColor='rgba(16, 185, 129, 0.3)'; this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                                <h:i class="fa-duotone fa-server" style="font-size: 24px; color: #10b981; margin-bottom: 8px;"></h:i>
-                                <div style="font-size: 11px; font-weight: 500;">Infrastructure</div>
-                            </button>
+                    <div class="card-body">
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <a href="#" 
+                               iconSclass="fa-duotone fa-tasks"
+                               style="padding: 12px; border-radius: 8px; background: rgba(59, 130, 246, 0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none;"
+                               onClick="@command('openTaskInbox')">
+                                <span>Bandeja de Tareas</span>
+                            </a>
+                            <a href="#"
+                               iconSclass="fa-duotone fa-robot"
+                               style="padding: 12px; border-radius: 8px; background: rgba(139, 92, 246, 0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none;">
+                                <span>Modelos IA</span>
+                            </a>
+                            <a href="#"
+                               iconSclass="fa-duotone fa-flask"
+                               style="padding: 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none;">
+                                <span>Training &amp; Experiments</span>
+                            </a>
+                            <a href="#"
+                               iconSclass="fa-duotone fa-server"
+                               style="padding: 12px; border-radius: 8px; background: rgba(16, 185, 129, 0.1); cursor: pointer; display: flex; align-items: center; gap: 12px; color: white; text-decoration: none;">
+                                <span>Infrastructure</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -283,3 +182,4 @@
         
 	</idspace>
 </zk>
+

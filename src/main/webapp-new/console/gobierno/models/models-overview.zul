@@ -1,0 +1,309 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.ModelsOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row  " style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+                    <h:h2 class="mb-1" style="font-weight: bold;">
+                        <h:i class="fa-sharp-duotone fa-solid fa-microchip "></h:i> 
+                        <label class="mb-1" value="${labels.models.overview.title}" style="font-weight: bold;"/>
+                    </h:h2>
+                    <h:p class="text-muted">
+                        <label value="${labels.models.detail.subtitle}" class="text-muted"/>
+                    </h:p>
+ 				</div>
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+
+							</div>
+							<div class="flex-shrink-0">
+								<div
+									class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-notes-medical label-icon align-middle fs-16 me-2 "
+										class="waves-effect waves-light"
+										onClick="@command('registerModel')"
+										label="${labels.models.overview.button.register}">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.models.overview.metrics.total}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalModels)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.models.overview.metrics.active}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.activeModels)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							   <fragment exps="${labels.models.overview.metrics.pending}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.pendingApproval)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							     <fragment exps="${labels.models.overview.metrics.rejected}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.rejectedModels)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="${labels.models.overview.filters.search.placeholder}"
+						class="form-control" onOK="@command('applyFilters')" />
+					<!-- Filtro por Proveedor -->
+					<combobox mold="rounded" autodrop="true"
+						selectedItem="@bind(vm.providerFilter)"
+						onChange="@command('applyFilters')"
+						model="@load(vm.availableProviders)" visible="true"
+						placeholder="${labels.models.overview.filters.provider}">
+						<comboitem label="ALL" value="null" />
+						<template name="model" var="provider">
+							<comboitem
+								label="@load(provider.moddisplayname)"
+								value="@load(provider.idxmodelprovider)" />
+						</template>
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox
+						placeholder="${labels.models.overview.filters.status}"
+						selectedItem="@bind(vm.statusFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="INACTIVE" value="INACTIVE" />
+						<comboitem label="DEVELOPMENT"
+							value="DEVELOPMENT" />
+						<comboitem
+							label="${labels.models.overview.filters.status.production}"
+							value="PRODUCTION" />
+					</combobox>
+					<!-- Filtro por Tipo -->
+
+					<combobox
+						placeholder="${labels.models.overview.filters.type}"
+						selectedItem="@bind(vm.typeFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="LLM" value="LLM" />
+						<comboitem label="VISION" value="VISION" />
+						<comboitem label="AUDIO" value="AUDIO" />
+						<comboitem label="EMBEDDING" value="EMBEDDING" />
+					</combobox>
+					<!-- Filtro por Compliance -->
+
+					<combobox selectedItem="@bind(vm.complianceFilter)"
+						onChange="@command('applyFilters')"
+						placeholder="${labels.models.overview.filters.compliance}">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="COMPLIANT" value="COMPLIANT" />
+						<comboitem label="NON_COMPLIANT"
+							value="NON_COMPLIANT" />
+						<comboitem label="UNDER_REVIEW"
+							value="UNDER_REVIEW" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Find"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Clear"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.filteredModels)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="${labels.models.overview.table.id}" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.name}" align="center"
+										width="25%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.provider}"
+										align="center" width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.type}" align="center"
+										width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.version}" align="center"
+										width="8%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.framework}"
+										align="center" width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.status}" align="center"
+										width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.models.overview.table.approvals}"
+										align="center" width="10%" />
+
+									<column
+										label="${labels.models.overview.table.actions}"
+										align="center" />
+								</columns>
+
+								<template name="model" var="model">
+									<row
+										style="text-align:right;cursor:pointer;"
+										onClick="@command('viewModelDetails', modelId=model.idxmodel)">
+										<label
+											value="@load(model.idxmodel) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(model.modname) @converter(vm.fieldConverter)">
+										</label>
+
+
+										<label
+											value="@load(model.providerDisplayName) @converter(vm.fieldConverter)">
+										</label>
+										<h:span
+											class="badge bg-secondary">
+											<label
+												value="@load(model.modtype)" />
+										</h:span>
+
+										<label
+											value="@load(model.modversion)" sclass="badge bg-info" />
+
+										<label
+											value="@load(model.modframework)">
+										</label>
+										<label
+											value="@load(model.modstatus)"
+											sclass="badge ${model.modstatus eq 'ACTIVE' ? 'bg-success' : (model.modstatus eq 'INACTIVE' ? 'bg-secondary' : 'bg-warning')}" />
+										<label
+											value="@load(model.modapprovalstatus)"
+											sclass="badge ${model.modapprovalstatus eq 'APPROVED' ? 'bg-success' : (model.modapprovalstatus eq 'REJECTED' ? 'bg-danger' : 'bg-warning')}" />
+
+
+										<cell align="center"
+											class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewModelDetails', modelId=model.idxmodel)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="${labels.models.overview.button.view.tooltip}" />
+											</div>
+											<div class="delete">
+												<a
+													onClick="@command('deleteModel', modelId=model.idxmodel)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="${labels.models.overview.button.delete.tooltip}" />
+											</div>
+
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+
+
+									</footer>
+									<footer span="4" align="left">
+
+
+
+
+									</footer>
+									<footer></footer>
+
+								</foot>
+
+
+
+							</grid>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>

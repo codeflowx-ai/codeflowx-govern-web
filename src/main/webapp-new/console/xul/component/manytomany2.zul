@@ -1,0 +1,183 @@
+<?component name="dual-listbox" extends="div" class="com.enartsystems.designer.commons.listbox.FieldsDualListBox"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml" xmlns:n="native"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute"
+	xmlns:w="client">
+	<window title="Configure Many to Many" border="normal"
+		closable="true" mode="modal" width="80%" height="700px"
+		position="center,center" class="bg-dark text-white" action="show: slideDown;hide: slideUp">
+		<div
+			viewModel="@id('vm') @init('com.enartsystems.designer.commons.ManyToManyUI')">
+			<div class="col-lg-12">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2">
+								<a
+								iconSclass="fa-duotone fa-solid fa-floppy-disk align-middle fs-16"
+								onClick="@command('doStore')"
+								sclass="mov-icon-hide waves-effect waves-light icon-label"
+								tooltiptext="Save"
+								label="Save">
+							</a>
+									
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div><!--end col-->
+			<div class="row">
+				<h:div class="col-md-6">
+					<label sclass="form-label"
+						value="Seleccione aplicación" />
+					<combobox model="@load(vm.applications)"   disabled="@load(vm.disabled)" value="@bind(vm.bean.application)" onSelect="@command('selectApp',item=event.data)">
+						 <template name="model" var="item">
+						   <comboitem value="${item.projectBase.txname}" label="${item.projectBase.txname}"/>
+						 </template>
+					</combobox>
+				</h:div>
+				<h:div class="col-md-6">
+					<label sclass="form-label"
+						value="Seleccione modelo" />
+					<combobox model="@load(vm.subtables)"  value="@bind(vm.entidad)" onSelect="@command('selectEntity')">
+						<template name="model" var="item">
+						   <comboitem value="${item.namesql}" label="${item.namesql}"/>
+						 </template>
+					</combobox>
+				</h:div>
+			</div>
+			<div class="row">
+				<h:div class="col-md-12">
+					<tabbox>
+						<tabs>
+							<tab label="Campos a Visualizar" />
+							<tab label="Filtro de Consulta" />
+						</tabs>
+						<tabpanels>
+						  <tabpanel>
+							<dual-listbox id="dualLBox" />
+                       	  </tabpanel>
+							<tabpanel>
+								<div class="row">
+									<div class="col-md-3">
+										<tabbox>
+											<tabs>
+												<tab
+													label="Fields Foreing" />
+												<tab
+													label="Fields Views" />
+											</tabs>
+											<tabpanels>
+												<tabpanel>
+													<listbox
+														multiple="true" model="@bind(vm.fieldsForeing)"
+														height="350px">
+														<listhead>
+															<listheader
+																label="Field">
+															</listheader>
+															<listheader
+																label="Foreing">
+															</listheader>
+														</listhead>
+														<template
+															name="model">
+															<listitem
+																draggable="true" value="${each}">
+																<listcell
+																	label="${each.columnname }" />
+																<listcell
+																	label="${each.fktablename }" />
+															</listitem>
+														</template>
+													</listbox>
+
+												</tabpanel>
+												<tabpanel>
+													<listbox
+														multiple="true" model="@bind(vm.fieldsView)"
+														height="350px">
+														<listhead>
+															<listheader
+																label="Field">
+															</listheader>
+															<listheader
+																label="Foreing">
+															</listheader>
+														</listhead>
+														<template
+															name="model">
+															<listitem
+																draggable="true" value="${each}">
+																<listcell
+																	label="${each.columnname }" />
+																<listcell
+																	label="${each.fktablename }" />
+															</listitem>
+														</template>
+													</listbox>
+
+												</tabpanel>
+											</tabpanels>
+										</tabbox>
+
+
+
+
+									</div>
+									<div class="col-md-9">
+										<label id="labelDrop"
+											value="Arrastra el campo aquí"
+											onDrop="@command('dragFields',dragged=event,filter=true)"
+											droppable="true">
+										</label>
+										<grid id="gridMapping"
+											droppable="true"
+											onDrop="@command('dragFields',dragged=event)"
+											model="@bind(vm.mfields)"
+											rowRenderer="@load(vm.rowRenderer)">
+											<columns>
+												<column
+													label="Condición" width="100px" />
+												<column
+													label="Campo Destino" />
+												<column label="Evaluar"
+													width="100px" />
+												<column
+													label="Valor Defecto" />
+												<column
+													label="Variable" />
+												<column
+													label="Asignar valor de.." />
+												<column label="" />
+
+											</columns>
+											<rows>
+
+
+											</rows>
+										</grid>
+									</div>
+								</div>
+							</tabpanel>
+
+
+							
+						</tabpanels>
+					</tabbox>
+
+
+
+				</h:div>
+
+
+			</div>
+		</div>
+	</window>
+</zk>

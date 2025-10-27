@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="native"
+    xmlns:x="xhtml">
+    
+    <div viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.core.PermissionViewModel')">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 col-md-6">
+                    <h:h1 class="h2 fw-bold mb-1">
+                        <h:i class="bi bi-key me-2"></h:i>
+                        <label value="${labels.permission.title}" />
+                    </h:h1>
+                    <h:p class="text-muted mb-0">${labels.permission.subtitle}</h:p>
+                </h:div>
+                <h:div class="col-12 col-md-6 text-end">
+                    <button class="btn btn-primary" onClick="@command('newPermission')">
+                        <h:i class="bi bi-plus-circle me-2"></h:i>
+                        <label value="${labels.permission.create}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Búsqueda -->
+            <h:div class="row mb-3">
+                <h:div class="col-12 col-md-10">
+                    <h:div class="input-group">
+                        <h:span class="input-group-text"><h:i class="bi bi-search"></h:i></h:span>
+                        <textbox class="form-control" placeholder="${labels.common.search}..." 
+                                 value="@bind(vm.searchTerm)" 
+                                 onOK="@command('search')"/>
+                        <button class="btn btn-outline-secondary" onClick="@command('search')">
+                            ${labels.common.search}
+                        </button>
+                        <button class="btn btn-outline-secondary" onClick="@command('clearSearch')">
+                            ${labels.common.clear}
+                        </button>
+                    </h:div>
+                </h:div>
+                <h:div class="col-12 col-md-2 text-end">
+                    <button class="btn btn-outline-secondary w-100" onClick="@command('refresh')">
+                        <h:i class="bi bi-arrow-clockwise me-2"></h:i>
+                        <label value="${labels.common.refresh}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Tabla -->
+            <h:div class="row">
+                <h:div class="col-12">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body p-0">
+                            <h:div class="table-responsive">
+                                <h:table class="table table-hover mb-0">
+                                    <h:thead class="table-light">
+                                        <h:tr>
+                                            <h:th>${labels.permission.id}</h:th>
+                                            <h:th>${labels.permission.name}</h:th>
+                                            <h:th>${labels.permission.created}</h:th>
+                                            <h:th>${labels.permission.updated}</h:th>
+                                            <h:th class="text-end">${labels.common.actions}</h:th>
+                                        </h:tr>
+                                    </h:thead>
+                                    <h:tbody>
+                                        <forEach items="@load(vm.pageResult.content)" var="dept">
+                                            <h:tr>
+                                                <h:td><label value="@load(dept.idxdepartment)"/></h:td>
+                                                <h:td><label value="@load(dept.corname)"/></h:td>
+                                                <h:td><label value="@load(dept.createdat)"/></h:td>
+                                                <h:td><label value="@load(dept.updatedat)"/></h:td>
+                                                <h:td class="text-end">
+                                                    <button class="btn btn-sm btn-outline-primary me-1" 
+                                                            onClick="@command('editPermission', item=dept)">
+                                                        <h:i class="bi bi-pencil"></h:i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                            onClick="@command('deletePermission', item=dept)">
+                                                        <h:i class="bi bi-trash"></h:i>
+                                                    </button>
+                                                </h:td>
+                                            </h:tr>
+                                        </forEach>
+                                    </h:tbody>
+                                </h:table>
+                            </h:div>
+                        </h:div>
+                        
+                        <!-- Paginación -->
+                        <h:div class="card-footer bg-light">
+                            <h:div class="d-flex justify-content-between align-items-center">
+                                <h:div>
+                                    <h:small class="text-muted">
+                                        ${labels.common.page} <label value="@load(vm.pageParams.pageActual)"/> 
+                                        ${labels.common.of} <label value="@load(vm.pageResult.totalPages)"/> 
+                                        (<label value="@load(vm.pageResult.totalRows)"/> ${labels.common.records})
+                                    </h:small>
+                                </h:div>
+                                <h:div>
+                                    <button class="btn btn-sm btn-outline-secondary me-2"
+                                            onClick="@command('previousPage')"
+                                            disabled="@load(vm.pageParams.pageActual eq 1)">
+                                        <h:i class="bi bi-chevron-left"></h:i>
+                        <label value="${labels.common.previous}" />
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary"
+                                            onClick="@command('nextPage')"
+                                            disabled="@load(vm.pageResult.nextRow eq 0)">
+                                        ${labels.common.next} <h:i class="bi bi-chevron-right"></h:i>
+                                    </button>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+        </h:div>
+    </div>
+    
+    <!-- Modal de Edición -->
+    <window visible="@load(vm.showDialog)" mode="modal" 
+                border="normal" width="600px" closable="true"
+                onClose="@command('cancelEdit')">
+            <h:div class="p-4">
+                <h:h5 class="mb-4">
+                    <label value="@load(vm.isEditing ? labels.permission.edit : labels.permission.create)"/>
+                </h:h5>
+                
+                <h:div class="mb-3">
+                    <h:label class="form-label">${labels.permission.name}</h:label>
+                    <textbox class="form-control" 
+                             value="@bind(vm.selectedPermission.corname)"
+                             placeholder="${labels.permission.name.placeholder}"/>
+                </h:div>
+                
+                <h:div class="d-flex justify-content-end gap-2 mt-4">
+                    <button class="btn btn-secondary" onClick="@command('cancelEdit')">
+                        ${labels.common.cancel}
+                    </button>
+                    <button class="btn btn-primary" onClick="@command('savePermission')">
+                        <h:i class="bi bi-check-circle me-2"></h:i>
+                        <label value="${labels.common.save}" />
+                    </button>
+                </h:div>
+            </h:div>
+        </window>
+</zk>
+

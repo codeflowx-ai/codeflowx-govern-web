@@ -1,0 +1,295 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.GovernanceOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+
+		<div class="row  " style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-shield-check me-2"></h:i>
+						<label value="${labels.governance.overview.title}" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label
+							value="${labels.governance.overview.subtitle}" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+
+							</div>
+							<div class="flex-shrink-0">
+								<div
+									class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2 "
+										class="waves-effect waves-light"
+										onClick="@command('createPolicy')"
+										label="${labels.governance.overview.button.create}">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.governance.overview.metrics.total}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalPolicies)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.governance.overview.metrics.active}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.activePolicies)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							   <fragment exps="${labels.governance.overview.metrics.violations}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalViolations)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							     <fragment exps="${labels.governance.overview.metrics.compliance}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.complianceScore)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="${labels.governance.overview.filters.search.placeholder}"
+						class="form-control" onOK="@command('applyFilters')" />
+					<!-- Filtro por Tipo -->
+					<combobox
+						placeholder="${labels.governance.overview.filters.type}"
+						selectedItem="@bind(vm.typeFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="SECURITY" value="SECURITY" />
+						<comboitem label="COMPLIANCE" value="COMPLIANCE" />
+						<comboitem label="ETHICS" value="ETHICS" />
+						<comboitem label="PRIVACY" value="PRIVACY" />
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox
+						placeholder="${labels.governance.overview.filters.status}"
+						selectedItem="@bind(vm.statusFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="INACTIVE" value="INACTIVE" />
+						<comboitem label="DRAFT" value="DRAFT" />
+					</combobox>
+					<!-- Filtro por Enforcement -->
+					<combobox
+						placeholder="${labels.governance.overview.filters.enforcement}"
+						selectedItem="@bind(vm.enforcementFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="MANDATORY" value="MANDATORY" />
+						<comboitem label="RECOMMENDED" value="RECOMMENDED" />
+						<comboitem label="OPTIONAL" value="OPTIONAL" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Find"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Clear"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.filteredPolicies)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="${labels.governance.overview.table.id}" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.name}" align="center"
+										width="25%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.type}"
+										align="center" width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.enforcement}" align="center"
+										width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.version}" align="center"
+										width="8%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.status}" align="center"
+										width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.violations}"
+										align="center" width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.governance.overview.table.score}"
+										align="center" width="8%" />
+
+									<column
+										label="${labels.governance.overview.table.actions}"
+										align="center" />
+								</columns>
+
+								<template name="model" var="policy">
+									<row
+										style="text-align:right;cursor:pointer;"
+										onClick="@command('viewPolicyDetails', policyId=policy.idxpolicy)">
+										<label
+											value="@load(policy.idxpolicy) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(policy.policyname) @converter(vm.fieldConverter)">
+										</label>
+
+										<h:span
+											class="badge bg-secondary">
+											<label
+												value="@load(policy.policytype)" />
+										</h:span>
+
+										<h:span
+											class="badge bg-info">
+											<label
+												value="@load(policy.enforcementlevel)" />
+										</h:span>
+
+										<label
+											value="@load(policy.version)" sclass="badge bg-info" />
+
+										<label
+											value="@load(policy.status)"
+											sclass="badge ${policy.status eq 'ACTIVE' ? 'bg-success' : (policy.status eq 'INACTIVE' ? 'bg-secondary' : 'bg-warning')}" />
+
+										<label
+											value="@load(policy.totalviolations)"
+											sclass="badge ${policy.totalviolations > 0 ? 'bg-danger' : 'bg-success'}" />
+
+										<label
+											value="@load(policy.avgcompliancescore)"
+											sclass="badge ${policy.avgcompliancescore >= 80 ? 'bg-success' : (policy.avgcompliancescore >= 60 ? 'bg-warning' : 'bg-danger')}" />
+
+										<cell align="center"
+											class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewPolicyDetails', policyId=policy.idxpolicy)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="${labels.governance.overview.button.view.tooltip}" />
+											</div>
+											<div class="delete">
+												<a
+													onClick="@command('deletePolicy', policyId=policy.idxpolicy)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="${labels.governance.overview.button.delete.tooltip}" />
+											</div>
+
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+
+
+									</footer>
+									<footer span="4" align="left">
+
+
+
+
+									</footer>
+									<footer></footer>
+
+								</foot>
+
+
+
+							</grid>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>

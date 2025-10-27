@@ -1,0 +1,92 @@
+<zk xmlns:h="native">
+	<div sclass="row">
+		<div sclass="col-md-6">
+			<radiogroup id="sv1"
+				onCheck="@command('selectTipo',app=self.selectedItem.value,label=self.selectedItem.label,form=fx) " />
+			<div sclass="form-group">
+				<label value="Tipo de Aplicacion"></label>
+				<textbox id="arq" sclass="form-control required"
+					value="@bind(fx.idarquitectura) @validator(vm.validator,required=true)"
+					visible="false">
+				</textbox>
+				<label id="arq2"
+					class="text-indigo font-weight-bold font-size-lg text-uppercase"
+					value="@bind(fx.labelarquitectura)">
+				</label>
+				<label sclass="text-danger"
+					value="@load(vmsgs['arq'])">
+				</label>
+			</div>
+		</div>
+	</div>
+	<div sclass="row">
+		<forEach items="@init(vm.arquitecturas)" var="item">
+			<div sclass="col-lg-3">
+				<div class="card">
+					<div class="card-body border-top-0">
+						<div class="row">
+							<div class="col-md-3 col-xl-3">
+								<div
+									class="card-img-actions ">
+									<image class="card-img img-fluid"
+										src="${item.imagen}">
+									</image>
+								</div>
+							</div>
+							<div
+								class="col-md-9 col-xl-9 border-top-0">
+								<vbox spacing="2px">
+								 <radio label="${item.txname}"
+									class="text-indigo font-weight-bold font-size-lg text-uppercase"
+									radiogroup="sv1" value="${item.idxarchitect}"
+									disabled="${item.active?false:true}" />
+								<label value="${item.dsdescription}"></label>
+								</vbox>
+									
+							</div>
+
+
+						</div>
+					</div>
+
+				</div>
+
+
+				<!-- 						<vbox spacing="2px" align="center"> -->
+				<!-- 						width="180px" height="95px" -->
+				<!-- 							<image src="${item.imagen}" -->
+				<!-- 								style="object-fit: cover;" > -->
+				<!-- 							</image> -->
+				<!-- 							<radio label="${item.txname}" -->
+				<!-- 								class="text-indigo font-weight-bold font-size-lg text-uppercase" -->
+				<!-- 								radiogroup="sv1" value="${item.idxarchitect}" disabled="${item.active?false:true}"/> -->
+				<!-- 						</vbox> -->
+			</div>
+		</forEach>
+		<!-- 	   <div sclass="col-md-3" > -->
+		<!-- 		<vbox spacing="2px" align="center"> -->
+		<!-- 		 	<image src="stepApp/shadow_elements/step_bar/steps/pcs.jpg" style="object-fit: cover;" width="225px" height="180px"></image> -->
+		<!-- 		 	<radio id="ra1" label="Aplicacion Web" class="text-indigo font-weight-bold font-size-lg text-uppercase" radiogroup="sv1" value="71"/> -->
+
+		<!-- 		</vbox> -->
+		<!-- 		</div> -->
+		<!-- 		<div sclass="col-md-3"> -->
+		<!-- 		<vbox spacing="2px" align="center"> -->
+		<!-- 			<image src="stepApp/shadow_elements/step_bar/steps/network1.jpg" style="object-fit: cover;" width="225px" height="180px"></image> -->
+		<!-- 			<radio id="ra2" label="Micro Servicios" class="text-indigo font-weight-bold font-size-lg text-uppercase" radiogroup="sv1" value="72"/> -->
+		<!-- 			</vbox> -->
+		<!-- 		</div> -->
+		<!-- 		<div sclass="col-md-3"> -->
+		<!-- 		<vbox spacing="2px" align="center"> -->
+		<!-- 			<image src="stepApp/shadow_elements/step_bar/steps/analisis.jpg" style="object-fit: cover;" width="225px" height="180px"></image> -->
+		<!-- 			<radio id="ra3" label="analisis de negocio" class="text-indigo font-weight-bold font-size-lg text-uppercase" radiogroup="sv1" value="73"/> -->
+		<!-- 			</vbox> -->
+		<!-- 		</div> -->
+		<!-- 		<div sclass="col-md-3"> -->
+		<!-- 		<vbox spacing="2px" align="center"> -->
+		<!-- 			<image src="stepApp/shadow_elements/step_bar/steps/movil.jpg" style="object-fit: cover;" width="225px" height="180px"></image> -->
+		<!-- 			<radio id="ra4" label="Aplicacion Movil" class="text-indigo font-weight-bold font-size-lg text-uppercase" radiogroup="sv1" value="74"/> -->
+		<!-- 			</vbox> -->
+		<!-- 		</div> -->
+	</div>
+</zk>

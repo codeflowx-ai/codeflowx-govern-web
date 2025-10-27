@@ -1,0 +1,866 @@
+<!doctype html>
+<html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:zk="zk" xmlns:z="zul" xmlns:c="client">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<title>CodeflowX Govern - Login</title>
+
+		<!-- Favicon -->
+		<link href="img/icono1.png" rel="icon">
+
+		<!-- CSS Bootstrap -->
+		<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+		<!-- Font Awesome -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+		<!-- Fuente personalizada -->
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body, html {
+				min-height: 100vh;
+				height: 100%;
+				font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			}
+
+			body {
+				overflow-x: hidden;
+				overflow-y: auto;
+			}
+
+			/* Fondo animado con estrellas */
+			.animated-background {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: linear-gradient(135deg, #060c1a 0%, #1b3281 50%, #16223c 100%);
+				overflow: hidden;
+				z-index: 0;
+			}
+
+			.stars {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+				background-image: 
+					radial-gradient(2px 2px at 20px 30px, #fff, rgba(0,0,0,0)),
+					radial-gradient(2px 2px at 60px 70px, #fff, rgba(0,0,0,0)),
+					radial-gradient(1px 1px at 50px 50px, #fff, rgba(0,0,0,0)),
+					radial-gradient(1px 1px at 130px 80px, #fff, rgba(0,0,0,0)),
+					radial-gradient(2px 2px at 90px 10px, #fff, rgba(0,0,0,0));
+				background-repeat: repeat;
+				background-size: 200px 200px;
+				animation: twinkle 5s ease-in-out infinite;
+				opacity: 0.4;
+			}
+
+			@keyframes twinkle {
+				0%, 100% { opacity: 0.4; }
+				50% { opacity: 0.7; }
+			}
+
+			.main-container {
+				position: relative;
+				z-index: 1;
+				min-height: 100vh;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 40px 20px;
+			}
+
+			.login-wrapper {
+				width: 100%;
+				max-width: 1400px;
+				margin: 0 auto;
+			}
+
+			.content-row {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 60px;
+				flex-wrap: wrap;
+			}
+
+			/* Panel izquierdo - Información */
+			.left-panel {
+				flex: 1;
+				min-width: 300px;
+				max-width: 600px;
+				color: #ffffff;
+			}
+
+			.logo-container {
+				display: flex;
+				align-items: center;
+				margin-bottom: 35px;
+			}
+
+			.logo-icon {
+				width: 80px;
+				height: 80px;
+				background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+				border-radius: 20px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-right: 20px;
+				box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+				flex-shrink: 0;
+			}
+
+			.logo-icon img {
+				width: 50px;
+				height: 50px;
+				object-fit: contain;
+			}
+
+			.logo-text {
+				flex: 1;
+			}
+
+			.main-title {
+				font-size: 2.2rem;
+				font-weight: 700;
+				margin-bottom: 5px;
+				color: #ffffff;
+				line-height: 1.2;
+			}
+
+			.subtitle {
+				font-size: 1rem;
+				color: #bfdbfe;
+				font-weight: 400;
+			}
+
+			.info-box {
+				background: rgba(255, 255, 255, 0.08);
+				border: 1px solid rgba(255, 255, 255, 0.15);
+				border-radius: 16px;
+				padding: 30px;
+				backdrop-filter: blur(10px);
+				margin-bottom: 20px;
+			}
+
+			.info-box-title {
+				display: flex;
+				align-items: center;
+				font-size: 1.1rem;
+				font-weight: 600;
+				margin-bottom: 20px;
+				color: #93c5fd;
+			}
+
+			.info-box-title i {
+				margin-right: 12px;
+				font-size: 1.3rem;
+				flex-shrink: 0;
+			}
+
+			.info-text {
+				color: #dbeafe;
+				line-height: 1.7;
+				margin-bottom: 15px;
+				font-size: 0.95rem;
+			}
+
+			.info-text strong {
+				color: #ffffff;
+				font-weight: 600;
+			}
+
+			.feature-item {
+				padding: 12px 0;
+				color: #dbeafe;
+				display: flex;
+				align-items: flex-start;
+				line-height: 1.6;
+			}
+
+			.feature-item:before {
+				content: "●";
+				color: #60a5fa;
+				font-size: 1.2rem;
+				margin-right: 12px;
+				flex-shrink: 0;
+				line-height: 1.5;
+			}
+
+			.secondary-info-box {
+				background: rgba(59, 130, 246, 0.15);
+				border: 1px solid rgba(147, 197, 253, 0.3);
+				border-radius: 16px;
+				padding: 25px;
+				backdrop-filter: blur(10px);
+			}
+
+			.secondary-info-box h3 {
+				color: #93c5fd;
+				font-size: 1rem;
+				font-weight: 600;
+				margin-bottom: 15px;
+				display: flex;
+				align-items: center;
+			}
+
+			.secondary-info-box h3 i {
+				margin-right: 10px;
+			}
+
+			.btn-link-external {
+				display: inline-flex;
+				align-items: center;
+				background: rgba(255, 255, 255, 0.1);
+				color: #ffffff;
+				padding: 12px 24px;
+				border-radius: 10px;
+				text-decoration: none;
+				margin-top: 15px;
+				transition: all 0.3s ease;
+				border: 1px solid rgba(255, 255, 255, 0.2);
+				font-size: 0.95rem;
+			}
+
+			.btn-link-external:hover {
+				background: rgba(255, 255, 255, 0.15);
+				transform: translateY(-2px);
+				text-decoration: none;
+				color: #ffffff;
+			}
+
+			.btn-link-external i {
+				margin-left: 8px;
+			}
+
+			.small-text {
+				color: #bfdbfe; 
+				font-size: 0.85rem; 
+				margin-top: 15px; 
+				margin-bottom: 0;
+				line-height: 1.5;
+			}
+
+			/* Panel derecho - Formulario */
+			.right-panel {
+				flex: 0 0 auto;
+				width: 100%;
+				max-width: 500px;
+			}
+
+			/* Header superior del formulario */
+			.form-top-header {
+				text-align: center;
+				margin-bottom: 25px;
+			}
+
+			.form-top-title {
+				font-size: 1.8rem;
+				font-weight: 700;
+				color: #e3e3e3;
+				margin-bottom: 8px;
+			}
+
+			.form-top-description {
+				color: #cbd5e1;
+				font-size: 1rem;
+			}
+
+			.login-card {
+				background: rgba(30, 58, 138, 0.4);
+				border: 1px solid rgba(147, 197, 253, 0.3);
+				border-radius: 16px;
+				padding: 0;
+				box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+				backdrop-filter: blur(20px);
+				overflow: hidden;
+			}
+
+			.login-header {
+				background: rgba(30, 58, 138, 0.3);
+				padding: 30px;
+				border-bottom: 1px solid rgba(147, 197, 253, 0.2);
+				display: flex;
+				align-items: center;
+				gap: 15px;
+			}
+
+			.login-icon {
+				width: 50px;
+				height: 50px;
+				background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+				border-radius: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-shrink: 0;
+			}
+
+			.login-icon i {
+				color: #ffffff;
+				font-size: 1.5rem;
+			}
+
+			.login-header-text {
+				flex: 1;
+			}
+
+			.login-title {
+				font-size: 1.3rem;
+				font-weight: 700;
+				color: #ffffff;
+				margin-bottom: 5px;
+			}
+
+			.login-description {
+				color: #cbd5e1;
+				font-size: 0.9rem;
+				margin-bottom: 0;
+			}
+
+			.login-body {
+				padding: 35px;
+			}
+
+			.form-group {
+				margin-bottom: 22px;
+			}
+
+			.form-label {
+				display: flex;
+				align-items: center;
+				font-size: 0.9rem;
+				font-weight: 600;
+				color: #e0e7ff;
+				margin-bottom: 10px;
+			}
+
+			.form-label i {
+				margin-right: 8px;
+				color: #93c5fd;
+				font-size: 1rem;
+			}
+
+			.input-wrapper {
+				position: relative;
+			}
+
+			.form-control {
+				width: 100%;
+				padding: 14px 18px;
+				border: 2px solid rgba(147, 197, 253, 0.2);
+				border-radius: 10px;
+				font-size: 0.95rem;
+				transition: all 0.3s ease;
+				background: rgba(255, 255, 255, 0.95);
+				color: #1e293b;
+			}
+
+			.form-control:focus {
+				outline: none;
+				border-color: #60a5fa;
+				box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2);
+				background: #ffffff;
+			}
+
+			.form-control::placeholder {
+				color: #94a3b8;
+			}
+
+			.input-icon-right {
+				position: absolute;
+				right: 15px;
+				top: 50%;
+				transform: translateY(-50%);
+				color: #3b82f6;
+				cursor: pointer;
+				font-size: 1.1rem;
+			}
+
+			.btn-login {
+				width: 100%;
+				padding: 16px;
+				background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+				color: #ffffff;
+				border: none;
+				border-radius: 10px;
+				font-size: 1rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-top: 10px;
+				box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+			}
+
+			.btn-login:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 20px rgba(37, 99, 235, 0.5);
+				background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+			}
+
+			.btn-login i {
+				margin-right: 8px;
+			}
+
+			.btn-secondary {
+				width: 100%;
+				padding: 14px;
+				background: rgba(255, 255, 255, 0.95);
+				color: #1e293b;
+				border: 2px solid rgba(147, 197, 253, 0.3);
+				border-radius: 10px;
+				font-size: 0.95rem;
+				font-weight: 600;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				margin-top: 12px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.btn-secondary:hover {
+				background: #ffffff;
+				border-color: #60a5fa;
+				transform: translateY(-2px);
+			}
+
+			.btn-secondary i {
+				margin-right: 8px;
+			}
+
+			.forgot-password {
+				text-align: center;
+				margin-top: 20px;
+			}
+
+			.forgot-password a {
+				color: #93c5fd;
+				text-decoration: none;
+				font-size: 0.9rem;
+				font-weight: 500;
+				cursor: pointer;
+				transition: color 0.3s ease;
+			}
+
+			.forgot-password a:hover {
+				color: #dbeafe;
+				text-decoration: underline;
+			}
+
+			.text-danger {
+				color: #fca5a5;
+				font-size: 0.85rem;
+				margin-top: 5px;
+				display: block;
+			}
+
+			/* Estilos para recovery y change password */
+			.auth-title h5 {
+				font-size: 1.3rem;
+				font-weight: 700;
+				color: #ffffff;
+				margin-bottom: 8px;
+			}
+
+			.auth-title p {
+				color: #cbd5e1;
+				margin-bottom: 0;
+				line-height: 1.5;
+			}
+
+			.footer-text {
+				text-align: center;
+				color: #94a3b8;
+				font-size: 0.85rem;
+				margin-top: 30px;
+			}
+
+			/* Responsive */
+			@media (max-width: 1200px) {
+				.content-row {
+					gap: 40px;
+				}
+			}
+
+			@media (max-width: 992px) {
+				.left-panel {
+					max-width: 100%;
+					text-align: center;
+				}
+
+				.logo-container {
+					justify-content: center;
+				}
+
+				.content-row {
+					flex-direction: column;
+				}
+
+				.main-container {
+					padding: 30px 15px;
+				}
+			}
+
+			@media (max-width: 768px) {
+				.left-panel {
+					display: none;
+				}
+
+				.right-panel {
+					max-width: 100%;
+				}
+
+				.login-body {
+					padding: 25px;
+				}
+
+				.main-title {
+					font-size: 1.8rem;
+				}
+			}
+
+			@media (max-width: 576px) {
+				.main-container {
+					padding: 20px 15px;
+				}
+
+				.login-header {
+					padding: 25px 20px;
+				}
+
+				.login-body {
+					padding: 25px 20px;
+				}
+
+				.logo-icon {
+					width: 60px;
+					height: 60px;
+				}
+
+				.logo-icon img {
+					width: 40px;
+					height: 40px;
+				}
+
+				.main-title {
+					font-size: 1.5rem;
+				}
+
+				.subtitle {
+					font-size: 0.9rem;
+				}
+
+				.form-control {
+					padding: 12px 15px;
+				}
+
+				.form-top-title {
+					font-size: 1.5rem;
+				}
+			}
+
+			@media (max-height: 700px) {
+				.main-container {
+					padding: 20px;
+				}
+
+				.info-box {
+					padding: 20px;
+				}
+
+				.login-body {
+					padding: 25px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Fondo animado -->
+		<div class="animated-background">
+			<div class="stars"></div>
+		</div>
+
+		<z:div 
+			viewModel="@id('vm') @init('com.suinsit.webapp.login.LoginUI')"
+			validationMessages="@id('vmsgs')">
+			
+			<div class="main-container">
+				<div class="login-wrapper">
+					<div class="content-row">
+						
+						<!-- Panel Izquierdo - Información -->
+						<div class="left-panel">
+							<!-- Logo y título -->
+							<div class="logo-container">
+								<div class="logo-icon">
+									<img src="img/logo-code.png" alt="CodeflowX Govern" />
+								</div>
+								<div class="logo-text">
+									<h1 class="main-title">CodeflowX Govern</h1>
+									<p class="subtitle">Plataforma de Gobernanza de IA</p>
+								</div>
+							</div>
+
+							<!-- Info principal -->
+							<div class="info-box">
+								<div class="info-box-title">
+									<i class="fas fa-shield-alt"></i>
+									<span>CodeflowX Govern</span>
+								</div>
+								<p class="info-text">
+									<strong>Bienvenido a CodeflowX Govern</strong> - la plataforma de 
+									gobernanza de Inteligencia Artificial. Esta es una versión 
+									con <strong>datos sintéticos</strong> que te permitirá explorar todas las 
+									funcionalidades de gobernanza sin conexión a la plataforma real.
+								</p>
+								<div class="feature-item">
+									<span><strong>Explora cada módulo de gobernanza</strong> para ver la versión 
+									disponible, estado actual y roadmap de los próximos 6-12 meses.</span>
+								</div>
+								<div class="feature-item">
+									<span><strong>Perfiles demo disponibles:</strong> Analista de Gobernanza, 
+									Compliance Officer, Data Steward, AI Ethics Officer y más 
+									roles especializados en gobernanza de IA.</span>
+								</div>
+							</div>
+
+							<!-- Info secundaria -->
+							<div class="secondary-info-box">
+								<h3>
+									<i class="fas fa-users"></i>
+									<span>Únete al Ecosistema CodeflowX Govern</span>
+								</h3>
+								<p class="info-text" style="margin-bottom: 10px;">
+									Sé parte de nuestra comunidad de gobernanza de IA como 
+									<strong>Compliance Officer</strong>, <strong>Data Steward</strong> o 
+									<strong>AI Ethics Officer</strong>.
+								</p>
+								<a href="https://codeflowx.com/" target="_blank" class="btn-link-external">
+									Visitar CodeflowX.com
+									<i class="fas fa-external-link-alt"></i>
+								</a>
+								<p class="small-text">
+									Te avisaremos cuando la plataforma esté lista para producción
+								</p>
+							</div>
+						</div>
+
+						<!-- Panel Derecho - Formulario Login -->
+						<div class="right-panel">
+							<!-- Header superior -->
+							<div class="form-top-header">
+								<h2 class="form-top-title">Acceso a la Plataforma</h2>
+								<p class="form-top-description">Ingresa tus credenciales para continuar</p>
+							</div>
+
+							<z:div id="loginForm" class="login-card">
+								<div class="login-header">
+									<div class="login-icon">
+										<i class="fas fa-fingerprint"></i>
+									</div>
+									<div class="login-header-text">
+										<h2 class="login-title">Autenticación</h2>
+										<p class="login-description">Ingresa tu email y contraseña</p>
+									</div>
+								</div>
+
+								<div class="login-body">
+									<z:div form="@id('fx') @load(vm.loginTO) @save(vm.loginTO,before={'login'})">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-envelope"></i>
+												<span>Email</span>
+											</label>
+											<div class="input-wrapper">
+												<z:textbox
+													placeholder="Ingresa tu email"
+													value="@bind(fx.ssousuario.txusername) @validator(vm.validator,required=true ,maxl='100' )"
+													class="form-control" />
+												<span class="input-icon-right">
+													<i class="fas fa-user-circle"></i>
+												</span>
+											</div>
+											<z:label sclass="text-danger" value="@load(vmsgs['user'])" />
+										</div>
+
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-lock"></i>
+												<span>Contraseña</span>
+											</label>
+											<div class="input-wrapper">
+												<z:textbox 
+													type="password"
+													placeholder="Ingresa tu contraseña"
+													value="@bind(fx.ssousuario.erpassword) @validator(vm.validator,required=true )"
+													class="form-control" />
+												<span class="input-icon-right">
+													<i class="fas fa-eye"></i>
+												</span>
+											</div>
+											<z:label sclass="text-danger" value="@load(vmsgs['pass'])" />
+										</div>
+
+										<z:button class="btn-login" onClick="@command('login')">
+											
+											Acceder
+										</z:button>
+									</z:div>
+
+									<div class="forgot-password">
+										<z:a onClick="@command('resetLogin')">
+											¿Olvidó su contraseña?
+										</z:a>
+									</div>
+								</div>
+							</z:div>
+
+							<div class="footer-text">
+								CodeflowX Govern v2.0.1 • Plataforma de Gobernanza de IA
+							</div>
+
+							<!-- Formulario de recuperación de contraseña -->
+							<z:div id="forget" class="login-card auth-title" visible="false">
+								<div class="login-header">
+									<div class="login-icon">
+										<i class="fas fa-key"></i>
+									</div>
+									<div class="login-header-text">
+										<h5>Recuperar Contraseña</h5>
+										<p>Introduzca su usuario o email</p>
+									</div>
+								</div>
+								
+								<div class="login-body">
+									<z:div form="@id('fx') @load(vm.loginTO) @save(vm.loginTO,before={'sendOTP'})">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-envelope"></i>
+												<span>Correo electrónico</span>
+											</label>
+											<z:textbox
+												id="email1"
+												placeholder="correo electrónico o nombre de usuario"
+												value="@bind(fx.ssousuario.txusername) @validator(vm.validator,required=true ,maxl='100' )"
+												class="form-control" />
+											<z:label sclass="text-danger" value="@load(vmsgs['email1'])" />
+										</div>
+										<z:button class="btn-login" onClick="@command('sendOTP')">
+											<i class="fas fa-paper-plane"></i>
+											<span>Enviar</span>
+										</z:button>
+									</z:div>
+								</div>
+							</z:div>
+
+							<!-- Formulario de código OTP -->
+							<z:div id="codeBox" class="login-card auth-title" visible="false">
+								<div class="login-header">
+									<div class="login-icon">
+										<i class="fas fa-shield-alt"></i>
+									</div>
+									<div class="login-header-text">
+										<h5>Código de Verificación</h5>
+										<p>Introduzca el código recibido</p>
+									</div>
+								</div>
+								
+								<div class="login-body">
+									<z:div form="@id('fx') @load(vm.loginTO) @save(vm.loginTO,before={'validarOTP'})">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-hashtag"></i>
+												<span>Código de verificación</span>
+											</label>
+											<z:intbox
+												id="numCode"
+												placeholder="Código de verificación"
+												class="form-control" />
+											<z:label sclass="text-danger" value="@load(vmsgs['numCode'])" />
+										</div>
+										<z:button class="btn-login" onClick="@command('validarOTP')">
+											<i class="fas fa-check"></i>
+											<span>Validar</span>
+										</z:button>
+										<z:button class="btn-secondary" onClick="@command('reenviarOTP')">
+											<i class="fas fa-redo"></i>
+											<span>Reenviar Código</span>
+										</z:button>
+									</z:div>
+								</div>
+							</z:div>
+
+							<!-- Formulario de cambio de contraseña -->
+							<z:div id="change" class="login-card auth-title" visible="false">
+								<div class="login-header">
+									<div class="login-icon">
+										<i class="fas fa-lock"></i>
+									</div>
+									<div class="login-header-text">
+										<h5>Cambiar Contraseña</h5>
+										<p>Introduzca su nueva contraseña</p>
+									</div>
+								</div>
+								
+								<div class="login-body">
+									<z:div form="@id('fx') @load(vm.loginTO) @save(vm.loginTO,before={'changePass'})">
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-key"></i>
+												<span>Nueva Contraseña</span>
+											</label>
+											<z:textbox 
+												id="pass2"
+												type="password"
+												placeholder="Nueva contraseña"
+												value="@bind(fx.ssousuario.erpassword) @validator(vm.validator,type='PASSWORD',required=true )"
+												class="form-control" />
+											<z:label sclass="text-danger" value="@load(vmsgs['pass2'])" />
+										</div>
+										<div class="form-group">
+											<label class="form-label">
+												<i class="fas fa-check-circle"></i>
+												<span>Confirmar Contraseña</span>
+											</label>
+											<z:textbox
+												type="password" 
+												id="pass3"
+												placeholder="Confirmar contraseña"
+												value="@bind(fx.repeat) @validator(vm.validator,type='PASSWORD',field=labelPass,required=true,equals= fx.ssousuario.erpassword)"
+												class="form-control" />
+											<z:label sclass="text-danger" value="@load(vmsgs['pass3'])" />
+										</div>
+										<z:button class="btn-login" onClick="@command('changePass')">
+											<i class="fas fa-save"></i>
+											<span>Cambiar</span>
+										</z:button>
+									</z:div>
+								</div>
+							</z:div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</z:div>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	</body>
+</html>

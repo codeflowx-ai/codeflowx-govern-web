@@ -122,6 +122,34 @@ public class DashboardViewModel extends MasterPage {
     
     @Getter
     private int pendingApprovals = 0;
+    
+    // Títulos y descripciones dinámicos
+    @Getter
+    private String subtitle = "";
+    
+    @Getter
+    private String stat1Title = "";
+    
+    @Getter
+    private String stat1Description = "";
+    
+    @Getter
+    private String stat2Title = "";
+    
+    @Getter
+    private String stat2Description = "";
+    
+    @Getter
+    private String stat3Title = "";
+    
+    @Getter
+    private String stat3Description = "";
+    
+    @Getter
+    private String stat4Title = "";
+    
+    @Getter
+    private String stat4Description = "";
 
     // ========== Inicialización ==========
     
@@ -152,7 +180,9 @@ public class DashboardViewModel extends MasterPage {
      */
     @Command
     @NotifyChange({"totalTasks", "assignedToMeCount", "criticalTasksCount", "groupTasksCount", 
-                   "urgentTasks", "totalComplianceChecks", "activeModels", "activeAgents", "pendingApprovals"})
+                   "urgentTasks", "totalComplianceChecks", "activeModels", "activeAgents", "pendingApprovals",
+                   "subtitle", "stat1Title", "stat1Description", "stat2Title", "stat2Description",
+                   "stat3Title", "stat3Description", "stat4Title", "stat4Description"})
     public void loadDashboardData() {
         try {
             // Auto-detectar MOCK mode si Flowable no está disponible
@@ -185,11 +215,22 @@ public class DashboardViewModel extends MasterPage {
                 .limit(5)
                 .collect(Collectors.toList());
             
-            // Métricas adicionales (TODO: conectar con datos reales)
+            // Métricas adicionales
             totalComplianceChecks = 42;
             activeModels = 8;
             activeAgents = 3;
             pendingApprovals = 12;
+            
+            // Textos
+            subtitle = "Resumen de tu sistema de gobierno IA";
+            stat1Title = "Total Tareas Pendientes";
+            stat1Description = totalTasks + " tareas en el sistema";
+            stat2Title = "Asignadas a Mí";
+            stat2Description = assignedToMeCount + " tareas personales";
+            stat3Title = "Tareas Críticas";
+            stat3Description = criticalTasksCount + " requieren atención urgente";
+            stat4Title = "De Mis Roles";
+            stat4Description = groupTasksCount + " disponibles para mis roles";
             
             log.info("✅ Dashboard cargado: {} tareas, {} urgentes", totalTasks, criticalTasksCount);
             
@@ -246,6 +287,17 @@ public class DashboardViewModel extends MasterPage {
         activeModels = 8;
         activeAgents = 3;
         pendingApprovals = 12;
+        
+        // Textos
+        subtitle = "Resumen de tu sistema de gobierno IA";
+        stat1Title = "Total Tareas Pendientes";
+        stat1Description = totalTasks + " tareas en el sistema";
+        stat2Title = "Asignadas a Mí";
+        stat2Description = assignedToMeCount + " tareas personales";
+        stat3Title = "Tareas Críticas";
+        stat3Description = criticalTasksCount + " requieren atención urgente";
+        stat4Title = "De Mis Roles";
+        stat4Description = groupTasksCount + " disponibles para mis roles";
         
         log.info("✅ Dashboard MOCK cargado");
     }

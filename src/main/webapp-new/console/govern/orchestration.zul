@@ -1,0 +1,73 @@
+<?page title="Model Orchestration" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.orchestration.OrchestrationVM')">
+        
+        <!-- Header Stats -->
+        <hlayout sclass="stats-container">
+            <div sclass="stat-box">
+                <label value="Active Models"/>
+                <label value="@load(vm.activeModelsCount)"/>
+            </div>
+            <div sclass="stat-box">
+                <label value="Health Score"/>
+                <label value="@load(vm.healthScore)%"/>
+            </div>
+            <div sclass="stat-box">
+                <label value="Total Requests"/>
+                <label value="@load(vm.totalRequests)"/>
+            </div>
+        </hlayout>
+
+        <!-- Main Content -->
+        <hlayout>
+            <!-- Left Panel - Models Grid -->
+            <vlayout width="70%">
+                <listbox model="@load(vm.modelsList)" 
+                        mold="paging" pageSize="10">
+                    <listhead>
+                        <listheader label="Model Name" sort="auto"/>
+                        <listheader label="Status"/>
+                        <listheader label="Load"/>
+                        <listheader label="Response Time"/>
+                        <listheader label="Actions"/>
+                    </listhead>
+                    <template name="model" var="model">
+                        <listitem>
+                            <listcell label="@load(model.name)"/>
+                            <listcell>
+                                <label value="@load(model.status)" 
+                                       sclass="@load(model.statusStyle)"/>
+                            </listcell>
+                            <listcell>
+                                <progressmeter value="@load(model.load)"/>
+                            </listcell>
+                            <listcell label="@load(model.responseTime)"/>
+                            <listcell>
+                                <button label="Configure" 
+                                        onClick="@command('configureModel', model=model)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+
+                <charts id="performanceChart" type="line" 
+                       title="Performance Trends"
+                       model="@load(vm.performanceData)"/>
+            </vlayout>
+
+            <!-- Right Panel -->
+            <vlayout width="30%">
+                <groupbox title="Quick Actions">
+                    <vlayout>
+                        <button label="Rebalance Load" 
+                                onClick="@command('rebalanceLoad')"/>
+                        <button label="Health Check" 
+                                onClick="@command('runHealthCheck')"/>
+                    </vlayout>
+                </groupbox>
+            </vlayout>
+        </hlayout>
+    </div>
+</zk>

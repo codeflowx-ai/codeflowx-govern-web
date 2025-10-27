@@ -1,0 +1,268 @@
+<!-- 
+    Bandeja de Tareas BPMN
+    
+    Funcionalidades:
+    - Ver tareas pendientes del usuario logado
+    - Ver tareas de sus roles (candidateGroups)
+    - Asignar tarea a usuario específico
+    - Claim (reclamar) tarea
+    - Filtrar por proceso, prioridad, fecha
+    - Acceder al formulario ZUL de la tarea
+-->
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.TaskInboxViewModel')">
+        <h:div id="notificacion"></h:div>
+        
+        <!-- Header -->
+        <div class="row">
+            <div>
+                <div class="left tittle-principal">
+                    <h:h2 class="mb-sm-0">Bandeja de Tareas BPMN</h:h2>
+                    <label value="@load(vm.labelTotal)"></label>
+                </div>
+            </div>
+            
+            <!-- Estadísticas rápidas -->
+            <div class="col-lg-12 s-bot">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <div class="flex-grow-1">
+                                <!-- Estadísticas -->
+                                <div class="d-flex gap-4">
+                                    <div>
+                                        <label value="@load(vm.totalTasks)" 
+                                               style="font-size: 20px; font-weight: bold; color: var(--primary-text);"/>
+                                        <label value=" Tareas Pendientes" style="color: var(--second-aux);"/>
+                                    </div>
+                                    <div>
+                                        <label value="@load(vm.assignedToMeCount)" 
+                                               style="font-size: 20px; font-weight: bold; color: var(--primary-text);"/>
+                                        <label value=" Asignadas a Mí" style="color: var(--second-aux);"/>
+                                    </div>
+                                    <div>
+                                        <label value="@load(vm.groupTasksCount)" 
+                                               style="font-size: 20px; font-weight: bold; color: var(--primary-text);"/>
+                                        <label value=" De Mis Roles" style="color: var(--second-aux);"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-shrink-0">
+                                <div class="hstack text-nowrap gap-2 d-flex">
+                                    <a iconSclass="fa-duotone fa-rotate" 
+                                       class="waves-effect waves-light"
+                                       onClick="@command('refreshTasks')"
+                                       tooltiptext="Refrescar"/>
+                                    <a iconSclass="fa-duotone fa-broom-wide" 
+                                       class="waves-effect waves-light"
+                                       onClick="@command('clearFilters')"
+                                       tooltiptext="Limpiar filtros"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Filtros -->
+            <div class="section filters">
+                <div class="search-bar d-flex gap-2" style="width: 100%;">
+                    <combobox placeholder="Proceso..." 
+                              width="200px"
+                              model="@load(vm.processDefinitions)"
+                              selectedItem="@bind(vm.selectedProcess)"
+                              onSelect="@command('filterTasks')">
+                        <template name="model">
+                            <comboitem label="@load(each)"/>
+                        </template>
+                    </combobox>
+                    
+                    <combobox placeholder="Prioridad..." 
+                              width="150px"
+                              model="@load(vm.priorities)"
+                              selectedItem="@bind(vm.selectedPriority)"
+                              onSelect="@command('filterTasks')">
+                        <template name="model">
+                            <comboitem label="@load(each)"/>
+                        </template>
+                    </combobox>
+                    
+                    <combobox placeholder="Estado..." 
+                              width="150px"
+                              model="@load(vm.taskStates)"
+                              selectedItem="@bind(vm.selectedState)"
+                              onSelect="@command('filterTasks')">
+                        <template name="model">
+                            <comboitem label="@load(each)"/>
+                        </template>
+                    </combobox>
+                </div>
+                <div class="filter-icons">
+                    <a tooltiptext="Filtrar"
+                       iconSclass="fa-duotone fa-filter"
+                       onClick="@command('filterTasks')" />
+                    <a tooltiptext="Limpiar"
+                       iconSclass="fa-duotone fa-broom-wide" 
+                       onClick="@command('clearFilters')" />
+                </div>
+            </div>
+            
+            <!-- Grid de tareas -->
+            <div class="col-xxl-12 s-bot">
+                <div class="card">
+                    <div class="card-body">
+                        <grid model="@load(vm.filteredTasks)" 
+                              emptyMessage="No hay tareas pendientes"
+                              style="overflow:auto;">
+                            <columns sizable="true">
+                                <column label="Prioridad" width="80px" align="center"/>
+                                <column label="Tarea" width="250px"/>
+                                <column label="Proceso" width="180px"/>
+                                <column label="Asignado" width="120px"/>
+                                <column label="Roles" width="150px"/>
+                                <column label="Creación" width="130px" align="center"/>
+                                <column label="Vencimiento" width="130px" align="center"/>
+                                <column label="Acciones" align="center" width="150px"/>
+                            </columns>
+                            <template name="model" var="task">
+                                <row style="cursor:pointer;" 
+                                     onClick="@command('selectTask', task=task)">
+                                    
+                                    <!-- Prioridad -->
+                                    <label value="@load(vm.getPriorityText(task.priority))" 
+                                           style="@load(vm.getPriorityStyle(task.priority))"/>
+                                    
+                                    <!-- Tarea -->
+                                    <div>
+                                        <label value="@load(task.name)" 
+                                               style="font-weight: 500; display: block;"/>
+                                        <label value="@load(task.description)" 
+                                               style="font-size: 11px; color: var(--second-aux); display: block;"
+                                               visible="@load(not empty task.description)"/>
+                                    </div>
+                                    
+                                    <!-- Proceso -->
+                                    <label value="@load(vm.getProcessName(task.processDefinitionId))"/>
+                                    
+                                    <!-- Asignado -->
+                                    <label value="@load(empty task.assignee ? 'Sin asignar' : task.assignee)" 
+                                           style="@load(empty task.assignee ? 'color: var(--second-aux); font-style: italic;' : 'font-weight: 500;')"/>
+                                    
+                                    <!-- Roles -->
+                                    <label value="@load(vm.formatCandidateGroups(task.candidateGroups))" 
+                                           style="font-size: 11px; color: var(--second-aux);"/>
+                                    
+                                    <!-- Fecha creación -->
+                                    <label value="@load(task.createTime) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
+                                    
+                                    <!-- Vencimiento -->
+                                    <label value="@load(task.dueDate) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"
+                                           style="@load(vm.getDueDateStyle(task.dueDate))"/>
+                                    
+                                    <!-- Acciones -->
+                                    <cell align="center" class="d-flex">
+                                        <div class="edit">
+                                            <a onClick="@command('openTaskForm', task=task)"
+                                               iconSclass="fa-duotone fa-solid fa-external-link"
+                                               sclass="waves-effect waves-light"
+                                               tooltiptext="Abrir tarea"
+                                               visible="@load(not empty task.formKey)"/>
+                                        </div>
+                                        <div class="edit">
+                                            <a onClick="@command('claimTask', task=task)"
+                                               iconSclass="fa-duotone fa-hand-point-up"
+                                               sclass="waves-effect waves-success"
+                                               tooltiptext="Reclamar"
+                                               visible="@load(empty task.assignee)"/>
+                                        </div>
+                                        <div class="edit">
+                                            <a onClick="@command('showAssignDialog', task=task)"
+                                               iconSclass="fa-duotone fa-user-plus"
+                                               sclass="waves-effect waves-light"
+                                               tooltiptext="Asignar"/>
+                                        </div>
+                                    </cell>
+                                </row>
+                            </template>
+                        </grid>
+                    </div>
+                </div>
+                
+                <!-- Paginación -->
+                <div class="section footer-prd">
+                    <div class="pagination">
+                        <paging id="topagin"
+                                pageSize="30"
+                                totalSize="@load(vm.filteredTasks.size())" 
+                                mold="os" 
+                                width="100%"
+                                style="background-color:#FFF;" />
+                    </div>
+                    <div class="records">
+                        <label value="@load(vm.labelTotal)" style="color: var(--second-aux);"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        
+        <!-- Window Modal: Asignar tarea -->
+        <window id="WIN_ASSIGN" visible="@load(vm.showAssignDialog)"
+                position="center,center" 
+                sclass="z-messagebox-window" 
+                border="none"
+                width="600px"
+                onClose="@command('closeAssignDialog')">
+            <div class="modal-header bg-soft-info p-3">
+                <h:h5 class="modal-title">Asignar Tarea a Usuario</h:h5>
+            </div>
+            <div class="modal-body">
+                <label value="@load(vm.taskToAssignTitle)" 
+                       style="font-weight: 500; display: block; margin-bottom: 15px;"/>
+                
+                <label value="Usuarios disponibles:" 
+                       style="font-weight: 500; display: block; margin-bottom: 10px;"/>
+                <label value="@load(vm.availableUsersCount)" 
+                       style="color: var(--second-aux); display: block; margin-bottom: 15px;"/>
+                
+                <grid model="@load(vm.availableUsers)" 
+                      selectedItem="@bind(vm.selectedUserToAssign)"
+                      height="300px"
+                      style="overflow:auto;">
+                    <columns>
+                        <column label="Usuario" width="120px"/>
+                        <column label="Nombre Completo"/>
+                        <column label="Email"/>
+                    </columns>
+                    <template name="model" var="user">
+                        <row style="cursor:pointer;">
+                            <label value="@load(user.username)"/>
+                            <label value="@load(user.fullname)"/>
+                            <label value="@load(user.email)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            <div class="modal-footer">
+                <div class="hstack gap-2 justify-content-end">
+                    <button onClick="@command('closeAssignDialog')"
+                            class="btn btn-light">
+                        Cancelar
+                    </button>
+                    <button onClick="@command('confirmAssign')"
+                            disabled="@load(empty vm.selectedUserToAssign)"
+                            class="btn btn-primary">
+                        Asignar
+                    </button>
+                </div>
+            </div>
+        </window>
+    
+	</idspace>
+</zk>
+

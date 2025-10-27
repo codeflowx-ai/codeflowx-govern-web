@@ -1,0 +1,129 @@
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<div class="row">
+		<div class="col-lg-12 " apply="org.zkoss.bind.BindComposer"
+			viewModel="@id('vm1') @init('com.enartsystems.designer.DataBindingUI')">
+			<custom-attributes scopeView="VIEWMODEL" />
+			<div class="row">
+				<h:div class="col-lg-4 ">
+					<div class="card">
+						<div
+							class="card-header header-elements-inline bg-indigo">
+							<h:h6 class="card-title">
+								Crear nueva tabla en Base de datos y vincular a la nueva pantalla
+							</h:h6>
+						</div>
+						<div class="card-body">
+							<label value="Nombre de nueva Tabla"></label>
+							<textbox
+								placeholder="introduzca nombre de nueva tabla" maxlength="30">
+							</textbox>
+						</div>
+						<div class="card-footer">
+							<button zclass="pull-right"
+								sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"
+								iconSclass="icon-arrow-right14 icon-2x"
+								onClick="@command('createTable')" label="Next" />
+						</div>
+					</div>
+   			   </h:div>
+				<h:div class="col-lg-8 ">
+					<div class="card">
+						<div
+							class="card-header header-elements-inline bg-indigo">
+							<h:h6 class="card-title">
+								Asociar una tabla/Vista y Servicios a la nueva pantalla
+							</h:h6>
+						</div>
+						<div class="card-body">
+							<div class="row">
+								<h:div class="col-lg-4 ">
+									<listbox
+										model="@load(vm1.entidades)"
+										selectedItems="@bind(vm1.selected)" height="500px"
+										pagingPosition="top" autopaging="true" mold="paging"
+										pageSize="20" checkmark="true">
+										<listhead>
+											<listheader
+												label="Tables/Views" width="70%">
+											</listheader>
+											<listheader label="Type"
+												sort="auto" width="30%">
+											</listheader>
+										</listhead>
+										<template name="model"
+											var="item">
+											<listitem value="${item}">
+												<listcell
+													label="${item.namesql }">
+												</listcell>
+												<listcell
+													label="${item.entitype }">
+												</listcell>
+											</listitem>
+
+										</template>
+									</listbox>
+								</h:div>
+								<h:div class="col-lg-4 ">
+									<listbox checkmark="true"
+										multiple="true" height="500px" pagingPosition="top"
+										autopaging="true" mold="paging">
+										<listhead>
+											<listheader label="Service"
+												width="70%">
+											</listheader>
+											<listheader label="Type"
+												sort="auto" width="30%">
+											</listheader>
+										</listhead>
+										<!-- 					<template name="model" var="item"> -->
+										<!-- 						<listitem value="${item}" > -->
+										<!-- 							<listcell label="${item.namesql }"></listcell> -->
+										<!-- 							<listcell label="${item.entitype }"></listcell> -->
+										<!-- 							</listitem> -->
+
+										<!-- 					</template> -->
+									</listbox>
+								</h:div>
+								<h:div class="col-lg-4 ">
+									<listbox checkmark="true"
+										multiple="true" height="500px" pagingPosition="top"
+										autopaging="true" mold="paging">
+										<listhead>
+											<listheader
+												label="Projects /Tables - Views" width="70%">
+											</listheader>
+											<listheader label="Type"
+												sort="auto" width="30%">
+											</listheader>
+										</listhead>
+										<!-- 					<template name="model" var="item"> -->
+										<!-- 						<listitem value="${item}" > -->
+										<!-- 							<listcell label="${item.namesql }"></listcell> -->
+										<!-- 							<listcell label="${item.entitype }"></listcell> -->
+										<!-- 							</listitem> -->
+
+										<!-- 					</template> -->
+									</listbox>
+								</h:div>
+							</div>
+
+
+
+						</div>
+						<div class="card-footer">
+							<button zclass="pull-right"
+								sclass="btn btn-outline bg-primary text-primary-800 btn-icon ml-2 legitRipple"
+								iconSclass="icon-arrow-right14 icon-2x"
+								onClick="@command('selectTable')" label="Next" />
+						</div>
+					</div>
+				</h:div>
+			</div>
+
+		</div>
+	</div>
+</zk>

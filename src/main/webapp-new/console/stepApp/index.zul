@@ -1,0 +1,24 @@
+<?component name="stepbar" templateURI="shadow_elements/step_bar/stepbar.zul"?>
+<zk>
+	<style src="shadow_elements/step_bar/stepbar.css"/>
+	<div viewModel="@id('vm') @init('demo.shadow_elements.step_bar.HolidayOrderViewModel')" 
+		 validationMessages="@id('vmsgs')">
+		<stepbar stepBarModel="@init(vm.stepBarModel)" gotoStepCommand="gotoStep"/>
+		
+		<div style="padding: 0 57px; margin-top: 16px;">
+			<label sclass="page-title" value="@load(vm.stepBarModel.current.label)"/>
+			<div style="margin-top: 26px;" sclass="stepbar-content">
+				<apply templateURI="@load(vm.stepBarModel.current.uri)" step="@load(vm.stepBarModel.current)"/>
+			</div>
+		</div>
+		<div style="padding: 0 57px; position: relative; margin-top: 32px;">
+			<if test="@load(!vm.stepBarModel.first and !vm.stepBarModel.last)">
+				<button zclass="stepbar-button" sclass="secondary" onClick="@command('back')" label="Back"/>
+			</if>
+			<if test="@load(!vm.stepBarModel.last)">
+				<button zclass="stepbar-button pull-right" sclass="primary" onClick="@command('next')" label="Next"/>
+			</if>
+		</div>
+		<div style="clear: both;"/>
+	</div>
+</zk>

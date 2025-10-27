@@ -1,0 +1,174 @@
+<zk xmlns:h="native">
+	<div class="row">
+		<div class="card col-md-10">
+			<radiogroup id="sv1"
+				onCheck="@command('selectRelation',relation=self.selectedItem.value,form=fx,radio='sv1')" />
+			<radiogroup id="sv2"
+				onCheck="@command('selectRelation',relation=self.selectedItem.value,form=fx,radio='sv2')" />
+			<div class="card-header header-elements-inline bg-indigo">
+				<h:h6 class="card-title">Relations Fields</h:h6>
+			</div>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-lg-2">
+						<div sclass="form-group">
+							<label value="Select Entity"></label>
+							<listbox mold="select"
+								model="@load(vm.bean.entidades)" 
+								onSelect="@command('onSelectLeftEntity',item=self.selectedItem.value)">
+								<template name="model" var="item">
+									<listitem value="${item}"
+										label="${item.name }" />
+								</template>
+							</listbox>
+						</div>
+					</div>
+					<div class="col-lg-3">
+						<div sclass="form-group">
+							<label value="Select Field"></label>
+							<listbox mold="select" 
+								model="@load(vm.attsLeft)" id="left">
+								<template name="model" var="item">
+									<listitem value="${item}"
+										label="${item.atribute}" />
+								</template>
+							</listbox>
+
+						</div>
+					</div>
+					<div class="col-lg-1">
+						<h:i class="icon-transmission icon-2x"></h:i>
+					</div>
+					<div class="col-md-2">
+						<div sclass="form-group">
+							<label value="Select Entity"></label>
+
+							<listbox mold="select"
+								model="@load(vm.bean.entidades)" 
+								onSelect="@command('onSelectRightEntity',item=self.selectedItem.value)">
+								<template name="model" var="item">
+									<listitem value="${item}"
+										label="${item.name }" />
+								</template>
+							</listbox>
+
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div sclass="form-group">
+							<label value="Select Field"></label>
+
+							<listbox mold="select"
+								model="@load(vm.attsRight)" id="right">
+
+								<template name="model" var="item">
+									<listitem value="${item}"
+										label="${item.atribute}" />
+								</template>
+							</listbox>
+
+
+						</div>
+					</div>
+					<div class="col-lg-1">
+					  <button
+												onClick="@command('addRelation',form=fx)"
+												tooltiptext="Append Relation"
+												iconSclass="mdi mdi-data-matrix-plus fs-2x"
+												sclass="btn btn-outline-success waves-effect waves-light shadow-none" />
+					
+<!-- 						<button zclass="pull-right" sclass="btn btn-success btn-label waves-effect waves-light rounded-pill"  -->
+<!-- 						iconSclass="mdi mdi-database-arrow-down-outline label-icon align-middle rounded-pill fs-16 me-2"   -->
+<!-- 			onClick="@command('addRelation',form=fx)" label="Append" /> -->
+<!-- 						<a sclass="list-icons-item" -->
+<!-- 							tooltiptext="add Relation" iconSclass="mdi mdi-database-arrow-down-outline" -->
+<!-- 							onClick="@command('addRelation',form=fx)"> -->
+<!-- 						</a> -->
+					</div>
+
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<vbox spacing="5px">
+							<radio radiogroup="sv1"
+								label="Incluye solo los registros relacionados"
+								value="left_check" checked="@load(vm.sv1 eq 'left_check')" />
+							<radio radiogroup="sv1"
+								label="Incluye todos los registros" value="left_all"
+								checked="@load(vm.sv1 eq 'left_all')" />
+						</vbox>
+					</div>
+					<div class="col-md-6">
+						<vbox spacing="5px">
+							<radio radiogroup="sv2"
+								label="Incluye solo los registros relacionados"
+								value="right_check" checked="@load(vm.sv2 eq 'right_check')" />
+							<radio radiogroup="sv2"
+								label="Incluye todos los registros" value="right_all"
+								checked="@load(vm.sv2 eq 'right_all')" />
+						</vbox>
+					</div>
+				</div>
+
+				<div class="row">
+					<div sclass="col-md-12">
+						<grid height="200px"
+							model="@load(vm.bean.joins)">
+							<columns>
+								<column label="Fields" width="70%" />
+								<column label="Relation" width="20%" />
+								<column label=" " />
+							</columns>
+							<rows>
+								<template name="model" var="item">
+									<row value="@bind(item)">
+										<label
+											value="@load(item.aliases)" />
+										<label value="@load(item.joinType)" />
+										<button
+												onClick="@command('removeJoin',item=item)"
+												tooltiptext="Remove criteria"
+												iconSclass="bx bx-trash fs-2x"
+												sclass="btn btn-outline-danger waves-effect waves-light shadow-none" />	
+										
+
+									</row>
+								</template>
+							</rows>
+						</grid>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer">
+					<button zclass="pull-left"
+								sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill" 
+								onClick="@command('back')" iconSclass="bx bx-left-arrow-alt label-icon align-middle rounded-pill fs-16 me-2" label="Anterior" />
+	
+									<button zclass="pull-right" sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill" iconSclass="bx bx-right-arrow-alt label-icon align-middle rounded-pill fs-16 me-2"  
+			onClick="@command('addRelations',form=fx)" label="Siguiente" />
+				
+			</div>
+		</div>
+		<h:div sclass="col-md-2">
+			<html>
+				<p>
+					Tienes que definir como vas a relacionar las tablas
+					y/o vistas que has seleccionado para esta nueva
+					vista o consulta.Una vez que hayas seleccionado los
+					campos podras elegir, si deseas que solamente se
+					incluyan los registros que exactamente cumplan la
+					relacion (INNER JOIN), o que incluya siempre todos
+					los registros de la tabla/vista seleccionado a tu
+					izquierda (LEFT JOIN), solamente los de la
+					tabla/vista seleccionadas a tu derecha (RIGHT JOIN),
+					o derecha e izquierda (FULL OUTER JOIN).
+				</p>
+				<p style="color:#ed4845">
+					Puedes añadir tantas relaciones como necesites, pero
+					los campos relacionados simpre deberan de ser del
+					mismo tipo.
+				</p>
+			</html>
+		</h:div>
+	</div>
+</zk>

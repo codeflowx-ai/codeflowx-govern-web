@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns:h="native" xmlns:zk="http://www.zkoss.org/2005/zul">
+    
+    <!-- ViewModel binding -->
+    <window viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.training.TrainingDashboardViewModel')"
+            border="none" width="100%" height="100%">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:h2 class="mb-1" style="font-weight: bold;">🏋️ Training Dashboard</h:h2>
+                    <h:p class="text-muted">Monitoreo de experimentos y entrenamiento de modelos</h:p>
+                </h:div>
+            </h:div>
+            
+            <!-- Botones de acción -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 text-end">
+                    <button label="➕ Nuevo Experimento" 
+                            class="btn btn-success me-2"
+                            onClick="@command('createExperiment')" />
+                    <button label="🔄 Refrescar" 
+                            class="btn btn-primary"
+                            onClick="@command('refreshDashboard')" />
+                </h:div>
+            </h:div>
+            
+            <!-- KPIs Principales -->
+            <h:div class="row g-3 mb-4">
+                
+                <!-- Total Experimentos -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Experimentos</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.totalExperiments)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">registrados</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Running -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">En Ejecución</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.runningExperiments)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">activos</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Completed -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Completados</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                <label value="@load(vm.completedExperiments)"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">exitosos</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Avg Cost -->
+                <h:div class="col-md-3">
+                    <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+                        <h:div class="card-body p-4">
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Costo Promedio</h:p>
+                            <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+                                $<label value="@load(vm.avgTrainingCost) @converter('formatedNumber', format='###,##0.00')"/>
+                            </h:h2>
+                            <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">por experimento</h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+            <!-- HPO Progress -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-primary text-white">
+                            <h:h5 class="mb-0">🎯 HPO Progress</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div if="@load(vm.hpoProgress ne null)">
+                                <h:p><h:strong>Experiment:</h:strong> <label value="@load(vm.hpoProgress.trnname)"/></h:p>
+                                <h:p><h:strong>Status:</h:strong> <label value="@load(vm.hpoProgress.trncurrentstage)"/></h:p>
+                                <h:p><h:strong>Best Score:</h:strong> <label value="@load(vm.hpoProgress.bestscore) @converter('formatedNumber', format='###,##0.000')"/></h:p>
+                                <h:p><h:strong>Trials Completed:</h:strong> <label value="@load(vm.hpoProgress.completedtrials)"/> / <label value="@load(vm.hpoProgress.totaltrials)"/></h:p>
+                            </h:div>
+                            <h:div if="@load(vm.hpoProgress eq null)">
+                                <h:p class="text-muted">No hay experimentos HPO en progreso</h:p>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Training Overview -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-success text-white">
+                            <h:h5 class="mb-0">📊 Training Overview</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div if="@load(vm.trainingOverview ne null)">
+                                <grid model="@load(vm.metricsSummaries)">
+                                    <columns>
+                                        <column label="Experiment" width="200px"/>
+                                        <column label="Status" width="100px"/>
+                                        <column label="Best Accuracy" width="120px"/>
+                                        <column label="Best Loss" width="120px"/>
+                                        <column label="Duration" width="120px"/>
+                                        <column label="Cost" width="100px"/>
+                                    </columns>
+                                    <template name="model">
+                                        <row>
+                                            <label value="@load(each.trnname)"/>
+                                            <label value="@load(each.trnlifecyclestage)" 
+                                                   style="@load(each.trnlifecyclestage eq 'COMPLETED' ? 'color: green; font-weight: bold;' : 'color: orange;')"/>
+                                            <label value="@load(each.bestaccuracy) @converter('formatedNumber', format='###,##0.00')"/>
+                                            <label value="@load(each.bestloss) @converter('formatedNumber', format='###,##0.000')"/>
+                                            <label value="@load(each.avgrundurationminutes) @converter('formatedNumber', format='###,##0')"/>
+                                            <label value="@load(each.totalcost) @converter('formatedNumber', format='###,##0.00')"/>
+                                        </row>
+                                    </template>
+                                </grid>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Resource Utilization & Cost Analysis -->
+            <h:div class="row mb-4">
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-warning text-dark">
+                            <h:h5 class="mb-0">💻 Resource Utilization</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.resourceUtilizations)">
+                                <columns>
+                                    <column label="Resource" width="150px"/>
+                                    <column label="Usage" width="100px"/>
+                                    <column label="Status" width="100px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.resourcetype)"/>
+                                        <label value="@load(each.utilization) @converter('formatedNumber', format='###,##0.0')"/>
+                                        <label value="@load(each.status)"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <h:div class="col-md-6">
+                    <h:div class="card shadow-sm">
+                        <h:div class="card-header bg-info text-white">
+                            <h:h5 class="mb-0">💰 Cost Analysis</h:h5>
+                        </h:div>
+                        <h:div class="card-body">
+                            <grid model="@load(vm.costAnalyses)">
+                                <columns>
+                                    <column label="Period" width="150px"/>
+                                    <column label="Total Cost" width="120px"/>
+                                    <column label="Avg per Hour" width="120px"/>
+                                </columns>
+                                <template name="model">
+                                    <row>
+                                        <label value="@load(each.period)"/>
+                                        <label value="@load(each.totalcost) @converter('formatedNumber', format='###,##0.00')"/>
+                                        <label value="@load(each.avgcostperhour) @converter('formatedNumber', format='###,##0.00')"/>
+                                    </row>
+                                </template>
+                            </grid>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+        </h:div>
+        
+    </window>
+    
+</zk>
+

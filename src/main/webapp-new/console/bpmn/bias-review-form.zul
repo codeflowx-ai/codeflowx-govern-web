@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+	<window title="Revisión de Bias Detectado" border="normal" width="800px" height="600px" 
+	        apply="org.zkoss.bind.BindComposer" viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.BiasReviewViewModel')">
+		
+		<vbox spacing="20px" style="padding: 20px;">
+			
+			<!-- TÍTULO -->
+			<hbox>
+				<label value="🔍 Revisión de Bias Detectado" style="font-size: 18px; font-weight: bold; color: #2c3e50;"/>
+			</hbox>
+			
+			<!-- INFORMACIÓN DEL MODELO -->
+			<groupbox title="📊 Información del Modelo">
+				<grid>
+					<columns>
+						<column width="200px"/>
+						<column/>
+					</columns>
+					<rows>
+						<row>
+							<cell><label value="Modelo ID:"/></cell>
+							<cell><label value="@load(vm.modelId)" style="font-weight: bold;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Tipo de Modelo:"/></cell>
+							<cell><label value="@load(vm.modelType)" style="font-weight: bold;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Dataset Size:"/></cell>
+							<cell><label value="@load(vm.datasetSize)" style="font-weight: bold;"/></cell>
+						</row>
+					</rows>
+				</grid>
+			</groupbox>
+			
+			<!-- RESULTADOS DE BIAS -->
+			<groupbox title="⚠️ Resultados de Análisis de Bias">
+				<grid>
+					<columns>
+						<column width="200px"/>
+						<column width="100px"/>
+						<column/>
+					</columns>
+					<rows>
+						<row>
+							<cell><label value="Bias Demográfico:"/></cell>
+							<cell><label value="@load(vm.demographicBiasScore + '/100')" 
+							           style="font-weight: bold; color: @load(vm.getBiasColor(vm.demographicBiasScore));"/></cell>
+							<cell><label value="@load(vm.getBiasDescription(vm.demographicBiasScore))" style="font-style: italic;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Bias Geográfico:"/></cell>
+							<cell><label value="@load(vm.geographicBiasScore + '/100')" 
+							           style="font-weight: bold; color: @load(vm.getBiasColor(vm.geographicBiasScore));"/></cell>
+							<cell><label value="@load(vm.getBiasDescription(vm.geographicBiasScore))" style="font-style: italic;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Bias Temporal:"/></cell>
+							<cell><label value="@load(vm.temporalBiasScore + '/100')" 
+							           style="font-weight: bold; color: @load(vm.getBiasColor(vm.temporalBiasScore));"/></cell>
+							<cell><label value="@load(vm.getBiasDescription(vm.temporalBiasScore))" style="font-style: italic;"/></cell>
+						</row>
+						<row>
+							<cell><label value="Score General:"/></cell>
+							<cell><label value="@load(vm.overallBiasScore + '/100')" 
+							           style="font-weight: bold; color: @load(vm.getBiasColor(vm.overallBiasScore));"/></cell>
+							<cell><label value="@load(vm.getBiasDescription(vm.overallBiasScore))" style="font-style: italic;"/></cell>
+						</row>
+					</rows>
+				</grid>
+			</groupbox>
+			
+			<!-- DECISIÓN DE IA -->
+			<groupbox title="🤖 Decisión de IA">
+				<vbox>
+					<hbox>
+						<label value="Decisión:" style="font-weight: bold;"/>
+						<label value="@load(vm.aiDecision)" style="font-weight: bold; color: @load(vm.getDecisionColor(vm.aiDecision));"/>
+					</hbox>
+					<label value="@load(vm.aiJustification)" style="font-style: italic; margin-top: 10px;"/>
+					<hbox style="margin-top: 10px;">
+						<label value="Nivel de Confianza:" style="font-weight: bold;"/>
+						<label value="@load(vm.confidenceLevel)" style="font-weight: bold; color: @load(vm.getConfidenceColor(vm.confidenceLevel));"/>
+					</hbox>
+					<hbox style="margin-top: 5px;">
+						<label value="Nivel de Riesgo:" style="font-weight: bold;"/>
+						<label value="@load(vm.riskLevel)" style="font-weight: bold; color: @load(vm.getRiskColor(vm.riskLevel));"/>
+					</hbox>
+				</vbox>
+			</groupbox>
+			
+			<!-- DECISIÓN HUMANA -->
+			<groupbox title="👤 Decisión Humana">
+				<vbox>
+					<label value="Seleccione la acción a tomar:" style="font-weight: bold; margin-bottom: 10px;"/>
+					
+					<radiogroup model="@bind(vm.biasAction)">
+						<radio label="✅ Aceptar Riesgo - El bias es aceptable para este caso de uso" value="ACCEPT_RISK"/>
+						<radio label="🔧 Mitigar - Generar plan de mitigación del bias" value="MITIGATE"/>
+						<radio label="❌ Rechazar - El modelo no cumple los criterios de bias" value="REJECT"/>
+					</radiogroup>
+					
+					<separator/>
+					
+					<label value="Comentarios adicionales:" style="font-weight: bold; margin-top: 10px;"/>
+					<textbox multiline="true" rows="3" width="100%" 
+					         model="@bind(vm.reviewerComments)" 
+					         placeholder="Explique su decisión y cualquier consideración adicional..."/>
+				</vbox>
+			</groupbox>
+			
+			<!-- BOTONES DE ACCIÓN -->
+			<hbox style="margin-top: 20px;" hflex="1">
+				<button label="✅ Confirmar Decisión" 
+				        style="background-color: #27ae60; color: white; font-weight: bold;"
+				        onClick="@command('confirmDecision')"
+				        disabled="@load(empty vm.biasAction)"/>
+				<button label="📋 Ver Detalles Técnicos" 
+				        style="background-color: #3498db; color: white;"
+				        onClick="@command('showTechnicalDetails')"/>
+				<button label="❌ Cancelar" 
+				        style="background-color: #e74c3c; color: white;"
+				        onClick="@command('cancelReview')"/>
+			</hbox>
+			
+		</vbox>
+		
+	</window>
+</zk>

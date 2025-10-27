@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Marketplace Analytics Dashboard" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <style>
+        .marketplace-container { 
+            padding: 20px; 
+            background: #f8f9fa; 
+        }
+        .chart-container {
+            background: white;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metrics-container {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .metric-label {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        .trend-positive { color: #27ae60; }
+        .trend-negative { color: #c0392b; }
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 10px;
+            color: #34495e;
+        }
+        .data-grid { border: none; }
+        .refresh-button {
+            margin: 10px;
+            padding: 8px 16px;
+            background: #3498db;
+            color: white;
+            border-radius: 4px;
+        }
+    </style>
+
+    <div viewModel="@id('vm') 
+                   @init('com.suinsit.apps.suinless.viewmodel.MarketplaceAnalyticsViewModel')"
+         sclass="marketplace-container">
+        
+        <!-- Usage Trends Section -->
+        <label value="Model Usage Analytics" sclass="section-title"/>
+        <div sclass="chart-container">
+            <charts id="usageTrendChart"
+                   model="@bind(vm.usageTrendChart)"
+                   height="400px"/>
+        </div>
+
+        <!-- Adoption and Satisfaction Section -->
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="adoptionRateChart"
+                       model="@bind(vm.adoptionRateChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.adoptionMetricsList)"
+                      sclass="data-grid"
+                      emptyMessage="No adoption data available">
+                    <columns>
+                        <column label="Model" width="150px"/>
+                        <column label="Total Uses"/>
+                        <column label="Active Days"/>
+                        <column label="Adoption Rate"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="@load(each.total_uses)"/>
+                            <label value="@load(each.active_days)"/>
+                            <label value="@load(each.adoption_rate)+'%'"
+                                   sclass="@load(each.adoption_rate gt 50 ? 'trend-positive' : 'trend-negative')"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            
+            <div sclass="chart-container" width="48%">
+                <charts id="satisfactionChart"
+                       model="@bind(vm.satisfactionChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.satisfactionMetricsList)"
+                      sclass="data-grid"
+                      emptyMessage="No satisfaction data available">
+                    <columns>
+                        <column label="Model" width="150px"/>
+                        <column label="Reviews"/>
+                        <column label="Avg Rating"/>
+                        <column label="Positive %"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="@load(each.total_reviews)"/>
+                            <label value="@load(each.avg_rating)"/>
+                            <label value="@load((each.positive_reviews/each.total_reviews)*100)+'%'"
+                                   sclass="@load(each.avg_rating gt 4 ? 'trend-positive' : 'trend-negative')"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+        </hlayout>
+
+        <!-- Pricing Analysis Section -->
+        <label value="Pricing and Competition Analysis" sclass="section-title"/>
+        <hlayout>
+            <div sclass="chart-container" width="48%">
+                <charts id="pricingChart"
+                       model="@bind(vm.pricingChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.pricingAnalysisList)"
+                      sclass="data-grid"
+                      emptyMessage="No pricing data available">
+                    <columns>
+                        <column label="Model" width="150px"/>
+                        <column label="List Price"/>
+                        <column label="Actual Cost"/>
+                        <column label="Cost/Token"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.model_name)"/>
+                            <label value="$@load(each.avg_list_price)"/>
+                            <label value="$@load(each.avg_actual_cost)"/>
+                            <label value="$@load(each.cost_per_token)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            
+            <div sclass="chart-container" width="48%">
+                <charts id="competitiveChart"
+                       model="@bind(vm.competitiveChart)"
+                       height="300px"/>
+                
+                <grid model="@bind(vm.competitiveAnalysisList)"
+                      sclass="data-grid"
+                      emptyMessage="No competitive data available">
+                    <columns>
+                        <column label="Vendor" width="150px"/>
+                        <column label="Models"/>
+                        <column label="Avg Accuracy"/>
+                        <column label="Market Rank"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.vendor_name)"/>
+                            <label value="@load(each.total_models)"/>
+                            <label value="@load(each.avg_accuracy)+'%'"/>
+                            <label value="@load(each.accuracy_rank)"/>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+        </hlayout>
+
+        <!-- Actions Section -->
+        <div sclass="metrics-container">
+            <hlayout spacing="20px">
+                <button label="Export Analytics"
+                        iconSclass="z-icon-download"
+                        sclass="refresh-button"/>
+                <button label="Generate Report"
+                        iconSclass="z-icon-file-text"
+                        sclass="refresh-button"/>
+                <button label="Refresh Analytics"
+                        iconSclass="z-icon-refresh"
+                        onClick="@command('refreshAnalytics')"
+                        sclass="refresh-button"/>
+            </hlayout>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; margin-top: 20px; color: #7f8c8d;">
+            <label value="Last Updated: "/>
+            <label value="@load(new java.util.Date())" />
+            <label value=" | Data refreshes every 5 minutes"/>
+        </div>
+    </div>
+</zk>

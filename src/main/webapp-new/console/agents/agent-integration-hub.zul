@@ -1,0 +1,362 @@
+<?page title="Agent Integration Hub" contentType="text/html;charset=UTF-8"?>
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/WEB-INF/templates/template.zul"?>
+<zk>
+    <div self="@define(content)" 
+         viewModel="@id('vm') @init('org.suinsit.apps.agent.integration.AgentIntegrationHubVM')">
+        
+        <!-- Integration Overview -->
+        <hlayout sclass="integration-header">
+            <div sclass="metric-box">
+                <label value="Active Integrations"/>
+                <label value="@load(vm.activeIntegrations)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Success Rate"/>
+                <label value="@load(vm.successRate)%" 
+                       sclass="@load(vm.successRateStyle)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Total Endpoints"/>
+                <label value="@load(vm.totalEndpoints)"/>
+            </div>
+            <div sclass="metric-box">
+                <label value="Data Flow Rate"/>
+                <label value="@load(vm.dataFlowRate)/s"/>
+            </div>
+        </hlayout>
+
+        <tabbox>
+            <tabs>
+                <tab label="Connectors"/>
+                <tab label="API Management"/>
+                <tab label="Data Flows"/>
+                <tab label="Monitoring"/>
+            </tabs>
+            <tabpanels>
+                <!-- Connectors Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Connector Categories -->
+                        <hlayout sclass="connector-categories">
+                            <forEach items="@load(vm.connectorCategories)" 
+                                     var="category">
+                                <button label="@load(category)"
+                                        sclass="@load(vm.isSelectedCategory(category) ? 'selected' : '')"
+                                        onClick="@command('selectConnectorCategory', category=category)"/>
+                            </forEach>
+                            <button label="Add Custom Connector" 
+                                    onClick="@command('addCustomConnector')"
+                                    sclass="add-connector"/>
+                        </hlayout>
+
+                        <!-- Connectors Grid -->
+                        <grid model="@load(vm.connectors)" 
+                              mold="paging" pageSize="10">
+                            <columns>
+                                <column label="Connector"/>
+                                <column label="Type"/>
+                                <column label="Status"/>
+                                <column label="Health"/>
+                                <column label="Last Sync"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="connector">
+                                <row>
+                                    <div sclass="connector-info">
+                                        <image src="@load(connector.icon)"/>
+                                        <vlayout>
+                                            <label value="@load(connector.name)" 
+                                                   sclass="connector-name"/>
+                                            <label value="@load(connector.description)" 
+                                                   sclass="connector-desc"/>
+                                        </vlayout>
+                                    </div>
+                                    <label value="@load(connector.type)"/>
+                                    <label value="@load(connector.status)" 
+                                           sclass="@load(connector.statusStyle)"/>
+                                    <progressmeter value="@load(connector.health)" 
+                                                 sclass="@load(connector.healthStyle)"/>
+                                    <label value="@load(connector.lastSync)"/>
+                                    <hlayout>
+                                        <button label="Configure" 
+                                                onClick="@command('configureConnector', connector=connector)"/>
+                                        <button label="Test" 
+                                                onClick="@command('testConnector', connector=connector)"/>
+                                        <button label="Logs" 
+                                                onClick="@command('viewConnectorLogs', connector=connector)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- API Management Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- API Endpoints -->
+                        <groupbox title="API Endpoints">
+                            <hlayout>
+                                <button label="Create Endpoint" 
+                                        onClick="@command('createEndpoint')"/>
+                                <button label="Import Swagger/OpenAPI" 
+                                        onClick="@command('importAPI')"/>
+                            </hlayout>
+
+                            <grid model="@load(vm.apiEndpoints)" 
+                                  mold="paging" pageSize="10">
+                                <columns>
+                                    <column label="Endpoint"/>
+                                    <column label="Method"/>
+                                    <column label="Version"/>
+                                    <column label="Status"/>
+                                    <column label="Usage"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="endpoint">
+                                    <row>
+                                        <label value="@load(endpoint.path)"/>
+                                        <label value="@load(endpoint.method)" 
+                                               sclass="@load(endpoint.methodStyle)"/>
+                                        <label value="@load(endpoint.version)"/>
+                                        <label value="@load(endpoint.status)" 
+                                               sclass="@load(endpoint.statusStyle)"/>
+                                        <vlayout>
+                                            <progressmeter value="@load(endpoint.usage)"/>
+                                            <label value="@load(endpoint.usageStats)"/>
+                                        </vlayout>
+                                        <hlayout>
+                                            <button label="Edit" 
+                                                    onClick="@command('editEndpoint', endpoint=endpoint)"/>
+                                            <button label="Test" 
+                                                    onClick="@command('testEndpoint', endpoint=endpoint)"/>
+                                            <button label="Docs" 
+                                                    onClick="@command('viewDocs', endpoint=endpoint)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+
+                        <!-- API Keys Management -->
+                        <groupbox title="API Keys">
+                            <grid model="@load(vm.apiKeys)" 
+                                  mold="paging" pageSize="5">
+                                <columns>
+                                    <column label="Key Name"/>
+                                    <column label="Access Level"/>
+                                    <column label="Created"/>
+                                    <column label="Expires"/>
+                                    <column label="Status"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="key">
+                                    <row>
+                                        <label value="@load(key.name)"/>
+                                        <label value="@load(key.accessLevel)"/>
+                                        <label value="@load(key.created)"/>
+                                        <label value="@load(key.expires)"/>
+                                        <label value="@load(key.status)" 
+                                               sclass="@load(key.statusStyle)"/>
+                                        <hlayout>
+                                            <button label="Rotate" 
+                                                    onClick="@command('rotateKey', key=key)"/>
+                                            <button label="Revoke" 
+                                                    onClick="@command('revokeKey', key=key)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Data Flows Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Data Flow Designer -->
+                        <hlayout>
+                            <div width="20%" sclass="flow-components">
+                                <groupbox title="Components">
+                                    <vlayout>
+                                        <div sclass="component-category">
+                                            <label value="Sources"/>
+                                            <div sclass="component-list">
+                                                <!-- Drag and drop components -->
+                                            </div>
+                                        </div>
+                                        <div sclass="component-category">
+                                            <label value="Transformations"/>
+                                            <div sclass="component-list">
+                                                <!-- Drag and drop components -->
+                                            </div>
+                                        </div>
+                                        <div sclass="component-category">
+                                            <label value="Destinations"/>
+                                            <div sclass="component-list">
+                                                <!-- Drag and drop components -->
+                                            </div>
+                                        </div>
+                                    </vlayout>
+                                </groupbox>
+                            </div>
+
+                            <div width="60%" sclass="flow-canvas">
+                                <!-- Flow Designer Canvas -->
+                                <include src="@load(vm.flowDesignerUrl)"/>
+                            </div>
+
+                            <div width="20%" sclass="flow-properties">
+                                <groupbox title="Properties">
+                                    <!-- Component properties -->
+                                </groupbox>
+                            </div>
+                        </hlayout>
+
+                        <!-- Active Flows -->
+                        <groupbox title="Active Data Flows">
+                            <grid model="@load(vm.dataFlows)" 
+                                  mold="paging" pageSize="5">
+                                <columns>
+                                    <column label="Flow Name"/>
+                                    <column label="Source → Destination"/>
+                                    <column label="Status"/>
+                                    <column label="Performance"/>
+                                    <column label="Last Run"/>
+                                    <column label="Actions"/>
+                                </columns>
+                                <template name="model" var="flow">
+                                    <row>
+                                        <label value="@load(flow.name)"/>
+                                        <label value="@load(flow.route)"/>
+                                        <label value="@load(flow.status)" 
+                                               sclass="@load(flow.statusStyle)"/>
+                                        <vlayout>
+                                            <progressmeter value="@load(flow.performance)"/>
+                                            <label value="@load(flow.performanceStats)"/>
+                                        </vlayout>
+                                        <label value="@load(flow.lastRun)"/>
+                                        <hlayout>
+                                            <button label="Start/Stop" 
+                                                    onClick="@command('toggleFlow', flow=flow)"/>
+                                            <button label="Edit" 
+                                                    onClick="@command('editFlow', flow=flow)"/>
+                                            <button label="Monitor" 
+                                                    onClick="@command('monitorFlow', flow=flow)"/>
+                                        </hlayout>
+                                    </row>
+                                </template>
+                            </grid>
+                        </groupbox>
+                    </vlayout>
+                </tabpanel>
+
+                <!-- Monitoring Panel -->
+                <tabpanel>
+                    <vlayout>
+                        <!-- Real-time Metrics -->
+                        <hlayout>
+                            <charts id="performanceChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Performance Metrics"
+                                   model="@load(vm.performanceData)"/>
+                            
+                            <charts id="throughputChart" 
+                                   type="line"
+                                   height="300px"
+                                   title="Data Throughput"
+                                   model="@load(vm.throughputData)"/>
+                        </hlayout>
+
+                        <!-- Integration Logs -->
+                        <groupbox title="Integration Logs">
+                            <listbox model="@load(vm.integrationLogs)" 
+                                    mold="paging" pageSize="20">
+                                <listhead>
+                                    <listheader label="Timestamp"/>
+                                    <listheader label="Integration"/>
+                                    <listheader label="Event"/>
+                                    <listheader label="Status"/>
+                                    <listheader label="Message"/>
+                                    <listheader label="Actions"/>
+                                </listhead>
+                                <template name="model" var="log">
+                                    <listitem sclass="@load(log.levelStyle)">
+                                        <listcell label="@load(log.timestamp)"/>
+                                        <listcell label="@load(log.integration)"/>
+                                        <listcell label="@load(log.event)"/>
+                                        <listcell>
+                                            <label value="@load(log.status)" 
+                                                   sclass="@load(log.statusStyle)"/>
+                                        </listcell>
+                                        <listcell label="@load(log.message)"/>
+                                        <listcell>
+                                            <button label="Details" 
+                                                    onClick="@command('viewLogDetails', log=log)"/>
+                                        </listcell>
+                                    </listitem>
+                                </template>
+                            </listbox>
+                        </groupbox>
+
+                        <!-- Health Status -->
+                        <grid model="@load(vm.healthStatus)" 
+                              mold="paging" pageSize="5">
+                            <columns>
+                                <column label="Component"/>
+                                <column label="Status"/>
+                                <column label="Response Time"/>
+                                <column label="Error Rate"/>
+                                <column label="Last Check"/>
+                                <column label="Actions"/>
+                            </columns>
+                            <template name="model" var="health">
+                                <row>
+                                    <label value="@load(health.component)"/>
+                                    <label value="@load(health.status)" 
+                                           sclass="@load(health.statusStyle)"/>
+                                    <label value="@load(health.responseTime)ms"/>
+                                    <label value="@load(health.errorRate)%"/>
+                                    <label value="@load(health.lastCheck)"/>
+                                    <hlayout>
+                                        <button label="Check Now" 
+                                                onClick="@command('checkHealth', health=health)"/>
+                                        <button label="History" 
+                                                onClick="@command('viewHealthHistory', health=health)"/>
+                                    </hlayout>
+                                </row>
+                            </template>
+                        </grid>
+                    </vlayout>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+
+        <!-- Modal Windows -->
+        <window id="connectorConfigWindow" 
+                title="Connector Configuration" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Connector Config Content -->
+        </window>
+
+        <window id="endpointEditorWindow" 
+                title="Endpoint Editor" 
+                visible="false" 
+                mode="modal"
+                width="800px">
+            <!-- Endpoint Editor Content -->
+        </window>
+
+        <window id="flowEditorWindow" 
+                title="Flow Editor" 
+                visible="false" 
+                mode="modal"
+                width="90%"
+                height="90%">
+            <!-- Flow Editor Content -->
+        </window>
+    </div>
+</zk>

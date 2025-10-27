@@ -1,0 +1,108 @@
+<!-- 
+    Agent Approval - HITL SLA Reminder Form
+    
+    BPMN Process: agent-approval-v1
+    User Task: hitlReminder (disparado por Timer Boundary 24h)
+    CandidateGroups: governance-leads
+    Priority: 95 (Alta)
+    
+    Contexto:
+    La revisión humana lleva más de 24h sin completarse.
+    Se notifica a governance-leads para escalar.
+    
+    Output Variables:
+    - sla_action: 'escalate', 'extend', 'complete_now'
+    - sla_notes: String
+-->
+<zk>
+    <window id="slaReminderWindow" 
+            title="🚨 SLA Excedido - Agent Approval" 
+            border="normal" 
+            width="700px"
+            closable="false"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.HitlSlaReminderViewModel')">
+        
+        <style>
+            .alert-section { background-color: #fff3e0; padding: 15px; margin: 10px 0; border-radius: 4px; border-left: 4px solid #ff9800; }
+            .info-section { background-color: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 4px; }
+        </style>
+        
+        <vlayout spacing="15px" style="padding: 20px;">
+            
+            <!-- Alert Header -->
+            <div sclass="alert-section">
+                <hlayout>
+                    <label value="🚨" style="font-size: 32px;"/>
+                    <vlayout>
+                        <label value="SLA Excedido - Revisión Humana Pendiente" 
+                               style="font-size: 16px; font-weight: bold; color: #f57c00;"/>
+                        <label value="La tarea de revisión humana lleva más de 24 horas sin completarse" 
+                               style="font-size: 12px; color: #666;"/>
+                    </vlayout>
+                </hlayout>
+            </div>
+            
+            <!-- Task Info -->
+            <div sclass="info-section">
+                <label value="📋 Información de la Tarea" style="font-weight: bold; font-size: 14px;"/>
+                <grid>
+                    <rows>
+                        <row>
+                            <label value="Agent Name:" style="width: 150px;"/>
+                            <label value="@load(vm.agentName)" style="font-weight: bold;"/>
+                        </row>
+                        <row>
+                            <label value="Tarea Pendiente:" />
+                            <label value="Human Override Review" style="font-style: italic;"/>
+                        </row>
+                        <row>
+                            <label value="Asignada a:"/>
+                            <label value="governance-admins" style="color: #1976d2;"/>
+                        </row>
+                        <row>
+                            <label value="Tiempo Transcurrido:"/>
+                            <label value="@load(vm.elapsedTime)" style="color: #f57c00; font-weight: bold;"/>
+                        </row>
+                    </rows>
+                </grid>
+            </div>
+            
+            <separator bar="true"/>
+            
+            <!-- SLA Action -->
+            <vlayout spacing="10px">
+                <label value="🎯 Acción a Tomar" style="font-weight: bold; font-size: 14px;"/>
+                
+                <radiogroup id="actionGroup" selectedItem="@bind(vm.slaAction)">
+                    <vlayout spacing="8px">
+                        <radio label="🔝 Escalar a superior inmediato" value="escalate"/>
+                        <radio label="⏰ Extender plazo (24h más)" value="extend"/>
+                        <radio label="✅ Completar ahora (asumir tarea)" value="complete_now"/>
+                    </vlayout>
+                </radiogroup>
+                
+                <label value="Notas:" style="font-weight: bold; margin-top: 10px;"/>
+                <textbox multiline="true" 
+                         rows="3" 
+                         width="100%" 
+                         value="@bind(vm.slaNotes)"
+                         placeholder="Explica la acción tomada..."/>
+            </vlayout>
+            
+            <separator bar="true"/>
+            
+            <!-- Actions -->
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cerrar" onClick="@command('cancel')"/>
+                <button label="Confirmar Acción" 
+                        onClick="@command('confirm')" 
+                        disabled="@load(empty vm.slaAction)"
+                        style="background-color: #ff9800; color: white;"/>
+            </hlayout>
+            
+        </vlayout>
+        
+    </window>
+</zk>
+

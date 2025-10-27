@@ -1,0 +1,204 @@
+	<!DOCTYPE html>
+<html class="h-100" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:zk="zk" xmlns:z="zul" xmlns:c="client"
+	xmlns:b='http://www.google.com/2005/gml/b'
+	xmlns:data='http://www.google.com/2005/gml/data'
+	xmlns:expr='http://www.google.com/2005/gml/expr'
+	xmlns:og='http://opengraphprotocol.org/schema/'>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Suinsit Nova | Login</title>
+		<!-- Estilos personalizados -->
+		<link href="css/styles.css" rel="stylesheet" />
+		<!-- Estilos slick -->
+		<link rel="stylesheet" type="text/css"
+			href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+	</head>
+	<body class="body-class bd-back"
+		style="background: url('img/fn-suinsit.jpg') center center no-repeat;  background-size: cover; background-position-y: center;">
+		<div class="auth-page-wrapper">
+			<div class="auth-left"
+				style="background: url('img/RRSS-SUINSIT-100.png') center center no-repeat;  background-size: cover; background-position-y: bottom;">
+
+			</div>
+			<z:div sclass="auth-right"
+				viewModel="@id('vm') @init('com.suinsit.webapp.login.LoginUI')"
+				validationMessages="@id('vmsgs')">
+				<z:div class="logo-leka">
+					<z:div id="login">
+					<img src="img/logo-leka.png" width="50%" alt="Logo" />
+						<div class="auth-title">
+							<h5>Bienvenidos a Suinsit Nova</h5>
+						</div>
+						<p class="auth-title">Autentifícate para acceder a <span>
+							Suinsit: Nova (Leka Studio) </span></p>
+						<form action="#">
+						<z:div
+														form="@id('fx')  @load(vm.loginTO) @save(vm.loginTO,before={'login'})">
+							<div class="form-group">
+								<!--<label for="username">Nombre de usuario / email</label>-->
+								<z:textbox
+									placeholder="Nombre de usuario o email"
+									value="@bind(fx.ssousuario.txusername) @validator(vm.validator,required=true ,maxl='100' )"
+									class="form-control" />
+								<z:label
+									sclass="text-danger"
+									value="@load(vmsgs['user'])" />
+							</div>
+							<div class="form-group">
+								<!--<label for="password">Contraseña</label>-->
+								<z:textbox
+									type="password"
+									value="@bind(fx.ssousuario.erpassword) @validator(vm.validator,required=true )"
+									class="form-control pe-5" />
+								<z:label
+									sclass="text-danger"
+									value="@load(vmsgs['pass'])" />
+							</div>
+							<z:button
+								class="btn-leka-login"
+								label="Autentificar"
+								onClick="@command('login')">
+							</z:button>
+							</z:div>
+						</form>
+						<p>
+							<z:a
+								onClick="@command('resetLogin')"
+								class="text-muted">
+								Olvido
+								su
+								contraseña?
+							</z:a>
+						</p>
+					</z:div>
+					<z:div id="forget" class="auth-title"
+						visible="false">
+						<h5>Recuperar Contraseña</h5>
+						<p>Introduzca su usuario o email y siga las
+							instrucciones recibidas</p>
+						<form action="#">
+							<z:div class="form-group"
+								form="@id('fx')  @load(vm.loginTO) @save(vm.loginTO,before={'sendOTP'})">
+								<div class="form-group">
+									<!--<label for="email">Correo electrónico</label>-->
+									<z:textbox
+										id="email1"
+										placeholder="correo electronico o nombre de usuario"
+										value="@bind(fx.ssousuario.txusername) @validator(vm.validator,required=true ,maxl='100' )"
+										class="form-control" />
+									<z:label
+										sclass="text-danger"
+										value="@load(vmsgs['email1'])" />
+								</div>
+								<z:button
+									class="btn btn-success w-100"
+									label="Enviar"
+									onClick="@command('sendOTP')">
+								</z:button>
+							</z:div>
+						</form>
+					</z:div>
+					<z:div id="codeBox" class="auth-title" visible="false">
+						<h5>
+							Introduzca el código recibido!
+						</h5>
+						<form action="#">
+							<z:div
+								form="@id('fx')  @load(vm.loginTO) @save(vm.loginTO,before={'validarOTP'})">
+								<div class="form-group">
+									<!--<label for="newPassword">Nueva Contraseña</label>-->
+									<z:intbox
+										id="numCode"
+										placeholder="Codigo de verificación"
+										class="form-control" />
+									<z:label
+										sclass="text-danger"
+										value="@load(vmsgs['numCode'])" />
+								</div>
+								<div class="form-group">
+									<z:button
+										class="btn "
+										label="Validar"
+										onClick="@command('validarOTP')">
+									</z:button>
+								</div>
+
+								<br />
+								<z:button
+									class="btn "
+									label="Reenviar Codigo"
+									onClick="@command('reenviarOTP')">
+								</z:button>
+							</z:div>
+						</form>
+
+					</z:div>
+
+					<z:div id="change" class="auth-title"
+						visible="false">
+						<h5>Cambiar Contraseña</h5>
+						<p>Introduzca su nueva contraseña</p>
+						<form action="#">
+							<z:div
+								form="@id('fx')  @load(vm.loginTO) @save(vm.loginTO,before={'changePass'})">
+								<div class="form-group">
+									<!--<label for="newPassword">Nueva Contraseña</label>-->
+									<z:textbox id="pass2"
+										type="password"
+										value="@bind(fx.ssousuario.erpassword) @validator(vm.validator,type='PASSWORD',required=true )"
+										class="form-control pe-5" />
+									<z:label
+										sclass="text-danger"
+										value="@load(vmsgs['pass2'])" />
+								</div>
+								<div class="form-group">
+									<!--<label for="confirmPassword">Confirmar Contraseña</label>-->
+									<z:textbox
+										type="password" id="pass3"
+										value="@bind(fx.repeat) @validator(vm.validator,type='PASSWORD',field=labelPass,required=true,equals= fx.ssousuario.erpassword)"
+										class="form-control pe-5" />
+									<z:label
+										sclass="text-danger"
+										value="@load(vmsgs['pass3'])" />
+								</div>
+								<z:button
+									class="btn btn-success w-100"
+									label="Cambiar"
+									onClick="@command('changePass')">
+								</z:button>
+							</z:div>
+						</form>
+					</z:div>
+					<div class="footer">
+						<p>&copy; <script>document.write(new
+							Date().getFullYear())</script> Suinsit Platform <i
+								class="mdi mdi-heart text-danger"></i> by Enart
+							Systems</p>
+					</div>
+				</z:div>
+			</z:div>
+		</div>
+
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<script type="text/javascript"
+			src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+		<script>
+			$(document).ready(function(){
+			$('.carousel').slick({
+			autoplay: true,
+			autoplaySpeed: 4000, // Cambia de slide cada 3 segundos
+			dots: true, // Muestra indicadores
+			arrows: false, // Esconde flechas de navegación
+			infinite: true,
+			speed: 500,
+			fade: true,
+			cssEase: 'linear'
+			});
+			});
+		</script>
+
+	</body>
+</html>
+

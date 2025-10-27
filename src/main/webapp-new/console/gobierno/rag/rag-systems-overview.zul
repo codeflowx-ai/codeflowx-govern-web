@@ -1,0 +1,293 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.rag.RagSystemsOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+
+		<div class="row  " style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-database me-2"></h:i>
+						<label value="${labels.rag.overview.title}" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label
+							value="${labels.rag.overview.subtitle}" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<div class="card">
+					<div class="card-header">
+						<div
+							class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+
+							</div>
+							<div class="flex-shrink-0">
+								<div
+									class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2 "
+										class="waves-effect waves-light"
+										onClick="@command('createRagSystem')"
+										label="${labels.rag.overview.button.create}">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="col-lg-12 s-bot ">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.rag.overview.metrics.total}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalSystems)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <fragment exps="${labels.rag.overview.metrics.active}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.activeSystems)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							   <fragment exps="${labels.rag.overview.metrics.datasources}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.totalDataSources)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							     <fragment exps="${labels.rag.overview.metrics.avgaccuracy}">
+	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
+								</fragment>
+								<fragment exps="@load(vm.avgAccuracy)">
+	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+								</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="${labels.rag.overview.filters.search.placeholder}"
+						class="form-control" onOK="@command('applyFilters')" />
+					<!-- Filtro por Tipo -->
+					<combobox
+						placeholder="${labels.rag.overview.filters.type}"
+						selectedItem="@bind(vm.typeFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="VECTOR_DB" value="VECTOR_DB" />
+						<comboitem label="HYBRID" value="HYBRID" />
+						<comboitem label="SEMANTIC" value="SEMANTIC" />
+						<comboitem label="KEYWORD" value="KEYWORD" />
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox
+						placeholder="${labels.rag.overview.filters.status}"
+						selectedItem="@bind(vm.statusFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="INACTIVE" value="INACTIVE" />
+						<comboitem label="INDEXING" value="INDEXING" />
+					</combobox>
+					<!-- Filtro por Embedding -->
+					<combobox
+						placeholder="${labels.rag.overview.filters.embedding}"
+						selectedItem="@bind(vm.embeddingFilter)"
+						onChange="@command('applyFilters')">
+						<comboitem label="ALL" value="ALL" />
+						<comboitem label="OPENAI" value="OPENAI" />
+						<comboitem label="COHERE" value="COHERE" />
+						<comboitem label="HUGGINGFACE" value="HUGGINGFACE" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Find"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Clear"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.filteredSystems)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="${labels.rag.overview.table.id}" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.name}" align="center"
+										width="25%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.type}"
+										align="center" width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.embedding}" align="center"
+										width="12%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.version}" align="center"
+										width="8%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.status}" align="center"
+										width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.datasources}"
+										align="center" width="10%" />
+
+									<column sclass=" text-capitalize "
+										label="${labels.rag.overview.table.accuracy}"
+										align="center" width="8%" />
+
+									<column
+										label="${labels.rag.overview.table.actions}"
+										align="center" />
+								</columns>
+
+								<template name="model" var="system">
+									<row
+										style="text-align:right;cursor:pointer;"
+										onClick="@command('viewSystemDetails', systemId=system.idxragsystem)">
+										<label
+											value="@load(system.idxragsystem) @converter(vm.fieldConverter)">
+										</label>
+
+										<label
+											value="@load(system.ragname) @converter(vm.fieldConverter)">
+										</label>
+
+										<h:span
+											class="badge bg-secondary">
+											<label
+												value="@load(system.ragtype)" />
+										</h:span>
+
+										<label
+											value="@load(system.ragembeddingmodel)">
+										</label>
+
+										<label
+											value="@load(system.ragversion)" sclass="badge bg-info" />
+
+										<label
+											value="@load(system.ragstatus)"
+											sclass="badge ${system.ragstatus eq 'ACTIVE' ? 'bg-success' : (system.ragstatus eq 'INACTIVE' ? 'bg-secondary' : 'bg-warning')}" />
+
+										<label
+											value="@load(system.totaldatasources)"
+											sclass="badge bg-primary" />
+
+										<label
+											value="@load(system.avgretrievalaccuracy)"
+											sclass="badge ${system.avgretrievalaccuracy >= 0.8 ? 'bg-success' : (system.avgretrievalaccuracy >= 0.6 ? 'bg-warning' : 'bg-danger')}" />
+
+										<cell align="center"
+											class="d-flex">
+											<div class="edit">
+												<a
+													onClick="@command('viewSystemDetails', systemId=system.idxragsystem)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="${labels.rag.overview.button.view.tooltip}" />
+											</div>
+											<div class="delete">
+												<a
+													onClick="@command('deleteSystem', systemId=system.idxragsystem)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="${labels.rag.overview.button.delete.tooltip}" />
+											</div>
+
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+
+
+									</footer>
+									<footer span="4" align="left">
+
+
+
+
+									</footer>
+									<footer></footer>
+
+								</foot>
+
+
+
+							</grid>
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>

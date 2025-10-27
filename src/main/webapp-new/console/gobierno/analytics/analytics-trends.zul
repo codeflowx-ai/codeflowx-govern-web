@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:h="native"
+    xmlns:x="xhtml">
+    
+    <div viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.analytics.AnalyticsTrendsViewModel')">
+        
+        <h:div class="container-fluid p-4">
+            
+            <!-- Header -->
+            <h:div class="row mb-4">
+                <h:div class="col-12 col-md-8">
+                    <h:h1 class="h2 fw-bold mb-1">
+                        <h:i class="bi bi-graph-up-arrow me-2"></h:i>
+                        <label value="${labels.analytics.trends.title}" />
+                    </h:h1>
+                    <h:p class="text-muted mb-0">${labels.analytics.trends.subtitle}</h:p>
+                </h:div>
+                <h:div class="col-12 col-md-4 text-end">
+                    <button class="btn btn-outline-secondary" onClick="@command('refresh')">
+                        <h:i class="bi bi-arrow-clockwise me-2"></h:i>
+                        <label value="${labels.common.refresh}" />
+                    </button>
+                </h:div>
+            </h:div>
+            
+            <!-- Indicador de Tendencia Principal -->
+            <h:div class="row mb-4">
+                <h:div class="col-12">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-body text-center py-5">
+                            <h:i class="@load(c:cat('bi ', vm.trendIcon, ' ', 'text-', vm.trendColor))" 
+                                 style="font-size: 4rem;"></h:i>
+                            <h:h3 class="mt-3 mb-2">
+                                ${labels.analytics.trends.direction}: 
+                                <h:span class="@load(c:cat('text-', vm.trendColor))">
+                                    <label value="@load(c:toUpperCase(vm.trendDirection))"/>
+                                </h:span>
+                            </h:h3>
+                            <h:p class="text-muted mb-0">
+                                ${labels.analytics.trends.activityRate}: <label value="@load(vm.activityRate)"/>%
+                            </h:p>
+                        </h:div>
+                    </h:div>
+                </h:div>
+            </h:div>
+            
+            <!-- Métricas Detalladas -->
+            <h:div class="row mb-4">
+                
+                <!-- Active vs Deployed -->
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-header bg-white">
+                            <h:h6 class="mb-0">${labels.analytics.trends.activeVsDeployed}</h:h6>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div class="row text-center">
+                                <h:div class="col-6 border-end">
+                                    <h:h4 class="text-success mb-1">
+                                        <label value="@load(vm.activeItems)"/>
+                                    </h:h4>
+                                    <h:small class="text-muted">${labels.analytics.overview.active}</h:small>
+                                </h:div>
+                                <h:div class="col-6">
+                                    <h:h4 class="text-info mb-1">
+                                        <label value="@load(vm.deployedItems)"/>
+                                    </h:h4>
+                                    <h:small class="text-muted">${labels.analytics.overview.deployed}</h:small>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <!-- Training vs Offline -->
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-header bg-white">
+                            <h:h6 class="mb-0">${labels.analytics.trends.trainingVsOffline}</h:h6>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div class="row text-center">
+                                <h:div class="col-6 border-end">
+                                    <h:h4 class="text-warning mb-1">
+                                        <label value="@load(vm.trainingItems)"/>
+                                    </h:h4>
+                                    <h:small class="text-muted">${labels.analytics.overview.training}</h:small>
+                                </h:div>
+                                <h:div class="col-6">
+                                    <h:h4 class="text-danger mb-1">
+                                        <label value="@load(vm.offlineItems)"/>
+                                    </h:h4>
+                                    <h:small class="text-muted">${labels.analytics.overview.offline}</h:small>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+            <!-- Score y Niveles -->
+            <h:div class="row">
+                
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-header bg-white">
+                            <h:h6 class="mb-0">${labels.analytics.trends.scoreEvolution}</h:h6>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div class="text-center">
+                                <h:h1 class="display-4 fw-bold mb-2" class="@load(c:cat('text-', vm.scoreColor))">
+                                    <label value="@load(vm.avgScore)"/>
+                                </h:h1>
+                                <h:span class="@load(c:cat('badge bg-', vm.scoreColor, ' fs-6'))">
+                                    <label value="@load(vm.scoreLevel)"/>
+                                </h:span>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+                <h:div class="col-12 col-md-6 mb-3">
+                    <h:div class="card border-0 shadow-sm">
+                        <h:div class="card-header bg-white">
+                            <h:h6 class="mb-0">${labels.analytics.trends.distribution}</h:h6>
+                        </h:div>
+                        <h:div class="card-body">
+                            <h:div class="mb-3">
+                                <h:div class="d-flex justify-content-between mb-1">
+                                    <h:small>${labels.analytics.overview.active}</h:small>
+                                    <h:small>
+                                        <label value="@load(vm.getActivePercentage())"/>%
+                                    </h:small>
+                                </h:div>
+                                <h:div class="progress" style="height: 10px;">
+                                    <h:div class="progress-bar bg-success" 
+                                           role="progressbar" 
+                                           style="@load(c:cat('width: ', vm.getActivePercentage(), '%'))">
+                                    </h:div>
+                                </h:div>
+                            </h:div>
+                            
+                            <h:div class="mb-0">
+                                <h:div class="d-flex justify-content-between mb-1">
+                                    <h:small>${labels.analytics.overview.deployed}</h:small>
+                                    <h:small>
+                                        <label value="@load(vm.getDeployedPercentage())"/>%
+                                    </h:small>
+                                </h:div>
+                                <h:div class="progress" style="height: 10px;">
+                                    <h:div class="progress-bar bg-info" 
+                                           role="progressbar" 
+                                           style="@load(c:cat('width: ', vm.getDeployedPercentage(), '%'))">
+                                    </h:div>
+                                </h:div>
+                            </h:div>
+                        </h:div>
+                    </h:div>
+                </h:div>
+                
+            </h:div>
+            
+        </h:div>
+    </div>
+</zk>
+

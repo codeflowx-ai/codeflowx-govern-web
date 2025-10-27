@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Recordatorio: Aprobación Pendiente - SLA 3 Días" border="normal" width="750px" 
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.ModelApprovalReminderViewModel')">
+        
+        <vlayout spacing="15px" style="padding: 20px;">
+            <div style="background: #fff3e0; padding: 15px; border-left: 4px solid #ff9800;">
+                <label value="⏰ SLA de 3 días excedido - Modelo pendiente de aprobación" style="font-weight: bold;"/>
+                <separator height="5px"/>
+                <label value="Modelo: ${vm.modelName}" style="color: #666;"/>
+            </div>
+
+            <radiogroup selectedItem="@bind(vm.selectedDecision)">
+                <vlayout spacing="10px">
+                    <radio value="APPROVE_NOW" label="✅ Aprobar Inmediatamente"/>
+                    <radio value="ESCALATE" label="🚨 Escalar a Manager/Director"/>
+                    <radio value="REQUEST_INFO" label="📋 Solicitar Más Información"/>
+                </vlayout>
+            </radiogroup>
+
+            <label value="Notas:"/>
+            <textbox rows="2" width="100%" value="@bind(vm.notes)"/>
+
+            <hlayout spacing="10px" style="float: right;">
+                <button label="Cancelar" onClick="@command('cancel')"/>
+                <button label="Confirmar" onClick="@command('confirm')" style="background: #1976d2; color: white;"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+

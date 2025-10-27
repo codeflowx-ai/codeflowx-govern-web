@@ -1,0 +1,112 @@
+<zk xmlns:h="native">
+	<div class="row s-bot">
+		<h:div class="card col-lg-12">
+			<div class="card-body">
+				<div class="row">
+					<h:div class="card col-lg-3">
+						<div class="card">
+							<div
+								class="card-header header-elements-inline bg-indigo">
+								<h:h6 class="card-title">
+									Pantallas
+								</h:h6>
+							</div>
+							<div class="card-body">
+								<listbox
+									model="@load(vm.buildScreens.screens)" height="500px"
+									
+									onSelect="@command('selectScreen' , item=self.selectedItem.value)">
+									<listhead>
+										<listheader
+											label="Name Screen">
+										</listheader>
+										<listheader label="Page Name"
+											sort="auto">
+										</listheader>
+									</listhead>
+									<template name="model" var="item">
+										<listitem value="${item}">
+											<listcell
+												label="${item.name }">
+											</listcell>
+											<listcell
+												label="${item.pageName }">
+											</listcell>
+										</listitem>
+
+									</template>
+								</listbox>
+							</div>
+
+						</div>
+					</h:div>
+
+
+					<h:div class="card col-lg-9">
+						<hbox spacing="3px" sclass="margin-field">
+							<label
+								sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+								style="" value="Seleccionar Plantillas para la pantalla " />
+							<label
+								sclass="fs-6 text form-label  text-capitalize  font-weight-normal align-text-middle"
+								style="" value="@load(vm.screen.name)" />
+						</hbox>
+						<listbox
+							model="@load(vm.screensLayout[vm.screen.name])" height="600px"
+							multiple="true"
+							checkmark="true" mold="paging">
+							<listhead>
+							   	<listheader label="" width="80px">
+								</listheader>
+									<listheader label="" width="100px">
+								</listheader>
+								<listheader label="Descripcion"
+									sort="auto">
+								</listheader>
+							</listhead>
+							<template name="model" var="item">
+								<listitem value="${item}" height="110px">
+								<listcell />
+<!-- 								<listcell label="${item.icon32}" > -->
+										
+<!-- 									</listcell> -->
+									<listcell>
+										<image
+														src="${item.icon16}" style="object-fit: cover;"
+														width="90px" height="90px" />
+								
+									</listcell>
+									
+									<listcell
+										label="${item.description}">
+									</listcell>
+								</listitem>
+
+							</template>
+						</listbox>
+
+
+					</h:div>
+					<h:div class="card col-lg-2">
+
+					</h:div>
+				</div>
+			</div>
+			<div class="card-footer">
+				<button zclass="pull-left"
+					sclass="btn btn-secondary btn-label waves-effect waves-light rounded-pill"
+					onClick="@command('back')"
+					iconSclass="fa-duotone fa-solid fa-arrow-left align-middle rounded-pill fs-16 me-2"
+					label="Anterior" />
+
+				<button zclass="pull-right"
+					sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+					iconSclass="fa-duotone fa-solid fa-arrow-right align-middle rounded-pill fs-16 me-2"
+					onClick="@command('evalScreens')" label="Siguiente" />
+
+			</div>
+
+		</h:div>
+
+	</div>
+</zk>

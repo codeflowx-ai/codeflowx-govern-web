@@ -1,0 +1,285 @@
+<zk xmlns:h="native">
+
+	<div class="row s-bot">
+		<h:div class="col-lg-12 ">
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						
+						<div class="col-12 col-md-8 col-lg-8 full-height" >
+							<!--  componente standar de chatbot -->
+<!-- 							<idspace id="bot" -->
+<!-- 								viewModel="@id('bot') @init('com.suinsit.nocode.suinless.ui.ChatbotUI',vm=vm)" -->
+<!-- 								validationMessages="@id('vmsgs')"> -->
+								<div class="chatbot">
+									<div class="chatbot-header">
+										<h:img src="../img/leka-1.png"
+											alt="Chat Icon" />
+										<h:h5>LEKA</h:h5>
+									</div>
+									<div class="chatbot-body" >
+										<h:h6>
+											¿Tienes dudas sobre como
+											elaborar el documento?
+											Pregúntanos.
+										</h:h6>
+										<hlayout class="b-bot">
+											<div id="areaMsg" class="area-msgchat" vflex="1"
+												>
+												<forEach
+													items="@bind(vm.chatmsgs)" var="item">
+													<choose>
+														<when
+															test="${item.usuario}">
+															<div
+																sclass="col-12 col-md-12 col-lg-12 stl-chat">
+																<if
+																	test="${item.user ne null}">
+																	<label
+																		value="${item.user}" sclass="${item.sclass}">
+																	</label>
+																</if>
+																<if
+																	test="${item.message ne null}">
+																	<label
+																		value="${item.message}" sclass="${item.sclass}"
+																		multiline="true">
+																	</label>
+																</if>
+															</div>
+
+														</when>
+														<when
+															test="${item.assistan}">
+															<if
+																test="${item.icon ne null}">
+																<h:icon
+																	sclass="${item.icon}">
+																</h:icon>
+															</if>
+															<if
+																test="${item.message ne null}">
+																<label
+																	value="${item.message}" sclass="${item.sclass}"
+																	multiline="true">
+																</label>
+															</if>
+														</when>
+														<otherwise>
+														</otherwise>
+													</choose>
+												</forEach>
+											</div>
+
+										</hlayout>
+										<textbox id="tbmessage"
+											multiline="true" rows="3" class="form-control"
+											placeholder="Escribe tu mensaje..."
+											value="@bind(vm.chatmsg)" />
+
+										<button class="btn btn-primary"
+											onClick="@command('sendChatMessage')">
+											Enviar Mensaje
+										</button>
+									</div>
+								</div>
+
+<!-- 							</idspace> -->
+
+
+						</div>
+						
+						
+						<div class="col-12 col-md-4 col-lg-4">
+							<div class="chatbot">
+								<div class="chatbot-header justify-content-center">
+									<h:h5>Plantillas / documentos</h:h5>
+								</div>
+								<div class="chatbot-body">
+									<div class="row element-input">
+									<div class="input-group-flex ">
+												<div class="col">
+													<h:label
+														for="prompt tokens">
+														Multi-Code
+													</h:label>
+	
+												</div>
+												<div class="col">
+												   <checkbox value="@bind(vm.suincode)" checked="@bind(vm.suincode)"/>
+												</div>
+											</div>
+											<div class="input-group-flex ">
+												<div class="col">
+													<h:label
+														for="prompt tokens">
+														Duration
+													</h:label>
+	
+												</div>
+												<div class="col">
+												    <label value="@bind(vm.stopWach.totalTimeSeconds / 60)"></label>
+												</div>
+											</div>
+											<div
+												class="input-group-flex ">
+												<div class="col">
+													<h:label
+														for="prompt tokens">
+														
+														prompt tokens
+													</h:label>
+	
+												</div>
+												<div class="col">
+												<label value="@bind(vm.prompt_tokens)"></label>
+												
+												</div>
+											</div>
+											<div
+												class="input-group-flex ">
+												<div class="col">
+													<h:label
+														for="completion tokens">
+														completion tokens
+													</h:label>
+	
+												</div>
+												<div class="col">
+												<label value="@bind(vm.completion_tokens)"></label>
+												
+												</div>
+											</div>
+									
+											<div
+												class="input-group-flex ">
+												<div class="col">
+													<h:label
+														for="Nombre del modulo">
+														Nombre del modulo
+													</h:label>
+	
+												</div>
+												<div class="col">
+													<textbox
+														class="form-control" />
+												</div>
+											</div>
+											<div class="input-group-flex">
+												<div class="col">
+													<h:label
+														for="acronimo">
+														Acronimo
+													</h:label>
+												</div>
+												<div class="col">
+													<textbox
+														class="form-control" />
+												</div>
+											</div>
+										
+
+
+									</div>
+									<div
+										class="d-flex align-items-center flex-wrap gap-2">
+										<div class="flex-grow-1 w-100">
+											<button
+												tooltiptext="Descargar Plantilla"
+												iconSclass="fa-duotone fa-solid fa-download"
+												onClick="@command('uploadDoc')"
+												sclass="btn btn-label btn-info waves-effect waves-light w-100">
+												Descargar Plantilla
+											</button>
+										</div>
+										<div class="flex-shrink-0 w-100">
+
+											<div
+												class="hstack text-nowrap w-100 gap-2">
+												<button
+													tooltiptext="Subir Fichero"
+													iconSclass="fa-duotone fa-solid fa-upload"
+													onUpload="@command('doUploadFiles', files=event.medias,progress=progress,messages=messages)"
+													upload="true,maxsize=10000"
+													sclass="btn btn-label btn-primary waves-effect waves-light w-100">
+													Subir Documento
+												</button>
+											</div>
+										</div>
+									</div>
+									<div
+										class="d-flex align-items-center flex-wrap gap-2">
+										<div class="flex-grow-1">
+											<groupbox
+												title="Attachments: " open="true" sclass="attachments">
+												<div id="target"
+													sclass="dropzone" children="@load(vm.attachments)">
+													<template
+														name="children" var="attachment">
+														<span
+															sclass="attachment">
+															<a
+																iconSclass="z-icon-paperclip" label="@load(attachment)" />
+														</span>
+													</template>
+												</div>
+												<dropupload
+													maxsize="1024" detection="browser" anchor="${target}"
+													onUpload="@command('doUploadFiles', files=event.medias)"
+													content="Drag your files here (max. 1MB) multiple allowed" />
+											</groupbox>
+
+										</div>
+									</div>
+
+
+								</div>
+							</div>
+
+
+
+<!-- 							<timer id="timer" delay="1000" -->
+<!-- 								repeats="true" onTimer="@command('onTimer')" /> -->
+							<div class="chatbot">
+								<div class="chatbot-header justify-content-center">
+									<h:h5>Creación de modulos</h:h5>
+								</div>
+								<div class="chatbot-body" height="348px">
+									<h:h6>
+										<progressmeter id="progress" width="100%" value="@bind(vm.progreso)" />
+									</h:h6>
+									<listbox id="messages"
+										model="@load(vm.messages)" >
+										<listhead>
+											<listheader label="Mensaje"
+												sort="auto" />
+										</listhead>
+										<template name="model"
+											var="item">
+											<listitem value="${item}">
+												<listcell
+													label="${item}">
+												</listcell>
+											</listitem>
+										</template>
+									</listbox>
+								</div>
+							</div>
+						</div>
+						
+						
+					</div>
+				</div>
+				<div class="card-footer">
+
+					<button zclass="pull-right"
+						sclass="btn btn-primary btn-label waves-effect waves-light rounded-pill"
+						iconSclass="fa-duotone fa-solid fa-arrow-right align-middle rounded-pill fs-16 me-2"
+						onClick="@command('nextTables',form=fx)" label="Siguiente" />
+
+				</div>
+			</div>
+		</h:div>
+
+	</div>
+</zk>
