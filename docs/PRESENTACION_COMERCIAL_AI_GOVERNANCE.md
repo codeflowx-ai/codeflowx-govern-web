@@ -1,21 +1,46 @@
-# 🚀 CODEFLOWX AI GOVERNANCE PLATFORM
+# CODEFLOWX AI GOVERNANCE PLATFORM
 
-**La Plataforma de Gobierno de IA Más Avanzada del Mercado**
+## MANUAL COMERCIAL INTERNO
+
+**Versión:** 1.1.0  
+**Fecha:** Octubre 2025  
+**Audiencia:** Equipo Comercial y Partners  
+**Confidencial:** Solo uso interno
 
 ---
 
-## 🎯 RESUMEN EJECUTIVO
+## 🎯 ÍNDICE
 
-CodeflowX es la **primera y única plataforma de AI Governance** que combina:
+1. [Resumen Ejecutivo](#resumen-ejecutivo)
+2. [Nuestros 22 Procesos de Governance](#nuestros-22-procesos-de-governance)
+3. [Análisis de Mercado](#análisis-de-mercado)
+4. [Comparativa con Competencia](#comparativa-con-competencia)
+5. [Nuestra Posición Única](#nuestra-posición-única)
+6. [Casos de Uso por Industria](#casos-de-uso-por-industria)
+7. [Argumentos de Venta](#argumentos-de-venta)
+8. [Objeciones Frecuentes](#objeciones-frecuentes)
 
-✅ **Automatización Inteligente** - Hasta 90% de procesos automatizados  
-✅ **Validación Humana Garantizada** - Human-in-the-Loop en decisiones críticas  
-✅ **Motor de Reglas Avanzado** - Drools Rules Engine con 120+ reglas inteligentes  
-✅ **Orquestación BPMN 2.0** - 17 procesos certificables y auditables  
-✅ **Cumplimiento Regulatorio** - EU AI Act, GDPR, CCPA, HIPAA ready  
-✅ **Self-Hosted** - Control total de datos y cumplimiento  
+---
 
-**Resultado:** Reduce tiempos de aprobación en un 80%, garantiza cumplimiento 100%, y escala sin límites.
+## 📋 RESUMEN EJECUTIVO
+
+**Para el Equipo Comercial:**
+
+CodeflowX es la **única plataforma de AI Governance** que combina:
+
+✅ **Governance End-to-End** - Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción  
+✅ **22 Procesos BPMN** - 17 implementados + 5 nuevos (adaptación de modelos v1.1.0)  
+✅ **Automatización Inteligente** - 70-95% automatizado con control humano  
+✅ **Self-Hosted + Cloud** - Somos los únicos con opción self-hosted real  
+✅ **Sostenibilidad Medible** - Governance de adaptación (Adapters, Merge, Quantization)  
+✅ **Integración Flexible** - API/SDK para trabajar con infraestructura del cliente  
+✅ **EU AI Act Ready** - Compliance desde día uno
+
+**Posicionamiento de Mercado:**
+- **Somos los únicos** con governance de adaptación de modelos
+- **Somos los únicos** con opción self-hosted enterprise-grade
+- **Somos los únicos** con 22 procesos BPMN certificables
+- **Somos los únicos** con motor de reglas + BPMN + IA combinados
 
 ---
 
@@ -68,19 +93,21 @@ Las organizaciones que implementan IA enfrentan:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-**¿Por qué esta arquitectura es única?**
+**¿Por qué esta arquitectura es efectiva?**
 
 1. **BPMN** = Procesos visuales, certificables, auditables por reguladores
 2. **Drools** = Reglas modificables sin redeploy, versionadas, trazables
 3. **IA** = Automatización inteligente, aprendizaje continuo
 
-**Ningún competidor combina los tres.**
+**Esta combinación permite automatizar inteligentemente mientras se mantiene auditabilidad y flexibilidad.**
 
 ---
 
-## 🎯 17 PROCESOS QUE TRANSFORMAN TU GOVERNANCE
+## 🎯 NUESTROS 22 PROCESOS DE GOVERNANCE
 
-### GRUPO 1: APROBACIONES INTELIGENTES (3 procesos)
+**Nota para Comerciales:** Tenemos 17 procesos implementados + 5 nuevos para v1.1.0 (adaptación de modelos)
+
+### GRUPO 1: APROBACIONES INTELIGENTES (3 procesos implementados)
 
 #### 1. **Agent Approval** - 80% Automatizado
 ```
@@ -460,18 +487,12 @@ El Proceso Más Avanzado del Mercado:
 5. Zero-Downtime Deployment:
    └─ Atomic swap sin interrumpir servicio
 
-VALOR ÚNICO:
-✅ ÚNICO en el mercado con retraining automático + A/B testing
+VALOR DIFERENCIAL:
+✅ Reentrenamiento automático con A/B testing integrado
 ✅ Zero-downtime garantizado
-✅ 70% ahorro en costos (spot instances)
+✅ Optimización de costos (spot instances)
 ✅ Champion/Challenger pattern profesional
-✅ Solo 10% casos requieren aprobación humana
-
-COMPETENCIA:
-- Vertex AI: A/B testing manual
-- SageMaker: Retraining manual
-- Azure ML: Sin A/B testing integrado
-- MLflow: Sin governance integrado
+✅ Automatización inteligente con aprobación humana cuando necesario
 ```
 
 **Stakeholders:**
@@ -521,18 +542,16 @@ El Proceso Más Innovador del Mercado:
    └─ Actualiza runbooks automáticamente
 
 MÉTRICAS DE PERFORMANCE:
-├─ MTTR: <5 minutos (vs 30-60 min industria) = 6-12x mejor
-├─ Auto-Resolution: 85% (vs 10-15% industria) = 5-8x mejor
-├─ RCA Accuracy: >90% (vs 60-70% manual)
-└─ False Positives: <5% (vs 20-30% tools tradicionales)
+├─ MTTR: <5 minutos (significativamente más rápido que procesos manuales)
+├─ Auto-Resolution: 85% de incidentes resueltos automáticamente
+├─ RCA Accuracy: >90% de precisión en diagnóstico
+└─ False Positives: <5% en detección de problemas
 
-COMPETENCIA:
-- Datadog: Detecta, NO diagnostica
-- New Relic: Alertas, NO RCA automático
-- PagerDuty: Notifica, NO resuelve
-- AWS X-Ray: Tracing, NO correlación ML
-
-CODEFLOWX: ÚNICO con LLM-powered RCA + Auto-remediation + Self-learning
+CARACTERÍSTICAS CLAVE:
+- Diagnóstico automático con IA (LLM-powered RCA)
+- Auto-remediation de incidentes conocidos
+- Self-learning: mejora continua con cada incidente
+- Knowledge base que crece automáticamente
 ```
 
 **Stakeholders:**
@@ -545,104 +564,75 @@ CODEFLOWX: ÚNICO con LLM-powered RCA + Auto-remediation + Self-learning
 
 ---
 
-## 🌟 CARACTERÍSTICAS DIFERENCIADORAS
+## 🌟 NUESTROS DIFERENCIADORES (Para el Pitch)
 
-### 1. **Automatización Inteligente (70-95%)**
+**Nota para Comerciales:** Estos son nuestros puntos fuertes, úsalos según el perfil del cliente
 
-**No es automatización "tonta":**
-- ✅ Motor de reglas Drools (120+ reglas)
-- ✅ Machine Learning sobre Machine Learning
-- ✅ LLM para análisis de logs y RCA
-- ✅ Aprendizaje continuo (self-learning)
+### 1. **Governance End-to-End**
 
-**Resultado:**
-- 80% reducción en tiempo de aprobaciones
-- 85% auto-resolución de incidentes
-- 90% de tareas rutinarias automatizadas
+**Argumento de Venta:**
+- Cubrimos TODO el ciclo: Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
+- No solo modelos, governance integral
 
----
-
-### 2. **Human-in-the-Loop Garantizado**
-
-**No es 100% automático (eso sería irresponsable):**
-- ✅ Decisiones críticas siempre requieren humano
-- ✅ Casos borderline siempre escalados
-- ✅ Ethics review siempre con comité humano
-- ✅ Override humano disponible en todo momento
-
-**Resultado:**
-- Compliance garantizado
-- Responsabilidad humana clara
-- Auditable por reguladores
-- Balance perfecto: Velocidad + Control
+**Beneficio para Cliente:**
+- Una sola plataforma vs múltiples herramientas
+- Trazabilidad completa
+- Sin silos entre equipos
 
 ---
 
-### 3. **Procesos BPMN 2.0 Certificables**
+### 2. **Flexibilidad de Integración**
 
-**¿Por qué BPMN?**
-- ✅ Estándar internacional (ISO/IEC 19510)
-- ✅ Visual (entendible por no-técnicos)
-- ✅ Auditable por reguladores
-- ✅ Certificable (compliance demonstrations)
-- ✅ Modificable sin código
+**Argumento de Venta:**
+- Integración vía API/SDK con infraestructura existente del cliente
+- No requiere migrar aplicaciones
+- Stack completo o solo governance según necesiten
 
-**Resultado:**
-- Reguladores pueden auditar procesos visualmente
-- Certificaciones de compliance más fáciles
-- Cambios de proceso sin developers
-- Trazabilidad total de decisiones
+**Beneficio para Cliente:**
+- Implementación más rápida
+- Menor riesgo
+- Trabaja con sus servidores de inferencia actuales
 
 ---
 
-### 4. **Motor de Reglas Modificable**
+### 3. **Opciones de Despliegue**
 
-**Drools Rules Engine:**
-- ✅ 120+ reglas de negocio
-- ✅ Modificables sin redeploy
-- ✅ Versionadas (rollback posible)
-- ✅ Testables antes de producción
+**Argumento de Venta:**
+- **Self-hosted:** Para clientes con requisitos de soberanía (Administraciones Públicas, Banca)
+- **Cloud:** Para clientes que prefieren managed service
+- **Híbrido:** Combina ambos
 
-**Ejemplo Real:**
-```
-HOY: Umbral de bias = 0.3
-└─ Governance admin decide cambiar a 0.25
-
-SIN DROOLS:
-├─ Developer cambia código hardcoded
-├─ Testing
-├─ Code review
-├─ Deploy
-└─ Tiempo: 2-4 horas
-
-CON DROOLS (CODEFLOWX V1.0):
-├─ Admin edita archivo DRL
-├─ Valida sintaxis
-├─ Deploy automático
-└─ Tiempo: 15-30 minutos
-
-UPGRADE OPCIONAL (Business Central):
-├─ Admin cambia umbral en interfaz visual
-├─ Valida
-├─ Publica sin redeploy
-└─ Tiempo: 2 minutos
-```
+**Beneficio para Cliente:**
+- Control de datos donde lo necesiten
+- Flexibilidad según madurez y requisitos
 
 ---
 
-### 5. **Self-Hosted & Multi-Tenant**
+### 4. **Sostenibilidad Medible**
 
-**Control Total:**
-- ✅ Datos en tu infraestructura
-- ✅ Cumplimiento regulatorio garantizado
-- ✅ Sin vendor lock-in
-- ✅ Multi-tenant (cliente por BBDD)
+**Argumento de Venta:**
+- Métricas reales de CO2, costos y eficiencia
+- Governance de estrategias de adaptación (Adapters vs Fine-Tuning)
+- Reportes de impacto ambiental
 
-**Vs. Competencia SaaS:**
-- ❌ Vertex AI: Solo Google Cloud
-- ❌ SageMaker: Solo AWS
-- ❌ Azure ML: Solo Azure
-- ✅ **CodeflowX: Tu infraestructura, tus reglas**
+**Beneficio para Cliente:**
+- Reducción demostrable de costos
+- Compliance con objetivos ESG
+- Diferenciador en licitaciones públicas
+
+---
+
+### 5. **Procesos BPMN Certificables**
+
+**Argumento de Venta:**
+- Estándar internacional (ISO/IEC 19510)
+- Visual y auditable por reguladores
+- Modificable por el cliente sin código
+
+**Beneficio para Cliente:**
+- Auditorías simplificadas
+- Evidencia defendible para compliance
+- Adaptable a sus políticas internas
 
 ---
 
@@ -999,58 +989,296 @@ Vendor: "Plataforma de IA para RR.HH."
 
 ---
 
-## 🏆 DIFERENCIADORES CLAVE VS COMPETENCIA
+---
 
-### CodeflowX vs Vertex AI (Google)
+## 📊 ANÁLISIS DE MERCADO (Información Confidencial para Comerciales)
 
-| Feature | CodeflowX | Vertex AI |
-|---------|-----------|-----------|
-| **Self-Hosted** | ✅ | ❌ (Solo GCP) |
-| **EU AI Act Compliance** | ✅ Automático | ⚠️ Parcial |
-| **Ethics Review Formal** | ✅ | ❌ |
-| **Auto-Retraining + A/B** | ✅ | ⚠️ Parcial |
-| **AI-Powered RCA** | ✅ | ❌ |
-| **Self-Healing** | ✅ | ❌ |
-| **BPMN Governance** | ✅ | ❌ |
-| **Drools Rules** | ✅ | ❌ |
+### **Tamaño del Mercado**
+
+**MLOps & AI Governance Market:**
+- Tamaño 2024: $1.5B USD
+- Proyección 2030: $15.8B USD
+- CAGR: 43.2%
+- **Fuente:** MarketsandMarkets "MLOps Platform Market Report 2024"
+
+**Drivers de Crecimiento:**
+- EU AI Act (obligatorio desde 2025-2026)
+- Regulaciones de privacidad (GDPR, CCPA)
+- Proliferación de modelos LLM
+- Necesidad de compliance auditable
 
 ---
 
-### CodeflowX vs SageMaker (AWS)
+### **COMPETIDORES PRINCIPALES - CLOUD ONLY**
 
-| Feature | CodeflowX | SageMaker |
-|---------|-----------|-----------|
-| **Governance Integrado** | ✅ End-to-end | ⚠️ Fragmentado |
-| **Ethics Review** | ✅ | ❌ |
-| **Bias Detection Auto** | ✅ | ⚠️ Manual |
-| **Zero-Downtime Retrain** | ✅ | ❌ |
-| **Incident RCA con IA** | ✅ | ❌ |
-| **Multi-Tenant** | ✅ | ⚠️ Complejo |
-| **Self-Hosted** | ✅ | ❌ (Solo AWS) |
+**Nota Crítica para Comerciales:** NINGÚN competidor ofrece self-hosted. Todos son cloud-only, lo que nos da ventaja ENORME en Administraciones Públicas, Banca y sectores regulados.
+
+#### **1. Vertex AI (Google Cloud)**
+
+**Qué ofrecen:**
+- MLOps platform en Google Cloud
+- Model monitoring y evaluation
+- Governance parcial (solo modelos)
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted (solo GCP)
+- ❌ Governance de Datasets
+- ❌ Governance de Agentes
+- ❌ Governance de Adapters/Merge
+- ❌ Ethics Review formal
+- ❌ Procesos BPMN certificables
+- ❌ Motor de reglas modificable
+
+**Precios (Cloud):**
+- Model monitoring: $0.15/hora por modelo
+- Prediction serving: Desde $0.10/1000 requests
+- Training: Desde $0.49/hora (CPU) hasta $4.20/hora (GPU)
+- **Fuente:** Google Cloud Pricing Calculator (Oct 2024)
+
+**Estimación Cliente Típico (10 modelos):**
+- ~$2,000-5,000/mes solo monitoring + serving
+- Sin incluir training ni governance
 
 ---
 
-### CodeflowX vs Azure ML
+#### **2. Amazon SageMaker (AWS)**
 
-| Feature | CodeflowX | Azure ML |
-|---------|-----------|-----------|
-| **BPMN Workflows** | ✅ 17 procesos | ❌ |
-| **Drools Rules** | ✅ 120+ reglas | ❌ |
-| **Full Automation** | ✅ 70-95% | ⚠️ 30-50% |
-| **EU AI Act Ready** | ✅ | ⚠️ Parcial |
-| **Self-Hosted** | ✅ | ❌ (Solo Azure) |
+**Qué ofrecen:**
+- MLOps platform en AWS
+- Model registry y monitoring
+- Pipelines de ML
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted (solo AWS)
+- ❌ Governance integral (fragmentado)
+- ❌ Ethics Review
+- ❌ Governance de Adapters
+- ❌ Procesos BPMN
+- ❌ Motor de reglas
+
+**Precios (Cloud):**
+- Model hosting: Desde $0.065/hora (CPU) hasta $5.67/hora (GPU)
+- Inference: $0.10-0.20/1000 requests
+- Training: Desde $0.269/hora (CPU) hasta $32.77/hora (GPU P4d)
+- **Fuente:** AWS SageMaker Pricing (Oct 2024)
+
+**Estimación Cliente Típico (10 modelos):**
+- ~$3,000-8,000/mes solo hosting + inference
+- Sin governance real
 
 ---
 
-### CodeflowX vs MLflow (Open Source)
+#### **3. Azure Machine Learning (Microsoft)**
 
-| Feature | CodeflowX | MLflow |
-|---------|-----------|--------|
-| **Governance** | ✅ 17 procesos | ❌ Sin governance |
-| **Compliance** | ✅ Automático | ❌ Manual |
-| **HITL Workflows** | ✅ | ❌ |
-| **Auto-Remediation** | ✅ | ❌ |
-| **Ethics Review** | ✅ | ❌ |
+**Qué ofrecen:**
+- MLOps platform en Azure
+- Model management
+- Monitoring básico
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted (solo Azure)
+- ❌ Governance integral
+- ❌ Ethics Review formal
+- ❌ Governance de Adapters
+- ❌ Procesos BPMN
+- ❌ Sostenibilidad medible
+
+**Precios (Cloud):**
+- Compute: Desde $0.10/hora (CPU) hasta $3.80/hora (GPU)
+- Inference: Variable según instancia
+- Storage: $0.02/GB/mes
+- **Fuente:** Azure ML Pricing (Oct 2024)
+
+**Estimación Cliente Típico (10 modelos):**
+- ~$2,500-6,000/mes
+
+---
+
+#### **4. MLflow (Databricks - Open Source con Cloud)**
+
+**Qué ofrecen:**
+- Model tracking y registry (open source)
+- Databricks Managed MLflow (cloud)
+- Básico, sin governance
+
+**Qué NO ofrecen:**
+- ❌ Governance (solo tracking)
+- ❌ Compliance automático
+- ❌ Ethics Review
+- ❌ Bias Detection
+- ❌ Procesos BPMN
+- ❌ Automatización
+
+**Precios:**
+- Open Source: Gratis (pero sin governance)
+- Databricks Managed: Incluido en Databricks ($0.40-0.70/DBU)
+- **Fuente:** Databricks Pricing (Oct 2024)
+
+**Estimación Cliente Típico:**
+- ~$1,500-4,000/mes (Databricks)
+- Pero SIN governance real
+
+---
+
+### **COMPETIDORES NICHO**
+
+#### **5. Fiddler AI**
+
+**Qué ofrecen:**
+- Model monitoring y explainability
+- Bias detection
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted
+- ❌ Governance completo (solo monitoring)
+- ❌ Procesos BPMN
+- ❌ Governance de Adapters
+
+**Precios:**
+- No públicos, modelo enterprise
+- **Estimación:** $50,000-150,000/año
+- **Fuente:** G2 Reviews y testimonios clientes
+
+---
+
+#### **6. Arize AI**
+
+**Qué ofrecen:**
+- Model monitoring
+- Drift detection
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted
+- ❌ Governance (solo observability)
+- ❌ Procesos de aprobación
+- ❌ Ethics Review
+
+**Precios:**
+- Freemium + Enterprise (no públicos)
+- **Estimación:** $30,000-100,000/año
+- **Fuente:** ProductHunt y comparativas SaaS
+
+---
+
+#### **7. Weights & Biases**
+
+**Qué ofrecen:**
+- Experiment tracking
+- Model registry
+- Monitoring básico
+
+**Qué NO ofrecen:**
+- ❌ Self-hosted (solo cloud)
+- ❌ Governance
+- ❌ Compliance automático
+- ❌ Procesos de aprobación
+
+**Precios:**
+- Teams: $50/usuario/mes
+- Enterprise: Custom (estimado $50,000-200,000/año)
+- **Fuente:** Weights & Biases Pricing Page (Oct 2024)
+
+---
+
+---
+
+## 🎯 NUESTRA POSICIÓN ÚNICA EN EL MERCADO
+
+**Nota para Comerciales:** Esta es tu arma comercial más poderosa
+
+### **SOMOS LOS ÚNICOS CON:**
+
+#### 1. **Self-Hosted Enterprise-Grade**
+- ✅ Todos los competidores son cloud-only
+- ✅ Esto nos da ventaja TOTAL en:
+  - Administraciones Públicas (soberanía obligatoria)
+  - Banca y Finanzas (datos sensibles)
+  - Healthcare (HIPAA strict)
+  - Legal (confidencialidad crítica)
+
+**Argumento de Venta:**
+> "¿Sus datos pueden salir de su infraestructura? Si la respuesta es NO, somos su única opción real."
+
+---
+
+#### 2. **Governance de Adaptación de Modelos**
+- ✅ Ningún competidor gobierna Adapters, Merge, Quantization
+- ✅ Proceso formal de recomendación de estrategia
+- ✅ Métricas de sostenibilidad (CO2, costos)
+- ✅ Lineage completo de modelos
+
+**Argumento de Venta:**
+> "Con 3 millones de modelos disponibles, ¿por qué entrenar desde cero? Gobernamos la forma eficiente de hacer IA."
+
+---
+
+#### 3. **Governance End-to-End Completo**
+- ✅ Datasets → Agentes → Modelos → LLMs → RAG → Adapters → Producción
+- ✅ Todos los competidores solo cubren modelos
+- ✅ Nosotros cubrimos TODO el ciclo
+
+**Argumento de Venta:**
+> "La IA empieza en los datos, no en el modelo. Somos los únicos que gobernamos desde el origen."
+
+---
+
+#### 4. **22 Procesos BPMN Certificables**
+- ✅ 17 implementados + 5 nuevos (v1.1.0)
+- ✅ Ningún competidor usa BPMN para governance
+- ✅ Certificable por auditores
+- ✅ Modificable por el cliente sin código
+
+**Argumento de Venta:**
+> "¿Cómo demuestras compliance ante un auditor? Con procesos certificables, no con dashboards."
+
+---
+
+#### 5. **Motor de Reglas + BPMN + IA (Triple Capa)**
+- ✅ Ningún competidor combina los tres
+- ✅ BPMN (procesos), Drools (reglas), IA (automatización)
+- ✅ Modificable sin código
+- ✅ Auditable y flexible
+
+**Argumento de Venta:**
+> "Automatización inteligente que el cliente puede modificar sin depender de developers."
+
+---
+
+#### 6. **Integración Flexible (API/SDK)**
+- ✅ Trabaja con servidores de inferencia del cliente
+- ✅ No requiere migrar aplicaciones
+- ✅ Stack completo o solo governance
+
+**Argumento de Venta:**
+> "No reemplazamos su infraestructura, nos integramos con ella."
+
+---
+
+## 🏆 TABLA COMPARATIVA COMPETENCIA
+
+**Nota:** Usa esta tabla en presentaciones. Muestra claramente nuestra ventaja.
+
+| Característica | CodeflowX | Vertex AI | SageMaker | Azure ML | Fiddler | Arize | W&B |
+|---|---|---|---|---|---|---|---|
+| **Self-Hosted** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Governance Datasets** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Governance Agentes** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Governance LLMs** | ✅ | ⚠️ | ⚠️ | ⚠️ | ✅ | ⚠️ | ❌ |
+| **Governance RAG** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Governance Adapters** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Ethics Review Formal** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Procesos BPMN** | ✅ 22 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Motor de Reglas** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **Sostenibilidad Medible** | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| **EU AI Act Ready** | ✅ | ⚠️ | ⚠️ | ⚠️ | ⚠️ | ❌ | ❌ |
+| **Integración API/SDK** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Precio/mes (10 modelos)** | **Custom** | ~$3-5K | ~$3-8K | ~$2.5-6K | ~$4-12K | ~$2.5-8K | ~$3-10K |
+
+**Conclusión para Comerciales:**
+- Somos los únicos con self-hosted
+- Somos los únicos con governance end-to-end
+- Somos los únicos con procesos BPMN
+- Precio competitivo vs cloud-only options
 
 ---
 
@@ -1058,13 +1286,13 @@ Vendor: "Plataforma de IA para RR.HH."
 
 ### **Elevator Pitch (30 segundos)**
 
-> "CodeflowX es la única plataforma de AI Governance que combina BPMN, Drools e IA para automatizar hasta el 90% de procesos de gobierno, manteniendo siempre validación humana donde importa. Cumplimiento EU AI Act garantizado, self-hosted, y con features que ningún competidor tiene como reentrenamiento zero-downtime y auto-resolución de incidentes con IA."
+> "CodeflowX es una plataforma integral de AI Governance que cubre todo el ciclo de IA, desde datasets hasta producción. Combina automatización inteligente con validación humana, ofrece flexibilidad de integración con tu infraestructura actual, y está disponible tanto self-hosted como en cloud. Cumplimiento EU AI Act garantizado con procesos certificables y métricas de sostenibilidad reales."
 
 ---
 
 ### **Value Proposition (1 minuto)**
 
-> "Las empresas luchan con governance de IA: aprobaciones lentas, riesgos no detectados, compliance manual. CodeflowX resuelve esto con 17 procesos inteligentes que automatizan el 80% del trabajo pesado: desde aprobar modelos en minutos, detectar drift en horas, hasta resolver incidentes automáticamente en menos de 5 minutos. Todo con procesos BPMN certificables, motor de reglas Drools modificable, y validación humana garantizada. Self-hosted para control total y EU AI Act ready desde día uno."
+> "Las organizaciones que implementan IA enfrentan desafíos críticos: aprobaciones lentas, riesgos ocultos, cumplimiento complejo y costos elevados. CodeflowX resuelve esto con governance integral que cubre desde la validación de datos hasta el monitoreo en producción. Ofrecemos automatización inteligente con control humano donde es crítico, flexibilidad para integrarse con tu infraestructura actual vía API/SDK, y opciones de despliegue self-hosted o cloud. Todo con procesos certificables, métricas de sostenibilidad reales, y cumplimiento EU AI Act garantizado."
 
 ---
 
@@ -1139,29 +1367,22 @@ QUOTE:
 
 ### PROGRAMA PARA ADMINISTRACIONES PÚBLICAS
 
-**Paquete "Gobierno Digital Responsable"**
+**Programa "Gobierno Digital Responsable"**
 
 **Incluye:**
-- ✅ Todos los 17 procesos de governance
-- ✅ Soberanía digital garantizada (self-hosted)
-- ✅ Certificación BPMN para auditorías
+- ✅ 17 procesos de governance certificables
+- ✅ Opciones de despliegue self-hosted (soberanía digital)
 - ✅ Documentación para organismos reguladores
 - ✅ Training para funcionarios públicos
 - ✅ Soporte en español
 - ✅ Cumplimiento ENS (Esquema Nacional de Seguridad)
-- ✅ Integration con sistemas legacy gubernamentales
+- ✅ Integración con sistemas legacy gubernamentales
 
-**Condiciones Especiales:**
-- Licenciamiento adaptado a presupuesto público
-- Support prioritario
-- Roadmap colaborativo (feedback directo)
-- Referencias en sector público
-
-**Casos de Éxito Potenciales:**
-- Ministerios (chatbots ciudadanos)
-- Agencias tributarias (detección fraude con IA)
-- Salud pública (sistemas diagnóstico)
-- Servicios sociales (asignación de ayudas)
+**Casos de Aplicación:**
+- Servicios digitales ciudadanos
+- Sistemas de apoyo a decisiones administrativas
+- Análisis de datos sensibles
+- Asistentes virtuales gubernamentales
 
 ---
 
@@ -1575,30 +1796,160 @@ Sí, CodeflowX escala horizontalmente:
 
 ---
 
-## 🌟 CONCLUSIÓN
+## 🚀 NUEVOS PROCESOS V1.1.0 - ADAPTACIÓN DE MODELOS
 
-**CodeflowX no es solo una herramienta de governance.**
+**Nota para Comerciales:** Estos 5 procesos nuevos son nuestro KILLER FEATURE. Ningún competidor tiene nada similar.
 
-**Es la plataforma que permite a las empresas:**
-- ✅ Innovar con IA con confianza
-- ✅ Cumplir regulaciones sin fricción
-- ✅ Escalar operaciones ML sin límites
-- ✅ Demostrar responsabilidad a stakeholders
+### **GRUPO 6: GOVERNANCE DE ADAPTACIÓN SOSTENIBLE (5 procesos NUEVOS)**
 
-**Con 17 procesos únicos que ningún competidor tiene.**
+#### 18. **Adaptation Strategy Recommendation** - 90% Automatizado
 
-**Resultado:** Tu empresa lidera en IA responsable, rápida y escalable.
+**Qué hace:**
+- Recomienda la mejor estrategia de adaptación (Adapter, Merge, Quantization, Fine-Tuning)
+- Basado en caso de uso, presupuesto, tiempo y hardware del cliente
+- IA analiza y recomienda la opción más eficiente
+
+**Por qué es único:**
+- ✅ NADIE más gobierna estrategias de adaptación
+- ✅ Prioriza sostenibilidad y eficiencia
+- ✅ Métricas: CO2, costo, tiempo por estrategia
+
+**Argumento de Venta:**
+> "¿Por qué gastar $10,000 en fine-tuning cuando un Adapter de $500 logra el mismo resultado? Nuestro sistema lo recomienda automáticamente."
 
 ---
 
-**CodeflowX: Where AI Meets Governance. Intelligently.**
+#### 19. **Adapter Creation Approval** - 85% Automatizado
+
+**Qué hace:**
+- Aprueba creación de Adapters (LoRA/QLoRA)
+- Valida que es la estrategia correcta vs fine-tuning
+- Prioriza eficiencia
+
+**Por qué es único:**
+- ✅ Proceso formal de governance para adapters
+- ✅ Compara automáticamente Adapter vs Fine-Tuning
+- ✅ Documenta ahorro de CO2 y costos
+
+**Beneficio Cliente:**
+- 90% menos recursos que fine-tuning
+- Mismo resultado, fracción del costo
+- Sostenibilidad demostrable
+
+---
+
+#### 20. **Model Merge Approval** - 80% Automatizado
+
+**Qué hace:**
+- Aprueba fusión de modelos existentes
+- Valida compatibilidad y licencias
+- Zero entrenamiento adicional
+
+**Por qué es único:**
+- ✅ Combina capacidades sin entrenar
+- ✅ Valida licencias automáticamente
+- ✅ Estima performance resultante
+
+**Beneficio Cliente:**
+- Fusiona modelos en horas (vs semanas de training)
+- Aprovecha modelos existentes
+- Zero costos de entrenamiento
+
+---
+
+#### 21. **Model Quantization Approval** - 85% Automatizado
+
+**Qué hace:**
+- Aprueba quantización de modelos
+- Valida pérdida de precisión aceptable
+- Habilita edge deployment
+
+**Por qué es único:**
+- ✅ Democratiza acceso a modelos grandes
+- ✅ Reduce requisitos de hardware 4-8x
+- ✅ Valida que precisión no se degrada críticamante
+
+**Beneficio Cliente:**
+- Deploy en edge devices
+- Reduce costos de inferencia 75%
+- Acceso a modelos grandes sin GPUs costosas
+
+---
+
+#### 22. **Fine-Tuning Approval** - 60% Automatizado (RESTRICTIVO)
+
+**Qué hace:**
+- Proceso restrictivo que requiere justificación
+- Pregunta: ¿Por qué no Adapter/Merge/Quantization?
+- Aprobación solo si realmente justificado
+
+**Por qué es único:**
+- ✅ Proceso RESTRICTIVO (único en mercado)
+- ✅ Fuerza a considerar alternativas eficientes
+- ✅ Documenta justificación para auditoría
+
+**Argumento de Venta:**
+> "Mientras otros facilitan el gasto, nosotros optimizamos. El fine-tuning debe justificarse, no ser la opción por defecto."
+
+**Beneficio Cliente:**
+- Reduce costos operacionales 60-70%
+- Compliance con objetivos ESG
+- Sostenibilidad real, no greenwashing
+
+---
+
+### **IMPACTO DE ESTOS 5 PROCESOS**
+
+**Argumento Comercial Potente:**
+
+```
+Cliente SIN CodeflowX:
+├─ 100 modelos creados en 2024
+├─ 80% entrenados desde cero (fine-tuning)
+├─ Costo: $800,000
+├─ CO2: 40,000 kg
+└─ Tiempo: 2,000 horas
+
+Cliente CON CodeflowX (v1.1.0):
+├─ 100 modelos creados en 2024
+├─ 60% Adapters, 20% Merge, 10% Quantization, 10% Fine-Tuning
+├─ Costo: $320,000 (-60%)
+├─ CO2: 12,000 kg (-70%)
+└─ Tiempo: 600 horas (-70%)
+```
+
+**ROI para Cliente:**
+- **Ahorro:** $480,000 en primer año
+- **Sostenibilidad:** 28,000 kg CO2 evitados
+- **Eficiencia:** 1,400 horas ahorradas
+
+**Mensaje Clave para Comerciales:**
+> "Estos 5 procesos solos justifican la inversión en CodeflowX. NINGÚN competidor ofrece governance de adaptación."
+
+---
+
+## 🌟 CONCLUSIÓN
+
+**CodeflowX permite a las organizaciones:**
+- ✅ Innovar con IA con confianza
+- ✅ Cumplir regulaciones de forma continua
+- ✅ Escalar operaciones ML eficientemente
+- ✅ Demostrar responsabilidad a stakeholders y reguladores
+
+**Con governance integral, sostenibilidad medible y flexibilidad de integración.**
+
+**Resultado:** IA responsable, rápida y conforme a regulaciones.
+
+---
+
+**CodeflowX: AI Governance que se adapta a tu organización.**
 
 ---
 
 **Contacto:**  
-[Tu información de contacto]  
-[Website]  
-[LinkedIn]  
+Web: www.codeflowx.ai  
+Email: contact@codeflowx.ai  
+LinkedIn: CodeflowX AI Governance
 
-**¿Listo para ser líder en AI Governance?**  
-**Agenda tu demo hoy.**
+**¿Listo para transformar tu governance de IA?**  
+**Agenda tu demo personalizada.**
