@@ -836,27 +836,24 @@ CodeflowX (AI First):      €1M ARR = 8-10 empleados, Margen 70-80%
 
 **Cómo aplicamos 80% IA en desarrollo:**
 
-**Code Generation:**
-- Entidades JPA: 100% generadas desde JSON
-- Pantallas ZUL: 95% generadas desde templates
-- APIs REST: 90% generadas desde OpenAPI
-- Tests unitarios: 70% generados automáticamente
-- Documentación: 80% generada desde código
+**Nuestra experiencia:**
+Llevamos más de 23 años especializados en automatización de desarrollo de aplicaciones con tecnología propia NoCode/LowCode, y desde hace 5 años aplicamos IA en proyectos de creación de software. Este conocimiento nos permite acelerar el desarrollo **20x** desde frontend hasta backend, procesos, APIs, SDKs e integraciones.
 
-**Ahorro demostrado:**
-- 500 pantallas × 4 horas/pantalla tradicional = 2,000 horas
-- Con IA: 500 pantallas × 0.5 horas = 250 horas
-- **Ahorro: 1,750 horas (88%)**
+**Ejemplo real - Desarrollo de pantallas:**
+- **Tradicional:** 500 pantallas × 4 horas/pantalla = 2,000 horas
+- **Con IA:** 500 pantallas × 0.5 horas = 250 horas
+- **Ahorro:** 1,750 horas (88% reducción)
 
-**Resultado:**
-- 2 developers + IA = 20-30 developers tradicionales
-- €150-200K inversión = €3-5M inversión tradicional
-- 12 meses = 24-36 meses tradicional
+**Resultado demostrado:**
+- 2 developers + IA = capacidad de 20-30 developers tradicionales
+- €150-200K inversión = equivalente a €3-5M inversión tradicional
+- 12 meses desarrollo = 24-36 meses tradicional
 
-**Por qué esto es relevante para Partner:**
-- CodeflowX sigue mejorando producto con IA (bajos costos)
+**Por qué esto es relevante para el Partner:**
+- CodeflowX sigue mejorando producto con IA sin incrementar costos operativos
 - Innovación continua sin aumentar headcount
-- **Dividendos predecibles** (margen 70-80% vs 40-50% tradicional)
+- Márgenes superiores: 70-80% vs 40-50% software tradicional
+- Dividendos predecibles y sostenibles
 
 ---
 
