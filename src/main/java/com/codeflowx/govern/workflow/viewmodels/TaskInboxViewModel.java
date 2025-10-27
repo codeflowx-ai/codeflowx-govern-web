@@ -262,123 +262,155 @@ public class TaskInboxViewModel extends MasterPage {
         
         // ========== TAREAS MOCK - UNA POR CADA PANTALLA ==========
         
+        // Nombres de usuarios reales para más realismo
+        String[] userNames = {"maria.garcia", "carlos.rodriguez", "ana.martinez", "luis.fernandez", "laura.sanchez"};
+        
+        // Generar fechas de vencimiento
+        long now = System.currentTimeMillis();
+        Date dueDateSoon = new Date(now + 2 * 3600000); // +2 horas
+        Date dueDateTomorrow = new Date(now + 86400000); // +1 día
+        Date dueDateNextWeek = new Date(now + 604800000); // +1 semana
+        
         // 1. AgentApprovalHumanOverrideViewModel
         allTasks.add(createMockTask("mock-1", "agent-approval-v1", "Aprobar Agente IA - Cliente Banco Nacional", 
-            "Agente conversacional para atención bancaria. Requiere revisión humana.", "demo.user", "HIGH", "PENDING",
-            "/workflow/agent-approval-override.zul?taskId=mock-1&mock=true"));
+            "Agente conversacional para atención bancaria. Requiere revisión humana.", userNames[0], "HIGH", "PENDING",
+            "/workflow/agent-approval-override.zul?taskId=mock-1&mock=true", 
+            Arrays.asList("Compliance", "EthicsOfficer"), dueDateTomorrow));
             
         // 2. AlertResponseViewModel
         allTasks.add(createMockTask("mock-2", "critical-alert-response", "Responder Alerta Crítica - Sistema Producción", 
-            "Alerta crítica detectada en sistema de inferencia", "demo.user", "CRITICAL", "PENDING",
-            "/workflow/alert-response.zul?taskId=mock-2&mock=true"));
+            "Alerta crítica detectada en sistema de inferencia", userNames[1], "CRITICAL", "PENDING",
+            "/workflow/alert-response.zul?taskId=mock-2&mock=true",
+            Arrays.asList("MLOps"), dueDateSoon));
             
         // 3. BiasMitigationPlanViewModel
         allTasks.add(createMockTask("mock-3", "bias-detection-v1", "Plan Mitigación Sesgo - Modelo HR", 
-            "Crear plan para mitigar sesgo detectado en sistema RRHH", "demo.user", "HIGH", "PENDING",
-            "/workflow/bias-mitigation-plan.zul?taskId=mock-3&mock=true"));
+            "Crear plan para mitigar sesgo detectado en sistema RRHH", userNames[2], "HIGH", "PENDING",
+            "/workflow/bias-mitigation-plan.zul?taskId=mock-3&mock=true",
+            Arrays.asList("Compliance", "EthicsOfficer"), dueDateNextWeek));
             
         // 4. BiasReviewViewModel
         allTasks.add(createMockTask("mock-4", "bias-detection-v1", "Revisar Sesgo Detectado - Modelo Scoring Crédito", 
             "Sesgo demográfico: género y edad en aprobaciones", null, "CRITICAL", "PENDING",
-            "/workflow/bias-review.zul?taskId=mock-4&mock=true"));
+            "/workflow/bias-review.zul?taskId=mock-4&mock=true",
+            Arrays.asList("Compliance", "EthicsOfficer", "DataEngineer"), dueDateSoon));
             
         // 5. BiasUrgentDecisionViewModel
         allTasks.add(createMockTask("mock-5", "bias-detection-v1", "Decisión Urgente Sesgo - Sistema Activo", 
-            "Sesgo crítico en producción requiere decisión inmediata", "demo.user", "CRITICAL", "PENDING",
-            "/workflow/bias-urgent-decision.zul?taskId=mock-5&mock=true"));
+            "Sesgo crítico en producción requiere decisión inmediata", userNames[3], "CRITICAL", "PENDING",
+            "/workflow/bias-urgent-decision.zul?taskId=mock-5&mock=true",
+            Arrays.asList("AdminAI", "Compliance"), dueDateSoon));
             
         // 6. ComplianceReviewDecisionViewModel
         allTasks.add(createMockTask("mock-6", "compliance-monitoring-v1", "Decisión Revisión Compliance - EU AI Act", 
-            "Decidir acción tras timer de 7 días en compliance", "demo.user", "MEDIUM", "PENDING",
-            "/workflow/compliance-review-decision.zul?taskId=mock-6&mock=true"));
+            "Decidir acción tras timer de 7 días en compliance", userNames[0], "MEDIUM", "PENDING",
+            "/workflow/compliance-review-decision.zul?taskId=mock-6&mock=true",
+            Arrays.asList("Compliance"), dueDateNextWeek));
             
         // 7. ComplianceReviewViewModel
         allTasks.add(createMockTask("mock-7", "compliance-monitoring-v1", "Compliance Review - Sistema RAG Legal", 
             "Revisión de hallazgos de compliance", null, "HIGH", "PENDING",
-            "/workflow/compliance-review.zul?taskId=mock-7&mock=true"));
+            "/workflow/compliance-review.zul?taskId=mock-7&mock=true",
+            Arrays.asList("Compliance", "EthicsOfficer"), dueDateTomorrow));
             
         // 8. DatasetReviewReminderViewModel
         allTasks.add(createMockTask("mock-8", "dataset-quality-v1", "Recordatorio Dataset - Training Sentiment Analysis", 
-            "Revisar calidad de dataset tras reminder", "demo.user", "MEDIUM", "PENDING",
-            "/workflow/dataset-review-reminder.zul?taskId=mock-8&mock=true"));
+            "Revisar calidad de dataset tras reminder", userNames[1], "MEDIUM", "PENDING",
+            "/workflow/dataset-review-reminder.zul?taskId=mock-8&mock=true",
+            Arrays.asList("DataEngineer"), dueDateTomorrow));
             
         // 9. DriftAnalysisViewModel
         allTasks.add(createMockTask("mock-9", "drift-detection-v1", "Analizar Drift - Modelo Recomendaciones", 
-            "Investigar causa raíz de drift detectado (-12% accuracy)", "demo.user", "CRITICAL", "PENDING",
-            "/workflow/drift-analysis.zul?taskId=mock-9&mock=true"));
+            "Investigar causa raíz de drift detectado (-12% accuracy)", userNames[2], "CRITICAL", "PENDING",
+            "/workflow/drift-analysis.zul?taskId=mock-9&mock=true",
+            Arrays.asList("DataEngineer", "MLOps"), dueDateSoon));
             
         // 10. DriftReviewDecisionViewModel
         allTasks.add(createMockTask("mock-10", "drift-detection-v1", "Decisión Drift - Modelo Predicción Ventas", 
             "Decidir acción correctiva para drift", null, "HIGH", "PENDING",
-            "/workflow/drift-review-decision.zul?taskId=mock-10&mock=true"));
+            "/workflow/drift-review-decision.zul?taskId=mock-10&mock=true",
+            Arrays.asList("MLOps", "DataEngineer"), dueDateTomorrow));
             
         // 11. EthicsCommitteeReviewViewModel
         allTasks.add(createMockTask("mock-11", "ethics-review-v1", "Ethics Committee - Chatbot Atención Médica", 
-            "Revisión del comité de ética para sistema médico", "demo.user", "CRITICAL", "PENDING",
-            "/workflow/ethics-committee-review.zul?taskId=mock-11&mock=true"));
+            "Revisión del comité de ética para sistema médico", userNames[3], "CRITICAL", "PENDING",
+            "/workflow/ethics-committee-review.zul?taskId=mock-11&mock=true",
+            Arrays.asList("EthicsOfficer", "AdminAI"), dueDateSoon));
             
         // 12. EthicsMitigationPlanViewModel
         allTasks.add(createMockTask("mock-12", "ethics-review-v1", "Plan Mitigación Ética - Sistema Automático", 
-            "Crear plan para mitigar problemas éticos detectados", "demo.user", "HIGH", "PENDING",
-            "/workflow/ethics-mitigation-plan.zul?taskId=mock-12&mock=true"));
+            "Crear plan para mitigar problemas éticos detectados", userNames[4], "HIGH", "PENDING",
+            "/workflow/ethics-mitigation-plan.zul?taskId=mock-12&mock=true",
+            Arrays.asList("EthicsOfficer"), dueDateNextWeek));
             
         // 13. EthicsReviewReminderViewModel
         allTasks.add(createMockTask("mock-13", "ethics-review-v1", "Recordatorio Ethics - Revisión Pendiente", 
             "Reminder de revisión ética pendiente", null, "MEDIUM", "PENDING",
-            "/workflow/ethics-review-reminder.zul?taskId=mock-13&mock=true"));
+            "/workflow/ethics-review-reminder.zul?taskId=mock-13&mock=true",
+            Arrays.asList("EthicsOfficer"), dueDateTomorrow));
             
         // 14. EthicsReviewRequestViewModel
         allTasks.add(createMockTask("mock-14", "ethics-review-v1", "Solicitud Ethics Review - IA Recursos Humanos", 
-            "Solicitar revisión ética para sistema de selección", "demo.user", "HIGH", "PENDING",
-            "/workflow/ethics-review-request.zul?taskId=mock-14&mock=true"));
+            "Solicitar revisión ética para sistema de selección", userNames[0], "HIGH", "PENDING",
+            "/workflow/ethics-review-request.zul?taskId=mock-14&mock=true",
+            Arrays.asList("EthicsOfficer", "AdminAI"), dueDateNextWeek));
             
         // 15. HitlSlaReminderViewModel
         allTasks.add(createMockTask("mock-15", "agent-approval-v1", "Recordatorio SLA HITL - Aprobación Pendiente", 
-            "SLA de revisión humana próximo a vencer", "demo.user", "HIGH", "PENDING",
-            "/workflow/hitl-sla-reminder.zul?taskId=mock-15&mock=true"));
+            "SLA de revisión humana próximo a vencer", userNames[1], "HIGH", "PENDING",
+            "/workflow/hitl-sla-reminder.zul?taskId=mock-15&mock=true",
+            Arrays.asList("Compliance"), dueDateSoon));
             
         // 16. LlmEvaluationReviewViewModel
         allTasks.add(createMockTask("mock-16", "llm-evaluation-v1", "Evaluar LLM - GPT-4o para Soporte Cliente", 
             "Revisión de calidad de respuestas del LLM", null, "MEDIUM", "PENDING",
-            "/workflow/llm-evaluation-review.zul?taskId=mock-16&mock=true"));
+            "/workflow/llm-evaluation-review.zul?taskId=mock-16&mock=true",
+            Arrays.asList("MLOps"), dueDateNextWeek));
             
         // 17. ModelApprovalHumanOverrideViewModel
         allTasks.add(createMockTask("mock-17", "model-approval-v1", "Aprobar Modelo - Predicción Fraude v4.2", 
-            "Modelo de ML para detección de fraude en pagos", "demo.user", "HIGH", "PENDING",
-            "/workflow/model-approval-override.zul?taskId=mock-17&mock=true"));
+            "Modelo de ML para detección de fraude en pagos", userNames[2], "HIGH", "PENDING",
+            "/workflow/model-approval-override.zul?taskId=mock-17&mock=true",
+            Arrays.asList("MLOps", "Compliance"), dueDateTomorrow));
             
         // 18. ModelApprovalReminderViewModel
         allTasks.add(createMockTask("mock-18", "model-approval-v1", "Recordatorio Aprobación Modelo - Churn Prediction", 
-            "Reminder de aprobación de modelo pendiente", "demo.user", "MEDIUM", "PENDING",
-            "/workflow/model-approval-reminder.zul?taskId=mock-18&mock=true"));
+            "Reminder de aprobación de modelo pendiente", userNames[3], "MEDIUM", "PENDING",
+            "/workflow/model-approval-reminder.zul?taskId=mock-18&mock=true",
+            Arrays.asList("MLOps"), dueDateNextWeek));
             
         // 19. ModelEvaluationReviewViewModel
         allTasks.add(createMockTask("mock-19", "model-evaluation-v1", "Revisar Evaluación Modelo - Clasificador Sentimientos", 
             "Revisar resultados de evaluación automática", null, "MEDIUM", "PENDING",
-            "/workflow/model-evaluation-review.zul?taskId=mock-19&mock=true"));
+            "/workflow/model-evaluation-review.zul?taskId=mock-19&mock=true",
+            Arrays.asList("DataEngineer", "MLOps"), dueDateNextWeek));
             
         // 20. PerformanceInterventionViewModel
         allTasks.add(createMockTask("mock-20", "performance-degradation-v1", "Intervención Performance - API Inference", 
-            "Latencia crítica: 300ms → 1200ms. Acción inmediata requerida", "demo.user", "CRITICAL", "PENDING",
-            "/workflow/performance-intervention.zul?taskId=mock-20&mock=true"));
+            "Latencia crítica: 300ms → 1200ms. Acción inmediata requerida", userNames[4], "CRITICAL", "PENDING",
+            "/workflow/performance-intervention.zul?taskId=mock-20&mock=true",
+            Arrays.asList("MLOps"), dueDateSoon));
             
         // 21. PerformanceReviewDecisionViewModel
         allTasks.add(createMockTask("mock-21", "performance-degradation-v1", "Decisión Performance - Endpoint Batch", 
-            "Decidir acción para degradación de performance", "demo.user", "HIGH", "PENDING",
-            "/workflow/performance-review-decision.zul?taskId=mock-21&mock=true"));
+            "Decidir acción para degradación de performance", userNames[0], "HIGH", "PENDING",
+            "/workflow/performance-review-decision.zul?taskId=mock-21&mock=true",
+            Arrays.asList("MLOps"), dueDateTomorrow));
             
         // 22. PromptApprovalRequestViewModel (solicitud)
         // Esta es pantalla de inicio de proceso, no user task, se accede diferente
         
         // 23. PromptHumanReviewViewModel
         allTasks.add(createMockTask("mock-23", "prompt-approval-process", "Revisión Humana Prompt - Marketing Black Friday", 
-            "Prompt para campaña marketing requiere revisión", "demo.user", "MEDIUM", "PENDING",
-            "/workflow/prompt-human-review.zul?taskId=mock-23&mock=true"));
+            "Prompt para campaña marketing requiere revisión", userNames[1], "MEDIUM", "PENDING",
+            "/workflow/prompt-human-review.zul?taskId=mock-23&mock=true",
+            Arrays.asList("Compliance"), dueDateTomorrow));
             
         // 24. RagEvaluationReviewViewModel
         allTasks.add(createMockTask("mock-24", "rag-evaluation-v1", "Evaluar RAG - Sistema Documentación Técnica", 
             "Revisión de calidad de retrieval y generación", null, "MEDIUM", "PENDING",
-            "/workflow/rag-evaluation-review.zul?taskId=mock-24&mock=true"));
+            "/workflow/rag-evaluation-review.zul?taskId=mock-24&mock=true",
+            Arrays.asList("DataEngineer"), dueDateNextWeek));
         
         filteredTasks = new ArrayList<>(allTasks);
         
@@ -408,7 +440,8 @@ public class TaskInboxViewModel extends MasterPage {
      * Crear tarea MOCK para demo
      */
     private TaskDTO createMockTask(String id, String processDefId, String name, String description, 
-                                    String assignee, String priorityStr, String status, String formKey) {
+                                    String assignee, String priorityStr, String status, String formKey,
+                                    List<String> candidateGroups, Date dueDate) {
         TaskDTO task = new TaskDTO();
         task.setId(id);
         task.setProcessDefinitionId(processDefId);
@@ -422,6 +455,8 @@ public class TaskInboxViewModel extends MasterPage {
         
         task.setCreateTime(new java.util.Date(System.currentTimeMillis() - (long)(Math.random() * 86400000))); // Random en último 24h
         task.setFormKey(formKey);
+        task.setCandidateGroups(candidateGroups);
+        task.setDueDate(dueDate);
         
         // Variables del proceso simuladas
         Map<String, Object> vars = new HashMap<>();
@@ -431,6 +466,16 @@ public class TaskInboxViewModel extends MasterPage {
         task.setProcessVariables(vars);
         
         return task;
+    }
+    
+    /**
+     * Convertir Integer priority a texto legible
+     */
+    public String getPriorityText(Integer priority) {
+        if (priority == null) return "MEDIUM";
+        if (priority >= 90) return "HIGH";
+        if (priority >= 50) return "MEDIUM";
+        return "LOW";
     }
     
     /**
