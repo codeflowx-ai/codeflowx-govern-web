@@ -8,6 +8,28 @@ El motor BPMN (Flowable) actualmente está embebido en el WAR del frontend ZK. P
 - **Resiliencia**: Aislar fallos del motor BPMN del frontend
 - **Reutilización**: Mismo engine para frontend ZK, APIs REST, SDKs
 - **Observabilidad**: Métricas y logs separados
+- **Compatibilidad**: Microservicio usa Spring Boot 3.x + Flowable 7.x (frontend sigue en Spring Boot 2.x + Flowable 6.x solo para DTOs)
+
+## ⚠️ Problema de Compatibilidad Spring Boot 2.x vs Flowable 7.x
+
+### Situación Actual
+- **Frontend**: Spring Boot 2.7.3 (no se puede migrar a 3.x por dependencias ZKoss y Suinsit)
+- **Flowable 7.x**: Requiere Spring Boot 3.x
+- **Incompatibilidad**: Flowable 7.x NO funciona con Spring Boot 2.x
+
+### Solución: Separación en Microservicio
+
+| Componente | Spring Boot | Flowable | Uso |
+|------------|-------------|----------|-----|
+| **Frontend ZK** | 2.7.3 | 6.8.1 | Solo DTOs y cliente REST (sin engine) |
+| **Microservicio BPMN** | 3.2+ | 7.2.0 | Engine completo, procesos, tareas |
+
+**Ventajas de esta solución:**
+- ✅ Frontend mantiene Spring Boot 2.x sin problemas
+- ✅ Microservicio usa últimas versiones (Spring Boot 3.x + Flowable 7.x)
+- ✅ Frontend solo necesita DTOs ligeros (TaskDTO, ProcessDTO) sin dependencias del engine
+- ✅ Separación clara de responsabilidades
+- ✅ Futuro: Frontend puede migrar a Spring Boot 3.x sin afectar microservicio BPMN
 
 ## 🏗️ Arquitectura Propuesta
 
@@ -171,7 +193,108 @@ Response 200:
 }
 ```
 
+## 📦 Dependencias Maven
+
+### Frontend (pom.xml) - ELIMINAR Engine Flowable
+
+```xml
+<!-- ANTES: Flowable Engine Completo (INCOMPATIBLE con Spring Boot 2.x) -->
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
+    <version>7.2.0</version> <!-- Requiere Spring Boot 3.x -->
+</dependency>
+
+<!-- DESPUÉS: Solo DTOs ligeros (COMPATIBLE con Spring Boot 2.x) -->
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
+    <version>6.8.1</version> <!-- Compatible Spring Boot 2.x -->
+</dependency>
+
+<!-- O mejor aún: DTOs propios sin dependencia de Flowable -->
+<!-- Los DTOs (TaskDTO, ProcessDTO) se definen en el frontend -->
+<!-- sin ninguna dependencia de Flowable -->
+```
+
+### Microservicio BPMN (pom.xml nuevo)
+
+```xml
+<parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.1</version> <!-- Spring Boot 3.x -->
+</parent>
+
+<properties>
+    <java.version>17</java.version>
+    <flowable.version>7.2.0</flowable.version>
+</properties>
+
+<dependencies>
+    <!-- Flowable Engine Completo -->
+    <dependency>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring-boot-starter</artifactId>
+        <version>${flowable.version}</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.flowable</groupId>
+        <artifactId>flowable-spring-boot-starter-rest</artifactId>
+        <version>${flowable.version}</version>
+    </dependency>
+    
+    <!-- PostgreSQL -->
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+    </dependency>
+    
+    <!-- Actuator para health checks -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+</dependencies>
+```
+
 ## 💻 Implementación Frontend
+
+### DTOs Propios (Sin dependencia de Flowable Engine)
+
+```java
+// TaskDTO.java - DTO propio del frontend
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskDTO {
+    private String id;
+    private String name;
+    private String description;
+    private String assignee;
+    private Integer priority;
+    private Date createTime;
+    private Date dueDate;
+    private String processDefinitionId;
+    private String processInstanceId;
+    private String formKey;
+    private Map<String, Object> processVariables;
+}
+
+// ProcessDTO.java
+@Data
+@Builder
+public class ProcessDTO {
+    private String id;
+    private String key;
+    private String name;
+    private Integer version;
+    private String category;
+    private String deploymentId;
+}
+```
 
 ### Cliente REST Interno
 
@@ -517,29 +640,87 @@ flowable_tasks_avg_duration_seconds{process="model-approval-v1"} 3600
 }
 ```
 
+## ⚠️ Problema de Compatibilidad Spring Boot 2.x + Flowable 7.x
+
+### El Problema
+- **Frontend actual**: Spring Boot 2.7.3 (no se puede migrar aún a 3.x por ZKoss y dependencias)
+- **Flowable 7.x**: Requiere Spring Boot 3.x (incompatible)
+- **Necesidad**: Librerías Flowable para compilar DTOs (`TaskDTO`, etc.)
+
+### Solución Implementada: Flowable 6.8.x
+
+```xml
+<!-- pom.xml -->
+<flowable.version>6.8.1</flowable.version>
+```
+
+**Ventajas:**
+- ✅ Totalmente compatible con Spring Boot 2.7.x
+- ✅ API estable y madura
+- ✅ Todas las funcionalidades BPMN necesarias
+- ✅ DTOs y clases disponibles para compilar
+- ✅ Se puede desactivar con `flowable.enabled=false`
+
+**El microservicio BPMN futuro:**
+- Usará Spring Boot 3.x + Flowable 7.x
+- Comunicación REST independiente
+- Frontend solo consume API REST (sin dependencia directa)
+
+### Alternativas Descartadas
+
+**Opción 2: Crear DTOs propios sin Flowable**
+```java
+// DTOs personalizados sin dependencia Flowable
+public class TaskDTO {
+    private String id;
+    private String name;
+    // ... sin usar org.flowable.task.api.Task
+}
+```
+❌ Problema: Perderíamos mappings automáticos y compatibilidad futura
+
+**Opción 3: Scope `provided` en Flowable 7.x**
+```xml
+<dependency>
+    <groupId>org.flowable</groupId>
+    <artifactId>flowable-spring-boot-starter</artifactId>
+    <version>7.2.0</version>
+    <scope>provided</scope>
+</dependency>
+```
+❌ Problema: Conflictos en runtime con Spring Boot 2.7.x
+
 ## 🚀 Plan de Migración
 
-### Fase 1: Demo (Actual)
+### Fase 1: Demo (Actual) ✅
 - ✅ Frontend con mockMode=true
 - ✅ Bandeja de tareas MOCK (24 tareas demo)
-- ✅ Flowable deshabilitado en frontend
+- ✅ Flowable 6.8.1 en dependencies (pero deshabilitado)
+- ✅ `flowable.enabled=false` en application.yml
 - ✅ Sin microservicio BPMN aún
 
-### Fase 2: Desarrollo Microservicio
+### Fase 2: Desarrollo Microservicio BPMN
 - Crear repo `codeflowx-bpmn-service`
+- **Spring Boot 3.2.x + Flowable 7.x** (última versión)
 - Mover `TaskManagementService`
 - Implementar REST controllers
 - Tests unitarios e integración
 
-### Fase 3: Integración
-- Implementar `BpmnClient` en frontend
+### Fase 3: Integración Frontend → Microservicio
+- Implementar `BpmnClient` en frontend (REST client)
+- Frontend sigue con Spring Boot 2.7.x
 - Probar comunicación interna K8s
 - Pruebas de carga
 
 ### Fase 4: Producción
-- Desplegar ambos servicios
+- Desplegar ambos servicios (diferentes versiones Spring Boot)
 - Monitoreo y alertas
 - Documentación operativa
+
+### Fase 5: Migración completa (Futuro)
+- Cuando ZKoss soporte Spring Boot 3.x
+- Migrar frontend a Spring Boot 3.x
+- Eliminar dependencia Flowable del frontend
 
 ## 🎯 Beneficios Específicos CodeflowX
 
