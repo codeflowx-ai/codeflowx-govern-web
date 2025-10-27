@@ -127,12 +127,10 @@ bpmn:
     mock-mode: true
     
 # Flowable Engine (DESHABILITADO para demo)
-# Los procesos BPMN se ejecutarán en microservicio separado
+# Flowable habilitado temporalmente para crear schema 6.8.1
 flowable:
-  enabled: false  # Deshabilita Flowable embebido
-  
-  # Configuración comentada - se usará en microservicio BPMN
-  # process-definition-location-prefix: classpath*:/processes/
-  # process-definition-location-suffixes: "**.bpmn20.bpmn,**.bpmn20.xml,**.bpmn"
-  # database-schema-update: true
-  # async-executor-activate: true
+  enabled: true
+  database-schema-update: true  # Crea tablas automáticamente
+  async-executor-activate: false  # Desactivar para demo
+  # No cargar procesos BPMN aún (se cargarán en microservicio futuro)
+  process-definition-location-prefix: classpath*:/processes-disabled/
