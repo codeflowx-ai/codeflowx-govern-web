@@ -99,14 +99,14 @@ public class TaskInboxViewModel extends MasterPage {
         // TODO Auto-generated method stub
     }
 
-    // ========== Servicios Flowable ==========
-    @WireVariable
+    // ========== Servicios Flowable (Opcionales para MOCK mode) ==========
+    @WireVariable(required = false)
     private TaskManagementService taskManagementService;
 
-    @WireVariable
+    @WireVariable(required = false)
     private TaskService taskService;
 
-    @WireVariable
+    @WireVariable(required = false)
     private RuntimeService runtimeService;
 
     // ========== Modo MOCK ==========
@@ -205,7 +205,12 @@ public class TaskInboxViewModel extends MasterPage {
     @Command
     @NotifyChange({"allTasks", "filteredTasks", "totalTasks", "assignedToMeCount", "groupTasksCount", "processDefinitions"})
     public void loadTasks() {
-        if (mockMode) {
+        // Auto-detectar MOCK mode si Flowable no está disponible
+        if (mockMode || taskManagementService == null) {
+            if (taskManagementService == null) {
+                log.info("🎭 Flowable no disponible - activando MOCK mode automáticamente");
+                mockMode = true;
+            }
             loadMockTasks();
             return;
         }
