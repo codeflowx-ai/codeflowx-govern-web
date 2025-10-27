@@ -710,6 +710,24 @@ public class TaskInboxViewModel extends MasterPage {
         if (availableUsers == null) return "(0 usuarios)";
         return "(" + availableUsers.size() + " usuarios)";
     }
+    
+    public String getPriorityStyle(Integer priority) {
+        if (priority == null) priority = 50;
+        if (priority >= 90) return "font-weight: bold; color: var(--primary-text);";
+        if (priority >= 50) return "font-weight: 500; color: var(--first-aux);";
+        return "color: var(--second-aux);";
+    }
+    
+    public String getLabelTotal() {
+        return totalTasks + " tareas totales";
+    }
+    
+    @Command
+    @NotifyChange({"selectedTask"})
+    public void selectTask(@BindingParam("task") TaskDTO task) {
+        this.selectedTask = task;
+        log.info("✅ Tarea seleccionada: {}", task != null ? task.getId() : "null");
+    }
 
     public String getProcessName(String processDefinitionId) {
         if (processDefinitionId == null) return "N/A";
