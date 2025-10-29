@@ -1,0 +1,304 @@
+<?page title="RAG Rollback" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.rag.RagRollbackViewModel')">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1">
+                    <i class="fas fa-undo me-2"></i>
+                    Rollback de Sistemas RAG
+                </h2>
+                <p class="text-muted">Gestión de rollbacks y recuperación de versiones</p>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Total Rollbacks</p>
+                                <h3 class="mb-0" label="@load(vm.totalRollbacks)"/>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-history text-primary fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Exitosos</p>
+                                <h3 class="mb-0" label="@load(vm.successRollbacks)"/>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-check-circle text-success fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Fallidos</p>
+                                <h3 class="mb-0" label="@load(vm.failedRollbacks)"/>
+                            </div>
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-times-circle text-danger fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">En Proceso</p>
+                                <h3 class="mb-0" label="@load(vm.inProgressRollbacks)"/>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-spinner text-warning fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Sistema RAG"
+                                  value="@bind(vm.filterRagSystem)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos los sistemas" value=""/>
+                            <comboitem forEach="@load(vm.ragSystemsList)" 
+                                       label="@load(each.ragsystemname)" 
+                                       value="@load(each.idxragsystem)"/>
+                        </combobox>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <combobox class="form-control" placeholder="Estado"
+                                  value="@bind(vm.filterStatus)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos los estados" value=""/>
+                            <comboitem label="Exitoso" value="SUCCESS"/>
+                            <comboitem label="Fallido" value="FAILED"/>
+                            <comboitem label="En Proceso" value="IN_PROGRESS"/>
+                            <comboitem label="Cancelado" value="CANCELLED"/>
+                        </combobox>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <combobox class="form-control" placeholder="Impacto"
+                                  value="@bind(vm.filterImpact)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos" value=""/>
+                            <comboitem label="Alto" value="HIGH"/>
+                            <comboitem label="Medio" value="MEDIUM"/>
+                            <comboitem label="Bajo" value="LOW"/>
+                        </combobox>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <textbox class="form-control" placeholder="Buscar..."
+                                     value="@bind(vm.searchText)" instant="true"
+                                     onChange="@command('searchRollbacks')"/>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-2">
+                        <button class="btn btn-primary w-100" onClick="@command('showInitiateModal')">
+                            <i class="fas fa-undo me-1"></i>Nuevo Rollback
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de rollbacks -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Historial de Rollbacks</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onClick="@command('refreshRollbacks')">
+                        <i class="fas fa-sync-alt me-1"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sistema RAG</th>
+                                <th>Versión Origen</th>
+                                <th>Versión Destino</th>
+                                <th>Razón</th>
+                                <th class="text-center">Duración</th>
+                                <th class="text-center">Impacto</th>
+                                <th class="text-center">Estado</th>
+                                <th>Iniciado por</th>
+                                <th>Fecha</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr forEach="@load(vm.rollbacksList)">
+                                <td>
+                                    <strong label="@load(vm.getRagSystemName(each.ragSystem))"/>
+                                </td>
+                                <td>
+                                    <span class="badge bg-secondary" label="@load(each.ragrfromversion)"/>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info" label="@load(each.ragrtoversion)"/>
+                                </td>
+                                <td>
+                                    <small label="@load(vm.truncate(each.ragrreason, 50))"/>
+                                </td>
+                                <td class="text-center">
+                                    <label value="@load(vm.formatDuration(each.ragrduration))"/>
+                                </td>
+                                <td class="text-center">
+                                    <span class="@load(vm.getImpactColor(each.ragrimpact))"
+                                          label="@load(each.ragrimpact)"/>
+                                </td>
+                                <td class="text-center">
+                                    <span class="@load(vm.getStatusColor(each.ragrstatus))"
+                                          label="@load(each.ragrstatus)"/>
+                                </td>
+                                <td>
+                                    <small label="@load(each.ragrinitiatedby)"/>
+                                </td>
+                                <td>
+                                    <small label="@load(vm.formatDate(each.ragrinitiatedat))"/>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                onClick="@command('viewRollback', rollback=each)"
+                                                title="Ver detalles">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" 
+                                                onClick="@command('cancelRollback', rollback=each)"
+                                                disabled="@load(each.ragrstatus ne 'IN_PROGRESS')"
+                                                title="Cancelar">
+                                            <i class="fas fa-ban"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Iniciar Rollback -->
+        <window id="initiateModal" title="Iniciar Rollback"
+                border="normal" width="700px" mode="modal" 
+                visible="@load(vm.showModal)" onClose="@command('closeModal')">
+            <div class="p-3">
+                <!-- Alerta de advertencia -->
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Advertencia:</strong> Un rollback puede afectar el funcionamiento del sistema. 
+                    Asegúrese de validar el impacto antes de continuar.
+                </div>
+                
+                <div class="row g-3">
+                    <!-- Sistema RAG -->
+                    <div class="col-12">
+                        <label class="form-label">Sistema RAG *</label>
+                        <combobox class="form-control" value="@bind(vm.rollbackRagSystemId)" 
+                                  buttonVisible="false" onChange="@command('loadVersions')">
+                            <comboitem forEach="@load(vm.ragSystemsList)" 
+                                       label="@load(each.ragsystemname)" 
+                                       value="@load(each.idxragsystem)"/>
+                        </combobox>
+                    </div>
+                    
+                    <!-- Versiones -->
+                    <div class="col-md-6">
+                        <label class="form-label">Versión Actual</label>
+                        <textbox class="form-control" value="@load(vm.currentVersion)" readonly="true"/>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Versión Destino *</label>
+                        <combobox class="form-control" value="@bind(vm.rollbackToVersion)" buttonVisible="false">
+                            <comboitem forEach="@load(vm.availableVersions)" 
+                                       label="@load(each.ragvversionnumber)" 
+                                       value="@load(each.ragvversionnumber)"/>
+                        </combobox>
+                    </div>
+                    
+                    <!-- Razón -->
+                    <div class="col-12">
+                        <label class="form-label">Razón del Rollback *</label>
+                        <textbox class="form-control" value="@bind(vm.rollbackReason)" 
+                                 rows="3" multiline="true"
+                                 placeholder="Describa la razón del rollback..."/>
+                    </div>
+                    
+                    <!-- Impacto -->
+                    <div class="col-12">
+                        <label class="form-label">Nivel de Impacto *</label>
+                        <combobox class="form-control" value="@bind(vm.rollbackImpact)" buttonVisible="false">
+                            <comboitem label="Bajo - Sin afectación de servicio" value="LOW"/>
+                            <comboitem label="Medio - Afectación parcial" value="MEDIUM"/>
+                            <comboitem label="Alto - Afectación total" value="HIGH"/>
+                        </combobox>
+                    </div>
+                    
+                    <!-- Validación de impacto -->
+                    <div class="col-12" visible="@load(vm.showImpactWarning)">
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            <strong>Alto Impacto:</strong> Este rollback requiere aprobación de gobierno.
+                            El proceso se registrará y notificará al equipo de cumplimiento.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button class="btn btn-secondary" onClick="@command('closeModal')">
+                        Cancelar
+                    </button>
+                    <button class="btn btn-danger" onClick="@command('initiateRollback')">
+                        <i class="fas fa-undo me-1"></i>
+                        Iniciar Rollback
+                    </button>
+                </div>
+            </div>
+        </window>
+
+    </div>
+</zk>
+
