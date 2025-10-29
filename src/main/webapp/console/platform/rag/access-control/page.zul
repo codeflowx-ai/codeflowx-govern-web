@@ -1,0 +1,404 @@
+<?page title="RAG Access Control" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.rag.RagAccessControlViewModel')">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1">
+                    <i class="fas fa-user-lock me-2"></i>
+                    Control de Acceso RAG
+                </h2>
+                <p class="text-muted">Gestión de permisos y control de acceso a sistemas RAG</p>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Usuarios Autorizados</p>
+                                <h3 class="mb-0" label="@load(vm.totalUsers)"/>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-users text-primary fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Roles Activos</p>
+                                <h3 class="mb-0" label="@load(vm.totalRoles)"/>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-user-tag text-success fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Intentos Bloqueados</p>
+                                <h3 class="mb-0 text-danger" label="@load(vm.blockedAttempts)"/>
+                            </div>
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-ban text-danger fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1 small">Accesos Hoy</p>
+                                <h3 class="mb-0" label="@load(vm.todayAccess)"/>
+                            </div>
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <i class="fas fa-sign-in-alt text-info fa-lg"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white">
+                <ul class="nav nav-tabs card-header-tabs">
+                    <li class="nav-item">
+                        <a class="nav-link @load(vm.activeTab eq 'systems' ? 'active' : '')" 
+                           onClick="@command('changeTab', tab='systems')">
+                            <i class="fas fa-server me-1"></i>Sistemas
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @load(vm.activeTab eq 'users' ? 'active' : '')" 
+                           onClick="@command('changeTab', tab='users')">
+                            <i class="fas fa-users me-1"></i>Usuarios
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @load(vm.activeTab eq 'roles' ? 'active' : '')" 
+                           onClick="@command('changeTab', tab='roles')">
+                            <i class="fas fa-user-tag me-1"></i>Roles
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link @load(vm.activeTab eq 'audit' ? 'active' : '')" 
+                           onClick="@command('changeTab', tab='audit')">
+                            <i class="fas fa-history me-1"></i>Auditoría
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                
+                <!-- Tab: Sistemas -->
+                <div visible="@load(vm.activeTab eq 'systems')">
+                    <div class="row mb-3">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <textbox class="form-control" placeholder="Buscar sistema..."
+                                         value="@bind(vm.searchText)" instant="true"
+                                         onChange="@command('searchSystems')"/>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" onClick="@command('showAddAccessModal')">
+                                <i class="fas fa-plus me-1"></i>Agregar Acceso
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sistema RAG</th>
+                                    <th>Nivel de Acceso</th>
+                                    <th class="text-center">Usuarios</th>
+                                    <th class="text-center">Estado</th>
+                                    <th>Última Modificación</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr forEach="@load(vm.systemsList)">
+                                    <td>
+                                        <strong label="@load(each.ragsystemname)"/>
+                                        <br/>
+                                        <small class="text-muted" label="@load(each.ragdescription)"/>
+                                    </td>
+                                    <td>
+                                        <span class="@load(vm.getAccessLevelColor(each.ragaccesslevel))"
+                                              label="@load(vm.translateAccessLevel(each.ragaccesslevel))"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary" label="@load(vm.getUserCount(each))"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="@load(vm.getStatusColor(each.ragstatus))"
+                                              label="@load(each.ragstatus)"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(vm.formatDate(each.ragupdatedat))"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    onClick="@command('manageAccess', system=each)"
+                                                    title="Gestionar acceso">
+                                                <i class="fas fa-key"></i>
+                                            </button>
+                                            <button class="btn btn-outline-info btn-sm" 
+                                                    onClick="@command('viewPermissions', system=each)"
+                                                    title="Ver permisos">
+                                                <i class="fas fa-list"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Tab: Usuarios -->
+                <div visible="@load(vm.activeTab eq 'users')">
+                    <div class="row mb-3">
+                        <div class="col-md-10">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <textbox class="form-control" placeholder="Buscar usuario..."
+                                         value="@bind(vm.searchUserText)" instant="true"
+                                         onChange="@command('searchUsers')"/>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onClick="@command('exportUserAccess')">
+                                <i class="fas fa-file-download me-1"></i>Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Integración con SSO:</strong> Los usuarios se gestionan desde el módulo de administración. 
+                        Aquí solo se asignan permisos específicos para sistemas RAG.
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Email</th>
+                                    <th>Rol Principal</th>
+                                    <th class="text-center">Sistemas Asignados</th>
+                                    <th class="text-center">Estado</th>
+                                    <th>Último Acceso</th>
+                                    <th class="text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr forEach="@load(vm.usersList)">
+                                    <td>
+                                        <i class="fas fa-user-circle me-2"></i>
+                                        <strong label="@load(each.userName)"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(each.userEmail)"/>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary" label="@load(each.userRole)"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-info" label="@load(each.systemsCount)"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="@load(vm.getUserStatusColor(each.userStatus))"
+                                              label="@load(each.userStatus)"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(vm.formatDate(each.lastAccess))"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    onClick="@command('editUserAccess', user=each)"
+                                                    title="Editar acceso">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onClick="@command('revokeUserAccess', user=each)"
+                                                    title="Revocar acceso">
+                                                <i class="fas fa-ban"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Tab: Roles -->
+                <div visible="@load(vm.activeTab eq 'roles')">
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <button class="btn btn-primary" onClick="@command('createRole')">
+                                <i class="fas fa-plus me-1"></i>Crear Rol
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4" forEach="@load(vm.rolesList)">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <h5 class="mb-0">
+                                            <i class="@load(vm.getRoleIcon(each.roleName)) me-2"></i>
+                                            <label value="@load(each.roleName)"/>
+                                        </h5>
+                                        <span class="@load(vm.getRoleStatusColor(each.roleStatus))"
+                                              label="@load(each.roleStatus)"/>
+                                    </div>
+                                    <p class="text-muted small mb-3" label="@load(each.roleDescription)"/>
+                                    <div class="mb-2">
+                                        <strong>Permisos:</strong>
+                                        <ul class="small mb-0">
+                                            <li forEach="@load(each.permissions)">
+                                                <label value="@load(each)"/>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <small class="text-muted">
+                                            <label value="@load(each.usersCount)"/> usuarios
+                                        </small>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-primary btn-sm" 
+                                                    onClick="@command('editRole', role=each)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger btn-sm" 
+                                                    onClick="@command('deleteRole', role=each)"
+                                                    disabled="@load(each.isSystemRole)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab: Auditoría -->
+                <div visible="@load(vm.activeTab eq 'audit')">
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <combobox class="form-control" placeholder="Tipo de Evento"
+                                      value="@bind(vm.filterEventType)" buttonVisible="false"
+                                      onChange="@command('applyAuditFilters')">
+                                <comboitem label="Todos" value=""/>
+                                <comboitem label="Acceso Permitido" value="ACCESS_GRANTED"/>
+                                <comboitem label="Acceso Denegado" value="ACCESS_DENIED"/>
+                                <comboitem label="Cambio Permisos" value="PERMISSION_CHANGE"/>
+                                <comboitem label="Rol Asignado" value="ROLE_ASSIGNED"/>
+                            </combobox>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="input-group">
+                                <span class="input-group-text bg-white">
+                                    <i class="fas fa-search text-muted"></i>
+                                </span>
+                                <textbox class="form-control" placeholder="Buscar en auditoría..."
+                                         value="@bind(vm.searchAuditText)" instant="true"
+                                         onChange="@command('searchAudit')"/>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-outline-secondary w-100" onClick="@command('exportAuditLog')">
+                                <i class="fas fa-file-download me-1"></i>Exportar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-link me-2"></i>
+                        <strong>Integración con Gobierno:</strong> Todos los eventos de acceso se registran en el sistema de auditoría centralizado.
+                        <a href="javascript:void(0)" onClick="@command('viewGovernanceAudit')">Ver auditoría completa</a>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Fecha/Hora</th>
+                                    <th>Usuario</th>
+                                    <th>Evento</th>
+                                    <th>Sistema</th>
+                                    <th>Detalles</th>
+                                    <th class="text-center">Resultado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr forEach="@load(vm.auditLogsList)">
+                                    <td>
+                                        <small label="@load(vm.formatDateTime(each.timestamp))"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(each.userName)"/>
+                                    </td>
+                                    <td>
+                                        <span class="@load(vm.getEventTypeColor(each.eventType))"
+                                              label="@load(vm.translateEventType(each.eventType))"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(each.systemName)"/>
+                                    </td>
+                                    <td>
+                                        <small label="@load(vm.truncate(each.details, 60))"/>
+                                    </td>
+                                    <td class="text-center">
+                                        <i class="@load(vm.getResultIcon(each.result))"></i>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+</zk>
+

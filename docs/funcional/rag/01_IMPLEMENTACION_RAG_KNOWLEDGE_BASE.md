@@ -407,27 +407,53 @@ Todos los ViewModels pendientes deben seguir el patrón `BaseFront`:
 
 - ✅ Entidades JPA: **4/4** (100%)
 - ✅ Scripts SQL: **1/1** (100%)
-- ✅ Pantallas ZKoss Principales: **3/3** (100%) - Overview, Registry, Data Sources
+- ✅ Pantallas ZKoss: **7/7** (100%) - Overview, Registry, Data Sources, Rollback, Bias Detection, Compliance, Access Control
 - ✅ Pantallas Secundarias Existentes: **11 archivos** (Versioning, Monitoring, Quality Control)
-- ⏳ Pantallas Pendientes: **4** (Rollback, Bias Detection, Compliance, Access Control)
-- ✅ ViewModels Principales: **3/3** (100%)
-- ⏳ ViewModels Pendientes: **4** (para pantallas pendientes)
-- ⏳ Integración leka-server: **0%**
+- ✅ ViewModels: **7/7** (100%) - Todos implementados con patrón BaseFront
+- ⏳ Integración leka-server: **0%** (pendiente)
 
-### ✅ Completado (Fases 1 y 2):
-- ✅ Overview - Dashboard principal (page.zul + summary.zul)
-- ✅ Registry - Vista grid/list + Modal CRUD
-- ✅ Data Sources - Dashboard + Gestión de fuentes (page.zul + 4 secundarias)
+### ✅ Completado (Fases 1, 2 y 3):
+
+**Fase 1 - Fundación:**
+- ✅ Overview - Dashboard principal (page.zul + summary.zul + ViewModel)
+- ✅ Registry - Vista grid/list + Modal CRUD + ViewModel
+- ✅ Data Sources - Dashboard + Gestión de fuentes (page.zul + 4 secundarias + ViewModel)
+
+**Fase 2 - Screens Existentes:**
 - ✅ Versioning - Ya existe (overview.zul, page.zul)
 - ✅ Monitoring - Ya existe (3 archivos: health-dashboard, metrics-summary, usage-by-agent)
 - ✅ Quality Control - Ya existe (2 archivos: chunk-distribution, retrieval-quality)
 
-### ⏳ Pendiente (Fase 3 - Solo 4 pantallas):
-- ⏳ Rollback - Directorio vacío
-- ⏳ Bias Detection - Directorio vacío
-- ⏳ Compliance - Directorio vacío
-- ⏳ Access Control - Directorio vacío
+**Fase 3 - Compliance & Security (COMPLETA):**
+- ✅ Rollback - page.zul + RagRollbackViewModel (con integración gobierno alto impacto)
+- ✅ Bias Detection - page.zul + RagBiasDetectionViewModel (reportes a gobierno)
+- ✅ Compliance - page.zul + RagComplianceViewModel (políticas de gobierno integradas)
+- ✅ Access Control - page.zul + RagAccessControlViewModel (auditoría centralizada)
 
-**Última actualización:** 2025-01-29 (Fase 2)
+### 🔗 Integración con Gobierno Implementada:
+
+**Rollback:**
+- `logActivity('ALERTAR', 'GOVERNANCE')` para rollbacks de alto impacto
+- Validación de impacto con alertas visuales
+- Historial completo con duración y razones
+
+**Bias Detection:**
+- Botón "Reportar a Gobierno" para fuentes de alto riesgo (score >= 70)
+- Alertas automáticas para fuentes críticas
+- Cálculo de conformidad y métricas de riesgo
+
+**Compliance:**
+- Vista de políticas de gobierno activas
+- Integración con dashboard de gobierno
+- Monitoreo de cumplimiento por sistema
+- Estados: COMPLIANT, NON_COMPLIANT, UNDER_REVIEW
+
+**Access Control:**
+- Auditoría centralizada integrada con gobierno
+- Logs de acceso: GRANTED, DENIED, PERMISSION_CHANGE
+- Revocación de acceso con registro en gobierno
+- Gestión de roles y permisos
+
+**Última actualización:** 2025-01-29 (Fase 3 COMPLETA)
 
 
