@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+<window title="Playground Chat" border="normal" width="100%" height="100%" 
+        apply="com.codeflowx.platform.viewmodel.playground.PlaygroundChatViewModel">
+    
+    <style src="/css/bootstrap.min.css"/>
+    <style src="/css/custom.css"/>
+    
+    <div class="container-fluid h-100">
+        <div class="row h-100">
+            <!-- Sidebar - Sessions -->
+            <div class="col-md-3 border-end h-100" style="overflow-y: auto;">
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="mb-0">Sessions</h5>
+                        <button class="btn btn-sm btn-primary" onClick="@command('newSession')">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Session List -->
+                    <div class="list-group">
+                        <template name="session" var="s">
+                            <div class="list-group-item list-group-item-action ${s.idxplaygroundsession == vm.currentSessionId ? 'active' : ''}" 
+                                 onClick="@command('selectSession', session=s)">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">${s.sessionname}</h6>
+                                        <small class="text-muted">${vm.formatDate(s.sessioncreatedat)}</small>
+                                    </div>
+                                    <span class="badge bg-${vm.getRiskColor(s.risklevel)}">${s.risklevel}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-message me-1"></i>${s.messagecount} msgs
+                                        <i class="fas fa-coins ms-2 me-1"></i>${s.tokensused}
+                                    </small>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Chat Area -->
+            <div class="col-md-6 h-100 d-flex flex-column">
+                <!-- Chat Header -->
+                <div class="border-bottom p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">${vm.currentSessionName}</h5>
+                            <small class="text-muted">
+                                Model: <span class="badge bg-secondary">${vm.selectedModel}</span>
+                            </small>
+                        </div>
+                        <div class="btn-group btn-group-sm">
+                            <button class="btn btn-outline-secondary" onClick="@command('clearChat')">
+                                <i class="fas fa-trash me-1"></i>Clear
+                            </button>
+                            <button class="btn btn-outline-primary" onClick="@command('exportChat')">
+                                <i class="fas fa-download me-1"></i>Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Messages Area -->
+                <div class="flex-grow-1 p-3" style="overflow-y: auto; height: 500px;">
+                    <template name="message" var="msg">
+                        <div class="mb-3 ${msg.chatrole == 'USER' ? 'text-end' : ''}">
+                            <div class="d-inline-block ${msg.chatrole == 'USER' ? 'bg-primary text-white' : 'bg-light'} rounded p-3" 
+                                 style="max-width: 70%;">
+                                <div class="mb-1">
+                                    <small class="opacity-75">${msg.chatrole}</small>
+                                </div>
+                                <div>${msg.chatmessage != null ? msg.chatmessage : msg.chatresponse}</div>
+                                <div class="mt-2" visible="@bind(msg.contentviol || msg.biasdetected || msg.piidetected)">
+                                    <div class="alert alert-warning alert-sm mb-0 py-1">
+                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                        <span visible="@bind(msg.contentviol)">Content Warning </span>
+                                        <span visible="@bind(msg.biasdetected)">Bias Detected </span>
+                                        <span visible="@bind(msg.piidetected)">PII Detected</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-1">
+                                <small class="text-muted">
+                                    ${vm.formatDate(msg.chatcreatedat)}
+                                    <span visible="@bind(msg.chattokens != null)"> · ${msg.chattokens} tokens</span>
+                                    <span visible="@bind(msg.toxicityscore != null)"> · Toxicity: ${msg.toxicityscore}</span>
+                                </small>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Input Area -->
+                <div class="border-top p-3">
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="input-group">
+                                <textarea class="form-control" rows="2" model="@bind(vm.messageInput)" 
+                                          placeholder="Type your message..."></textarea>
+                                <button class="btn btn-primary" onClick="@command('sendMessage')" 
+                                        disabled="@bind(vm.isSending)">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel - Settings & Compliance -->
+            <div class="col-md-3 border-start h-100" style="overflow-y: auto;">
+                <div class="p-3">
+                    <!-- Model Selection -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">Model Settings</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label class="form-label">Model</label>
+                                <select class="form-select form-select-sm" model="@bind(vm.selectedModel)">
+                                    <option value="gpt-4">GPT-4</option>
+                                    <option value="gpt-3.5">GPT-3.5</option>
+                                    <option value="claude">Claude</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Temperature</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" 
+                                       model="@bind(vm.temperature)"/>
+                                <small class="text-muted">${vm.temperature}</small>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Max Tokens</label>
+                                <input type="number" class="form-control form-control-sm" 
+                                       model="@bind(vm.maxTokens)" placeholder="2000"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Compliance Monitor -->
+                    <div class="card mb-3">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">Compliance Monitor</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <small>Status:</small>
+                                    <span class="badge bg-${vm.getComplianceColor(vm.sessionComplianceStatus)}">
+                                        ${vm.sessionComplianceStatus}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <small>Governance:</small>
+                                    <span class="badge bg-${vm.getGovernanceColor(vm.sessionGovernanceStatus)}">
+                                        ${vm.sessionGovernanceStatus}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between">
+                                    <small>Risk Level:</small>
+                                    <span class="badge bg-${vm.getRiskColor(vm.sessionRiskLevel)}">
+                                        ${vm.sessionRiskLevel}
+                                    </span>
+                                </div>
+                            </div>
+                            <hr/>
+                            <div class="mb-2">
+                                <small class="text-muted">Content Violations: </small>
+                                <span class="badge bg-danger">${vm.contentViolations}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Bias Detected: </small>
+                                <span class="badge bg-warning">${vm.biasDetections}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">PII Detected: </small>
+                                <span class="badge bg-warning">${vm.piiDetections}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Session Stats -->
+                    <div class="card">
+                        <div class="card-header bg-white">
+                            <h6 class="mb-0">Session Stats</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <small class="text-muted">Messages:</small>
+                                <span class="float-end">${vm.sessionMessageCount}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Tokens:</small>
+                                <span class="float-end">${vm.sessionTokens}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Cost:</small>
+                                <span class="float-end">$${vm.sessionCost}</span>
+                            </div>
+                            <div class="mb-2">
+                                <small class="text-muted">Avg Latency:</small>
+                                <span class="float-end">${vm.avgLatency}ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"/>
+</window>
+</zk>

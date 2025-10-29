@@ -1,0 +1,296 @@
+package com.codeflowx.platform.viewmodel.datasources;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+import javax.sql.DataSource;
+import org.enartframework.suinsit.Context;
+import org.enartframework.nocode.dao.IEntityLocal;
+import org.enartframework.web.zk.page.MasterPage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.env.Environment;
+import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import org.zkoss.zul.Messagebox;
+import com.codeflowx.govern.entity.datasources.DataSource;
+import codeflowx.nocode.persist.BusinessService;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * ViewModel para búsqueda y listado de Data Sources
+ * Pantalla principal de gestión de fuentes de datos
+ */
+@Slf4j
+@Getter
+@Setter
+@VariableResolver(DelegatingVariableResolver.class)
+public class DataSourcesOverviewViewModel extends MasterPage {
+
+    private static final long serialVersionUID = 1L;
+    private static final String IDDESKTOP = "contenedor";
+    
+    @WireVariable
+    private BusinessService businessService;
+    
+    @Autowired
+    protected IEntityLocal dao;
+    
+    @WireVariable
+    public Environment environment;
+    
+    @WireVariable("context")
+    protected GenericApplicationContext contexto;
+    
+    @WireVariable("ctxBean")
+    protected Context ctxBean;
+    
+    @WireVariable("APPLICATION_DS")
+    protected javax.sql.DataSource ds;
+    
+    protected void initDao() {
+        if (businessService == null) {
+            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
+        }
+    }
+    
+    @Override
+    public void setBeans(Object bean) {
+        // Auto-generated method stub
+    }
+    
+    // ========== Paginación ==========
+    private PageParams pageParams;
+    private PageResult<DataSource> pageResult;
+    
+    // ========== Filtros ==========
+    private String searchText = "";
+    private String filterType = "";
+    private String filterStatus = "";
+    
+    // ========== Datos ==========
+    private List<DataSource> dataSourceList = new ArrayList<>();
+    
+    // ========== Métricas ==========
+    private int totalDataSources = 0;
+    private int activeDataSources = 0;
+    private int errorDataSources = 0;
+    private long totalDocuments = 0L;
+    
+    @AfterCompose
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
+        Selectors.wireComponents(view, this, false);
+        super.doAfterCompose(view);
+        initDao();
+        
+        pageParams = PageParams.builder()
+            .maxRows(20)
+            .pageActual(1)
+            .rowActual(0)
+            .build();
+        
+        loadData();
+        loadMetrics();
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void loadData() {
+        try {
+            log.debug("Cargando data sources - Página: {}", pageParams.getPageActual());
+            
+            Criterias criterias = buildCriterias();
+            
+            pageResult = businessService.findAllEntity(
+                DataSource.class,
+                pageParams,
+                criterias
+            );
+            
+            if (pageResult != null && pageResult.getContent() != null) {
+                dataSourceList = pageResult.getContent();
+                totalDataSources = pageResult.getTotalRows();
+                
+                log.info("Cargados {} data sources de {} totales", 
+                    dataSourceList.size(), totalDataSources);
+            } else {
+                dataSourceList = new ArrayList<>();
+                totalDataSources = 0;
+            }
+        } catch (Exception e) {
+            log.error("Error al cargar data sources", e);
+            Messagebox.show("Error al cargar data sources: " + e.getMessage(), 
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        }
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void loadMetrics() {
+        try {
+            // TODO: Implementar integración con leka-server para métricas en tiempo real
+            // Por ahora usamos datos locales
+            activeDataSources = (int) dataSourceList.stream()
+                .filter(ds -> "ACTIVE".equals(ds.getDsstatus()))
+                .count();
+                
+            errorDataSources = (int) dataSourceList.stream()
+                .filter(ds -> "ERROR".equals(ds.getDsstatus()))
+                .count();
+                
+            totalDocuments = dataSourceList.stream()
+                .mapToLong(ds -> ds.getDsdocumentcount() != null ? ds.getDsdocumentcount() : 0L)
+                .sum();
+                
+        } catch (Exception e) {
+            log.error("Error al cargar métricas", e);
+        }
+    }
+    
+    private Criterias buildCriterias() {
+        Criterias criterias = new Criterias();
+        
+        // Filtro por búsqueda de texto
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            criterias.addCriteria("dsname", searchText, "LIKE");
+        }
+        
+        // Filtro por tipo
+        if (filterType != null && !filterType.trim().isEmpty()) {
+            criterias.addCriteria("dstype", filterType, "=");
+        }
+        
+        // Filtro por estado
+        if (filterStatus != null && !filterStatus.trim().isEmpty()) {
+            criterias.addCriteria("dsstatus", filterStatus, "=");
+        }
+        
+        return criterias;
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void filterDataSources() {
+        pageParams.setPageActual(1);
+        loadData();
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void searchDataSources() {
+        pageParams.setPageActual(1);
+        loadData();
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void clearFilters() {
+        searchText = "";
+        filterType = "";
+        filterStatus = "";
+        pageParams.setPageActual(1);
+        loadData();
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void refreshDataSources() {
+        loadData();
+        loadMetrics();
+    }
+    
+    @Command
+    public void createDataSource() {
+        // TODO: Navegar a pantalla de creación
+        log.info("Crear nuevo data source");
+    }
+    
+    @Command
+    public void viewDataSource(@BindingParam("ds") DataSource dataSource) {
+        // TODO: Navegar a vista detalle
+        log.info("Ver data source: {}", dataSource.getDsname());
+    }
+    
+    @Command
+    public void editDataSource(@BindingParam("ds") DataSource dataSource) {
+        // TODO: Navegar a pantalla de edición
+        log.info("Editar data source: {}", dataSource.getDsname());
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void testDataSource(@BindingParam("ds") DataSource dataSource) {
+        try {
+            // TODO: Implementar integración con leka-server para test de conexión
+            log.info("Testeando data source: {}", dataSource.getDsname());
+            Messagebox.show("Funcionalidad de test en desarrollo. Requiere integración con leka-server.", 
+                "Info", Messagebox.OK, Messagebox.INFORMATION);
+        } catch (Exception e) {
+            log.error("Error al testear data source", e);
+            Messagebox.show("Error al testear data source: " + e.getMessage(), 
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        }
+    }
+    
+    @Command
+    @NotifyChange("*")
+    public void deleteDataSource(@BindingParam("ds") DataSource dataSource) {
+        Messagebox.show("¿Está seguro de eliminar el data source: " + dataSource.getDsname() + "?",
+            "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+            event -> {
+                if (Messagebox.ON_OK.equals(event.getName())) {
+                    try {
+                        businessService.deleteEntity(dataSource);
+                        loadData();
+                        loadMetrics();
+                        Messagebox.show("Data source eliminado exitosamente", 
+                            "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+                    } catch (Exception e) {
+                        log.error("Error al eliminar data source", e);
+                        Messagebox.show("Error al eliminar data source: " + e.getMessage(), 
+                            "Error", Messagebox.OK, Messagebox.ERROR);
+                    }
+                }
+            });
+    }
+    
+    @Command
+    public void exportDataSources() {
+        // TODO: Implementar exportación
+        log.info("Exportar data sources");
+        Messagebox.show("Funcionalidad de exportación en desarrollo", 
+            "Info", Messagebox.OK, Messagebox.INFORMATION);
+    }
+    
+    // ========== Métodos auxiliares ==========
+    
+    public String getStatusColor(String status) {
+        if (status == null) return "secondary";
+        switch (status) {
+            case "ACTIVE": return "success";
+            case "INACTIVE": return "secondary";
+            case "ERROR": return "danger";
+            case "SYNCING": return "warning";
+            default: return "secondary";
+        }
+    }
+    
+    public String formatDate(Timestamp timestamp) {
+        if (timestamp == null) return "-";
+        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+}

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk>
+<window title="Playground Routing" border="normal" width="100%" height="100%" 
+        apply="com.codeflowx.platform.viewmodel.playground.PlaygroundRoutingViewModel">
+    
+    <style src="/css/bootstrap.min.css"/>
+    <style src="/css/custom.css"/>
+    
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/playground/page.zul">Playground</a></li>
+                        <li class="breadcrumb-item active">Agent Routing</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 mb-0 text-primary">
+                    <i class="fas fa-route me-2"></i>Intelligent Agent Routing
+                </h1>
+            </div>
+        </div>
+
+        <!-- Routing Test Panel -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Test Query Routing</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Query</label>
+                            <textarea class="form-control" rows="4" model="@bind(vm.routingQuery)" 
+                                      placeholder="Enter a query to test agent routing..."></textarea>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Routing Strategy</label>
+                                <select class="form-select" model="@bind(vm.routingStrategy)">
+                                    <option value="SIMILARITY">Similarity-based</option>
+                                    <option value="CAPABILITY">Capability-based</option>
+                                    <option value="LOAD_BALANCE">Load Balancing</option>
+                                    <option value="CUSTOM">Custom Logic</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Confidence Threshold</label>
+                                <input type="range" class="form-range" min="0" max="1" step="0.1" 
+                                       model="@bind(vm.confidenceThreshold)"/>
+                                <small class="text-muted">${vm.confidenceThreshold}</small>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onClick="@command('routeQuery')" 
+                                disabled="@bind(vm.isRouting)">
+                            <i class="fas fa-route me-1"></i>Route Query
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Routing Result -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h6 class="mb-0">Selected Agent</h6>
+                    </div>
+                    <div class="card-body text-center" visible="@bind(vm.selectedAgent != null)">
+                        <div class="bg-primary text-white rounded-circle p-3 mx-auto mb-3" style="width: 80px; height: 80px;">
+                            <i class="fas fa-robot fa-3x"></i>
+                        </div>
+                        <h5>${vm.selectedAgentName}</h5>
+                        <p class="text-muted">${vm.selectedAgentDescription}</p>
+                        <div class="mb-3">
+                            <small class="text-muted">Confidence:</small>
+                            <h4 class="text-success">${vm.routingConfidence}%</h4>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge bg-secondary">${vm.routingStrategy}</span>
+                        </div>
+                    </div>
+                    <div class="card-body text-center text-muted" visible="@bind(vm.selectedAgent == null)">
+                        <i class="fas fa-robot fa-3x mb-3"></i>
+                        <p>No agent selected yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Agents Scores -->
+        <div class="row mb-4" visible="@bind(vm.showRoutingScores)">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Routing Scores for All Agents</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>Capability Match</th>
+                                        <th>Similarity Score</th>
+                                        <th>Load</th>
+                                        <th>Final Score</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template name="agentScore" var="score">
+                                        <tr class="${score.selected ? 'table-success' : ''}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <i class="fas fa-robot me-2"></i>
+                                                    <div>
+                                                        <h6 class="mb-0">${score.agentName}</h6>
+                                                        <small class="text-muted">${score.agentCapability}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-info" style="width: ${score.capabilityMatch}%">
+                                                        ${score.capabilityMatch}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-primary" style="width: ${score.similarityScore}%">
+                                                        ${score.similarityScore}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td><span class="badge bg-secondary">${score.currentLoad}%</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-success" style="width: ${score.finalScore}%">
+                                                        ${score.finalScore}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-${score.selected ? 'success' : 'secondary'}">
+                                                    ${score.selected ? 'SELECTED' : 'Available'}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Routing History -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">Routing History</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Query</th>
+                                        <th>Selected Agent</th>
+                                        <th>Strategy</th>
+                                        <th>Confidence</th>
+                                        <th>User Feedback</th>
+                                        <th>Accuracy</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <template name="routing" var="r">
+                                        <tr>
+                                            <td><small>${vm.truncate(r.routingquery, 60)}</small></td>
+                                            <td><span class="badge bg-primary">${vm.getAgentName(r.selectedagentid)}</span></td>
+                                            <td><span class="badge bg-secondary">${r.routingstrategy}</span></td>
+                                            <td>
+                                                <div class="progress" style="height: 20px; width: 100px;">
+                                                    <div class="progress-bar bg-success" style="width: ${r.routingconfidence * 100}%">
+                                                        ${r.routingconfidence * 100}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-${vm.getFeedbackColor(r.userfeedback)}">
+                                                    ${r.userfeedback}
+                                                </span>
+                                            </td>
+                                            <td><small>${r.routingaccuracy != null ? r.routingaccuracy * 100 : '-'}%</small></td>
+                                            <td><small>${vm.formatDate(r.routingcreatedat)}</small></td>
+                                            <td>
+                                                <div class="btn-group btn-group-sm">
+                                                    <button class="btn btn-outline-success" onClick="@command('markCorrect', routing=r)">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="btn btn-outline-danger" onClick="@command('markIncorrect', routing=r)">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/bootstrap.bundle.min.js"/>
+</window>
+</zk>
