@@ -3,37 +3,30 @@ package com.codeflowx.platform.viewmodel.playground;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.*;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.playground.PlaygroundRouting;
 import com.codeflowx.govern.entity.agents.Agent;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundRoutingViewModel extends MasterPage {
+public class PlaygroundRoutingViewModel extends BaseFront<PlaygroundRoutingViewModel> {
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    @WireVariable
-    public Environment environment;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -56,7 +49,6 @@ public class PlaygroundRoutingViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         loadRoutingHistory();
     }
     
@@ -65,8 +57,18 @@ public class PlaygroundRoutingViewModel extends MasterPage {
     public void loadRoutingHistory() {
         try {
             PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundRouting> result = businessService.findAllEntity(PlaygroundRouting.class, params, new Criterias());
-            if (result != null) routingsList = result.getContent();
+            PageResult<PlaygroundRouting> result = businessService.findAllEntity(
+                PlaygroundRouting.class, params, new Criterias());
+            
+            if (result != null && result.getContent() != null) {
+                routingsList = result.getContent();
+                
+                // Auditar búsqueda
+                logActivity("BUSCAR", "PLAYGROUNDROUTINGS", null, 
+                    "Búsqueda: " + routingsList.size() + " routings");
+            } else {
+                routingsList = new ArrayList<>();
+            }
         } catch (Exception e) {
             log.error("Error loading routing history", e);
         }
@@ -110,6 +112,11 @@ public class PlaygroundRoutingViewModel extends MasterPage {
             routing.setUserfeedback("CORRECT");
             routing.setRoutingaccuracy(new java.math.BigDecimal("1.0"));
             businessService.save(routing);
+            
+            // Auditar actualización
+            logActivity("EDITAR", "PLAYGROUNDROUTINGS", routing.getIdxplaygroundrouting(), 
+                "Feedback: CORRECT");
+            
             loadRoutingHistory();
         } catch (Exception e) {
             log.error("Error updating feedback", e);
@@ -123,6 +130,11 @@ public class PlaygroundRoutingViewModel extends MasterPage {
             routing.setUserfeedback("INCORRECT");
             routing.setRoutingaccuracy(new java.math.BigDecimal("0.0"));
             businessService.save(routing);
+            
+            // Auditar actualización
+            logActivity("EDITAR", "PLAYGROUNDROUTINGS", routing.getIdxplaygroundrouting(), 
+                "Feedback: INCORRECT");
+            
             loadRoutingHistory();
         } catch (Exception e) {
             log.error("Error updating feedback", e);
@@ -159,6 +171,19 @@ public class PlaygroundRoutingViewModel extends MasterPage {
     
     public String formatDate(Timestamp ts) {
         return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (routingsList != null) { 
+            routingsList.clear(); 
+            routingsList = null; 
+        }
+        if (agentScoresList != null) {
+            agentScoresList.clear();
+            agentScoresList = null;
+        }
+        businessService = null;
     }
     
     // Inner class para scores de agentes

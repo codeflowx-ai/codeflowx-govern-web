@@ -3,38 +3,28 @@ package com.codeflowx.platform.viewmodel.playground;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.*;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
-import com.codeflowx.govern.entity.playground.*;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import com.codeflowx.framework.zkoss.BaseFront;
+import com.codeflowx.govern.entity.playground.PlaygroundImage;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundImageViewModel extends MasterPage {
+public class PlaygroundImageViewModel extends BaseFront<PlaygroundImageViewModel> {
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    @WireVariable
-    public Environment environment;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -54,7 +44,6 @@ public class PlaygroundImageViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         loadImages();
     }
     
@@ -63,8 +52,18 @@ public class PlaygroundImageViewModel extends MasterPage {
     public void loadImages() {
         try {
             PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundImage> result = businessService.findAllEntity(PlaygroundImage.class, params, new Criterias());
-            if (result != null) imagesList = result.getContent();
+            PageResult<PlaygroundImage> result = businessService.findAllEntity(
+                PlaygroundImage.class, params, new Criterias());
+            
+            if (result != null && result.getContent() != null) {
+                imagesList = result.getContent();
+                
+                // Auditar búsqueda
+                logActivity("BUSCAR", "PLAYGROUNDIMAGES", null, 
+                    "Búsqueda: " + imagesList.size() + " imágenes");
+            } else {
+                imagesList = new ArrayList<>();
+            }
         } catch (Exception e) {
             log.error("Error loading images", e);
         }
@@ -76,7 +75,8 @@ public class PlaygroundImageViewModel extends MasterPage {
         try {
             isGenerating = true;
             // TODO: Integración con leka-server
-            Messagebox.show("Image generation requires leka-server integration", "Info", Messagebox.OK, Messagebox.INFORMATION);
+            Messagebox.show("Image generation requires leka-server integration", 
+                "Info", Messagebox.OK, Messagebox.INFORMATION);
         } finally {
             isGenerating = false;
         }
@@ -92,6 +92,11 @@ public class PlaygroundImageViewModel extends MasterPage {
     public void deleteImage(@BindingParam("image") PlaygroundImage image) {
         try {
             businessService.removeFromID(image);
+            
+            // Auditar eliminación
+            logActivity("ELIMINAR", "PLAYGROUNDIMAGES", image.getIdxplaygroundimage(), 
+                "Imagen eliminada");
+            
             loadImages();
         } catch (Exception e) {
             log.error("Error deleting image", e);
@@ -104,5 +109,14 @@ public class PlaygroundImageViewModel extends MasterPage {
     
     public String formatDate(Timestamp ts) {
         return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (imagesList != null) { 
+            imagesList.clear(); 
+            imagesList = null; 
+        }
+        businessService = null;
     }
 }

@@ -42,7 +42,6 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         
         pageParams = PageParams.builder()
             .maxRows(50)
@@ -61,6 +60,10 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             pageResult = businessService.findAllEntity(PlaygroundSession.class, pageParams, new Criterias());
             if (pageResult != null && pageResult.getContent() != null) {
                 sessionsList = pageResult.getContent();
+                
+                // Auditar búsqueda
+                logActivity("BUSCAR", "PLAYGROUNDSESSIONS", null, 
+                    "Búsqueda: " + sessionsList.size() + " sesiones");
             }
         } catch (Exception e) {
             log.error("Error al cargar sesiones", e);
@@ -148,6 +151,11 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
                         businessService.removeFromID(session);
+                        
+                        // Auditar eliminación
+                        logActivity("ELIMINAR", "PLAYGROUNDSESSIONS", session.getIdxplaygroundsession(), 
+                            "Sesión eliminada: " + session.getSessionname());
+                        
                         loadSessions();
                         loadMetrics();
                     } catch (Exception e) {

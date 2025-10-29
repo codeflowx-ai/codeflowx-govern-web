@@ -3,36 +3,28 @@ package com.codeflowx.platform.viewmodel.playground;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.*;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.playground.PlaygroundVoice;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundVoiceViewModel extends MasterPage {
+public class PlaygroundVoiceViewModel extends BaseFront<PlaygroundVoiceViewModel> {
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    @WireVariable
-    public Environment environment;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -75,7 +67,6 @@ public class PlaygroundVoiceViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         loadHistory();
     }
     
@@ -84,10 +75,18 @@ public class PlaygroundVoiceViewModel extends MasterPage {
     public void loadHistory() {
         try {
             PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundVoice> result = businessService.findAllEntity(PlaygroundVoice.class, params, new Criterias());
-            if (result != null) {
+            PageResult<PlaygroundVoice> result = businessService.findAllEntity(
+                PlaygroundVoice.class, params, new Criterias());
+            
+            if (result != null && result.getContent() != null) {
                 voicesList = result.getContent();
                 calculateMetrics();
+                
+                // Auditar búsqueda
+                logActivity("BUSCAR", "PLAYGROUNDVOICES", null, 
+                    "Búsqueda: " + voicesList.size() + " interacciones de voz");
+            } else {
+                voicesList = new ArrayList<>();
             }
         } catch (Exception e) {
             log.error("Error loading voice history", e);
@@ -175,5 +174,14 @@ public class PlaygroundVoiceViewModel extends MasterPage {
     
     public String formatDate(Timestamp ts) {
         return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (voicesList != null) { 
+            voicesList.clear(); 
+            voicesList = null; 
+        }
+        businessService = null;
     }
 }
