@@ -383,3 +383,4 @@ public class DomainIngestionDashboardViewModel extends BaseFront<DomainIngestion
     }
 }
 
+
