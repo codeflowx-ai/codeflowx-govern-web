@@ -174,17 +174,26 @@ SELECT * FROM RAGSYSTEMS;
 - Reindexación (pendiente integración leka-server)
 - Auditoría completa
 
-### 4.4 Pantallas Pendientes de Implementar
+### 4.4 Pantallas Existentes (Ya Creadas Previamente)
+
+| Pantalla | Ruta | Estado | Archivos |
+|----------|------|--------|----------|
+| **Versioning** | `/rag/versioning/` | ✅ EXISTE | overview.zul, page.zul |
+| **Monitoring** | `/rag/monitoring/` | ✅ EXISTE | health-dashboard.zul, metrics-summary.zul, usage-by-agent.zul |
+| **Quality Control** | `/rag/quality-control/` | ✅ EXISTE | chunk-distribution.zul, retrieval-quality.zul |
+| **Data Sources (otros)** | `/rag/data-sources/` | ✅ EXISTE | coverage-analysis.zul, embedding-progress.zul, overview.zul, statistics.zul |
+| **Overview (otros)** | `/rag/overview/` | ✅ EXISTE | summary.zul |
+
+### 4.5 Pantallas Realmente Pendientes
 
 | Pantalla | Ruta | Estado | Descripción |
 |----------|------|--------|-------------|
-| **Versioning** | `/rag/versioning/page.zul` | ⏳ PENDIENTE | Control de versiones |
-| **Rollback** | `/rag/rollback/page.zul` | ⏳ PENDIENTE | Gestión de rollbacks |
-| **Quality Control** | `/rag/quality-control/page.zul` | ⏳ PENDIENTE | Control de calidad |
-| **Bias Detection** | `/rag/bias-detection/page.zul` | ⏳ PENDIENTE | Detección de sesgos |
-| **Compliance** | `/rag/compliance/page.zul` | ⏳ PENDIENTE | Monitoreo de cumplimiento |
-| **Monitoring** | `/rag/monitoring/page.zul` | ⏳ PENDIENTE | Monitoreo en tiempo real |
-| **Access Control** | `/rag/access-control/page.zul` | ⏳ PENDIENTE | Control de acceso |
+| **Rollback** | `/rag/rollback/page.zul` | ⏳ PENDIENTE | Gestión de rollbacks (directorio existe vacío) |
+| **Bias Detection** | `/rag/bias-detection/page.zul` | ⏳ PENDIENTE | Detección de sesgos (directorio existe vacío) |
+| **Compliance** | `/rag/compliance/page.zul` | ⏳ PENDIENTE | Monitoreo de cumplimiento (directorio existe vacío) |
+| **Access Control** | `/rag/access-control/page.zul` | ⏳ PENDIENTE | Control de acceso (directorio existe vacío) |
+
+**Nota:** Los directorios existen pero están vacíos. Necesitan implementación de pantallas ZKoss y ViewModels.
 
 ## 5. ViewModels Implementados
 
@@ -398,23 +407,26 @@ Todos los ViewModels pendientes deben seguir el patrón `BaseFront`:
 
 - ✅ Entidades JPA: **4/4** (100%)
 - ✅ Scripts SQL: **1/1** (100%)
-- ✅ Pantallas ZKoss: **3/9** (33%)
-- ✅ ViewModels: **3/9** (33%)
+- ✅ Pantallas ZKoss Principales: **3/3** (100%) - Overview, Registry, Data Sources
+- ✅ Pantallas Secundarias Existentes: **11 archivos** (Versioning, Monitoring, Quality Control)
+- ⏳ Pantallas Pendientes: **4** (Rollback, Bias Detection, Compliance, Access Control)
+- ✅ ViewModels Principales: **3/3** (100%)
+- ⏳ ViewModels Pendientes: **4** (para pantallas pendientes)
 - ⏳ Integración leka-server: **0%**
 
-### Fase 2 Completada:
-- ✅ Overview (Fase 1)
-- ✅ Registry (Fase 2) - Vista grid/list + Modal CRUD
-- ✅ Data Sources (Fase 2) - Dashboard + Gestión de fuentes
+### ✅ Completado (Fases 1 y 2):
+- ✅ Overview - Dashboard principal (page.zul + summary.zul)
+- ✅ Registry - Vista grid/list + Modal CRUD
+- ✅ Data Sources - Dashboard + Gestión de fuentes (page.zul + 4 secundarias)
+- ✅ Versioning - Ya existe (overview.zul, page.zul)
+- ✅ Monitoring - Ya existe (3 archivos: health-dashboard, metrics-summary, usage-by-agent)
+- ✅ Quality Control - Ya existe (2 archivos: chunk-distribution, retrieval-quality)
 
-### Pendiente (Fase 3):
-- ⏳ Versioning (6 pantallas restantes)
-- ⏳ Rollback
-- ⏳ Quality Control
-- ⏳ Bias Detection
-- ⏳ Compliance
-- ⏳ Monitoring
-- ⏳ Access Control
+### ⏳ Pendiente (Fase 3 - Solo 4 pantallas):
+- ⏳ Rollback - Directorio vacío
+- ⏳ Bias Detection - Directorio vacío
+- ⏳ Compliance - Directorio vacío
+- ⏳ Access Control - Directorio vacío
 
 **Última actualización:** 2025-01-29 (Fase 2)
 
