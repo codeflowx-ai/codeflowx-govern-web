@@ -3,44 +3,32 @@ package com.codeflowx.platform.viewmodel.playground;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.suinsit.Context;
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.*;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.playground.*;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criteria;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundChatViewModel extends MasterPage {
+public class PlaygroundChatViewModel extends BaseFront<PlaygroundChatViewModel> {
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    @Autowired
-    protected IEntityLocal dao;
-    @WireVariable
-    public Environment environment;
-    @WireVariable("APPLICATION_DS")
-    protected javax.sql.DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -94,7 +82,7 @@ public class PlaygroundChatViewModel extends MasterPage {
         try {
             PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
             Criterias criterias = new Criterias();
-            criterias.addCriteria("sessiontype", "CHAT", "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "sessiontype", "CHAT"));
             
             PageResult<PlaygroundSession> result = businessService.findAllEntity(PlaygroundSession.class, params, criterias);
             if (result != null && result.getContent() != null) {
@@ -113,7 +101,7 @@ public class PlaygroundChatViewModel extends MasterPage {
             
             PageParams params = PageParams.builder().maxRows(100).pageActual(1).build();
             Criterias criterias = new Criterias();
-            criterias.addCriteria("playgroundSession.idxplaygroundsession", currentSessionId, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "playgroundSession.idxplaygroundsession", currentSessionId));
             
             PageResult<PlaygroundChat> result = businessService.findAllEntity(PlaygroundChat.class, params, criterias);
             if (result != null && result.getContent() != null) {
@@ -284,5 +272,18 @@ public class PlaygroundChatViewModel extends MasterPage {
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (sessionsList != null) { 
+            sessionsList.clear(); 
+            sessionsList = null; 
+        }
+        if (messagesList != null) {
+            messagesList.clear();
+            messagesList = null;
+        }
+        businessService = null;
     }
 }

@@ -11,8 +11,14 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceWebscraping;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criteria;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -79,10 +85,10 @@ public class DataSourceWebscrapingOverviewViewModel extends BaseFront<DataSource
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
-            criterias.addCriteria("wsname", searchText, "LIKE");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "wsname", searchText));
         }
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
-            criterias.addCriteria("wsstatus", filterStatus, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "wsstatus", filterStatus));
         }
         return criterias;
     }

@@ -11,7 +11,10 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceDocument;
+import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
 import lombok.Getter;
@@ -83,13 +86,13 @@ public class DataSourceDocumentOverviewViewModel extends BaseFront<DataSourceDoc
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
-            criterias.addCriteria("docname", searchText, "LIKE");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "docname", searchText));
         }
         if (filterType != null && !filterType.trim().isEmpty()) {
-            criterias.addCriteria("doctype", filterType, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "doctype", filterType));
         }
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
-            criterias.addCriteria("docstatus", filterStatus, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "docstatus", filterStatus));
         }
         return criterias;
     }

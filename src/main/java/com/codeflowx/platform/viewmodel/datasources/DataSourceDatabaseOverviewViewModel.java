@@ -11,8 +11,14 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceDatabase;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criteria;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -80,13 +86,13 @@ public class DataSourceDatabaseOverviewViewModel extends BaseFront<DataSourceDat
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
-            criterias.addCriteria("dbname", searchText, "LIKE");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "dbname", searchText));
         }
         if (filterType != null && !filterType.trim().isEmpty()) {
-            criterias.addCriteria("dbtype", filterType, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dbtype", filterType));
         }
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
-            criterias.addCriteria("dbstatus", filterStatus, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dbstatus", filterStatus));
         }
         return criterias;
     }
