@@ -1,0 +1,20 @@
+-- =====================================================
+-- DATOS MOCK - MÓDULO 02_PROJECTS
+-- =====================================================
+-- Generado automáticamente desde JSONs EnArt
+-- =====================================================
+
+-- PRJPROJECTS (Project)
+-- Namespace: projects
+-- Campos requeridos: 7
+INSERT INTO PRJPROJECTS (NAME, PROJECTCODE, PROJECTTYPE, STATUS, ISACTIVE)
+VALUES ('Project 1 Name', 'CODE-6574', ARRAY['STANDARD'], ARRAY['ACTIVE'], true);
+INSERT INTO PRJPROJECTS (NAME, PROJECTCODE, PROJECTTYPE, STATUS, ISACTIVE)
+VALUES ('Project 2 Name', 'CODE-4507', ARRAY['STANDARD'], ARRAY['ACTIVE'], true);
+INSERT INTO PRJPROJECTS (NAME, PROJECTCODE, PROJECTTYPE, STATUS, ISACTIVE)
+VALUES ('Project 3 Name', 'CODE-8281', ARRAY['STANDARD'], ARRAY['ACTIVE'], true);
+INSERT INTO PRJPROJECTS (NAME, PROJECTCODE, PROJECTTYPE, STATUS, ISACTIVE)
+VALUES ('Project 4 Name', 'CODE-3060', ARRAY['STANDARD'], ARRAY['ACTIVE'], true);
+INSERT INTO PRJPROJECTS (NAME, PROJECTCODE, PROJECTTYPE, STATUS, ISACTIVE)
+VALUES ('Project 5 Name', 'CODE-7186', ARRAY['STANDARD'], ARRAY['ACTIVE'], true);
+

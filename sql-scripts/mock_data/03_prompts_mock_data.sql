@@ -1,0 +1,26 @@
+-- =====================================================
+-- DATOS MOCK - MÓDULO 03_PROMPTS
+-- =====================================================
+-- Generado automáticamente desde JSONs EnArt
+-- =====================================================
+
+-- PRMPROMPTS (Prompt)
+-- Namespace: prompts
+-- Campos requeridos: 6
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 1 Name', ARRAY['STANDARD'], 'Prompt 1 Value', ARRAY['ACTIVE'], 'Prompt 1 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 2 Name', ARRAY['STANDARD'], 'Prompt 2 Value', ARRAY['ACTIVE'], 'Prompt 2 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 3 Name', ARRAY['STANDARD'], 'Prompt 3 Value', ARRAY['ACTIVE'], 'Prompt 3 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 4 Name', ARRAY['STANDARD'], 'Prompt 4 Value', ARRAY['ACTIVE'], 'Prompt 4 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 5 Name', ARRAY['STANDARD'], 'Prompt 5 Value', ARRAY['ACTIVE'], 'Prompt 5 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 6 Name', ARRAY['STANDARD'], 'Prompt 6 Value', ARRAY['ACTIVE'], 'Prompt 6 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 7 Name', ARRAY['STANDARD'], 'Prompt 7 Value', ARRAY['ACTIVE'], 'Prompt 7 Value');
+INSERT INTO PRMPROMPTS (PRMNAME, PRMTYPE, PRMVERSION, PRMSTATUS, PRMCREATEDBY)
+VALUES ('Prompt 8 Name', ARRAY['STANDARD'], 'Prompt 8 Value', ARRAY['ACTIVE'], 'Prompt 8 Value');
+

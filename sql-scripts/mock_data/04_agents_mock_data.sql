@@ -1,0 +1,26 @@
+-- =====================================================
+-- DATOS MOCK - MÓDULO 04_AGENTS
+-- =====================================================
+-- Generado automáticamente desde JSONs EnArt
+-- =====================================================
+
+-- AGTAGENTS (Agent)
+-- Namespace: agents
+-- Campos requeridos: 6
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 1 Name', ARRAY['STANDARD'], 'Agent 1 Value', ARRAY['ACTIVE'], 'Agent 1 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 2 Name', ARRAY['STANDARD'], 'Agent 2 Value', ARRAY['ACTIVE'], 'Agent 2 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 3 Name', ARRAY['STANDARD'], 'Agent 3 Value', ARRAY['ACTIVE'], 'Agent 3 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 4 Name', ARRAY['STANDARD'], 'Agent 4 Value', ARRAY['ACTIVE'], 'Agent 4 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 5 Name', ARRAY['STANDARD'], 'Agent 5 Value', ARRAY['ACTIVE'], 'Agent 5 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 6 Name', ARRAY['STANDARD'], 'Agent 6 Value', ARRAY['ACTIVE'], 'Agent 6 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 7 Name', ARRAY['STANDARD'], 'Agent 7 Value', ARRAY['ACTIVE'], 'Agent 7 Value');
+INSERT INTO AGTAGENTS (AGTNAME, AGTTYPE, AGTVERSION, AGTSTATUS, AGTCREATEDBY)
+VALUES ('Agent 8 Name', ARRAY['STANDARD'], 'Agent 8 Value', ARRAY['ACTIVE'], 'Agent 8 Value');
+

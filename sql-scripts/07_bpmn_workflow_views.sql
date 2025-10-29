@@ -1,0 +1,174 @@
+-- ============================================================================
+-- CodeFlowX Govern Platform - BPMN Workflow Views
+-- Metodología: EnArt (sin guiones bajos, TODO MAYÚSCULAS)
+-- Fecha: 2025-10-20
+-- Total vistas: 4
+-- ============================================================================
+
+-- ============================================================================
+-- Vista: VW_DRIFT_DETECTION_DASHBOARD
+-- Dashboard de monitoreo de drift de modelos ML
+-- ============================================================================
+CREATE OR REPLACE VIEW VW_DRIFT_DETECTION_DASHBOARD AS
+SELECT 
+    d.IDXDRIFTDETECTION,
+    d.IDXMODEL,
+    m.MODNAME AS MODELNAME,
+    m.MODTYPE AS MODELTYPE,
+    d.DRFTYPE,
+    d.DRFSCORE,
+    d.DRFTHRESHOLD,
+    d.DRFDETECTED,
+    d.DRFSEVERITY,
+    d.DRFACTION,
+    d.DRFACCURACYDEGRADATION,
+    d.DRFLATENCYINCREASE,
+    d.DRFREQUIRESHUMANANALYSIS,
+    d.DRFESCALATIONLEVEL,
+    d.DRFACTIONTAKEN,
+    d.DRFSTATUS,
+    d.DRFCREATEDAT,
+    EXTRACT(DAY FROM NOW() - d.DRFCREATEDAT)::INTEGER AS DAYSINCEDETECTION,
+    CASE 
+        WHEN d.DRFSTATUS = 'DETECTED' AND EXTRACT(DAY FROM NOW() - d.DRFCREATEDAT) > 1 THEN true
+        WHEN d.DRFSTATUS = 'ANALYZING' AND EXTRACT(DAY FROM NOW() - d.DRFCREATEDAT) > 3 THEN true
+        ELSE false
+    END AS ISOVERDUE
+FROM DRFDRIFTDETECTIONS d
+LEFT JOIN MODMODELS m ON d.IDXMODEL = m.IDXMODEL
+ORDER BY d.DRFCREATEDAT DESC;
+
+COMMENT ON VIEW VW_DRIFT_DETECTION_DASHBOARD IS 'Dashboard de drift detection con métricas agregadas';
+
+-- ============================================================================
+-- Vista: VW_ETHICS_REVIEWS_DASHBOARD
+-- Dashboard de revisiones éticas
+-- ============================================================================
+CREATE OR REPLACE VIEW VW_ETHICS_REVIEWS_DASHBOARD AS
+SELECT 
+    e.IDXETHICSREVIEW,
+    e.ETHENTITYTYPE,
+    e.ETHENTITYID,
+    e.ETHENTITYNAME,
+    e.ETHREVIEWTYPE,
+    e.ETHREQUESTER,
+    e.ETHSCORE,
+    e.ETHTHRESHOLD,
+    e.ETHMEETSTHRESHOLD,
+    e.ETHSEVERITY,
+    e.ETHREQUIRESCOMMITTEEREVIEW,
+    e.ETHCOMMITTEEDECISION,
+    e.ETHMITIGATIONREQUIRED,
+    e.ETHMITIGATIONSTATUS,
+    e.ETHSTATUS,
+    e.ETHCREATEDAT,
+    e.ETHAPPROVEDAT,
+    EXTRACT(DAY FROM NOW() - e.ETHCREATEDAT)::INTEGER AS DAYSINREVIEW,
+    CASE 
+        WHEN e.ETHSTATUS IN ('REQUESTED', 'ASSESSING') AND EXTRACT(DAY FROM NOW() - e.ETHCREATEDAT) > 5 THEN true
+        WHEN e.ETHSTATUS = 'COMMITTEE_REVIEW' AND EXTRACT(DAY FROM NOW() - e.ETHCREATEDAT) > 10 THEN true
+        ELSE false
+    END AS ISOVERDUE,
+    CASE 
+        WHEN e.ETHCONCERNS IS NOT NULL THEN jsonb_array_length(e.ETHCONCERNS::jsonb)
+        ELSE 0
+    END AS CONCERNSCOUNT
+FROM ETHETHICSREVIEWS e
+ORDER BY e.ETHCREATEDAT DESC;
+
+COMMENT ON VIEW VW_ETHICS_REVIEWS_DASHBOARD IS 'Dashboard de revisiones éticas con métricas calculadas';
+
+-- ============================================================================
+-- Vista: VW_PERFORMANCE_METRICS_DASHBOARD
+-- Dashboard de métricas de performance en tiempo real
+-- ============================================================================
+CREATE OR REPLACE VIEW VW_PERFORMANCE_METRICS_DASHBOARD AS
+SELECT 
+    p.IDXPERFORMANCEMETRIC,
+    p.PRFENTITYTYPE,
+    p.PRFENTITYID,
+    p.PRFENTITYNAME,
+    p.PRFDEPLOYMENTNAME,
+    p.PRFNAMESPACE,
+    p.PRFLATENCYMS,
+    p.PRFLATENCYTHRESHOLDMS,
+    p.PRFTHROUGHPUT,
+    p.PRFERRORRATE,
+    p.PRFCPUUSAGE,
+    p.PRFMEMORYUSAGE,
+    p.PRFGPUUSAGE,
+    p.PRFDEGRADATIONDETECTED,
+    p.PRFDEGRADATIONPERCENTAGE,
+    p.PRFDEGRADATIONTYPE,
+    p.PRFCANAUTOSCALE,
+    p.PRFCURRENTREPLICAS,
+    p.PRFTARGETREPLICAS,
+    p.PRFACTIONTAKEN,
+    p.PRFSTATUS,
+    p.PRFMEASUREDAT,
+    CASE 
+        WHEN p.PRFDEGRADATIONDETECTED = false THEN 'HEALTHY'
+        WHEN p.PRFDEGRADATIONPERCENTAGE > 40 THEN 'CRITICAL'
+        WHEN p.PRFDEGRADATIONPERCENTAGE > 20 THEN 'DEGRADED'
+        ELSE 'WARNING'
+    END AS HEALTHSTATUS,
+    EXTRACT(EPOCH FROM (NOW() - p.PRFMEASUREDAT))::INTEGER / 60 AS MINUTESSINCELASTMEASUREMENT
+FROM PRFPERFORMANCEMETRICS p
+WHERE p.PRFMEASUREDAT > NOW() - INTERVAL '24 hours'
+ORDER BY p.PRFMEASUREDAT DESC;
+
+COMMENT ON VIEW VW_PERFORMANCE_METRICS_DASHBOARD IS 'Dashboard de performance metrics en tiempo real (últimas 24h)';
+
+-- ============================================================================
+-- Vista: VW_PROCESS_EXECUTIONS_DASHBOARD
+-- Dashboard de tracking de procesos BPMN (80% IA / 20% HITL)
+-- ============================================================================
+CREATE OR REPLACE VIEW VW_PROCESS_EXECUTIONS_DASHBOARD AS
+SELECT 
+    p.IDXPROCESSEXECUTION,
+    p.PEXPROCESSDEFINITIONID,
+    p.PEXPROCESSINSTANCEID,
+    p.PEXPROCESSNAME,
+    p.PEXBUSINESSKEY,
+    p.PEXENTITYTYPE,
+    p.PEXENTITYID,
+    p.PEXSTATUS,
+    p.PEXOUTCOME,
+    p.PEXSTARTEDAT,
+    p.PEXCOMPLETEDAT,
+    p.PEXDURATIONMS,
+    p.PEXTASKSTOTAL,
+    p.PEXTASKSCOMPLETED,
+    p.PEXTASKSFAILED,
+    p.PEXUSERTASKS,
+    p.PEXSERVICETASKS,
+    p.PEXAUTOMATIONPERCENTAGE,
+    p.PEXHITLINTERVENTIONS,
+    p.PEXERRORMESSAGE,
+    p.PEXERRORTASKID,
+    CASE 
+        WHEN p.PEXDURATIONMS IS NOT NULL THEN (p.PEXDURATIONMS / 60000)::INTEGER
+        WHEN p.PEXSTATUS = 'RUNNING' THEN EXTRACT(EPOCH FROM (NOW() - p.PEXSTARTEDAT))::INTEGER / 60
+        ELSE NULL
+    END AS DURATIONMINUTES,
+    CASE 
+        WHEN p.PEXAUTOMATIONPERCENTAGE = 100 THEN true
+        ELSE false
+    END AS ISAUTOMATIC,
+    CASE 
+        WHEN p.PEXTASKSTOTAL > 0 THEN (p.PEXTASKSCOMPLETED::DOUBLE PRECISION / p.PEXTASKSTOTAL * 100)
+        ELSE 0
+    END AS TASKSCOMPLETIONRATE,
+    CASE 
+        WHEN p.PEXSTATUS = 'RUNNING' AND EXTRACT(HOUR FROM NOW() - p.PEXSTARTEDAT) > 24 THEN true
+        WHEN p.PEXSTATUS = 'FAILED' THEN true
+        ELSE false
+    END AS ISOVERDUE
+FROM PEXPROCESSEXECUTIONS p
+ORDER BY p.PEXSTARTEDAT DESC;
+
+COMMENT ON VIEW VW_PROCESS_EXECUTIONS_DASHBOARD IS 'Dashboard de procesos BPMN con métricas de automatización 80/20';
+
+-- ============================================================================
+-- FIN DEL SCRIPT
+-- ============================================================================

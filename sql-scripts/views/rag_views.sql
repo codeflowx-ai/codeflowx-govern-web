@@ -1,0 +1,95 @@
+-- ============================================================================
+-- VIEWS - RAG SYSTEMS MODULE
+-- ============================================================================
+
+-- Vista para listado de sistemas RAG con métricas calculadas
+DROP VIEW IF EXISTS V_RAG_OVERVIEW CASCADE;
+
+CREATE VIEW V_RAG_OVERVIEW AS
+SELECT 
+    -- Campos del sistema RAG (SOLO LOS QUE EXISTEN EN RAGRAGSYSTEMS)
+    r.IDXRAGSYSTEM,
+    r.RAGNAME,
+    r.RAGDESCRIPTION,
+    r.RAGTYPE,
+    r.RAGVERSION,
+    r.RAGSTATUS,
+    r.RAGCONFIGURATION,
+    r.RAGEMBEDDINGMODEL,
+    r.RAGRETRIEVALCONFIG,
+    r.RAGGENERATIONCONFIG,
+    r.RAGMETADATA,
+    r.RAGAPPROVALSTATUS,
+    r.RAGAPPROVEDBY,
+    r.RAGAPPROVEDAT,
+    r.RAGCREATEDBY,
+    r.RAGUPDATEDBY,
+    r.RAGCREATEDAT,
+    r.RAGUPDATEDAT,
+    
+    -- Contadores calculados (mejora performance)
+    (SELECT COUNT(*) FROM RAGRAGVERSIONS rv WHERE rv.IDRAGRAGSYSTEMS0 = r.IDXRAGSYSTEM) AS TOTAL_VERSIONS,
+    (SELECT COUNT(*) FROM RAGRAGDATASOURCES rds WHERE rds.IDRAGRAGSYSTEMS0 = r.IDXRAGSYSTEM) AS TOTAL_DATASOURCES,
+    
+    -- Total de documentos de todas las fuentes
+    (SELECT COALESCE(SUM(rds.RAGDOCUMENTCOUNT), 0) 
+     FROM RAGRAGDATASOURCES rds 
+     WHERE rds.IDRAGRAGSYSTEMS0 = r.IDXRAGSYSTEM) AS TOTAL_DOCUMENTS,
+    
+    -- Última sincronización de cualquier fuente
+    (SELECT MAX(rds.RAGLASTSYNCAT) 
+     FROM RAGRAGDATASOURCES rds 
+     WHERE rds.IDRAGRAGSYSTEMS0 = r.IDXRAGSYSTEM) AS LAST_SYNC_DATE,
+    
+    -- Fuentes activas
+    (SELECT COUNT(*) 
+     FROM RAGRAGDATASOURCES rds 
+     WHERE rds.IDRAGRAGSYSTEMS0 = r.IDXRAGSYSTEM 
+       AND 'ACTIVE' = ANY(rds.RAGSTATUS)) AS ACTIVE_DATASOURCES
+
+FROM RAGRAGSYSTEMS r;
+
+-- Comentario en la vista
+COMMENT ON VIEW V_RAG_OVERVIEW IS 'Vista optimizada para listado de sistemas RAG con métricas calculadas';
+
+
+-- ============================================================================
+-- Vista para métricas globales del módulo RAG
+-- ============================================================================
+
+DROP VIEW IF EXISTS V_RAG_METRICS_SUMMARY CASCADE;
+
+CREATE VIEW V_RAG_METRICS_SUMMARY AS
+SELECT 
+    -- Contadores totales
+    COUNT(*) AS TOTAL_RAG_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'ACTIVE' = ANY(RAGSTATUS)) AS ACTIVE_RAG_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'DRAFT' = ANY(RAGSTATUS)) AS DRAFT_RAG_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'PENDING' = ANY(RAGAPPROVALSTATUS)) AS PENDING_APPROVAL,
+    COUNT(*) FILTER (WHERE 'APPROVED' = ANY(RAGAPPROVALSTATUS)) AS APPROVED_RAG_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'REJECTED' = ANY(RAGAPPROVALSTATUS)) AS REJECTED_RAG_SYSTEMS,
+    
+    -- Métricas por tipo
+    COUNT(*) FILTER (WHERE 'SEMANTIC_SEARCH' = ANY(RAGTYPE)) AS SEMANTIC_SEARCH_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'QA_SYSTEM' = ANY(RAGTYPE)) AS QA_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'KNOWLEDGE_BASE' = ANY(RAGTYPE)) AS KNOWLEDGE_BASE_SYSTEMS,
+    COUNT(*) FILTER (WHERE 'HYBRID' = ANY(RAGTYPE)) AS HYBRID_SYSTEMS,
+    
+    -- Totales de versiones y fuentes de datos
+    (SELECT COUNT(*) FROM RAGRAGVERSIONS) AS TOTAL_VERSIONS_ALL,
+    (SELECT COUNT(*) FROM RAGRAGDATASOURCES) AS TOTAL_DATASOURCES_ALL,
+    
+    -- Total de documentos indexados
+    (SELECT COALESCE(SUM(RAGDOCUMENTCOUNT), 0) FROM RAGRAGDATASOURCES) AS TOTAL_DOCUMENTS_INDEXED,
+    
+    -- Fuentes activas y sincronizadas
+    (SELECT COUNT(*) FROM RAGRAGDATASOURCES WHERE 'ACTIVE' = ANY(RAGSTATUS)) AS ACTIVE_DATASOURCES_ALL,
+    (SELECT COUNT(*) FROM RAGRAGDATASOURCES WHERE 'SUCCESS' = ANY(RAGSYNCSTATUS)) AS SYNCED_DATASOURCES,
+    
+    -- Timestamp de generación
+    NOW() AS GENERATED_AT
+
+FROM RAGRAGSYSTEMS r;
+
+COMMENT ON VIEW V_RAG_METRICS_SUMMARY IS 'Vista para métricas globales del módulo de sistemas RAG';
+
