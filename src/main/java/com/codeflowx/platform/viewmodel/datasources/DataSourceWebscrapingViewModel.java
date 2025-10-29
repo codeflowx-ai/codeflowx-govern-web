@@ -11,8 +11,11 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceWebscraping;
-import codeflowx.nocode.persist.*;
-import lombok.*;
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.PageParams;
+import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -44,7 +47,6 @@ public class DataSourceWebscrapingViewModel extends BaseFront<DataSourceWebscrap
     private String dateSelector;
     
     // ========== Configuración ==========
-    private String wsHeaders = "{}";
     private String wsConfiguration = "{}";
     private String wsMetadata = "{}";
     
@@ -126,7 +128,6 @@ public class DataSourceWebscrapingViewModel extends BaseFront<DataSourceWebscrap
             wsSource.setWsurl(wsUrl);
             wsSource.setWscronschedule(wsCronSchedule);
             wsSource.setWsstatus(wsStatus);
-            wsSource.setWsheaders(wsHeaders);
             wsSource.setWsconfiguration(wsConfiguration);
             wsSource.setWsmetadata(wsMetadata);
             wsSource.setWscreatedat(new Timestamp(System.currentTimeMillis()));
@@ -248,7 +249,6 @@ public class DataSourceWebscrapingViewModel extends BaseFront<DataSourceWebscrap
         wsUrl = wsSource.getWsurl();
         wsCronSchedule = wsSource.getWscronschedule();
         wsStatus = wsSource.getWsstatus();
-        wsHeaders = wsSource.getWsheaders();
         wsConfiguration = wsSource.getWsconfiguration();
         wsMetadata = wsSource.getWsmetadata();
         // TODO: Parsear selectores desde JSON
@@ -299,7 +299,6 @@ public class DataSourceWebscrapingViewModel extends BaseFront<DataSourceWebscrap
         contentSelector = null;
         linkSelector = null;
         dateSelector = null;
-        wsHeaders = "{}";
         wsConfiguration = "{}";
         wsMetadata = "{}";
         testResultVisible = false;
