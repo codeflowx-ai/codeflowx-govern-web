@@ -62,83 +62,184 @@ Esta es la **pantalla principal de entrada** al módulo de agentes, mostrando:
 
 ## 🗂️ ORGANIZACIÓN DEL MENÚ DE USUARIOS
 
+### **Estructura de Navegación SSO**
+
+```
+📱 SSO APPLICATIONS (Nivel 1 - Aplicaciones)
+├── 🤖 Agents (Dashboard: /platform/agents/monitoring/dashboard)
+├── 🏛️ Gobierno
+├── 🏗️ Infraestructura
+└── ...
+
+Cada SSO Application contiene:
+└── 📊 SSO MENUS (Nivel 2 - Menús con Dashboard)
+    └── 📝 MENU ITEMS (Nivel 3 - Enlaces ZUL o BPMN con permisos por rol)
+```
+
+---
+
+## 🤖 SSO APPLICATION: AGENTS
+
+**Dashboard Principal:** `/platform/agents/monitoring/dashboard` (monitoring/dashboard.zul)  
+**Icono:** 🤖 Robot  
+**Descripción:** Gestión completa de agentes AI
+
+---
+
 ### **Menú Principal - Módulo Agentes**
 
 ```
 📊 Agentes (Dashboard Principal)
-  └─ [/platform/agents/monitoring/dashboard] - agent-health-dashboard-overview.zul
+  └─ [/platform/agents/monitoring/dashboard] ⭐ monitoring/dashboard.zul
 
 ├── 📋 Gestión de Agentes
-│   ├── 📝 Listado de Agentes (/agents/overview)
-│   ├── ➕ Crear Agente (/agents/create)
-│   ├── 🏷️ Dominios (/agents/registry/domain-overview)
-│   └── 📦 Registro (/agents/registry)
+│   ├── 📝 Listado de Agentes (/platform/agents/overview/page)
+│   ├── ➕ Crear Agente (/platform/agents/create/page)
+│   └── 🏷️ Dominios
+│       ├── Listado de Dominios (/platform/agents/registry/domain-overview)
+│       └── Gestionar Dominio (/platform/agents/registry/domain)
 │
 ├── ⚙️ Operaciones
-│   ├── 🚀 Despliegues (/agents/deployment/overview)
-│   │   ├── Estado de Despliegues (/agents/deployment/status)
-│   │   └── Nuevo Despliegue (/agents/deployment/page)
-│   ├── 🔄 Versionado (/agents/versioning/overview)
-│   │   └── Gestionar Versiones (/agents/versioning/page)
-│   └── ⏮️ Rollback (/agents/rollback/overview)
-│       └── Ejecutar Rollback (/agents/rollback/page)
+│   ├── 🚀 Despliegues
+│   │   ├── Listado (/platform/agents/deployment/overview)
+│   │   ├── Estado (/platform/agents/deployment/status)
+│   │   └── Nuevo Despliegue (/platform/agents/deployment/page)
+│   ├── 🔄 Versionado
+│   │   ├── Listado (/platform/agents/versioning/overview)
+│   │   └── Gestionar Versión (/platform/agents/versioning/page)
+│   └── ⏮️ Rollback
+│       ├── Listado (/platform/agents/rollback/overview)
+│       └── Ejecutar Rollback (/platform/agents/rollback/page)
 │
 ├── 📈 Monitoreo y Performance
-│   ├── 📊 Dashboard General (/agents/monitoring/dashboard) ⭐ DASHBOARD PRINCIPAL
-│   ├── 💚 Salud de Agentes (/agents/monitoring/health-overview)
-│   ├── ⚡ Performance (/agents/monitoring/performance)
-│   ├── 💾 Recursos (/agents/monitoring/resources)
-│   ├── ❌ Análisis de Errores (/agents/monitoring/errors)
-│   └── 🚨 Alertas (/agents/alerts/overview)
-│       └── Configurar Alerta (/agents/alerts/page)
+│   ├── 📊 Dashboard (/platform/agents/monitoring/dashboard) ⭐ PRINCIPAL
+│   ├── 📋 Overview General (/platform/agents/monitoring/overview)
+│   ├── 💚 Salud de Agentes
+│   │   ├── Listado (/platform/agents/monitoring/health-overview)
+│   │   └── Detalle (/platform/agents/monitoring/health)
+│   ├── 💾 Consumo de Recursos (/platform/agents/monitoring/resources)
+│   ├── ❌ Análisis de Errores (/platform/agents/monitoring/errors)
+│   ├── ⚙️ Configurar Monitoreo (/platform/agents/monitoring/page)
+│   └── 🚨 Alertas
+│       ├── Listado (/platform/agents/alerts/overview)
+│       └── Configurar Alerta (/platform/agents/alerts/page)
 │
 ├── 🤝 Interacciones
-│   ├── 💬 Interacciones (/agents/interactions/overview)
-│   │   ├── Patrones (/agents/interactions/patterns)
-│   │   └── Detalle (/agents/interactions/page)
-│   ├── 📡 Comunicación (/agents/interactions/communication-overview)
-│   │   └── Configurar (/agents/interactions/communication)
-│   └── 🔗 Colaboración (/agents/interactions/collaboration-overview)
-│       ├── Configurar (/agents/interactions/collaboration)
-│       └── Red de Colaboración (/agents/interactions/network)
+│   ├── 💬 Interacciones
+│   │   ├── Listado (/platform/agents/interactions/overview)
+│   │   ├── Patrones (/platform/agents/interactions/patterns)
+│   │   └── Detalle (/platform/agents/interactions/page)
+│   ├── 📡 Comunicación
+│   │   ├── Listado (/platform/agents/interactions/communication-overview)
+│   │   └── Configurar (/platform/agents/interactions/communication)
+│   └── 🔗 Colaboración
+│       ├── Listado (/platform/agents/interactions/collaboration-overview)
+│       ├── Configurar (/platform/agents/interactions/collaboration)
+│       └── Red de Colaboración (/platform/agents/interactions/network)
 │
 ├── 🎓 Aprendizaje y Expertise
-│   ├── 🧠 Expertise (/agents/learning/overview)
-│   └── 📚 Gestionar Expertise (/agents/learning/page)
+│   ├── 🧠 Listado de Expertise (/platform/agents/learning/overview)
+│   └── 📚 Gestionar Expertise (/platform/agents/learning/page)
 │
-├── 🔄 Workflows y Automatización
-│   ├── 🔀 Workflows (/agents/workflow/overview)
-│   │   ├── Crear Workflow (/agents/workflow/page)
-│   │   └── Analytics (/agents/workflow/analytics)
-│   └── ▶️ Ejecuciones (/agents/workflow/execution-overview)
-│       └── Detalle de Ejecución (/agents/workflow/execution)
+├── 🔄 Workflows
+│   ├── 🔀 Workflows
+│   │   ├── Listado (/platform/agents/workflow/overview)
+│   │   └── Crear/Editar (/platform/agents/workflow/page)
+│   └── ▶️ Ejecuciones
+│       ├── Listado (/platform/agents/workflow/execution-overview)
+│       └── Detalle (/platform/agents/workflow/execution)
 │
 ├── ⚖️ Ética y Gobernanza
-│   ├── ⚖️ Evaluaciones Éticas (/agents/ethics/overview)
-│   │   └── Nueva Evaluación (/agents/ethics/page)
-│   ├── 🔍 Detección de Sesgo (/agents/bias-detection/overview)
-│   │   └── Analizar Sesgo (/agents/bias-detection/page)
-│   ├── 🔎 Transparencia (/agents/transparency/overview)
-│   │   └── Configurar (/agents/transparency/page)
-│   └── 🏛️ Gobernanza (/agents/governance/overview)
-│       └── Configurar (/agents/governance/page)
+│   ├── ⚖️ Evaluaciones Éticas
+│   │   ├── Listado (/platform/agents/ethics/overview)
+│   │   └── Nueva Evaluación (/platform/agents/ethics/page)
+│   ├── 🔍 Detección de Sesgo
+│   │   ├── Listado (/platform/agents/bias-detection/overview)
+│   │   └── Analizar (/platform/agents/bias-detection/page)
+│   ├── 🔎 Transparencia
+│   │   ├── Listado (/platform/agents/transparency/overview)
+│   │   └── Configurar (/platform/agents/transparency/page)
+│   └── 🏛️ Gobernanza
+│       ├── Listado (/platform/agents/governance/overview)
+│       └── Configurar (/platform/agents/governance/page)
 │
 ├── ✅ Aprobaciones y Decisiones
-│   ├── ✅ Aprobaciones (/agents/approval/overview)
-│   │   └── Procesar Aprobación (/agents/approval/page)
-│   └── 🎯 Decisiones (/agents/decisions/overview)
-│       ├── Nueva Decisión (/agents/decisions/page)
-│       └── Auditoría (/agents/decisions/audit)
+│   ├── ✅ Aprobaciones
+│   │   ├── Listado (/platform/agents/approval/overview)
+│   │   └── Procesar (/platform/agents/approval/page)
+│   └── 🎯 Decisiones
+│       ├── Listado (/platform/agents/decisions/overview)
+│       ├── Nueva/Editar (/platform/agents/decisions/page)
+│       └── Auditoría (/platform/agents/decisions/audit)
 │
 ├── ✓ Compliance
-│   ├── 📋 Estado de Compliance (/agents/compliance/status)
-│   ├── 📊 Compliance General (/agents/compliance/overview)
-│   └── ⚙️ Configurar Compliance (/agents/compliance/page)
+│   ├── 📋 Estado (/platform/agents/compliance/status)
+│   ├── 📊 Listado (/platform/agents/compliance/overview)
+│   └── ⚙️ Configurar (/platform/agents/compliance/page)
 │
 └── 🛠️ Herramientas
-    ├── 🔧 Tools (/agents/tools/overview)
-    └── ➕ Nueva Tool (/agents/tools/page)
+    ├── 🔧 Listado de Tools (/platform/agents/tools/overview)
+    └── ➕ Nueva Tool (/platform/agents/tools/page)
 ```
+
+### **Resumen de Rutas por Pantalla ZUL**
+
+| Archivo ZUL | Ruta de Acceso | Tipo |
+|-------------|----------------|------|
+| `monitoring/dashboard.zul` | `/agents/monitoring/dashboard` | ⭐ Dashboard Principal |
+| `overview/page.zul` | `/agents/overview/page` | Listado Principal |
+| `create/page.zul` | `/agents/create/page` | CRUD |
+| `registry/domain-overview.zul` | `/agents/registry/domain-overview` | Consulta |
+| `registry/domain.zul` | `/agents/registry/domain` | CRUD |
+| `deployment/overview.zul` | `/agents/deployment/overview` | Consulta |
+| `deployment/status.zul` | `/agents/deployment/status` | Consulta |
+| `deployment/page.zul` | `/agents/deployment/page` | CRUD |
+| `versioning/overview.zul` | `/agents/versioning/overview` | Consulta |
+| `versioning/page.zul` | `/agents/versioning/page` | CRUD |
+| `rollback/overview.zul` | `/agents/rollback/overview` | Consulta |
+| `rollback/page.zul` | `/agents/rollback/page` | CRUD |
+| `monitoring/overview.zul` | `/agents/monitoring/overview` | Consulta |
+| `monitoring/health-overview.zul` | `/agents/monitoring/health-overview` | Consulta |
+| `monitoring/health.zul` | `/agents/monitoring/health` | CRUD |
+| `monitoring/resources.zul` | `/agents/monitoring/resources` | Consulta |
+| `monitoring/errors.zul` | `/agents/monitoring/errors` | Consulta |
+| `monitoring/page.zul` | `/agents/monitoring/page` | CRUD |
+| `alerts/overview.zul` | `/agents/alerts/overview` | Consulta |
+| `alerts/page.zul` | `/agents/alerts/page` | CRUD |
+| `interactions/overview.zul` | `/agents/interactions/overview` | Consulta |
+| `interactions/patterns.zul` | `/agents/interactions/patterns` | Consulta |
+| `interactions/page.zul` | `/agents/interactions/page` | CRUD |
+| `interactions/communication-overview.zul` | `/agents/interactions/communication-overview` | Consulta |
+| `interactions/communication.zul` | `/agents/interactions/communication` | CRUD |
+| `interactions/collaboration-overview.zul` | `/agents/interactions/collaboration-overview` | Consulta |
+| `interactions/collaboration.zul` | `/agents/interactions/collaboration` | CRUD |
+| `interactions/network.zul` | `/agents/interactions/network` | Consulta |
+| `learning/overview.zul` | `/agents/learning/overview` | Consulta |
+| `learning/page.zul` | `/agents/learning/page` | CRUD |
+| `workflow/overview.zul` | `/agents/workflow/overview` | Consulta |
+| `workflow/page.zul` | `/agents/workflow/page` | CRUD |
+| `workflow/execution-overview.zul` | `/agents/workflow/execution-overview` | Consulta |
+| `workflow/execution.zul` | `/agents/workflow/execution` | CRUD |
+| `ethics/overview.zul` | `/agents/ethics/overview` | Consulta |
+| `ethics/page.zul` | `/agents/ethics/page` | CRUD |
+| `bias-detection/overview.zul` | `/agents/bias-detection/overview` | Consulta |
+| `bias-detection/page.zul` | `/agents/bias-detection/page` | CRUD |
+| `transparency/overview.zul` | `/agents/transparency/overview` | Consulta |
+| `transparency/page.zul` | `/agents/transparency/page` | CRUD |
+| `governance/overview.zul` | `/agents/governance/overview` | Consulta |
+| `governance/page.zul` | `/agents/governance/page` | CRUD |
+| `approval/overview.zul` | `/agents/approval/overview` | Consulta |
+| `approval/page.zul` | `/agents/approval/page` | CRUD |
+| `decisions/overview.zul` | `/agents/decisions/overview` | Consulta |
+| `decisions/page.zul` | `/agents/decisions/page` | CRUD |
+| `decisions/audit.zul` | `/agents/decisions/audit` | Consulta |
+| `compliance/status.zul` | `/agents/compliance/status` | Consulta |
+| `compliance/overview.zul` | `/agents/compliance/overview` | Consulta |
+| `compliance/page.zul` | `/agents/compliance/page` | CRUD |
+| `tools/overview.zul` | `/agents/tools/overview` | Consulta |
+| `tools/page.zul` | `/agents/tools/page` | CRUD |
+
+**Total:** 52 pantallas en la estructura de menús
 
 ### **Roles y Permisos por Menú**
 
@@ -525,3 +626,79 @@ console/bpmn/
 
 **Estado:** ✅ **IMPLEMENTACIÓN COMPLETADA**  
 **Próximo:** Documento técnico de tablas y vistas
+
+---
+
+## ✅ VERIFICACIÓN DE PANTALLAS EXISTENTES
+
+### **Total de Pantallas ZUL Verificadas: 52 archivos**
+
+**Listado completo de archivos existentes:**
+
+```
+✅ alerts/overview.zul
+✅ alerts/page.zul
+✅ approval/overview.zul
+✅ approval/page.zul
+✅ bias-detection/overview.zul
+✅ bias-detection/page.zul
+✅ compliance/overview.zul
+✅ compliance/page.zul
+✅ compliance/status.zul
+✅ create/page.zul
+✅ decisions/audit.zul
+✅ decisions/overview.zul
+✅ decisions/page.zul
+✅ deployment/overview.zul
+✅ deployment/page.zul
+✅ deployment/status.zul
+✅ ethics/overview.zul
+✅ ethics/page.zul
+✅ governance/overview.zul
+✅ governance/page.zul
+✅ interactions/collaboration-overview.zul
+✅ interactions/collaboration.zul
+✅ interactions/communication-overview.zul
+✅ interactions/communication.zul
+✅ interactions/network.zul
+✅ interactions/overview.zul
+✅ interactions/page.zul
+✅ interactions/patterns.zul
+✅ learning/overview.zul
+✅ learning/page.zul
+✅ monitoring/dashboard.zul ⭐ DASHBOARD PRINCIPAL
+✅ monitoring/errors.zul
+✅ monitoring/health-overview.zul
+✅ monitoring/health.zul
+✅ monitoring/overview.zul
+✅ monitoring/page.zul
+✅ monitoring/resources.zul
+✅ overview/page.zul
+✅ registry/domain-overview.zul
+✅ registry/domain.zul
+✅ rollback/overview.zul
+✅ rollback/page.zul
+✅ tools/overview.zul
+✅ tools/page.zul
+✅ transparency/overview.zul
+✅ transparency/page.zul
+✅ versioning/overview.zul
+✅ versioning/page.zul
+✅ workflow/execution-overview.zul
+✅ workflow/execution.zul
+✅ workflow/overview.zul
+✅ workflow/page.zul
+```
+
+### **Pantallas BPMN (fuera de platform/agents):**
+```
+✅ console/bpmn/agent-approval-human-override-form.zul
+✅ console/bpmn/hitl-sla-reminder-form.zul
+```
+
+### **Total General: 54 pantallas ZUL**
+- 52 pantallas en `/platform/agents/`
+- 2 pantallas BPMN en `/bpmn/`
+
+**Última verificación:** Octubre 29, 2025  
+**Estado:** ✅ Todas las pantallas existen y están correctamente ubicadas

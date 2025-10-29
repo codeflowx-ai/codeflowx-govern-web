@@ -1,6 +1,6 @@
 # Implementación RAG Knowledge Base
 
-## Estado: 🚧 EN PROGRESO
+## Estado: 🚧 EN PROGRESO - FASE 2
 
 ## 1. Resumen
 
@@ -131,12 +131,53 @@ SELECT * FROM RAGSYSTEMS;
 - Implementa `logActivity()` para auditoría
 - Usa patrón correcto de `Criterias` con `new Criteria(Operation, Evaluation, campo, valor)`
 
-### 4.2 Pantallas Pendientes de Implementar
+### 4.2 Registry ✅
+
+**Archivo:** `/console/platform/rag/registry/page.zul`
+
+**Funcionalidades:**
+- ✅ Vista Grid y List intercambiables
+- ✅ Filtros por estado, tipo y rendimiento
+- ✅ Búsqueda por nombre, descripción y tags
+- ✅ Modal de creación/edición completo
+- ✅ Tarjetas con métricas (rendimiento, precisión, fuentes, documentos)
+- ✅ Gestión de tags
+- ✅ Descarga de configuración
+- ✅ Acciones CRUD completas
+
+**ViewModel:** `RagRegistryViewModel`
+- Extiende `BaseFront<RagRegistryViewModel>`
+- Modal integrado para crear/editar
+- Filtros avanzados con `buildCriterias()`
+- Auditoría completa (`logActivity()`)
+- Destructor con cleanup
+
+### 4.3 Data Sources ✅
+
+**Archivo:** `/console/platform/rag/data-sources/page.zul`
+
+**Funcionalidades:**
+- ✅ Dashboard con 4 métricas (total, indexadas, en proceso, documentos)
+- ✅ Filtros por sistema RAG, tipo, estado
+- ✅ Búsqueda de fuentes
+- ✅ Modal de creación/edición
+- ✅ Tabla con información completa
+- ✅ Clasificación de datos (PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED)
+- ✅ Score de calidad visual
+- ✅ Acción de reindexación
+- ✅ Última indexación
+
+**ViewModel:** `RagDataSourceViewModel`
+- Extiende `BaseFront<RagDataSourceViewModel>`
+- Carga sistemas RAG para el combobox
+- Métricas calculadas en tiempo real
+- Reindexación (pendiente integración leka-server)
+- Auditoría completa
+
+### 4.4 Pantallas Pendientes de Implementar
 
 | Pantalla | Ruta | Estado | Descripción |
 |----------|------|--------|-------------|
-| **Registry** | `/rag/registry/page.zul` | ⏳ PENDIENTE | Registro detallado de sistemas |
-| **Data Sources** | `/rag/data-sources/page.zul` | ⏳ PENDIENTE | Gestión de fuentes de datos |
 | **Versioning** | `/rag/versioning/page.zul` | ⏳ PENDIENTE | Control de versiones |
 | **Rollback** | `/rag/rollback/page.zul` | ⏳ PENDIENTE | Gestión de rollbacks |
 | **Quality Control** | `/rag/quality-control/page.zul` | ⏳ PENDIENTE | Control de calidad |
@@ -210,12 +251,48 @@ public class RagSystemOverviewViewModel extends BaseFront<RagSystemOverviewViewM
 - `getComplianceColor()` - Estilos Bootstrap para compliance
 - `formatDate()` - Formateo de fechas
 
-### 5.2 ViewModels Pendientes
+### 5.2 RagRegistryViewModel ✅
+
+**Ubicación:** `com.codeflowx.platform.viewmodel.rag.RagRegistryViewModel`
+
+**Funcionalidades:**
+- Toggle entre vista Grid y List
+- Filtros por estado, tipo y rendimiento (score-based)
+- Modal completo para creación/edición
+- Parseo de tags
+- Descarga de configuración (pendiente)
+- CRUD completo con auditoría
+
+**Métodos Destacados:**
+- `toggleView()` - Cambia entre grid/list
+- `showCreateModal()` / `editSystem()` - Gestión de modal
+- `saveSystem()` - Crear/editar con validaciones
+- `getTags()` - Parsear tags separados por comas
+- `buildCriterias()` - Incluye filtro de rendimiento con GREATER_THAN/LESS_THAN
+
+### 5.3 RagDataSourceViewModel ✅
+
+**Ubicación:** `com.codeflowx.platform.viewmodel.rag.RagDataSourceViewModel`
+
+**Funcionalidades:**
+- Dashboard con métricas calculadas
+- Filtros por sistema RAG (con lista dinámica)
+- Modal de creación/edición
+- Reindexación de fuentes
+- Clasificación de datos
+- Relación con RagSystem
+
+**Métodos Destacados:**
+- `loadRagSystems()` - Carga lista de sistemas para filtros
+- `loadMetrics()` - Calcula métricas en tiempo real
+- `reindexSource()` - Solicita reindexación (pendiente leka-server)
+- `getRagSystemName()` - Helper para mostrar nombre del sistema
+- `getClassificationColor()` - Estilos para clasificación de datos
+
+### 5.4 ViewModels Pendientes
 
 | ViewModel | Estado | Descripción |
 |-----------|--------|-------------|
-| `RagSystemRegistryViewModel` | ⏳ PENDIENTE | Registro de sistemas |
-| `RagDataSourceViewModel` | ⏳ PENDIENTE | Gestión de fuentes |
 | `RagVersionViewModel` | ⏳ PENDIENTE | Versionamiento |
 | `RagRollbackViewModel` | ⏳ PENDIENTE | Rollbacks |
 | `RagQualityControlViewModel` | ⏳ PENDIENTE | Control de calidad |
@@ -321,9 +398,24 @@ Todos los ViewModels pendientes deben seguir el patrón `BaseFront`:
 
 - ✅ Entidades JPA: **4/4** (100%)
 - ✅ Scripts SQL: **1/1** (100%)
-- ✅ Pantallas ZKoss: **1/9** (11%)
-- ✅ ViewModels: **1/9** (11%)
+- ✅ Pantallas ZKoss: **3/9** (33%)
+- ✅ ViewModels: **3/9** (33%)
 - ⏳ Integración leka-server: **0%**
 
-**Última actualización:** 2025-01-29
+### Fase 2 Completada:
+- ✅ Overview (Fase 1)
+- ✅ Registry (Fase 2) - Vista grid/list + Modal CRUD
+- ✅ Data Sources (Fase 2) - Dashboard + Gestión de fuentes
+
+### Pendiente (Fase 3):
+- ⏳ Versioning (6 pantallas restantes)
+- ⏳ Rollback
+- ⏳ Quality Control
+- ⏳ Bias Detection
+- ⏳ Compliance
+- ⏳ Monitoring
+- ⏳ Access Control
+
+**Última actualización:** 2025-01-29 (Fase 2)
+
 

@@ -1,462 +1,332 @@
-<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
-<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
-<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
-	xmlns:h="xhtml"
-	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
-	<idspace id="rag"
-		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.rag.RagSystemDetailViewModel')"
-		validationMessages="@id('vmsgs')">
-		<div class="row">
-			<div>
-				<div class="left tittle-principal">
-					<h:h2 class="mb-1" style="font-weight: bold;">
-						<h:i class="fa-sharp-duotone fa-solid fa-books label-icon align-middle fs-16 me-2"></h:i>
-						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
-					</h:h2>
-					<h:p class="text-muted">
-						<label value="Gestión y configuración de System" class="text-muted" />
-					</h:p>
-				</div>
-			</div>
-			
-			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
-				<div class="card">
-					<div class="card-header">
-						<div class="d-flex align-items-center flex-wrap gap-2">
-							<div class="flex-grow-1">
-								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
-									onClick="@command('cancelEdit')"
-									sclass="waves-effect waves-light" 
-									tooltiptext="Volver">
-								</a>
-							</div>
-							<div class="flex-shrink-0">
-								<div class="hstack text-nowrap gap-2 d-flex">
-									<a class="waves-effect waves-light"
-										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
-										onClick="@command('saveRagSystem')"
-										tooltiptext="Guardar">
-									</a>
-								</div>
-							</div>
-						</div>
-					</div><!--header-->
-					
-					<div class="card-body">
-						<div class="row">
-							<!-- Formulario Principal -->
-							<div class="col-lg-12 col-xlg-12 col-md-12">
-								<div class="card default shadow-xl">
-									<div class="card-body">
+<?page title="RAG Registry" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.rag.RagRegistryViewModel')">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1">
+                    <i class="fas fa-folder-open me-2"></i>
+                    Registro de Sistemas RAG
+                </h2>
+                <p class="text-muted">Gestión y configuración de sistemas RAG</p>
+            </div>
+        </div>
 
-										<div class="form-group row">
-											<!-- Name -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Name *" />
-														<textbox tabindex="2" id="ragname"
-															value="@bind(vm.currentRagSystem.ragname) @save(vm.currentRagSystem.ragname, before=('saveItem')) @validator(vm.unique, field='RAGNAME', required=true, oldValue=vm.originalRagname)"
-															maxlength="255"
-															constraint="no empty: max 255" />
-														<label sclass="text-danger" value="@load(vmsgs['ragname'])" />
-													</div>
-												</div>
-											</div>											<!-- Description -->
-											<div class="default col-lg-12 col-xlg-12 col-md-12">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Description" />
-														<textbox tabindex="3" id="ragdescription"
-															value="@bind(vm.currentRagSystem.ragdescription)"
-															rows="4" multiline="true"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragdescription'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Type -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Type *" />
-														<combobox tabindex="4" id="ragtype"
-															selectedItem="@bind(vm.currentRagSystem.ragtype)"
-															readonly="true"
-															constraint="no empty">
-															<comboitem label="Tipo 1" value="TYPE1"/>
-															<comboitem label="Tipo 2" value="TYPE2"/>
-															<comboitem label="Tipo 3" value="TYPE3"/>
-														</combobox>
-														<label sclass="text-danger" value="@load(vmsgs['ragtype'])" />
-													</div>
-												</div>
-											</div>											<!-- Version -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Version *" />
-														<textbox tabindex="5" id="ragversion"
-															value="@bind(vm.currentRagSystem.ragversion)"
-															maxlength="50"
-															constraint="no empty: max 50" />
-														<label sclass="text-danger" value="@load(vmsgs['ragversion'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Status -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Status *" />
-														<combobox tabindex="6" id="ragstatus"
-															selectedItem="@bind(vm.currentRagSystem.ragstatus)"
-															readonly="true"
-															constraint="no empty">
-															<comboitem label="Activo" value="ACTIVE"/>
-															<comboitem label="Inactivo" value="INACTIVE"/>
-															<comboitem label="Pendiente" value="PENDING"/>
-															<comboitem label="Rechazado" value="REJECTED"/>
-														</combobox>
-														<label sclass="text-danger" value="@load(vmsgs['ragstatus'])" />
-													</div>
-												</div>
-											</div>											<!-- Configuration -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Configuration" />
-														<textbox tabindex="7" id="ragconfiguration"
-															value="@bind(vm.currentRagSystem.ragconfiguration)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragconfiguration'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Embeddingmodel -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Embeddingmodel" />
-														<textbox tabindex="8" id="ragembeddingmodel"
-															value="@bind(vm.currentRagSystem.ragembeddingmodel)"
-															maxlength="255"
-															constraint="max 255" />
-														<label sclass="text-danger" value="@load(vmsgs['ragembeddingmodel'])" />
-													</div>
-												</div>
-											</div>											<!-- Retrievalconfig -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Retrievalconfig" />
-														<textbox tabindex="9" id="ragretrievalconfig"
-															value="@bind(vm.currentRagSystem.ragretrievalconfig)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragretrievalconfig'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Generationconfig -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Generationconfig" />
-														<textbox tabindex="10" id="raggenerationconfig"
-															value="@bind(vm.currentRagSystem.raggenerationconfig)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['raggenerationconfig'])" />
-													</div>
-												</div>
-											</div>											<!-- Metadata -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Metadata" />
-														<textbox tabindex="11" id="ragmetadata"
-															value="@bind(vm.currentRagSystem.ragmetadata)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragmetadata'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Approval Status -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Approval Status" />
-														<combobox tabindex="12" id="ragapprovalstatus"
-															selectedItem="@bind(vm.currentRagSystem.ragapprovalstatus)"
-															readonly="true"
-															>
-															<comboitem label="Activo" value="ACTIVE"/>
-															<comboitem label="Inactivo" value="INACTIVE"/>
-															<comboitem label="Pendiente" value="PENDING"/>
-															<comboitem label="Rechazado" value="REJECTED"/>
-														</combobox>
-														<label sclass="text-danger" value="@load(vmsgs['ragapprovalstatus'])" />
-													</div>
-												</div>
-											</div>											<!-- Approvedby -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Approvedby" />
-														<textbox tabindex="13" id="ragapprovedby"
-															value="@bind(vm.currentRagSystem.ragapprovedby)"
-															maxlength="255"
-															constraint="max 255" />
-														<label sclass="text-danger" value="@load(vmsgs['ragapprovedby'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Approvedat -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Approvedat" />
-														<textbox tabindex="14" id="ragapprovedat"
-															value="@bind(vm.currentRagSystem.ragapprovedat)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragapprovedat'])" />
-													</div>
-												</div>
-											</div>											<!-- Created By -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Created By *" />
-														<textbox tabindex="15" id="ragcreatedby"
-															value="@bind(vm.currentRagSystem.ragcreatedby)"
-															maxlength="255"
-															constraint="no empty: max 255" />
-														<label sclass="text-danger" value="@load(vmsgs['ragcreatedby'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Updated By -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Updated By" />
-														<textbox tabindex="16" id="ragupdatedby"
-															value="@bind(vm.currentRagSystem.ragupdatedby)"
-															maxlength="255"
-															constraint="max 255" />
-														<label sclass="text-danger" value="@load(vmsgs['ragupdatedby'])" />
-													</div>
-												</div>
-											</div>											<!-- Created At -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Created At *" />
-														<textbox tabindex="17" id="ragcreatedat"
-															value="@bind(vm.currentRagSystem.ragcreatedat)"
-															maxlength="255"
-															constraint="no empty" />
-														<label sclass="text-danger" value="@load(vmsgs['ragcreatedat'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Updated At -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Updated At" />
-														<textbox tabindex="18" id="ragupdatedat"
-															value="@bind(vm.currentRagSystem.ragupdatedat)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['ragupdatedat'])" />
-													</div>
-												</div>
-											</div>											<!-- Subragragdatasources -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Subragragdatasources" />
-														<textbox tabindex="19" id="subragragdatasources"
-															value="@bind(vm.currentRagSystem.subragragdatasources)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['subragragdatasources'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-										<div class="form-group row">
-											<!-- Subragragversions -->
-											<div class="default col-lg-6 col-xlg-6 col-md-6">
-												<div class="row">
-													<div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Subragragversions" />
-														<textbox tabindex="20" id="subragragversions"
-															value="@bind(vm.currentRagSystem.subragragversions)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['subragragversions'])" />
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
+        <!-- Barra de acciones -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="input-group">
+                    <span class="input-group-text bg-white">
+                        <i class="fas fa-search text-muted"></i>
+                    </span>
+                    <textbox class="form-control" placeholder="Buscar por nombre, descripción o tags..."
+                             value="@bind(vm.searchText)" instant="true"
+                             onChange="@command('searchRegistry')"/>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group">
+                    <button class="btn btn-outline-secondary" 
+                            onClick="@command('toggleView', view='grid')"
+                            disabled="@load(vm.viewMode eq 'grid')">
+                        <i class="fas fa-th"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" 
+                            onClick="@command('toggleView', view='list')"
+                            disabled="@load(vm.viewMode eq 'list')">
+                        <i class="fas fa-list"></i>
+                    </button>
+                </div>
+                <button class="btn btn-primary ms-2" onClick="@command('showCreateModal')">
+                    <i class="fas fa-plus me-1"></i>Nuevo Sistema RAG
+                </button>
+            </div>
+        </div>
 
-							<!-- Tabs de Información Descendente -->
-							<div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
-								<div class="card default shadow-xl">
-									<div class="card-body">
-										<tabbox>
-											<tabs>
-												<tab label="Subragragdatasources" onSelect="@command('onSelectRagDataSourceTab')" />
-												<tab label="Subragragversions" onSelect="@command('onSelectRagVersionTab')" />
-											</tabs>
-											<tabpanels>
-												<!-- Panel: Subragragdatasources -->
-												<tabpanel>
-													<h:div class="d-flex justify-content-between align-items-center mb-3">
-														<h:h5 class="mb-0">
-															<label value="Subragragdatasources"/>
-														</h:h5>
-														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalRagDataSources)"/> 
-															<label value="registros"/>
-														</h:span>
-													</h:div>
-													
-													<h:div class="table-responsive">
-														<h:table class="table table-hover table-sm">
-															<h:thead class="table-light">
-																<h:tr>
-																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
-																</h:tr>
-															</h:thead>
-															<h:tbody>
-																<forEach items="@load(vm.subragragdatasources)" var="item">
-																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
-																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
-																			</h:span>
-																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
-																	</h:tr>
-																</forEach>
-															</h:tbody>
-														</h:table>
-													</h:div>
-													
-													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subragragdatasources)">
-														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
-														<h:p class="mt-2">
-															<label value="No hay subragragdatasources registrados"/>
-														</h:p>
-													</h:div>
-												</tabpanel>
-												<!-- Panel: Subragragversions -->
-												<tabpanel>
-													<h:div class="d-flex justify-content-between align-items-center mb-3">
-														<h:h5 class="mb-0">
-															<label value="Subragragversions"/>
-														</h:h5>
-														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalRagVersions)"/> 
-															<label value="registros"/>
-														</h:span>
-													</h:div>
-													
-													<h:div class="table-responsive">
-														<h:table class="table table-hover table-sm">
-															<h:thead class="table-light">
-																<h:tr>
-																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
-																</h:tr>
-															</h:thead>
-															<h:tbody>
-																<forEach items="@load(vm.subragragversions)" var="item">
-																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
-																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
-																			</h:span>
-																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
-																	</h:tr>
-																</forEach>
-															</h:tbody>
-														</h:table>
-													</h:div>
-													
-													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subragragversions)">
-														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
-														<h:p class="mt-2">
-															<label value="No hay subragragversions registrados"/>
-														</h:p>
-													</h:div>
-												</tabpanel>
-											</tabpanels>
-										</tabbox>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div><!--card-->
-			</div><!--lg-->
-		</div><!--row-->
-	</idspace>
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Estado"
+                                  value="@bind(vm.filterStatus)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos los estados" value=""/>
+                            <comboitem label="Activo" value="active"/>
+                            <comboitem label="Inactivo" value="inactive"/>
+                            <comboitem label="Borrador" value="draft"/>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Tipo"
+                                  value="@bind(vm.filterType)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos los tipos" value=""/>
+                            <comboitem label="Knowledge Base" value="KNOWLEDGE_BASE"/>
+                            <comboitem label="Legal Assistant" value="LEGAL_ASSISTANT"/>
+                            <comboitem label="Code Assistant" value="CODE_ASSISTANT"/>
+                            <comboitem label="Support" value="SUPPORT"/>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Rendimiento"
+                                  value="@bind(vm.filterPerformance)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos" value=""/>
+                            <comboitem label="Excelente (>90%)" value="excellent"/>
+                            <comboitem label="Bueno (70-90%)" value="good"/>
+                            <comboitem label="Regular (<70%)" value="poor"/>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-secondary w-100" onClick="@command('clearFilters')">
+                            <i class="fas fa-times me-1"></i>Limpiar Filtros
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista Grid -->
+        <div class="row g-4" visible="@load(vm.viewMode eq 'grid')">
+            <div class="col-md-4" forEach="@load(vm.registryList)">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 pt-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1" label="@load(each.ragsystemname)"/>
+                                <small class="text-muted" label="@load(concat('v', each.ragversion))"/>
+                            </div>
+                            <span class="@load(vm.getStatusColor(each.ragstatus))"
+                                  label="@load(each.ragstatus)"/>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted small mb-3" label="@load(each.ragdescription)"/>
+                        
+                        <!-- Métricas -->
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <div class="small text-muted">Rendimiento</div>
+                                    <strong label="@load(each.ragoverallscore)"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <div class="small text-muted">Precisión</div>
+                                    <strong label="@load(each.ragaccuracyscore)"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <div class="small text-muted">Fuentes</div>
+                                    <strong label="@load(each.ragdatasources)"/>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-center p-2 bg-light rounded">
+                                    <div class="small text-muted">Documentos</div>
+                                    <strong label="@load(each.ragdocuments)"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Tags -->
+                        <div class="mb-3" visible="@load(not empty each.ragtags)">
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-secondary" forEach="@load(vm.getTags(each.ragtags))">
+                                    <label value="@load(each)"/>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                <label value="@load(each.ragcreatedby)"/>
+                            </small>
+                            <small class="text-muted" label="@load(vm.formatDate(each.ragcreatedat))"/>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0">
+                        <div class="btn-group w-100">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onClick="@command('viewSystem', system=each)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" 
+                                    onClick="@command('editSystem', system=each)">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" 
+                                    onClick="@command('deleteSystem', system=each)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-info" 
+                                    onClick="@command('downloadConfig', system=each)">
+                                <i class="fas fa-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vista List -->
+        <div class="card border-0 shadow-sm" visible="@load(vm.viewMode eq 'list')">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sistema</th>
+                                <th>Tipo</th>
+                                <th class="text-center">Rendimiento</th>
+                                <th class="text-center">Precisión</th>
+                                <th class="text-center">Fuentes/Docs</th>
+                                <th class="text-center">Estado</th>
+                                <th>Creado por</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr forEach="@load(vm.registryList)">
+                                <td>
+                                    <div>
+                                        <strong label="@load(each.ragsystemname)"/>
+                                        <br/>
+                                        <small class="text-muted" label="@load(each.ragversion)"/>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info" label="@load(each.ragtype)"/>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        <div class="progress" style="width: 60px; height: 8px;">
+                                            <div class="progress-bar bg-success" 
+                                                 style="@load(concat('width: ', each.ragoverallscore, '%'))"></div>
+                                        </div>
+                                        <span class="ms-2 small" label="@load(each.ragoverallscore)"/>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="small" label="@load(each.ragaccuracyscore)"/>
+                                </td>
+                                <td class="text-center">
+                                    <span label="@load(concat(each.ragdatasources, ' / ', each.ragdocuments))"/>
+                                </td>
+                                <td class="text-center">
+                                    <span class="@load(vm.getStatusColor(each.ragstatus))"
+                                          label="@load(each.ragstatus)"/>
+                                </td>
+                                <td>
+                                    <small label="@load(each.ragcreatedby)"/>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                onClick="@command('viewSystem', system=each)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" 
+                                                onClick="@command('editSystem', system=each)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" 
+                                                onClick="@command('deleteSystem', system=each)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Creación/Edición -->
+        <window id="createEditModal" title="@load(vm.isEditMode ? 'Editar Sistema RAG' : 'Crear Sistema RAG')"
+                border="normal" width="800px" mode="modal" 
+                visible="@load(vm.showModal)" onClose="@command('closeModal')">
+            <div class="p-3">
+                <div class="row g-3">
+                    <!-- Nombre -->
+                    <div class="col-12">
+                        <label class="form-label">Nombre del Sistema *</label>
+                        <textbox class="form-control" value="@bind(vm.systemName)" 
+                                 placeholder="Ej: Knowledge Base RAG"/>
+                    </div>
+                    
+                    <!-- Descripción -->
+                    <div class="col-12">
+                        <label class="form-label">Descripción</label>
+                        <textbox class="form-control" value="@bind(vm.systemDescription)" 
+                                 rows="3" multiline="true"
+                                 placeholder="Descripción del sistema RAG"/>
+                    </div>
+                    
+                    <!-- Versión y Tipo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Versión *</label>
+                        <textbox class="form-control" value="@bind(vm.systemVersion)" 
+                                 placeholder="1.0.0"/>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Tipo *</label>
+                        <combobox class="form-control" value="@bind(vm.systemType)" buttonVisible="false">
+                            <comboitem label="Knowledge Base" value="KNOWLEDGE_BASE"/>
+                            <comboitem label="Legal Assistant" value="LEGAL_ASSISTANT"/>
+                            <comboitem label="Code Assistant" value="CODE_ASSISTANT"/>
+                            <comboitem label="Support" value="SUPPORT"/>
+                        </combobox>
+                    </div>
+                    
+                    <!-- Estado y Nivel de Riesgo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Estado *</label>
+                        <combobox class="form-control" value="@bind(vm.systemStatus)" buttonVisible="false">
+                            <comboitem label="Activo" value="ACTIVE"/>
+                            <comboitem label="Inactivo" value="INACTIVE"/>
+                            <comboitem label="Borrador" value="DRAFT"/>
+                        </combobox>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Nivel de Riesgo</label>
+                        <combobox class="form-control" value="@bind(vm.systemRiskLevel)" buttonVisible="false">
+                            <comboitem label="Bajo" value="LOW"/>
+                            <comboitem label="Medio" value="MEDIUM"/>
+                            <comboitem label="Alto" value="HIGH"/>
+                            <comboitem label="Crítico" value="CRITICAL"/>
+                        </combobox>
+                    </div>
+                    
+                    <!-- Tags -->
+                    <div class="col-12">
+                        <label class="form-label">Tags (separados por comas)</label>
+                        <textbox class="form-control" value="@bind(vm.systemTags)" 
+                                 placeholder="knowledge-base, documentation, technical"/>
+                    </div>
+                </div>
+                
+                <!-- Botones -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button class="btn btn-secondary" onClick="@command('closeModal')">
+                        Cancelar
+                    </button>
+                    <button class="btn btn-primary" onClick="@command('saveSystem')">
+                        <i class="fas fa-save me-1"></i>
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </window>
+
+    </div>
 </zk>
