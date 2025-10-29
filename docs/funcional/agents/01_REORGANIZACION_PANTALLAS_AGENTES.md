@@ -39,6 +39,167 @@ console/platform/agents/
 
 ---
 
+## 📊 PANTALLA DASHBOARD DEL MÓDULO
+
+### **Dashboard Principal de Agentes**
+
+**Pantalla:** `agent-health-dashboard-overview.zul`  
+**Nueva Ubicación:** `console/platform/agents/monitoring/dashboard.zul`  
+**ViewModel:** `AgentHealthDashboardOverviewViewModel`  
+**Tipo:** Dashboard Principal (Consulta)
+
+Esta es la **pantalla principal de entrada** al módulo de agentes, mostrando:
+- Estado general de todos los agentes
+- Métricas de salud en tiempo real
+- Alertas y notificaciones críticas
+- KPIs principales del módulo
+- Gráficos de performance
+- Accesos rápidos a funcionalidades principales
+
+**Ruta de acceso:** `/platform/agents/monitoring/dashboard`
+
+---
+
+## 🗂️ ORGANIZACIÓN DEL MENÚ DE USUARIOS
+
+### **Menú Principal - Módulo Agentes**
+
+```
+📊 Agentes (Dashboard Principal)
+  └─ [/platform/agents/monitoring/dashboard] - agent-health-dashboard-overview.zul
+
+├── 📋 Gestión de Agentes
+│   ├── 📝 Listado de Agentes (/agents/overview)
+│   ├── ➕ Crear Agente (/agents/create)
+│   ├── 🏷️ Dominios (/agents/registry/domain-overview)
+│   └── 📦 Registro (/agents/registry)
+│
+├── ⚙️ Operaciones
+│   ├── 🚀 Despliegues (/agents/deployment/overview)
+│   │   ├── Estado de Despliegues (/agents/deployment/status)
+│   │   └── Nuevo Despliegue (/agents/deployment/page)
+│   ├── 🔄 Versionado (/agents/versioning/overview)
+│   │   └── Gestionar Versiones (/agents/versioning/page)
+│   └── ⏮️ Rollback (/agents/rollback/overview)
+│       └── Ejecutar Rollback (/agents/rollback/page)
+│
+├── 📈 Monitoreo y Performance
+│   ├── 📊 Dashboard General (/agents/monitoring/dashboard) ⭐ DASHBOARD PRINCIPAL
+│   ├── 💚 Salud de Agentes (/agents/monitoring/health-overview)
+│   ├── ⚡ Performance (/agents/monitoring/performance)
+│   ├── 💾 Recursos (/agents/monitoring/resources)
+│   ├── ❌ Análisis de Errores (/agents/monitoring/errors)
+│   └── 🚨 Alertas (/agents/alerts/overview)
+│       └── Configurar Alerta (/agents/alerts/page)
+│
+├── 🤝 Interacciones
+│   ├── 💬 Interacciones (/agents/interactions/overview)
+│   │   ├── Patrones (/agents/interactions/patterns)
+│   │   └── Detalle (/agents/interactions/page)
+│   ├── 📡 Comunicación (/agents/interactions/communication-overview)
+│   │   └── Configurar (/agents/interactions/communication)
+│   └── 🔗 Colaboración (/agents/interactions/collaboration-overview)
+│       ├── Configurar (/agents/interactions/collaboration)
+│       └── Red de Colaboración (/agents/interactions/network)
+│
+├── 🎓 Aprendizaje y Expertise
+│   ├── 🧠 Expertise (/agents/learning/overview)
+│   └── 📚 Gestionar Expertise (/agents/learning/page)
+│
+├── 🔄 Workflows y Automatización
+│   ├── 🔀 Workflows (/agents/workflow/overview)
+│   │   ├── Crear Workflow (/agents/workflow/page)
+│   │   └── Analytics (/agents/workflow/analytics)
+│   └── ▶️ Ejecuciones (/agents/workflow/execution-overview)
+│       └── Detalle de Ejecución (/agents/workflow/execution)
+│
+├── ⚖️ Ética y Gobernanza
+│   ├── ⚖️ Evaluaciones Éticas (/agents/ethics/overview)
+│   │   └── Nueva Evaluación (/agents/ethics/page)
+│   ├── 🔍 Detección de Sesgo (/agents/bias-detection/overview)
+│   │   └── Analizar Sesgo (/agents/bias-detection/page)
+│   ├── 🔎 Transparencia (/agents/transparency/overview)
+│   │   └── Configurar (/agents/transparency/page)
+│   └── 🏛️ Gobernanza (/agents/governance/overview)
+│       └── Configurar (/agents/governance/page)
+│
+├── ✅ Aprobaciones y Decisiones
+│   ├── ✅ Aprobaciones (/agents/approval/overview)
+│   │   └── Procesar Aprobación (/agents/approval/page)
+│   └── 🎯 Decisiones (/agents/decisions/overview)
+│       ├── Nueva Decisión (/agents/decisions/page)
+│       └── Auditoría (/agents/decisions/audit)
+│
+├── ✓ Compliance
+│   ├── 📋 Estado de Compliance (/agents/compliance/status)
+│   ├── 📊 Compliance General (/agents/compliance/overview)
+│   └── ⚙️ Configurar Compliance (/agents/compliance/page)
+│
+└── 🛠️ Herramientas
+    ├── 🔧 Tools (/agents/tools/overview)
+    └── ➕ Nueva Tool (/agents/tools/page)
+```
+
+### **Roles y Permisos por Menú**
+
+| Sección | Admin | Manager | Developer | Viewer |
+|---------|-------|---------|-----------|--------|
+| **Dashboard** | ✅ | ✅ | ✅ | ✅ |
+| **Gestión de Agentes** | ✅ | ✅ | ✅ | 👁️ |
+| **Operaciones** | ✅ | ✅ | ✅ | 👁️ |
+| **Monitoreo** | ✅ | ✅ | ✅ | ✅ |
+| **Interacciones** | ✅ | ✅ | ✅ | 👁️ |
+| **Aprendizaje** | ✅ | ✅ | ✅ | 👁️ |
+| **Workflows** | ✅ | ✅ | ✅ | 👁️ |
+| **Ética y Gobernanza** | ✅ | ✅ | 👁️ | 👁️ |
+| **Aprobaciones** | ✅ | ✅ | ❌ | 👁️ |
+| **Compliance** | ✅ | ✅ | 👁️ | 👁️ |
+| **Herramientas** | ✅ | ✅ | ✅ | 👁️ |
+
+**Leyenda:**
+- ✅ = Acceso completo (lectura + escritura)
+- 👁️ = Solo lectura
+- ❌ = Sin acceso
+
+### **Menú Contextual por Rol**
+
+#### **1. Admin (Acceso Completo)**
+- Todos los menús y funcionalidades
+- Gestión de permisos
+- Configuración del sistema
+
+#### **2. Manager (Gestión Operativa)**
+- Dashboard y monitoreo completo
+- Gestión de agentes y deployments
+- Aprobaciones y compliance
+- Sin acceso a configuración de sistema
+
+#### **3. Developer (Desarrollo y Testing)**
+- Dashboard y monitoreo
+- Gestión de agentes (crear, editar)
+- Workflows y herramientas
+- Sin aprobaciones ni compliance
+
+#### **4. Viewer (Solo Consulta)**
+- Dashboard y monitoreo
+- Consulta de todos los listados
+- Sin capacidad de modificación
+
+### **Breadcrumbs Dinámicos**
+
+Ejemplos de navegación con breadcrumbs:
+
+```
+Inicio > Agentes > Dashboard
+Inicio > Agentes > Gestión > Listado de Agentes
+Inicio > Agentes > Gestión > Crear Agente
+Inicio > Agentes > Monitoreo > Performance
+Inicio > Agentes > Ética y Gobernanza > Evaluaciones Éticas
+Inicio > Agentes > Workflows > Ejecuciones > Detalle
+```
+
+---
+
 ## 🔄 MAPEO DE REORGANIZACIÓN
 
 ### **1. OVERVIEW (Listado Principal)**

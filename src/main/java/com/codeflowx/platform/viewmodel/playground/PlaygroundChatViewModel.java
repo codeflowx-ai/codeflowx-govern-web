@@ -127,7 +127,7 @@ public class PlaygroundChatViewModel extends BaseFront<PlaygroundChatViewModel> 
             session.setMessagecount(0);
             session.setTokensused(0L);
             session.setCost(java.math.BigDecimal.ZERO);
-            session.setSessioncreatedby(ctxBean.getUsuario().getUsuario());
+            session.setSessioncreatedby(getUser().getUsername());
             session.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
             
             businessService.save(session);

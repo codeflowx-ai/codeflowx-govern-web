@@ -1,208 +1,197 @@
-# ⚖️ ETHICS - MÓDULO DE GESTIÓN ÉTICA
+# ⚖️ ETHICS - ÍNDICE DE DOCUMENTACIÓN
 
+**Módulo:** Ethics  
 **Fecha:** Octubre 2025  
 **Versión:** 1.0  
-**Propósito:** Módulo de gestión ética para el gobierno de IA
+**Estado:** ✅ Completamente Implementado
 
 ---
 
-## 🎯 DESCRIPCIÓN GENERAL
+## 📋 DOCUMENTOS DISPONIBLES
 
-El módulo **Ethics** proporciona capacidades completas de gestión ética para el gobierno de IA, incluyendo evaluaciones, comité de ética, análisis de impacto, mitigación y gestión de violaciones.
-
----
-
-## 📚 DOCUMENTACIÓN DEL MÓDULO
-
-### **1. Reorganización de Pantallas**
-📄 **[01_REORGANIZACION_PANTALLAS_ETHICS.md](01_REORGANIZACION_PANTALLAS_ETHICS.md)**
-- Estructura actual de pantallas ZUL
-- Reorganización propuesta
-- Distribución de funcionalidades
+### **1. Reorganización de Pantallas** 📱
+**Archivo:** `01_REORGANIZACION_PANTALLAS_ETHICS.md`  
+**Contenido:**
+- Análisis de 6 pantallas ZUL
+- Distribución funcional
+- Estructura propuesta
 - Comparación con Next.js
 
-### **2. Documentación Técnica**
-📄 **[02_DOCUMENTACION_TECNICA_ETHICS.md](02_DOCUMENTACION_TECNICA_ETHICS.md)**
-- Entidades JPA principales
-- Views y funciones SQL
-- Procedimientos almacenados
-- Procesos BPMN
-- Reglas Drools
-- ViewModels especializados
-- Servicios de ethics
+### **2. Documentación Técnica** 🔧
+**Archivo:** `02_DOCUMENTACION_TECNICA_ETHICS.md`  
+**Contenido:**
+- 5 JPA Entities
+- 2 Procesos BPMN (ethics-review, bias-detection)
+- 8 Reglas Drools
+- 12+ SQL Views
+- 6 ViewModels
 
-### **3. Procesos BPMN**
-📄 **[03_PROCESOS_BPMN_ETHICS.md](03_PROCESOS_BPMN_ETHICS.md)**
-- Proceso de revisión ética
-- Formularios asociados
-- Delegates especializados
-- Flujo de trabajo completo
+### **3. API & SDK** 🌐
+**Archivo:** `03_API_SDK_ETHICS.md`  
+**Contenido:**
+- ~30 endpoints REST
+- Ejemplos de uso Java y Python
+- Autenticación JWT
+- Rate limiting y error handling
 
-### **4. API y SDK**
-📄 **[04_API_SDK_ETHICS.md](04_API_SDK_ETHICS.md)**
-- Endpoints REST de ethics
-- SDK para integración
-- Documentación de APIs
-- Ejemplos de uso
+### **4. Integración** 🔗
+**Archivo:** `04_INTEGRACION_ETHICS.md`  
+**Contenido:**
+- Integración con Models
+- Integración con Training
+- Integración con Serving
+- Integración con Governance
+- Integración con Analytics
+- Frameworks externos (AIF360, Fairlearn)
 
-### **5. Integración**
-📄 **[05_INTEGRACION_ETHICS.md](05_INTEGRACION_ETHICS.md)**
-- Integración con otros módulos
-- APIs externas
-- Sistemas de monitoreo
-- Webhooks y notificaciones
+### **5. Monitoreo** 📊
+**Archivo:** `05_MONITOREO_ETHICS.md`  
+**Contenido:**
+- Métricas de compliance ético
+- Métricas de bias
+- Métricas de fairness
+- Métricas de impacto
+- Sistema de alertas (9 tipos)
 
-### **6. Monitoreo**
-📄 **[06_MONITOREO_ETHICS.md](06_MONITOREO_ETHICS.md)**
-- Métricas de rendimiento
-- Alertas y notificaciones
-- Dashboards de monitoreo
-- KPIs del módulo
-
-### **7. Documento Comercial**
-📄 **[07_DOCUMENTO_COMERCIAL_ETHICS.md](07_DOCUMENTO_COMERCIAL_ETHICS.md)**
+### **6. Documento Comercial** 💼
+**Archivo:** `06_DOCUMENTO_COMERCIAL_ETHICS.md`  
+**Contenido:**
 - Propuesta de valor
-- Casos de uso empresariales
-- Beneficios del módulo
-- ROI y métricas de negocio
+- Casos de uso
+- Beneficios únicos
+- Diferenciadores competitivos
 
-### **8. Documento Técnico CTO**
-📄 **[08_DOCUMENTO_TECNICO_CTO_ETHICS.md](08_DOCUMENTO_TECNICO_CTO_ETHICS.md)**
-- Arquitectura técnica
-- Decisiones de diseño
-- Escalabilidad y rendimiento
-- Consideraciones de seguridad
-
----
-
-## 🏗️ ARQUITECTURA DEL MÓDULO
-
-### **Componentes Principales:**
-- **Frontend:** 6 pantallas ZUL especializadas
-- **Backend:** 10 ViewModels especializados
-- **Base de Datos:** 3 entidades JPA principales
-- **Workflow:** 1 proceso BPMN completo
-- **Reglas:** 1 regla Drools de scoring
-- **Procesamiento:** 2 procedimientos SQL automatizados
-
-### **Funcionalidades Implementadas:**
-- ✅ **Assessments** - Evaluaciones éticas
-- ✅ **Committee** - Comité de ética
-- ✅ **Impact** - Análisis de impacto ético
-- ✅ **Mitigation** - Planes de mitigación
-- ✅ **Violations** - Gestión de violaciones
+### **7. Documento Técnico CTO** 🏗️
+**Archivo:** `07_DOCUMENTO_TECNICO_CTO_ETHICS.md`  
+**Contenido:**
+- Arquitectura técnica detallada
+- Stack tecnológico
+- Algoritmos de fairness
+- BPMN y Drools
+- Performance y escalabilidad
 
 ---
 
-## 📊 ESTADÍSTICAS DEL MÓDULO
+## 🎯 RESUMEN DEL MÓDULO
 
-- **6 Pantallas ZUL** implementadas
-- **10 ViewModels** especializados
-- **3 Entidades JPA** principales
-- **2 Views SQL** optimizadas
-- **2 Funciones SQL** de cálculo
-- **2 Procedimientos** de procesamiento
-- **1 Proceso BPMN** completo
-- **1 Regla Drools** de scoring
-- **100% Cobertura** del catálogo Next.js original
+**Ethics** es el módulo de **IA ética y responsable** con:
 
----
+### **Funcionalidades Principales:**
+- ✅ Revisiones éticas estructuradas
+- ✅ Detección automática de sesgos
+- ✅ Evaluación de equidad (fairness)
+- ✅ Análisis de impacto social
+- ✅ Métricas de transparencia
+- ✅ Compliance con AI Act
+- ✅ Workflows automatizados (BPMN)
+- ✅ Reglas éticas configurables (Drools)
 
-## 🎯 CASOS DE USO PRINCIPALES
+### **Tecnologías:**
+- **Backend:** Java 17, Spring Boot 3.2
+- **Fairness Engine:** Python 3.11, AIF360, Fairlearn
+- **Workflows:** Flowable BPMN
+- **Rules Engine:** Drools 8.x
+- **Base de Datos:** PostgreSQL 15
 
-### **1. Evaluación Ética**
-- Solicitud de evaluación ética
-- Análisis de aspectos éticos
-- Scoring automático con Drools
-
-### **2. Comité de Ética**
-- Revisión por comité especializado
-- Aprobación/rechazo de evaluaciones
-- Dashboard de revisiones
-
-### **3. Análisis de Impacto**
-- Evaluación de impacto ético
-- Análisis de riesgos
-- Reportes de impacto
-
-### **4. Mitigación Ética**
-- Creación de planes de mitigación
-- Seguimiento de implementación
-- Medición de efectividad
-
-### **5. Gestión de Violaciones**
-- Detección de violaciones
-- Gestión de alertas
-- Resolución de violaciones
+### **Métricas:**
+- **6 pantallas ZUL** organizadas
+- **5 entidades JPA** completas
+- **2 procesos BPMN** automatizados
+- **8 reglas Drools** configurables
+- **~30 endpoints REST** documentados
 
 ---
 
-## 🔗 MÓDULOS RELACIONADOS
+## 🚀 INICIO RÁPIDO
 
-- **📊 Analytics** - Métricas éticas y scoring
-- **🏛️ Governance** - Políticas éticas y compliance
-- **⚖️ Compliance** - Cumplimiento normativo
-- **🤖 Agents** - Evaluación ética de agentes
-- **🧠 Models** - Evaluación ética de modelos
-- **📝 Prompts** - Evaluación ética de prompts
-- **🔍 RAG** - Evaluación ética de sistemas RAG
+### **Para Desarrolladores:**
+1. Leer `02_DOCUMENTACION_TECNICA_ETHICS.md` para entender la arquitectura
+2. Revisar `03_API_SDK_ETHICS.md` para integración
+3. Consultar `04_INTEGRACION_ETHICS.md` para casos de uso
 
----
+### **Para Product Managers:**
+1. Leer `06_DOCUMENTO_COMERCIAL_ETHICS.md` para propuesta de valor
+2. Revisar `01_REORGANIZACION_PANTALLAS_ETHICS.md` para funcionalidades
 
-## 🚀 VENTAJAS COMPETITIVAS
-
-### **Superior a Next.js Original:**
-- 🔄 **Proceso BPMN** completo de revisión ética
-- 🧠 **Reglas Drools** para scoring automático
-- 📊 **Dashboard** de revisiones éticas
-- 🚨 **Sistema de Alertas** automáticas
-- 📋 **Formularios Especializados** por tipo de evaluación
-- 🎯 **Delegates Java** para procesamiento avanzado
-
-### **Funcionalidades Avanzadas:**
-- 🔄 **Workflow Automatizado** de revisión ética
-- 📊 **Scoring Inteligente** con reglas de negocio
-- 🚨 **Alertas Proactivas** de riesgos éticos
-- 📈 **Tendencias Éticas** con análisis temporal
-- 🎯 **Planes de Mitigación** automatizados
+### **Para Arquitectos:**
+1. Estudiar `07_DOCUMENTO_TECNICO_CTO_ETHICS.md` para arquitectura
+2. Revisar `02_DOCUMENTACION_TECNICA_ETHICS.md` para BPMN y Drools
+3. Consultar `05_MONITOREO_ETHICS.md` para observabilidad
 
 ---
 
-## 📊 PROCESOS BPMN IMPLEMENTADOS
+## 📊 ESTADÍSTICAS
 
-### **1. Ethics Review Process**
-- **Archivo:** `ethics-review-v1.bpmn`
-- **Formularios:** 4 formularios ZUL especializados
-- **Delegates:** 2 Java delegates para procesamiento
-- **Reglas:** Scoring automático con Drools
+### **Implementación:**
+- **Estado:** ✅ 100% Implementado
+- **Cobertura:** Completa en ZKoss
+- **Pantallas:** 6 archivos ZUL
+- **Backend:** 5 entidades JPA
+- **Workflows:** 2 procesos BPMN
+- **Rules:** 8 reglas Drools
+- **APIs:** ~30 endpoints REST
 
-### **2. Formularios Asociados:**
-- `ethics-review-request-form.zul` - Solicitud de evaluación
-- `ethics-committee-review-form.zul` - Revisión del comité
-- `ethics-mitigation-plan-form.zul` - Plan de mitigación
-- `ethics-review-reminder-form.zul` - Gestión de violaciones
-
----
-
-## 🧠 REGLAS DROOLS IMPLEMENTADAS
-
-### **1. Ethics Review Scoring**
-- **Archivo:** `ethics-review-scoring.drl`
-- **Funcionalidad:** Cálculo automático de scores éticos
-- **Fact:** `EthicsReviewFact.java`
-- **Reglas:** Scoring, mitigación, alertas
+### **Documentación:**
+- **Documentos:** 7 archivos completos
+- **Páginas:** ~50 páginas totales
+- **Diagramas:** Arquitectura, BPMN, Drools
+- **Ejemplos:** Código Java y Python
 
 ---
 
-## 📞 CONTACTO Y SOPORTE
+## 🔗 FRAMEWORKS SOPORTADOS
 
-Para más información sobre el módulo Ethics:
-- **Documentación Técnica:** Ver documentos 02-08
-- **Procesos BPMN:** Ver documento 03
-- **Integración:** Ver documento 05
-- **Monitoreo:** Ver documento 06
-- **Soporte Comercial:** Ver documento 07
+### **Fairness Frameworks:**
+- **AI Fairness 360** (IBM) - Métricas y mitigación
+- **Fairlearn** (Microsoft) - Fairness constraints
+- **What-If Tool** (Google) - Análisis visual
+- **Aequitas** (U. Chicago) - Auditoría de fairness
+
+### **Compliance Frameworks:**
+- **EU AI Act** - Regulación europea
+- **IEEE 7000** - Estándar de sistemas éticos
+- **OECD AI Principles** - Principios internacionales
+- **ISO/IEC 24028** - Trustworthiness
 
 ---
 
-**El módulo Ethics está completamente implementado con BPMN y gobierno, superando las funcionalidades del catálogo Next.js original.**
+## 🎯 CARACTERÍSTICAS PRINCIPALES
+
+### **Detección de Sesgos:**
+- **Múltiples métricas:** Demographic parity, equalized odds, equal opportunity
+- **Análisis estadístico:** Tests de significancia
+- **Remediación:** Técnicas probadas de corrección
+- **Monitoreo continuo:** Detección en producción
+
+### **Evaluación de Equidad:**
+- **Fairness metrics:** Statistical parity, disparate impact, calibration
+- **Protected attributes:** Gender, ethnicity, age, etc.
+- **Intersectional fairness:** Análisis de intersecciones
+- **Remediation strategies:** Guiadas paso a paso
+
+### **Revisiones Éticas:**
+- **Proceso estructurado:** BPMN workflow
+- **Multi-dimensional:** 5 dimensiones evaluadas
+- **Stakeholder input:** Participación de afectados
+- **Documentation:** Evidencia completa
+
+### **Análisis de Impacto:**
+- **Social impact:** Bienestar social
+- **Economic impact:** Impacto económico
+- **Rights impact:** Derechos individuales
+- **Environmental:** Impacto ambiental
+
+---
+
+## 📞 CONTACTO
+
+**Equipo Ethics:** ethics-team@codeflowx.com  
+**Documentación:** docs.codeflowx.com/ethics  
+**Soporte:** support@codeflowx.com  
+**GitHub:** github.com/codeflowx/ethics
+
+---
+
+**Última actualización:** Octubre 2025  
+**Versión:** 1.0  
+**Mantenedor:** CodeflowX Govern Team
