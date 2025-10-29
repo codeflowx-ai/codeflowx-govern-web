@@ -7,7 +7,6 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.flowable.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
@@ -27,6 +26,7 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.admin.Ssoractividad;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import codeflowx.nocode.persist.BusinessService;
 import lombok.Getter;
@@ -60,35 +60,8 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class AgentApprovalHumanOverrideViewModel extends MasterPage {
-
-    private static final long serialVersionUID = 1L;
-
-    // ========== Servicios y contexto Spring ==========
-    @WireVariable
-    private BusinessService businessService;
-    
-    @Autowired
-    protected IEntityLocal dao;
-    
-    @WireVariable
-    public Environment environment;
-    
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    
-    @WireVariable("APPLICATION_DS")
-    protected DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
-    }
-    
+public class AgentApprovalHumanOverrideViewModel extends BaseFront<AgentApprovalHumanOverrideViewModel> {
+   private static final long serialVersionUID = 1L;
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -126,8 +99,11 @@ public class AgentApprovalHumanOverrideViewModel extends MasterPage {
         log.info("🚀 Inicializando AgentApprovalHumanOverrideViewModel");
         
         // Detectar mock mode desde parámetros URL
-        Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        if (params.containsKey("mock") && "true".equals(params.get("mock")[0])) {
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
+        }
+       
+        if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
@@ -315,24 +291,7 @@ public class AgentApprovalHumanOverrideViewModel extends MasterPage {
         return null;
     }
     
-    /**
-     * Registra la actividad del usuario en el sistema de auditoría
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
+   
     
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {

@@ -3,26 +3,21 @@ package com.codeflowx.platform.viewmodel.datasources;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.suinsit.Context;
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceDatabase;
-import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
@@ -36,34 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class DataSourceDatabaseViewModel extends MasterPage {
+public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseViewModel> {
 
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    
-    @Autowired
-    protected IEntityLocal dao;
-    
-    @WireVariable
-    public Environment environment;
-    
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    
-    @WireVariable("APPLICATION_DS")
-    protected javax.sql.DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -161,6 +133,10 @@ public class DataSourceDatabaseViewModel extends MasterPage {
             dbSource.setDbcreatedat(new Timestamp(System.currentTimeMillis()));
             
             businessService.saveEntity(dbSource);
+            
+            // Auditar creación
+            logActivity("CREAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(), 
+                "Base de datos creada: " + dbSource.getDbname());
             
             clearForm();
             loadDbSources();
@@ -294,7 +270,12 @@ public class DataSourceDatabaseViewModel extends MasterPage {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.deleteEntity(dbSource);
+                        businessService.removeFromID(dbSource);
+                        
+                        // Auditar eliminación
+                        logActivity("ELIMINAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(), 
+                            "Base de datos eliminada: " + dbSource.getDbname());
+                        
                         loadDbSources();
                         Messagebox.show("Base de datos eliminada exitosamente", 
                             "Éxito", Messagebox.OK, Messagebox.INFORMATION);
@@ -336,5 +317,16 @@ public class DataSourceDatabaseViewModel extends MasterPage {
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (dbSourcesList != null) { 
+            dbSourcesList.clear(); 
+            dbSourcesList = null; 
+        }
+        pageResult = null;
+        pageParams = null;
+        businessService = null;
     }
 }

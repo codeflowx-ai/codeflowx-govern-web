@@ -126,8 +126,12 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
         
         log.info("🚀 Inicializando ComplianceReviewDecisionViewModel");
         
-        Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        if (params.containsKey("mock") && "true".equals(params.get("mock")[0])) {
+     // Detectar mock mode desde parámetros URL
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
+        }
+       
+        if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
@@ -219,7 +223,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
             Messagebox.show(message, "Decisión Confirmada", Messagebox.OK, Messagebox.INFORMATION, 
                 event -> {
                     // Cerrar ventana
-                    Executions.sendRedirect("/console/govern/governance-reports.zul");
+                    Executions.sendRedirect("/governance/reports/effectiveness.zul");
                 });
 
         } catch (Exception e) {
@@ -230,7 +234,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
 
     @Command
     public void cancel() {
-        String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/console/govern/governance-reports.zul";
+        String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/governance/reports/effectiveness.zul";
         Executions.sendRedirect(redirect);
     }
     

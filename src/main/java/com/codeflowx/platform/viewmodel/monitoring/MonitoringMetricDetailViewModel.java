@@ -131,7 +131,7 @@ public class MonitoringMetricDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxmonitoringmetric");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/monitoring/monitoring-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("monitoring/dashboard/summary.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad

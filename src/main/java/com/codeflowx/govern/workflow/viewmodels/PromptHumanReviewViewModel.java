@@ -117,7 +117,12 @@ public class PromptHumanReviewViewModel extends MasterPage {
         log.info("🚀 Inicializando PromptHumanReviewViewModel");
         
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        if (params.containsKey("mock") && "true".equals(params.get("mock")[0])) {
+     // Detectar mock mode desde parámetros URL
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
+        }
+       
+        if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");

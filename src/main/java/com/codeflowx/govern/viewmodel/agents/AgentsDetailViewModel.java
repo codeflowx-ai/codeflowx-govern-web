@@ -1,6 +1,7 @@
 package com.codeflowx.govern.viewmodel.agents;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +10,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.exception.UiException;
-import org.enartframework.web.zk.page.MasterPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.Environment;
@@ -20,14 +19,17 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.agents.Agent;
 import com.codeflowx.govern.entity.agents.AgentCollaboration;
 import com.codeflowx.govern.entity.agents.AgentDecision;
@@ -38,6 +40,8 @@ import com.codeflowx.govern.entity.agents.AgentTool;
 import com.codeflowx.govern.entity.agents.AgentVersion;
 import com.codeflowx.govern.entity.agents.AgentWorkflow;
 import com.codeflowx.govern.entity.views.agents.AgentComplianceStatus;
+import com.codeflowx.govern.entity.views.agents.AgentDeploymentStatus;
+import com.codeflowx.govern.entity.views.agents.AgentHealthDashboard;
 import com.codeflowx.govern.entity.views.agents.AgentPerformanceMetrics;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -47,6 +51,9 @@ import codeflowx.nocode.persist.Evaluation;
 import codeflowx.nocode.persist.Operation;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel complejo para DETALLE/EDICIÓN/CREACIÓN de Agentes
@@ -60,19 +67,15 @@ import codeflowx.nocode.persist.PageResult;
  * - Monitoreo de performance
  * - Auditoría de decisiones
  */
-@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class AgentsDetailViewModel extends MasterPage implements Serializable {
+@Slf4j
+@Getter
+@Setter
+@VariableResolver(DelegatingVariableResolver.class)
+@Init(superclass = true)
+public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    private static final Logger log = LoggerFactory.getLogger(AgentsDetailViewModel.class);
-
-    @WireVariable
-    private transient Context context;
-    
-    @WireVariable
-    public Environment environment;
-    
-    private transient BusinessService businessService;
+   
 
     // ========== Entidad Principal ==========
     private Agent currentAgent;
@@ -128,15 +131,7 @@ public class AgentsDetailViewModel extends MasterPage implements Serializable {
         }
     }
 
-    private void initDao() {
-        try {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-            log.debug("BusinessService inicializado correctamente");
-        } catch (Exception e) {
-            log.error("Error al inicializar BusinessService", e);
-        }
-    }
-
+  
     /**
      * Inicializa un nuevo agente
      * @throws Exception 

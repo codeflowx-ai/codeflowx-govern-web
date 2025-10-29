@@ -240,7 +240,7 @@ public class GovernanceOverviewViewModel extends MasterPage {
         log.info("Navegando a creación de nueva política");
         Map<String, Object> params = new HashMap<>();
         params.put("mode", "create");
-        appendPage("gobierno/governance/governance-detail.zul", page.getFellow(IDDESKTOP), params);
+        appendPage("governance/policies/page.zul", page.getFellow(IDDESKTOP), params);
     }
     
     @Command
@@ -249,7 +249,7 @@ public class GovernanceOverviewViewModel extends MasterPage {
         Map<String, Object> params = new HashMap<>();
         params.put("policyId", policyId);
         params.put("mode", "edit");
-        appendPage("gobierno/governance/governance-detail.zul", page.getFellow(IDDESKTOP), params);
+        appendPage("governance/policies/page.zul", page.getFellow(IDDESKTOP), params);
     }
 
     @Command

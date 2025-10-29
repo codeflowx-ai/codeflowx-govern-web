@@ -181,6 +181,10 @@ public class TaskInboxViewModel extends MasterPage {
         String mockParam = Executions.getCurrent().getParameter("mock");
         mockMode = "true".equalsIgnoreCase(mockParam);
         
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.getBoolean(System.getenv("MOCK_MODE").toString());
+        }
+        
         log.info("🚀 Inicializando TaskInboxViewModel - MOCK MODE: {}", mockMode);
 
         // Obtener usuario logado de sesión ZKoss

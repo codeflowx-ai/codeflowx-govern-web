@@ -91,7 +91,7 @@ public class PlaygroundImageViewModel extends MasterPage {
     @NotifyChange("*")
     public void deleteImage(@BindingParam("image") PlaygroundImage image) {
         try {
-            businessService.deleteEntity(image);
+            businessService.removeFromID(image);
             loadImages();
         } catch (Exception e) {
             log.error("Error deleting image", e);

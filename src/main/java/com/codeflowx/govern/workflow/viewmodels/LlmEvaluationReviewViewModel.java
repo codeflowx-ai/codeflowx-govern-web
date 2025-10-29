@@ -140,12 +140,12 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
         
         // Detectar mock mode
-        if (params.containsKey("mock") && "true".equals(params.get("mock")[0])) {
-            this.mockMode = true;
-            loadMockData();
-            log.info("🎭 Mock mode activado");
-            return;
+     // Detectar mock mode desde parámetros URL
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
+       
+        
         
         if (params.containsKey("taskId")) {
             this.taskId = params.get("taskId")[0];

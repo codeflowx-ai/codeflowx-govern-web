@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -15,6 +14,7 @@ import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
@@ -23,7 +23,9 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceApi;
+import com.codeflowx.govern.viewmodel.agents.AgentApprovalWorkflowViewModel;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criterias;
@@ -39,35 +41,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class DataSourceApiViewModel extends MasterPage {
+public class DataSourceApiViewModel extends BaseFront<AgentApprovalWorkflowViewModel> {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable
-    private BusinessService businessService;
-    
-    @Autowired
-    protected IEntityLocal dao;
-    
-    @WireVariable
-    public Environment environment;
-    
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    
-    @WireVariable("APPLICATION_DS")
-    protected javax.sql.DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
-    
+        
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
@@ -178,6 +158,10 @@ public class DataSourceApiViewModel extends MasterPage {
             apiSource.setApiauthentication(authConfig);
             
             businessService.saveEntity(apiSource);
+            
+            // Auditar creación
+            logActivity("CREAR", "DATASOURCEAPIS", apiSource.getIdxdatasourceapi(), 
+                "API creada: " + apiSource.getApiname());
             
             clearForm();
             loadApiSources();
@@ -317,7 +301,12 @@ public class DataSourceApiViewModel extends MasterPage {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.deleteEntity(apiSource);
+                        businessService.removeFromID(apiSource);
+                        
+                        // Auditar eliminación
+                        logActivity("ELIMINAR", "DATASOURCEAPIS", apiSource.getIdxdatasourceapi(), 
+                            "API eliminada: " + apiSource.getApiname());
+                        
                         loadApiSources();
                         Messagebox.show("API eliminada exitosamente", 
                             "Éxito", Messagebox.OK, Messagebox.INFORMATION);
@@ -366,5 +355,16 @@ public class DataSourceApiViewModel extends MasterPage {
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (apiSourcesList != null) { 
+            apiSourcesList.clear(); 
+            apiSourcesList = null; 
+        }
+        pageResult = null;
+        pageParams = null;
+        businessService = null;
     }
 }

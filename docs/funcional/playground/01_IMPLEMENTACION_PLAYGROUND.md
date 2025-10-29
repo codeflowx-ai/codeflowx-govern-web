@@ -138,13 +138,20 @@ PLAYGROUNDSESSIONS (Sesión principal)
 5. ✅ **playground/translation/page.zul** - Traductor bidireccional con quality score
 6. ✅ **playground/routing/page.zul** - Routing inteligente con scores de agentes y feedback
 
-### **ViewModels Java** ✅ COMPLETADO
+### **ViewModels Java** ✅ COMPLETADO (Patrón BaseFront)
 1. ✅ **PlaygroundSessionsViewModel.java** - Dashboard con métricas, compliance rate y navegación
 2. ✅ **PlaygroundChatViewModel.java** - Chat funcional con análisis automático de compliance
 3. ✅ **PlaygroundImageViewModel.java** - Generación de imágenes con NSFW detection
 4. ✅ **PlaygroundVoiceViewModel.java** - TTS/STT con monitorización de contenido
 5. ✅ **PlaygroundTranslationViewModel.java** - Traducciones con quality assessment
 6. ✅ **PlaygroundRoutingViewModel.java** - Routing con scores detallados y user feedback
+
+**Patrón Aplicado:**
+- ✅ Extends `BaseFront<T>` con `@Init(superclass = true)`
+- ✅ `@Destroy` para limpieza de recursos
+- ✅ `logActivity()` en operaciones (CREAR, BUSCAR, ELIMINAR)
+- ✅ `businessService.removeFromID()` para eliminaciones
+- ✅ `businessService.saveEntity()` para creaciones
 
 ### **Integración con Backend (leka-server)** ⏳
 

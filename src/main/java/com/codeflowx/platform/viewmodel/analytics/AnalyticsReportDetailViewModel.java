@@ -132,7 +132,7 @@ public class AnalyticsReportDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxanalyticsreport");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/analytics/analytics-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("analytics/overview/page.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad

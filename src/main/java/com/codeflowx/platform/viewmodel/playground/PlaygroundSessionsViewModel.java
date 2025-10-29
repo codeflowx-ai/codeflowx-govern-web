@@ -3,19 +3,14 @@ package com.codeflowx.platform.viewmodel.playground;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.enartframework.suinsit.Context;
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.*;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import codeflowx.nocode.persist.*;
 import lombok.*;
@@ -24,28 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundSessionsViewModel extends MasterPage {
+public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsViewModel> {
     private static final long serialVersionUID = 1L;
-    
-    @WireVariable
-    private BusinessService businessService;
-    @Autowired
-    protected IEntityLocal dao;
-    @WireVariable
-    public Environment environment;
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    @WireVariable("APPLICATION_DS")
-    protected javax.sql.DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {}
@@ -170,7 +147,7 @@ public class PlaygroundSessionsViewModel extends MasterPage {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.deleteEntity(session);
+                        businessService.removeFromID(session);
                         loadSessions();
                         loadMetrics();
                     } catch (Exception e) {
@@ -214,5 +191,16 @@ public class PlaygroundSessionsViewModel extends MasterPage {
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (sessionsList != null) { 
+            sessionsList.clear(); 
+            sessionsList = null; 
+        }
+        pageResult = null;
+        pageParams = null;
+        businessService = null;
     }
 }

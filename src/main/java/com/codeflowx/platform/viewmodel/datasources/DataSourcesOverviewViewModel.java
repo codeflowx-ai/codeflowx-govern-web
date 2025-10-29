@@ -3,27 +3,21 @@ package com.codeflowx.platform.viewmodel.datasources;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import javax.sql.DataSource;
-import org.enartframework.suinsit.Context;
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSource;
-import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
@@ -38,35 +32,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class DataSourcesOverviewViewModel extends MasterPage {
+public class DataSourcesOverviewViewModel extends BaseFront<DataSourcesOverviewViewModel> {
 
     private static final long serialVersionUID = 1L;
-    private static final String IDDESKTOP = "contenedor";
-    
-    @WireVariable
-    private BusinessService businessService;
-    
-    @Autowired
-    protected IEntityLocal dao;
-    
-    @WireVariable
-    public Environment environment;
-    
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    
-    @WireVariable("APPLICATION_DS")
-    protected javax.sql.DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((javax.sql.DataSource) environment.getProperty("APPLICATION_DS", javax.sql.DataSource.class));
-        }
-    }
     
     @Override
     public void setBeans(Object bean) {
@@ -95,7 +65,6 @@ public class DataSourcesOverviewViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         
         pageParams = PageParams.builder()
             .maxRows(20)
@@ -124,6 +93,10 @@ public class DataSourcesOverviewViewModel extends MasterPage {
             if (pageResult != null && pageResult.getContent() != null) {
                 dataSourceList = pageResult.getContent();
                 totalDataSources = pageResult.getTotalRows();
+                
+                // Auditar búsqueda
+                logActivity("BUSCAR", "DATASOURCES", null, 
+                    "Búsqueda: " + dataSourceList.size() + " resultados");
                 
                 log.info("Cargados {} data sources de {} totales", 
                     dataSourceList.size(), totalDataSources);
@@ -254,7 +227,12 @@ public class DataSourcesOverviewViewModel extends MasterPage {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.deleteEntity(dataSource);
+                        businessService.removeFromID(dataSource);
+                        
+                        // Auditar eliminación
+                        logActivity("ELIMINAR", "DATASOURCES", dataSource.getIdxdatasource(), 
+                            "Data source eliminado: " + dataSource.getDsname());
+                        
                         loadData();
                         loadMetrics();
                         Messagebox.show("Data source eliminado exitosamente", 
@@ -292,5 +270,16 @@ public class DataSourcesOverviewViewModel extends MasterPage {
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+    }
+    
+    @Destroy
+    public void destroy() {
+        if (dataSourceList != null) { 
+            dataSourceList.clear(); 
+            dataSourceList = null; 
+        }
+        pageResult = null;
+        pageParams = null;
+        businessService = null;
     }
 }

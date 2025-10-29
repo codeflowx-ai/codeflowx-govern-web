@@ -216,10 +216,28 @@ class DataSourcesService:
 
 ### **📝 Notas de Implementación:**
 
-#### **ViewModels Implementados:**
-- ✅ **DataSourcesOverviewViewModel.java** - Pantalla principal con dashboard, filtros y métricas
-- ✅ **DataSourceApiViewModel.java** - Gestión completa de APIs con autenticación y test
-- ✅ **DataSourceDatabaseViewModel.java** - Gestión de bases de datos con validaciones
+#### **ViewModels Implementados (8 ViewModels):**
+
+**Overview ViewModels (Búsquedas y Listados):**
+- ✅ **DataSourcesOverviewViewModel.java** - Dashboard principal con métricas y filtros
+- ✅ **DataSourceApiOverviewViewModel.java** - Listado y búsqueda de APIs
+- ✅ **DataSourceDatabaseOverviewViewModel.java** - Listado y búsqueda de bases de datos
+- ✅ **DataSourceDocumentOverviewViewModel.java** - Listado y búsqueda de documentos
+- ✅ **DataSourceWebscrapingOverviewViewModel.java** - Listado y búsqueda de web scrapings
+
+**Detail ViewModels (CRUD y Detalles):**
+- ✅ **DataSourceApiViewModel.java** - Gestión completa de APIs con autenticación
+- ✅ **DataSourceDatabaseViewModel.java** - Configuración de bases de datos
+- ✅ **DataSourceDocumentViewModel.java** - Upload y procesamiento de documentos
+- ✅ **DataSourceWebscrapingViewModel.java** - Configuración de web scraping con selectores
+
+**Patrón Aplicado:**
+- ✅ Extienden **BaseFront<T>** en lugar de MasterPage
+- ✅ Usan **@Init(superclass = true)** para inicialización
+- ✅ Incluyen **@Destroy** para limpieza de recursos
+- ✅ Llaman a **logActivity()** del padre para auditoría (CREAR, BUSCAR, ELIMINAR)
+- ✅ Usan **businessService.removeFromID()** para eliminaciones
+- ✅ Usan **businessService.saveEntity()** para creaciones y actualizaciones
 
 #### **Funcionalidades Implementadas en ViewModels:**
 - ✅ **CRUD completo** para todas las entidades

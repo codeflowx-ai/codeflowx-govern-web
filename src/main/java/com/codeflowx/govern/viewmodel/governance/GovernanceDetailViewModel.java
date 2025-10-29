@@ -133,7 +133,7 @@ public class GovernanceDetailViewModel extends MasterPage {
             loadPolicy(policyId);
         } else {
             log.error("Modo inválido o falta policyId");
-            Executions.sendRedirect("/governance/governance-overview.zul");
+            Executions.sendRedirect("/governance/dashboard/overview.zul");
         }
     }
 
@@ -168,7 +168,7 @@ public class GovernanceDetailViewModel extends MasterPage {
                 log.error("Política no encontrada: ID={}", id);
                 Messagebox.show(Labels.getLabel("governance.error.notfound"), Labels.getLabel("governance.error.title"),
                     Messagebox.OK, Messagebox.ERROR);
-                Executions.sendRedirect("/governance/governance-overview.zul");
+                Executions.sendRedirect("/governance/dashboard/overview.zul");
                 return;
             }
 
@@ -188,7 +188,7 @@ public class GovernanceDetailViewModel extends MasterPage {
             log.error("Error al cargar política ID={}", id, e);
             Messagebox.show(Labels.getLabel("governance.error.load") + ": " + e.getMessage(),
                 Labels.getLabel("governance.error.title"), Messagebox.OK, Messagebox.ERROR);
-            Executions.sendRedirect("/governance/governance-overview.zul");
+            Executions.sendRedirect("/governance/dashboard/overview.zul");
         }
     }
 
@@ -438,7 +438,7 @@ public class GovernanceDetailViewModel extends MasterPage {
                     Labels.getLabel("governance.success.title"), Messagebox.OK, Messagebox.INFORMATION);
             }
 
-            Executions.sendRedirect("/governance/governance-overview.zul");
+            Executions.sendRedirect("/governance/dashboard/overview.zul");
 
         } catch (Exception e) {
             log.error("Error al guardar política", e);
@@ -450,7 +450,7 @@ public class GovernanceDetailViewModel extends MasterPage {
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición/creación de política, volviendo a overview");
-        Executions.sendRedirect("/governance/governance-overview.zul");
+        Executions.sendRedirect("/governance/dashboard/overview.zul");
     }
 
     // ========== Operaciones especiales (funciones/procedimientos) ==========

@@ -144,8 +144,12 @@ public class DriftAnalysisViewModel extends MasterPage {
         initDao();
         
         // Detectar modo MOCK
-        String mockParam = Executions.getCurrent().getParameter("mock");
-        mockMode = "true".equalsIgnoreCase(mockParam);
+     // Detectar mock mode desde parámetros URL
+        if(System.getenv("MOCK_MODE")!=null) {
+        	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
+        }
+       
+       
         
         log.info("🚀 Inicializando DriftAnalysisViewModel - MOCK MODE: {}", mockMode);
         
