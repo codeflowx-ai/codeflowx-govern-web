@@ -109,7 +109,7 @@ public class PlaygroundRoutingViewModel extends MasterPage {
         try {
             routing.setUserfeedback("CORRECT");
             routing.setRoutingaccuracy(new java.math.BigDecimal("1.0"));
-            businessService.saveEntity(routing);
+            businessService.save(routing);
             loadRoutingHistory();
         } catch (Exception e) {
             log.error("Error updating feedback", e);
@@ -122,7 +122,7 @@ public class PlaygroundRoutingViewModel extends MasterPage {
         try {
             routing.setUserfeedback("INCORRECT");
             routing.setRoutingaccuracy(new java.math.BigDecimal("0.0"));
-            businessService.saveEntity(routing);
+            businessService.save(routing);
             loadRoutingHistory();
         } catch (Exception e) {
             log.error("Error updating feedback", e);

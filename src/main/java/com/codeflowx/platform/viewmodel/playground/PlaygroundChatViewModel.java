@@ -142,7 +142,7 @@ public class PlaygroundChatViewModel extends MasterPage {
             session.setSessioncreatedby(ctxBean.getUsuario().getUsuario());
             session.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
             
-            businessService.saveEntity(session);
+            businessService.save(session);
             currentSessionId = session.getIdxplaygroundsession();
             currentSessionName = session.getSessionname();
             
@@ -187,7 +187,7 @@ public class PlaygroundChatViewModel extends MasterPage {
             session.setIdxplaygroundsession(currentSessionId);
             userMessage.setPlaygroundSession(session);
             
-            businessService.saveEntity(userMessage);
+            businessService.save(userMessage);
             
             // TODO: Integración con leka-server para obtener respuesta del modelo
             // Por ahora simulamos respuesta
@@ -208,7 +208,7 @@ public class PlaygroundChatViewModel extends MasterPage {
             assistantMessage.setBiasdetected(false);
             assistantMessage.setPiidetected(false);
             
-            businessService.saveEntity(assistantMessage);
+            businessService.save(assistantMessage);
             
             messageInput = "";
             loadSessionMessages();

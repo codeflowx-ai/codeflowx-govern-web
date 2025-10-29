@@ -147,7 +147,7 @@ public class DataSourceDocumentViewModel extends BaseFront<DataSourceDocumentVie
                 doc.setDocuploadedat(new Timestamp(System.currentTimeMillis()));
                 doc.setDoccreatedat(new Timestamp(System.currentTimeMillis()));
                 
-                businessService.saveEntity(doc);
+                businessService.save(doc);
                 
                 // Auditar creación
                 logActivity("CREAR", "DATASOURCEDOCUMENTS", doc.getIdxdatasourcedocument(), 

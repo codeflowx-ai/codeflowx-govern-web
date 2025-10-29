@@ -135,7 +135,7 @@ public class DataSourceWebscrapingViewModel extends BaseFront<DataSourceWebscrap
             String selectorsJson = buildSelectorsJson();
             wsSource.setWsselectors(selectorsJson);
             
-            businessService.saveEntity(wsSource);
+            businessService.save(wsSource);
             
             // Auditar creación
             logActivity("CREAR", "DATASOURCEWEBSCRAPINGS", wsSource.getIdxdatasourcewebscraping(), 

@@ -19,6 +19,9 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceDatabase;
 import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Criteria;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
 import lombok.Getter;
@@ -132,7 +135,7 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             dbSource.setDbstatus(dbStatus);
             dbSource.setDbcreatedat(new Timestamp(System.currentTimeMillis()));
             
-            businessService.saveEntity(dbSource);
+            businessService.save(dbSource);
             
             // Auditar creación
             logActivity("CREAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(), 

@@ -18,7 +18,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSource;
+import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Criteria;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
 import lombok.Getter;
@@ -139,17 +145,17 @@ public class DataSourcesOverviewViewModel extends BaseFront<DataSourcesOverviewV
         
         // Filtro por búsqueda de texto
         if (searchText != null && !searchText.trim().isEmpty()) {
-            criterias.addCriteria("dsname", searchText, "LIKE");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "dsname", searchText));
         }
         
         // Filtro por tipo
         if (filterType != null && !filterType.trim().isEmpty()) {
-            criterias.addCriteria("dstype", filterType, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dstype", filterType));
         }
         
         // Filtro por estado
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
-            criterias.addCriteria("dsstatus", filterStatus, "=");
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dsstatus", filterStatus));
         }
         
         return criterias;

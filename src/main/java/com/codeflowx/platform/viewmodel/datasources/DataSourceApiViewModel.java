@@ -4,30 +4,22 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.suinsit.Context;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
+import org.zkoss.spring.DelegatingVariableResolver;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceApi;
-import com.codeflowx.govern.viewmodel.agents.AgentApprovalWorkflowViewModel;
-
-import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
@@ -43,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class DataSourceApiViewModel extends BaseFront<AgentApprovalWorkflowViewModel> {
+public class DataSourceApiViewModel extends BaseFront<DataSourceApiViewModel> {
 
     private static final long serialVersionUID = 1L;
     
@@ -85,7 +77,6 @@ public class DataSourceApiViewModel extends BaseFront<AgentApprovalWorkflowViewM
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        initDao();
         
         pageParams = PageParams.builder()
             .maxRows(20)
@@ -157,7 +148,7 @@ public class DataSourceApiViewModel extends BaseFront<AgentApprovalWorkflowViewM
             String authConfig = buildAuthenticationConfig();
             apiSource.setApiauthentication(authConfig);
             
-            businessService.saveEntity(apiSource);
+            businessService.save(apiSource);
             
             // Auditar creación
             logActivity("CREAR", "DATASOURCEAPIS", apiSource.getIdxdatasourceapi(), 
