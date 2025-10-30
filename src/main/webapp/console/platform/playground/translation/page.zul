@@ -1,144 +1,107 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<zk>
-<window title="Playground Translation" border="normal" width="100%" height="100%" 
-        apply="com.codeflowx.platform.viewmodel.playground.PlaygroundTranslationViewModel">
+<?page title="Translation Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <style src="/theme/console/css/console-custom.css"/>
     
-    <style src="/css/bootstrap.min.css"/>
-    <style src="/css/custom.css"/>
-    
-    <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-12">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/playground/page.zul">Playground</a></li>
-                        <li class="breadcrumb-item active">Translation</li>
-                    </ol>
-                </nav>
-                <h1 class="h3 mb-0 text-primary">
-                    <i class="fas fa-language me-2"></i>AI Translation
-                </h1>
+    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundTranslationViewModel')"
+         class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
+        
+        <!-- Header -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <n:h4 class="mb-1 fw-bold">
+                            <n:i class="fas fa-language text-warning me-2"></n:i>Translation Playground
+                        </n:h4>
+                        <n:p class="text-muted mb-0">Traduce textos entre múltiples idiomas con IA</n:p>
+                    </div>
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                            sclass="btn btn-warning"
+                            onClick="@command('newSession')"/>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Translator</h5>
-                            <div>
-                                <select class="form-select form-select-sm d-inline-block w-auto" model="@bind(vm.translationModel)">
-                                    <option value="gpt-4">GPT-4</option>
-                                    <option value="gpt-3.5">GPT-3.5</option>
-                                    <option value="deepl">DeepL</option>
-                                </select>
+        <!-- Main Translation Area -->
+        <div class="card border-0 shadow-lg mb-4">
+            <div class="card-body p-4">
+                <div class="row g-4">
+                    <!-- Source Language -->
+                    <div class="col-md-5">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Idioma Origen</label>
+                            <div class="d-flex gap-2">
+                                <combobox model="@load(vm.availableLanguages)"
+                                         selectedItem="@bind(vm.sourceLanguage)"
+                                         sclass="form-control"/>
+                                <button iconSclass="fas fa-microphone" tooltiptext="Transcribir"
+                                        sclass="btn btn-outline-primary"
+                                        onClick="@command('transcribeSource')"/>
                             </div>
+                        </div>
+                        <textbox multiline="true" rows="12" 
+                                value="@bind(vm.sourceText)"
+                                sclass="form-control"
+                                placeholder="Ingresa el texto a traducir..."
+                                style="font-size: 1rem;"/>
+                        <n:p class="mt-2 mb-0 text-muted small">
+                            Caracteres: <label value="@load(vm.sourceText.length())"/>
+                        </n:p>
+                    </div>
+
+                    <!-- Translation Controls -->
+                    <div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
+                        <button iconSclass="fas fa-exchange-alt fa-2x" 
+                                tooltiptext="Intercambiar idiomas"
+                                sclass="btn btn-lg btn-outline-secondary rounded-circle mb-3"
+                                style="width: 60px; height: 60px;"
+                                onClick="@command('swapLanguages')"/>
+                        
+                        <button label="Traducir" iconSclass="fas fa-language" 
+                                sclass="btn btn-warning btn-lg"
+                                disabled="@load(empty vm.sourceText)"
+                                onClick="@command('translate')"/>
+
+                        <div class="mt-4 text-center">
+                            <n:p class="small text-muted mb-2">Modelo</n:p>
+                            <combobox placeholder="Seleccionar..." 
+                                     model="@load(vm.availableModels)"
+                                     selectedItem="@bind(vm.selectedModel)"
+                                     sclass="form-control form-control-sm"/>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Source Text -->
-                            <div class="col-md-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Source Language</label>
-                                    <select class="form-select" model="@bind(vm.sourceLanguage)">
-                                        <option value="en">English</option>
-                                        <option value="es">Spanish</option>
-                                        <option value="fr">French</option>
-                                        <option value="de">German</option>
-                                        <option value="it">Italian</option>
-                                        <option value="pt">Portuguese</option>
-                                        <option value="auto">Auto-detect</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" rows="10" model="@bind(vm.sourceText)" 
-                                              placeholder="Enter text to translate..."></textarea>
-                                </div>
-                                <div class="text-muted small">
-                                    Characters: ${vm.sourceTextLength} | 
-                                    <span visible="@bind(vm.sourceToxicityScore > 0)">
-                                        Toxicity: <span class="text-${vm.sourceToxicityScore > 0.5 ? 'danger' : 'warning'}">${vm.sourceToxicityScore}</span>
-                                    </span>
-                                </div>
-                            </div>
 
-                            <!-- Translation Controls -->
-                            <div class="col-md-2 d-flex align-items-center justify-content-center">
-                                <div class="text-center">
-                                    <button class="btn btn-primary rounded-circle mb-3" onClick="@command('translate')" 
-                                            disabled="@bind(vm.isTranslating)">
-                                        <i class="fas fa-arrow-right fa-2x"></i>
-                                    </button>
-                                    <div>
-                                        <button class="btn btn-outline-secondary btn-sm" onClick="@command('swapLanguages')">
-                                            <i class="fas fa-exchange-alt"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Translated Text -->
-                            <div class="col-md-5">
-                                <div class="mb-3">
-                                    <label class="form-label">Target Language</label>
-                                    <select class="form-select" model="@bind(vm.targetLanguage)">
-                                        <option value="en">English</option>
-                                        <option value="es">Spanish</option>
-                                        <option value="fr">French</option>
-                                        <option value="de">German</option>
-                                        <option value="it">Italian</option>
-                                        <option value="pt">Portuguese</option>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <textarea class="form-control" rows="10" model="@bind(vm.translatedText)" 
-                                              readonly="" placeholder="Translation will appear here..."></textarea>
-                                </div>
-                                <div class="text-muted small">
-                                    Quality Score: <span class="text-success">${vm.translationQuality}</span> |
-                                    Characters: ${vm.translatedTextLength}
-                                </div>
+                    <!-- Target Language -->
+                    <div class="col-md-5">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Idioma Destino</label>
+                            <div class="d-flex gap-2">
+                                <combobox model="@load(vm.availableLanguages)"
+                                         selectedItem="@bind(vm.targetLanguage)"
+                                         sclass="form-control"/>
+                                <button iconSclass="fas fa-volume-up" tooltiptext="Leer en voz alta"
+                                        sclass="btn btn-outline-success"
+                                        disabled="@load(empty vm.targetText)"
+                                        onClick="@command('speakTarget')"/>
                             </div>
                         </div>
-
-                        <!-- Compliance Monitor -->
-                        <div class="row mt-3" visible="@bind(vm.showComplianceMonitor)">
-                            <div class="col-12">
-                                <div class="alert alert-${vm.complianceAlertType}">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-shield-alt fa-2x me-3"></i>
-                                        <div class="flex-grow-1">
-                                            <h6 class="alert-heading mb-1">Compliance Analysis</h6>
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <small>Content Violation:</small>
-                                                    <span class="badge bg-${vm.contentViolation ? 'danger' : 'success'} ms-1">
-                                                        ${vm.contentViolation ? 'YES' : 'NO'}
-                                                    </span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small>PII Detected:</small>
-                                                    <span class="badge bg-${vm.piiDetected ? 'danger' : 'success'} ms-1">
-                                                        ${vm.piiDetected ? 'YES' : 'NO'}
-                                                    </span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small>Toxicity:</small>
-                                                    <span class="badge bg-${vm.toxicityScore > 0.5 ? 'danger' : 'success'} ms-1">
-                                                        ${vm.toxicityScore}
-                                                    </span>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <small>Quality:</small>
-                                                    <span class="badge bg-success ms-1">${vm.translationQuality}</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="p-3 bg-light rounded" style="min-height: 300px; max-height: 300px; overflow-y: auto;">
+                            <n:p if="${empty vm.targetText}" class="text-muted text-center mt-5">
+                                La traducción aparecerá aquí...
+                            </n:p>
+                            <n:p if="${not empty vm.targetText}" style="font-size: 1rem; white-space: pre-wrap;">
+                                ${vm.targetText}
+                            </n:p>
+                        </div>
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                            <n:p class="mb-0 text-muted small">
+                                Caracteres: <label value="@load(vm.targetText.length())"/> · 
+                                Confianza: <label value="@load(vm.confidence)"/>%
+                            </n:p>
+                            <button label="Copiar" iconSclass="fas fa-copy" 
+                                    sclass="btn btn-sm btn-outline-primary"
+                                    disabled="@load(empty vm.targetText)"
+                                    onClick="@command('copyTranslation')"/>
                         </div>
                     </div>
                 </div>
@@ -146,55 +109,63 @@
         </div>
 
         <!-- Translation History -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Translation History</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Source Text</th>
-                                        <th>Translation</th>
-                                        <th>Languages</th>
-                                        <th>Quality</th>
-                                        <th>Compliance</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template name="translation" var="tr">
-                                        <tr>
-                                            <td><small>${vm.truncate(tr.sourcetext, 50)}</small></td>
-                                            <td><small>${vm.truncate(tr.translatedtext, 50)}</small></td>
-                                            <td><small>${tr.sourcelanguage} → ${tr.targetlanguage}</small></td>
-                                            <td><span class="badge bg-success">${tr.translationquality}</span></td>
-                                            <td>
-                                                <span class="badge bg-${tr.contentviol ? 'danger' : 'success'}">
-                                                    ${tr.contentviol ? 'Warning' : 'Clean'}
-                                                </span>
-                                            </td>
-                                            <td><small>${vm.formatDate(tr.translationcreatedat)}</small></td>
-                                            <td>
-                                                <button class="btn btn-outline-primary btn-sm" onClick="@command('viewTranslation', translation=tr)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <n:h6 class="mb-0 fw-bold">
+                        <n:i class="fas fa-history me-2"></n:i>Historial de Traducciones
+                    </n:h6>
+                    <textbox placeholder="Buscar..." value="@bind(vm.searchTerm)"
+                             sclass="form-control form-control-sm" style="width: 250px;"
+                             onChange="@command('search')"/>
                 </div>
             </div>
+            <div class="card-body p-0">
+                <grid model="@load(vm.translationHistory)" emptyMessage="No hay traducciones previas"
+                      sclass="table table-hover">
+                    <columns>
+                        <column label="Texto Origen" width="35%"/>
+                        <column label="Traducción" width="35%"/>
+                        <column label="Idiomas" width="10%" align="center"/>
+                        <column label="Confianza" width="8%" align="center"/>
+                        <column label="Fecha" width="12%"/>
+                        <column label="Acciones" width="5%" align="center"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.translationsourcetext)" 
+                                   style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
+                            <label value="@load(each.translationtargettext)" 
+                                   style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
+                            <label>
+                                <n:span class="badge bg-primary">${each.translationsourcelanguage}</n:span>
+                                <n:i class="fas fa-arrow-right mx-1 small"></n:i>
+                                <n:span class="badge bg-success">${each.translationtargetlanguage}</n:span>
+                            </label>
+                            <label>
+                                <n:span class="badge bg-info">
+                                    <label value="@load(each.translationconfidence)"/>%
+                                </n:span>
+                            </label>
+                            <label value="@load(each.translationcreatedat) @converter('formattedDate', format='dd/MM/yyyy HH:mm')"/>
+                            <div class="btn-group btn-group-sm">
+                                <button iconSclass="fas fa-redo" tooltiptext="Re-usar"
+                                        sclass="btn btn-sm btn-outline-primary"
+                                        onClick="@command('reuseTranslation', translation=each)"/>
+                                <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
+                                        sclass="btn btn-sm btn-outline-danger"
+                                        onClick="@command('deleteTranslation', translation=each)"/>
+                            </div>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            <div class="card-footer bg-white border-0 p-3" if="${vm.totalSize > vm.pageSize}">
+                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+                        activePage="@bind(vm.activePage)" onPaging="@command('changePage')"
+                        sclass="pagination pagination-sm justify-content-end mb-0"/>
+            </div>
         </div>
-    </div>
 
-    <script src="/js/bootstrap.bundle.min.js"/>
-</window>
+    </div>
 </zk>

@@ -1,181 +1,180 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<zk>
-<window title="Playground Voice" border="normal" width="100%" height="100%" 
-        apply="com.codeflowx.platform.viewmodel.playground.PlaygroundVoiceViewModel">
+<?page title="Voice Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <style src="/theme/console/css/console-custom.css"/>
     
-    <style src="/css/bootstrap.min.css"/>
-    <style src="/css/custom.css"/>
-    
-    <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-12">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/playground/page.zul">Playground</a></li>
-                        <li class="breadcrumb-item active">Voice</li>
-                    </ol>
-                </nav>
-                <h1 class="h3 mb-0 text-primary">
-                    <i class="fas fa-microphone me-2"></i>Voice Processing (TTS & STT)
-                </h1>
-                <p class="text-muted">Text-to-Speech and Speech-to-Text with compliance monitoring</p>
+    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundVoiceViewModel')"
+         class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
+        
+        <!-- Header -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <n:h4 class="mb-1 fw-bold">
+                            <n:i class="fas fa-microphone text-info me-2"></n:i>Voice Playground
+                        </n:h4>
+                        <n:p class="text-muted mb-0">Convierte texto a voz y voz a texto</n:p>
+                    </div>
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                            sclass="btn btn-info"
+                            onClick="@command('newSession')"/>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Text-to-Speech Panel -->
+        <div class="row g-4">
+            <!-- Text to Speech -->
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0"><i class="fas fa-volume-up me-2"></i>Text-to-Speech (TTS)</h5>
+                    <div class="card-header bg-info text-white p-3">
+                        <n:h5 class="mb-0">
+                            <n:i class="fas fa-volume-up me-2"></n:i>Text to Speech
+                        </n:h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
+                        <!-- Model Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Text to Convert</label>
-                            <textarea class="form-control" rows="6" model="@bind(vm.ttsText)" 
-                                      placeholder="Enter text to convert to speech..."></textarea>
+                            <label class="form-label fw-semibold">Modelo</label>
+                            <combobox placeholder="Seleccionar modelo..." 
+                                     model="@load(vm.availableModels)"
+                                     selectedItem="@bind(vm.selectedTTSModel)"
+                                     sclass="form-control"/>
                         </div>
+
+                        <!-- Voice Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Language</label>
-                            <select class="form-select" model="@bind(vm.ttsLanguage)">
-                                <option value="en-US">English (US)</option>
-                                <option value="en-GB">English (UK)</option>
-                                <option value="es-ES">Spanish (Spain)</option>
-                                <option value="es-MX">Spanish (Mexico)</option>
-                                <option value="fr-FR">French</option>
-                                <option value="de-DE">German</option>
-                                <option value="it-IT">Italian</option>
-                                <option value="pt-BR">Portuguese (Brazil)</option>
-                            </select>
+                            <label class="form-label fw-semibold">Voz</label>
+                            <combobox model="@load(vm.availableVoices)"
+                                     selectedItem="@bind(vm.selectedVoice)"
+                                     sclass="form-control"/>
                         </div>
+
+                        <!-- Language -->
                         <div class="mb-3">
-                            <label class="form-label">Voice</label>
-                            <select class="form-select" model="@bind(vm.ttsVoice)">
-                                <option value="alloy">Alloy (Neutral)</option>
-                                <option value="echo">Echo (Male)</option>
-                                <option value="fable">Fable (Male)</option>
-                                <option value="onyx">Onyx (Male)</option>
-                                <option value="nova">Nova (Female)</option>
-                                <option value="shimmer">Shimmer (Female)</option>
-                            </select>
+                            <label class="form-label fw-semibold">Idioma</label>
+                            <combobox model="@load(vm.availableLanguages)"
+                                     selectedItem="@bind(vm.selectedLanguage)"
+                                     sclass="form-control"/>
                         </div>
+
+                        <!-- Speed -->
                         <div class="mb-3">
-                            <label class="form-label">Audio Format</label>
-                            <select class="form-select" model="@bind(vm.ttsFormat)">
-                                <option value="mp3">MP3</option>
-                                <option value="wav">WAV</option>
-                                <option value="ogg">OGG</option>
-                            </select>
+                            <label class="form-label fw-semibold">
+                                Velocidad: <label value="@load(vm.speed)"/>x
+                            </label>
+                            <slider value="@bind(vm.speed)" 
+                                   mold="scale" maxpos="200" 
+                                   sclass="form-range"/>
+                            <n:small class="text-muted">0.25x - 4.0x</n:small>
                         </div>
-                        <button class="btn btn-primary w-100 mb-3" onClick="@command('generateSpeech')" 
-                                disabled="@bind(vm.isGenerating)">
-                            <i class="fas fa-magic me-1"></i>
-                            <span visible="@bind(!vm.isGenerating)">Generate Speech</span>
-                            <span visible="@bind(vm.isGenerating)">Generating...</span>
-                        </button>
-                        
-                        <!-- Audio Player -->
-                        <div class="mb-3" visible="@bind(vm.ttsAudioUrl != null)">
-                            <label class="form-label">Generated Audio</label>
-                            <audio controls="" class="w-100" src="${vm.ttsAudioUrl}"></audio>
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    Duration: ${vm.ttsDuration}s | 
-                                    Cost: $${vm.ttsCost}
-                                </small>
-                            </div>
+
+                        <!-- Text Input -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Texto</label>
+                            <textbox multiline="true" rows="6" 
+                                    value="@bind(vm.textToConvert)"
+                                    sclass="form-control"
+                                    placeholder="Escribe el texto que quieres convertir a voz..."/>
                         </div>
-                        
-                        <!-- Compliance Alerts TTS -->
-                        <div visible="@bind(vm.ttsContentViolation || vm.ttsToxicityScore > 0.5 || vm.ttsPiiDetected)">
-                            <div class="alert alert-warning">
-                                <h6 class="alert-heading">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Compliance Alerts
-                                </h6>
-                                <div visible="@bind(vm.ttsContentViolation)">
-                                    <small><i class="fas fa-times-circle me-1"></i>Content Violation Detected</small>
-                                </div>
-                                <div visible="@bind(vm.ttsToxicityScore > 0.5)">
-                                    <small><i class="fas fa-skull me-1"></i>High Toxicity Score: ${vm.ttsToxicityScore}</small>
-                                </div>
-                                <div visible="@bind(vm.ttsPiiDetected)">
-                                    <small><i class="fas fa-user-secret me-1"></i>PII Detected</small>
-                                </div>
+
+                        <button label="Generar Audio" iconSclass="fas fa-play" 
+                                sclass="btn btn-info w-100"
+                                disabled="@load(empty vm.textToConvert)"
+                                onClick="@command('generateSpeech')"/>
+
+                        <!-- Generated Audio -->
+                        <div if="${not empty vm.generatedAudioUrl}" class="mt-4 p-3 bg-light rounded">
+                            <n:audio controls="" class="w-100" src="${vm.generatedAudioUrl}">
+                                Tu navegador no soporta el elemento de audio.
+                            </n:audio>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <n:small class="text-muted">
+                                    Duración: <label value="@load(vm.audioDuration)"/>s · 
+                                    Costo: $<label value="@load(vm.audioCost) @converter('formattedNumber', format='0.0000')"/>
+                                </n:small>
+                                <button label="Descargar" iconSclass="fas fa-download" 
+                                        sclass="btn btn-sm btn-outline-info"
+                                        onClick="@command('downloadAudio')"/>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Speech-to-Text Panel -->
+            <!-- Speech to Text -->
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-info text-white">
-                        <h5 class="mb-0"><i class="fas fa-microphone me-2"></i>Speech-to-Text (STT)</h5>
+                    <div class="card-header bg-primary text-white p-3">
+                        <n:h5 class="mb-0">
+                            <n:i class="fas fa-file-audio me-2"></n:i>Speech to Text
+                        </n:h5>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
+                        <!-- Model Selection -->
                         <div class="mb-3">
-                            <label class="form-label">Upload Audio File</label>
-                            <input type="file" class="form-control" accept="audio/*" 
-                                   onChange="@command('uploadAudio')"/>
-                            <small class="text-muted">Supported formats: MP3, WAV, OGG, M4A</small>
+                            <label class="form-label fw-semibold">Modelo</label>
+                            <combobox placeholder="Seleccionar modelo..." 
+                                     model="@load(vm.availableModels)"
+                                     selectedItem="@bind(vm.selectedSTTModel)"
+                                     sclass="form-control"/>
                         </div>
-                        
-                        <!-- Audio Preview -->
-                        <div class="mb-3" visible="@bind(vm.sttAudioUrl != null)">
-                            <label class="form-label">Audio Preview</label>
-                            <audio controls="" class="w-100" src="${vm.sttAudioUrl}"></audio>
-                        </div>
-                        
+
+                        <!-- Language -->
                         <div class="mb-3">
-                            <label class="form-label">Language</label>
-                            <select class="form-select" model="@bind(vm.sttLanguage)">
-                                <option value="auto">Auto-detect</option>
-                                <option value="en">English</option>
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                                <option value="de">German</option>
-                                <option value="it">Italian</option>
-                                <option value="pt">Portuguese</option>
-                            </select>
+                            <label class="form-label fw-semibold">Idioma (Opcional)</label>
+                            <combobox model="@load(vm.availableLanguages)"
+                                     selectedItem="@bind(vm.transcriptionLanguage)"
+                                     sclass="form-control"
+                                     placeholder="Auto-detectar"/>
                         </div>
-                        
-                        <button class="btn btn-info w-100 mb-3" onClick="@command('transcribeAudio')" 
-                                disabled="@bind(vm.isTranscribing || vm.sttAudioUrl == null)">
-                            <i class="fas fa-magic me-1"></i>
-                            <span visible="@bind(!vm.isTranscribing)">Transcribe Audio</span>
-                            <span visible="@bind(vm.isTranscribing)">Transcribing...</span>
-                        </button>
-                        
+
+                        <!-- Audio Upload -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Archivo de Audio</label>
+                            <div class="border rounded p-4 text-center bg-light">
+                                <n:i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></n:i>
+                                <n:p class="mb-2">Arrastra tu archivo de audio aquí</n:p>
+                                <n:p class="small text-muted mb-3">o</n:p>
+                                <button label="Seleccionar Archivo" iconSclass="fas fa-folder-open" 
+                                        sclass="btn btn-primary"
+                                        onClick="@command('selectAudioFile')"/>
+                                <n:p class="small text-muted mt-3 mb-0">
+                                    Formatos: MP3, WAV, M4A, FLAC (máx. 25 MB)
+                                </n:p>
+                            </div>
+                        </div>
+
+                        <div if="${not empty vm.selectedAudioFile}" class="mb-3 p-3 bg-light rounded">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <n:i class="fas fa-file-audio me-2"></n:i>
+                                    <label value="@load(vm.selectedAudioFile)"/>
+                                </div>
+                                <button iconSclass="fas fa-times" 
+                                        sclass="btn btn-sm btn-outline-danger"
+                                        onClick="@command('clearAudioFile')"/>
+                            </div>
+                        </div>
+
+                        <button label="Transcribir Audio" iconSclass="fas fa-microphone" 
+                                sclass="btn btn-primary w-100"
+                                disabled="@load(empty vm.selectedAudioFile)"
+                                onClick="@command('transcribeAudio')"/>
+
                         <!-- Transcription Result -->
-                        <div class="mb-3" visible="@bind(vm.sttTranscription != null)">
-                            <label class="form-label">Transcription</label>
-                            <textarea class="form-control" rows="8" readonly="" 
-                                      model="@bind(vm.sttTranscription)"></textarea>
-                            <div class="mt-2">
-                                <small class="text-muted">
-                                    Duration: ${vm.sttDuration}s | 
-                                    Language: ${vm.sttDetectedLanguage} | 
-                                    Cost: $${vm.sttCost}
-                                </small>
+                        <div if="${not empty vm.transcriptionText}" class="mt-4">
+                            <label class="form-label fw-semibold">Transcripción</label>
+                            <div class="p-3 bg-light rounded">
+                                <n:p class="mb-0">${vm.transcriptionText}</n:p>
                             </div>
-                        </div>
-                        
-                        <!-- Compliance Alerts STT -->
-                        <div visible="@bind(vm.sttContentViolation || vm.sttPiiDetected || vm.sttToxicityScore > 0.5)">
-                            <div class="alert alert-warning">
-                                <h6 class="alert-heading">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>Compliance Alerts
-                                </h6>
-                                <div visible="@bind(vm.sttContentViolation)">
-                                    <small><i class="fas fa-times-circle me-1"></i>Content Violation Detected</small>
-                                </div>
-                                <div visible="@bind(vm.sttPiiDetected)">
-                                    <small><i class="fas fa-user-secret me-1"></i>PII Detected in Transcription</small>
-                                </div>
-                                <div visible="@bind(vm.sttToxicityScore > 0.5)">
-                                    <small><i class="fas fa-skull me-1"></i>High Toxicity: ${vm.sttToxicityScore}</small>
-                                </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <n:small class="text-muted">
+                                    Tiempo: <label value="@load(vm.processingTime)"/>ms · 
+                                    Costo: $<label value="@load(vm.transcriptionCost) @converter('formattedNumber', format='0.0000')"/>
+                                </n:small>
+                                <button label="Copiar" iconSclass="fas fa-copy" 
+                                        sclass="btn btn-sm btn-outline-primary"
+                                        onClick="@command('copyTranscription')"/>
                             </div>
                         </div>
                     </div>
@@ -183,127 +182,51 @@
             </div>
         </div>
 
-        <!-- Voice Processing History -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">Voice Processing History</h5>
+        <!-- History -->
+        <div class="card border-0 shadow-sm mt-4">
+            <div class="card-header bg-white border-0 p-3">
+                <n:h6 class="mb-0 fw-bold">
+                    <n:i class="fas fa-history me-2"></n:i>Historial
+                </n:h6>
+            </div>
+            <div class="card-body p-0">
+                <grid model="@load(vm.voiceHistory)" emptyMessage="No hay conversiones previas"
+                      sclass="table table-hover">
+                    <columns>
+                        <column label="Tipo" width="15%"/>
+                        <column label="Contenido" width="50%"/>
+                        <column label="Configuración" width="20%"/>
+                        <column label="Duración" width="10%"/>
+                        <column label="Fecha" width="15%"/>
+                        <column label="Acciones" width="5%" align="center"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label>
+                                <n:span if="${each.voicetype eq 'TEXT_TO_SPEECH'}" class="badge bg-info">TTS</n:span>
+                                <n:span if="${each.voicetype eq 'SPEECH_TO_TEXT'}" class="badge bg-primary">STT</n:span>
+                            </label>
+                            <label value="@load(each.voicetext)" style="max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
+                            <label>
+                                <n:small class="text-muted">
+                                    ${each.voicename} · ${each.voicelanguage}
+                                </n:small>
+                            </label>
+                            <label value="@load(each.voiceduration)"/>s
+                            <label value="@load(each.voicecreatedat) @converter('formattedDate', format='dd/MM/yyyy HH:mm')"/>
                             <div class="btn-group btn-group-sm">
-                                <button class="btn btn-outline-secondary" onClick="@command('refreshHistory')">
-                                    <i class="fas fa-sync-alt me-1"></i>Refresh
-                                </button>
+                                <button iconSclass="fas fa-eye" tooltiptext="Ver"
+                                        sclass="btn btn-sm btn-outline-primary"
+                                        onClick="@command('viewVoice', voice=each)"/>
+                                <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
+                                        sclass="btn btn-sm btn-outline-danger"
+                                        onClick="@command('deleteVoice', voice=each)"/>
                             </div>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Text/Transcription</th>
-                                        <th>Type</th>
-                                        <th>Language</th>
-                                        <th>Model</th>
-                                        <th>Duration</th>
-                                        <th>Compliance</th>
-                                        <th>Cost</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template name="voice" var="v">
-                                        <tr>
-                                            <td>
-                                                <small>${vm.truncate(v.voicetext, 80)}</small>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-${v.voicetype == 'TTS' ? 'primary' : 'info'}">
-                                                    ${v.voicetype}
-                                                </span>
-                                            </td>
-                                            <td><small>${v.voicelanguage}</small></td>
-                                            <td><small>${v.voicemodel}</small></td>
-                                            <td><small>${v.voiceduration}s</small></td>
-                                            <td>
-                                                <div>
-                                                    <span class="badge bg-${v.contentviol ? 'danger' : 'success'}" visible="@bind(v.contentviol != null)">
-                                                        ${v.contentviol ? 'Violation' : 'Clean'}
-                                                    </span>
-                                                    <span class="badge bg-warning ms-1" visible="@bind(v.piidetected)">PII</span>
-                                                    <span class="badge bg-warning ms-1" visible="@bind(v.toxicityscore > 0.5)">
-                                                        Toxic: ${v.toxicityscore}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td><small>$${v.voicecost}</small></td>
-                                            <td><small>${vm.formatDate(v.voicecreatedat)}</small></td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button class="btn btn-outline-primary" onClick="@command('playAudio', voice=v)">
-                                                        <i class="fas fa-play"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-secondary" onClick="@command('downloadAudio', voice=v)">
-                                                        <i class="fas fa-download"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                        </row>
+                    </template>
+                </grid>
             </div>
         </div>
 
-        <!-- Session Compliance Monitor -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Session Compliance Monitor</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Compliance Status</h6>
-                                    <span class="badge bg-${vm.getComplianceColor(vm.complianceStatus)} fs-6">
-                                        ${vm.complianceStatus}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Risk Level</h6>
-                                    <span class="badge bg-${vm.getRiskColor(vm.riskLevel)} fs-6">
-                                        ${vm.riskLevel}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Total Violations</h6>
-                                    <h4 class="text-danger mb-0">${vm.totalViolations}</h4>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="text-center">
-                                    <h6 class="text-muted">Total Cost</h6>
-                                    <h4 class="text-success mb-0">$${vm.totalCost}</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-
-    <script src="/js/bootstrap.bundle.min.js"/>
-</window>
 </zk>

@@ -1,155 +1,155 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<zk>
-<window title="Playground Routing" border="normal" width="100%" height="100%" 
-        apply="com.codeflowx.platform.viewmodel.playground.PlaygroundRoutingViewModel">
+<?page title="Routing Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <style src="/theme/console/css/console-custom.css"/>
     
-    <style src="/css/bootstrap.min.css"/>
-    <style src="/css/custom.css"/>
-    
-    <div class="container-fluid">
-        <div class="row mb-4">
-            <div class="col-12">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/playground/page.zul">Playground</a></li>
-                        <li class="breadcrumb-item active">Agent Routing</li>
-                    </ol>
-                </nav>
-                <h1 class="h3 mb-0 text-primary">
-                    <i class="fas fa-route me-2"></i>Intelligent Agent Routing
-                </h1>
+    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundRoutingViewModel')"
+         class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
+        
+        <!-- Header -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <n:h4 class="mb-1 fw-bold">
+                            <n:i class="fas fa-route text-danger me-2"></n:i>Routing Playground
+                        </n:h4>
+                        <n:p class="text-muted mb-0">Enruta automáticamente consultas al modelo o agente más apropiado</n:p>
+                    </div>
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                            sclass="btn btn-danger"
+                            onClick="@command('newSession')"/>
+                </div>
             </div>
         </div>
 
-        <!-- Routing Test Panel -->
-        <div class="row mb-4">
+        <!-- Routing Test Area -->
+        <div class="row g-4 mb-4">
+            <!-- Input Panel -->
             <div class="col-md-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Test Query Routing</h5>
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-header bg-white border-0 p-3">
+                        <n:h6 class="mb-0 fw-bold">
+                            <n:i class="fas fa-terminal me-2"></n:i>Prueba de Routing
+                        </n:h6>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body p-4">
                         <div class="mb-3">
-                            <label class="form-label">Query</label>
-                            <textarea class="form-control" rows="4" model="@bind(vm.routingQuery)" 
-                                      placeholder="Enter a query to test agent routing..."></textarea>
+                            <label class="form-label fw-semibold">Consulta / Prompt</label>
+                            <textbox multiline="true" rows="6" 
+                                    value="@bind(vm.inputQuery)"
+                                    sclass="form-control"
+                                    placeholder="Escribe tu consulta aquí y el sistema la enrutará al modelo o agente más apropiado..."/>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Routing Strategy</label>
-                                <select class="form-select" model="@bind(vm.routingStrategy)">
-                                    <option value="SIMILARITY">Similarity-based</option>
-                                    <option value="CAPABILITY">Capability-based</option>
-                                    <option value="LOAD_BALANCE">Load Balancing</option>
-                                    <option value="CUSTOM">Custom Logic</option>
-                                </select>
+
+                        <div class="d-flex gap-3 mb-4">
+                            <button label="Analizar y Enrutar" iconSclass="fas fa-play" 
+                                    sclass="btn btn-danger btn-lg flex-grow-1"
+                                    disabled="@load(empty vm.inputQuery)"
+                                    onClick="@command('analyzeAndRoute')"/>
+                            <button label="Limpiar" iconSclass="fas fa-eraser" 
+                                    sclass="btn btn-outline-secondary"
+                                    onClick="@command('clear')"/>
+                        </div>
+
+                        <!-- Routing Result -->
+                        <div if="${not empty vm.routingResult}" class="border rounded p-4 bg-light">
+                            <n:h6 class="fw-bold mb-3">
+                                <n:i class="fas fa-check-circle text-success me-2"></n:i>Resultado del Routing
+                            </n:h6>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <n:p class="small text-muted mb-1">Modelo Seleccionado</n:p>
+                                    <n:p class="fw-semibold mb-0">
+                                        <n:i class="fas fa-brain me-2 text-primary"></n:i>
+                                        <label value="@load(vm.routingResult.routingselectedmodel)"/>
+                                    </n:p>
+                                </div>
+                                <div class="col-md-6">
+                                    <n:p class="small text-muted mb-1">Agente Seleccionado</n:p>
+                                    <n:p class="fw-semibold mb-0">
+                                        <n:i class="fas fa-robot me-2 text-info"></n:i>
+                                        <label value="@load(vm.routingResult.routingselectedagent)"/>
+                                    </n:p>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Confidence Threshold</label>
-                                <input type="range" class="form-range" min="0" max="1" step="0.1" 
-                                       model="@bind(vm.confidenceThreshold)"/>
-                                <small class="text-muted">${vm.confidenceThreshold}</small>
+
+                            <div class="mb-3">
+                                <n:p class="small text-muted mb-1">Confianza del Routing</n:p>
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: ${vm.routingResult.routingconfidence}%"
+                                         aria-valuenow="${vm.routingResult.routingconfidence}" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        <label value="@load(vm.routingResult.routingconfidence)"/>%
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <n:p class="small text-muted mb-1">Razón de la Selección</n:p>
+                                <div class="p-3 bg-white rounded">
+                                    <n:p class="mb-0 small">${vm.routingResult.routingreason}</n:p>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <n:p class="small text-muted mb-1">Respuesta</n:p>
+                                <div class="p-3 bg-white rounded">
+                                    <n:p class="mb-0">${vm.routingResult.routingoutput}</n:p>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <n:small class="text-muted">
+                                    Tiempo: <label value="@load(vm.routingResult.routingprocessingtime)"/>ms · 
+                                    Costo: $<label value="@load(vm.routingResult.routingcost) @converter('formattedNumber', format='0.0000')"/>
+                                </n:small>
+                                <button label="Ver Alternativas" iconSclass="fas fa-list" 
+                                        sclass="btn btn-sm btn-outline-primary"
+                                        onClick="@command('showAlternatives')"/>
                             </div>
                         </div>
-                        <button class="btn btn-primary" onClick="@command('routeQuery')" 
-                                disabled="@bind(vm.isRouting)">
-                            <i class="fas fa-route me-1"></i>Route Query
-                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Routing Result -->
+            <!-- Available Options Panel -->
             <div class="col-md-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h6 class="mb-0">Selected Agent</h6>
+                <div class="card border-0 shadow-sm mb-3">
+                    <div class="card-header bg-white border-0 p-3">
+                        <n:h6 class="mb-0 fw-bold">
+                            <n:i class="fas fa-brain me-2 text-primary"></n:i>Modelos Disponibles
+                        </n:h6>
                     </div>
-                    <div class="card-body text-center" visible="@bind(vm.selectedAgent != null)">
-                        <div class="bg-primary text-white rounded-circle p-3 mx-auto mb-3" style="width: 80px; height: 80px;">
-                            <i class="fas fa-robot fa-3x"></i>
+                    <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
+                        <div forEach="${vm.availableModels}" class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                <div>
+                                    <n:p class="mb-0 small fw-semibold">${each.modelname}</n:p>
+                                    <n:p class="mb-0 text-muted" style="font-size: 0.75rem;">${each.modelprovider}</n:p>
+                                </div>
+                                <n:span class="badge bg-primary">${each.modelstatus}</n:span>
+                            </div>
                         </div>
-                        <h5>${vm.selectedAgentName}</h5>
-                        <p class="text-muted">${vm.selectedAgentDescription}</p>
-                        <div class="mb-3">
-                            <small class="text-muted">Confidence:</small>
-                            <h4 class="text-success">${vm.routingConfidence}%</h4>
-                        </div>
-                        <div class="mb-2">
-                            <span class="badge bg-secondary">${vm.routingStrategy}</span>
-                        </div>
-                    </div>
-                    <div class="card-body text-center text-muted" visible="@bind(vm.selectedAgent == null)">
-                        <i class="fas fa-robot fa-3x mb-3"></i>
-                        <p>No agent selected yet</p>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- All Agents Scores -->
-        <div class="row mb-4" visible="@bind(vm.showRoutingScores)">
-            <div class="col-12">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Routing Scores for All Agents</h5>
+                    <div class="card-header bg-white border-0 p-3">
+                        <n:h6 class="mb-0 fw-bold">
+                            <n:i class="fas fa-robot me-2 text-info"></n:i>Agentes Disponibles
+                        </n:h6>
                     </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Agent</th>
-                                        <th>Capability Match</th>
-                                        <th>Similarity Score</th>
-                                        <th>Load</th>
-                                        <th>Final Score</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template name="agentScore" var="score">
-                                        <tr class="${score.selected ? 'table-success' : ''}">
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <i class="fas fa-robot me-2"></i>
-                                                    <div>
-                                                        <h6 class="mb-0">${score.agentName}</h6>
-                                                        <small class="text-muted">${score.agentCapability}</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-info" style="width: ${score.capabilityMatch}%">
-                                                        ${score.capabilityMatch}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-primary" style="width: ${score.similarityScore}%">
-                                                        ${score.similarityScore}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td><span class="badge bg-secondary">${score.currentLoad}%</span></td>
-                                            <td>
-                                                <div class="progress" style="height: 20px;">
-                                                    <div class="progress-bar bg-success" style="width: ${score.finalScore}%">
-                                                        ${score.finalScore}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-${score.selected ? 'success' : 'secondary'}">
-                                                    ${score.selected ? 'SELECTED' : 'Available'}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
+                    <div class="card-body p-3" style="max-height: 300px; overflow-y: auto;">
+                        <div forEach="${vm.availableAgents}" class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center p-2 border rounded">
+                                <div>
+                                    <n:p class="mb-0 small fw-semibold">${each.agentname}</n:p>
+                                    <n:p class="mb-0 text-muted" style="font-size: 0.75rem;">${each.agenttype}</n:p>
+                                </div>
+                                <n:span class="badge bg-info">${each.agentstatus}</n:span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -157,68 +157,77 @@
         </div>
 
         <!-- Routing History -->
-        <div class="row">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Routing History</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Query</th>
-                                        <th>Selected Agent</th>
-                                        <th>Strategy</th>
-                                        <th>Confidence</th>
-                                        <th>User Feedback</th>
-                                        <th>Accuracy</th>
-                                        <th>Created</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template name="routing" var="r">
-                                        <tr>
-                                            <td><small>${vm.truncate(r.routingquery, 60)}</small></td>
-                                            <td><span class="badge bg-primary">${vm.getAgentName(r.selectedagentid)}</span></td>
-                                            <td><span class="badge bg-secondary">${r.routingstrategy}</span></td>
-                                            <td>
-                                                <div class="progress" style="height: 20px; width: 100px;">
-                                                    <div class="progress-bar bg-success" style="width: ${r.routingconfidence * 100}%">
-                                                        ${r.routingconfidence * 100}%
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-${vm.getFeedbackColor(r.userfeedback)}">
-                                                    ${r.userfeedback}
-                                                </span>
-                                            </td>
-                                            <td><small>${r.routingaccuracy != null ? r.routingaccuracy * 100 : '-'}%</small></td>
-                                            <td><small>${vm.formatDate(r.routingcreatedat)}</small></td>
-                                            <td>
-                                                <div class="btn-group btn-group-sm">
-                                                    <button class="btn btn-outline-success" onClick="@command('markCorrect', routing=r)">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button class="btn btn-outline-danger" onClick="@command('markIncorrect', routing=r)">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0 p-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <n:h6 class="mb-0 fw-bold">
+                        <n:i class="fas fa-history me-2"></n:i>Historial de Routings
+                    </n:h6>
+                    <div class="d-flex gap-2">
+                        <combobox placeholder="Filtrar por estado..." 
+                                 model="@load(vm.availableStatuses)"
+                                 selectedItem="@bind(vm.filterStatus)"
+                                 sclass="form-control form-control-sm" style="width: 200px;"
+                                 onChange="@command('applyFilter')"/>
+                        <textbox placeholder="Buscar..." value="@bind(vm.searchTerm)"
+                                 sclass="form-control form-control-sm" style="width: 200px;"
+                                 onChange="@command('search')"/>
                     </div>
                 </div>
             </div>
+            <div class="card-body p-0">
+                <grid model="@load(vm.routingHistory)" emptyMessage="No hay routings previos"
+                      sclass="table table-hover">
+                    <columns>
+                        <column label="Consulta" width="30%"/>
+                        <column label="Modelo" width="15%"/>
+                        <column label="Agente" width="15%"/>
+                        <column label="Confianza" width="10%" align="center"/>
+                        <column label="Tiempo" width="8%" align="right"/>
+                        <column label="Estado" width="10%" align="center"/>
+                        <column label="Fecha" width="12%"/>
+                        <column label="Acciones" width="5%" align="center"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.routinginput)" 
+                                   style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
+                            <label value="@load(each.routingselectedmodel)"/>
+                            <label value="@load(each.routingselectedagent)"/>
+                            <label>
+                                <n:span class="badge bg-info">
+                                    <label value="@load(each.routingconfidence)"/>%
+                                </n:span>
+                            </label>
+                            <label value="@load(each.routingprocessingtime)"/>ms
+                            <label>
+                                <n:span if="${each.routingstatus eq 'COMPLETED'}" class="badge bg-success">Completado</n:span>
+                                <n:span if="${each.routingstatus eq 'PENDING'}" class="badge bg-warning">Pendiente</n:span>
+                                <n:span if="${each.routingstatus eq 'ROUTING'}" class="badge bg-info">Enrutando</n:span>
+                                <n:span if="${each.routingstatus eq 'ERROR'}" class="badge bg-danger">Error</n:span>
+                            </label>
+                            <label value="@load(each.routingcreatedat) @converter('formattedDate', format='dd/MM/yyyy HH:mm')"/>
+                            <div class="btn-group btn-group-sm">
+                                <button iconSclass="fas fa-eye" tooltiptext="Ver Detalles"
+                                        sclass="btn btn-sm btn-outline-primary"
+                                        onClick="@command('viewRouting', routing=each)"/>
+                                <button iconSclass="fas fa-redo" tooltiptext="Re-ejecutar"
+                                        sclass="btn btn-sm btn-outline-info"
+                                        onClick="@command('rerun', routing=each)"/>
+                                <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
+                                        sclass="btn btn-sm btn-outline-danger"
+                                        onClick="@command('deleteRouting', routing=each)"/>
+                            </div>
+                        </row>
+                    </template>
+                </grid>
+            </div>
+            <div class="card-footer bg-white border-0 p-3" if="${vm.totalSize > vm.pageSize}">
+                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+                        activePage="@bind(vm.activePage)" onPaging="@command('changePage')"
+                        sclass="pagination pagination-sm justify-content-end mb-0"/>
+            </div>
         </div>
-    </div>
 
-    <script src="/js/bootstrap.bundle.min.js"/>
-</window>
+    </div>
 </zk>
