@@ -27,7 +27,6 @@ Objetivo: desacoplar la lógica RAG (ingesta, embeddings, búsqueda, métricas) 
 - CRUD de sistemas RAG, datasources, versiones
 - Vinculación a proyectos/tenants/agentes
 - Gestión de permisos y tokens (ACL, JWT scopes)
-- Registro de dominios de negocio y datasets para entrenamiento
 - Configuración de compliance/retención/lineage de datos
 - Auditoría completa de acciones (búsquedas, ingestas, rollbacks)
 - Consolidación de métricas de consumo/costes (tokens, requests, proveedores)
@@ -134,40 +133,7 @@ Nota: los GET admiten filtros por query params; todos devuelven JSON paginado `{
 
 ---
 
-### Domain Ingestion: Gestión de Datasets para Entrenamiento de Dominios
-
-Los datasets para entrenamiento de dominios de negocio (AgentDomain, DomainDataset) se gestionan con la misma separación:
-
-**Gestión (Java):**
-- Módulo: `platform/viewmodel/domainingestion/*`
-- ViewModels: DomainManagementViewModel, DomainIngestionWizardViewModel, ConfigureDocumentsViewModel, ConfigureApiViewModel, ConfigureDatabaseViewModel, ConfigureWebScrapingViewModel, JobMonitorViewModel
-- Entidades: Domain, DomainDataset, AgentDomain
-- Campos gestionados en Java:
-  - Metadatos del dataset: name, description, datasetType, filePath, fileFormat, recordCount, columnCount, schemaVersion
-  - Compliance: complianceTags, retentionPolicy, dataLineage, sourceMetadata
-  - Configuración RAG: isRagReady (boolean), ragMetadata (JSON), trainingRelevance (1-10)
-  - Frecuencia y auditoría: ingestionFrequency, lastIngested, dataQualityScore
-  - Relación con dominios: domainId (FK a AgentDomain/Domain)
-
-**Ejecución (leka-server):**
-- Datasets reales: chunks, embeddings, índices vectoriales
-- Ingesta y procesamiento: parseo de archivos (CSV, JSON, Parquet), chunking, embeddings batch
-- Indexación en Qdrant/Cohere/Pinecone con payload: {domainId, datasetId, projectId, tenantId, ...}
-- Evaluación de calidad: data profiling, bias detection, coverage análisis
-- Métricas: embedding generation progress, chunk distribution stats, document coverage
-
-**Endpoints adicionales (leka-server) para Domain Ingestion:**
-- POST /domains/{domainId}/datasets/{datasetId}/ingest (ingesta de dataset a índice vectorial)
-- GET /domains/{domainId}/datasets/{datasetId}/progress (progreso de ingesta/embeddings)
-- GET /domains/{domainId}/coverage (cobertura de conocimiento del dominio)
-- POST /domains/{domainId}/rebuild (rebuild de índice completo para un dominio)
-- GET /domains/{domainId}/quality (métricas de calidad del dominio: bias, coverage, consistency)
-
-**Integración en ViewModels de Domain Ingestion:**
-- `DomainManagementViewModel.loadDomains()`: permanece en DB (metadatos), métricas de coverage/quality desde GET /domains/{id}/coverage.
-- `DomainIngestionWizardViewModel.finishDomain()`: crea Domain en DB; si `ragEnabled=true`, lanza POST /domains/{id}/ingest.
-- `ConfigureDocumentsViewModel.uploadDataset()`: guarda DomainDataset en DB (metadatos); lanza POST /domains/{domainId}/datasets/{datasetId}/ingest.
-- `JobMonitorViewModel.loadJobs()`: si los jobs de ingesta están en leka, GET /jobs?type=ingestion&domainId=; si en Java (workflow BPMN), permanece en DB.
+> **Nota:** Para la gestión de Domain Datasets (entrenamiento de dominios de negocio), consultar el documento dedicado: `docs/funcional/datasets/01_ARQUITECTURA_DATASETS.md`
 
 ---
 
@@ -246,13 +212,6 @@ Los datasets para entrenamiento de dominios de negocio (AgentDomain, DomainDatas
 - RagBiasDetection (configuración de umbrales y reglas, **NO ejecución de detección**)
 - Audit/Consumption (RagAuditLog: acciones de usuario; RagConsumption: tokens/costes consolidados)
 
-**Módulos de gestión de Dominios:**
-- DomainManagementViewModel (CRUD de dominios de negocio: nombre, industria, categoría, status, **NO vectores de conocimiento**)
-- DomainIngestionWizardViewModel (creación de dominios: templates, fuentes, compliance, flags ragEnabled/trainingEnabled, **NO procesamiento**)
-- ConfigureDocuments/Api/Database/WebScraping (configuración de fuentes de datos: parámetros de conexión, formatos, frecuencias, **NO extracción real**)
-- JobMonitorViewModel (monitoreo de jobs si están en Java/BPMN; si en leka, solo visualización)
-- AgentDomain (dominio con datasets[JSONB]: referencias a datasets, **NO embeddings**)
-- DomainDataset (metadata: filePath, format, recordCount, compliance, isRagReady, trainingRelevance, **NO vectores**)
 
 **Qué permanece en BusinessService (DB):**
 - Crear/editar/borrar sistemas RAG, datasources, versiones, dominios, datasets
@@ -328,11 +287,6 @@ Los datasets para entrenamiento de dominios de negocio (AgentDomain, DomainDatas
 - platform/viewmodel/rag/RagComplianceViewModel.java: configuración cumplimiento → **DB**; análisis técnico → **GET /rag/governance/compliance (API)**.
 - platform/viewmodel/rag/RagBiasDetectionViewModel.java: umbrales/reglas → **DB**; detección ejecutada → **GET /rag/governance/bias-detection (API)**.
 
-**ViewModels Domain Ingestion:**
-- platform/viewmodel/domainingestion/DomainManagementViewModel.java: CRUD dominios → **DB**; métricas coverage/quality → **GET /domains/{id}/coverage (API)**.
-- platform/viewmodel/domainingestion/DomainIngestionWizardViewModel.java: creación dominio → **DB**; si ragEnabled → **POST /domains/{id}/ingest (API)**.
-- platform/viewmodel/domainingestion/Configure*.java: guardar DomainDataset → **DB**; lanzar ingesta → **POST /domains/{domainId}/datasets/{datasetId}/ingest (API)**.
-- platform/viewmodel/domainingestion/JobMonitorViewModel.java: jobs en BPMN → **DB**; jobs de ingesta en leka → **GET /jobs?type=ingestion (API)**.
 
 ### Siguientes pasos
 1) Definir OpenAPI en leka-server con estos endpoints y DTOs.
