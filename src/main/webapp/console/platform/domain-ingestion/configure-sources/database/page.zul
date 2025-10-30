@@ -1,0 +1,95 @@
+<?page title="Configurar Database" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.domainingestion.ConfigureDatabaseViewModel')">
+        
+        <div class="row mb-4">
+            <div class="col-12">
+                <h2 class="mb-1"><i class="fas fa-database me-2"></i>Configurar Fuente Database</h2>
+                <p class="text-muted">Configura conexiones a bases de datos</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white"><h5 class="mb-0">Nueva Fuente Database</h5></div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">Dominio *</label>
+                            <combobox class="form-control" value="@bind(vm.selectedDomain)" 
+                                     model="@load(vm.domainsList)" buttonVisible="false">
+                                <template name="model"><comboitem label="${each.dindomainname}" value="${each}"/></template>
+                            </combobox>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre *</label>
+                            <textbox class="form-control" value="@bind(vm.dataSource.dindsname)" placeholder="Nombre de la conexión"/>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Descripción</label>
+                            <textbox class="form-control" multiline="true" rows="3" value="@bind(vm.dataSource.dindsdescription)"/>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo DB *</label>
+                                <combobox class="form-control" value="@bind(vm.dataSource.dindsdatabasetype)" buttonVisible="false">
+                                    <comboitem label="PostgreSQL" value="postgresql"/>
+                                    <comboitem label="MySQL" value="mysql"/>
+                                    <comboitem label="MongoDB" value="mongodb"/>
+                                    <comboitem label="Oracle" value="oracle"/>
+                                    <comboitem label="SQL Server" value="sqlserver"/>
+                                </combobox>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tablas (JSON Array)</label>
+                                <textbox class="form-control" multiline="true" rows="2" value="@bind(vm.dataSource.dindstables)" placeholder='["table1", "table2"]'/>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Connection String *</label>
+                            <textbox class="form-control" value="@bind(vm.dataSource.dindsconnectionstring)" placeholder="jdbc:postgresql://host:port/database"/>
+                        </div>
+                        <div class="mb-3">
+                            <checkbox checked="@bind(vm.dataSource.dindsenabled)" label="Habilitar fuente"/>
+                        </div>
+                        <div class="d-flex justify-content-end gap-2">
+                            <button class="btn btn-secondary" onClick="@command('cancel')">Cancelar</button>
+                            <button class="btn btn-primary" onClick="@command('saveDataSource')"><i class="fas fa-save me-1"></i>Guardar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white"><h5 class="mb-0">Fuentes Database Configuradas</h5></div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr><th>Nombre</th><th>Tipo</th><th>Dominio</th><th>Estado</th><th class="text-center">Acciones</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr forEach="@load(vm.existingSources)" visible="@load(each.dindstype == 'database')">
+                                        <td><strong label="@load(each.dindsname)"/></td>
+                                        <td><label value="@load(each.dindsdatabasetype)"/></td>
+                                        <td><label value="@load(each.domain.dindomainname)"/></td>
+                                        <td><span class="@load(vm.getStatusBadge(each.dindsstatus))" label="@load(vm.translateStatus(each.dindsstatus))"/></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-outline-primary btn-sm" onClick="@command('editSource', source=each)"><i class="fas fa-edit"></i></button>
+                                            <button class="btn btn-outline-danger btn-sm" onClick="@command('deleteSource', source=each)"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</zk>
+

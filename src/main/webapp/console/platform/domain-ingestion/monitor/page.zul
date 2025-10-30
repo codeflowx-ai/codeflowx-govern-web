@@ -1,0 +1,231 @@
+<?page title="Monitor de Jobs" contentType="text/html;charset=UTF-8"?>
+<zk xmlns:n="native">
+    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.domainingestion.JobMonitorViewModel')">
+        
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="mb-1">
+                            <i class="fas fa-tasks me-2"></i>
+                            Monitor de Jobs de Ingesta
+                        </h2>
+                        <p class="text-muted">Monitorea y gestiona los trabajos de ingesta en tiempo real</p>
+                    </div>
+                    <button class="btn btn-primary" onClick="@command('createNewJob')">
+                        <i class="fas fa-plus me-1"></i>Nuevo Job
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Total Jobs</p>
+                                <h3 class="mb-0" label="@load(vm.totalJobs)"/>
+                            </div>
+                            <div class="text-primary" style="font-size: 2rem;">
+                                <i class="fas fa-list"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">En Ejecución</p>
+                                <h3 class="mb-0 text-warning" label="@load(vm.runningJobs)"/>
+                            </div>
+                            <div class="text-warning" style="font-size: 2rem;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Completados</p>
+                                <h3 class="mb-0 text-success" label="@load(vm.completedJobs)"/>
+                            </div>
+                            <div class="text-success" style="font-size: 2rem;">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <p class="text-muted mb-1">Fallidos</p>
+                                <h3 class="mb-0 text-danger" label="@load(vm.failedJobs)"/>
+                            </div>
+                            <div class="text-danger" style="font-size: 2rem;">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Dominio"
+                                  value="@bind(vm.filterDomain)" buttonVisible="false"
+                                  model="@load(vm.domainsList)">
+                            <template name="model">
+                                <comboitem label="${each.dindomainname}" value="${each}"/>
+                            </template>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Tipo"
+                                  value="@bind(vm.filterType)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos" value=""/>
+                            <comboitem label="Document Upload" value="document_upload"/>
+                            <comboitem label="Web Scraping" value="web_scraping"/>
+                            <comboitem label="API" value="api"/>
+                            <comboitem label="Database" value="database"/>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <combobox class="form-control" placeholder="Estado"
+                                  value="@bind(vm.filterStatus)" buttonVisible="false"
+                                  onChange="@command('applyFilters')">
+                            <comboitem label="Todos" value=""/>
+                            <comboitem label="Pending" value="pending"/>
+                            <comboitem label="Running" value="running"/>
+                            <comboitem label="Completed" value="completed"/>
+                            <comboitem label="Failed" value="failed"/>
+                            <comboitem label="Paused" value="paused"/>
+                        </combobox>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white">
+                                <i class="fas fa-search text-muted"></i>
+                            </span>
+                            <textbox class="form-control" placeholder="Buscar..."
+                                     value="@bind(vm.searchText)" instant="true"
+                                     onChange="@command('searchJobs')"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabla de Jobs -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Jobs de Ingesta</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onClick="@command('refreshJobs')">
+                        <i class="fas fa-sync-alt me-1"></i>Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Job</th>
+                                <th>Dominio</th>
+                                <th>Tipo</th>
+                                <th class="text-center">Progreso</th>
+                                <th class="text-center">Registros</th>
+                                <th>Estado</th>
+                                <th>Inicio</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr forEach="@load(vm.jobsList)">
+                                <td>
+                                    <strong label="@load(each.dinjobname)"/>
+                                    <br/>
+                                    <small class="text-muted" label="@load(each.dinjobtype)"/>
+                                </td>
+                                <td>
+                                    <label value="@load(each.domain.dindomainname)"/>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info" label="@load(each.dinjobtype)"/>
+                                </td>
+                                <td class="text-center">
+                                    <div class="progress" style="height: 20px; width: 100px; margin: 0 auto;">
+                                        <div class="progress-bar @load(vm.getProgressBarClass(each.dinstatus))" 
+                                             style="width: @load(each.dinprogress)%"
+                                             role="progressbar">
+                                            <small label="@load(each.dinprogress)%"/>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <small>
+                                        <strong label="@load(each.dinprocessedrecords)"/>/<label value="@load(each.dintotalrecords)"/>
+                                        <span class="text-danger" visible="@load(each.dinfailedrecords > 0)">
+                                            <i class="fas fa-exclamation-triangle ms-1"></i>
+                                            <label value="@load(each.dinfailedrecords)"/>
+                                        </span>
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="@load(vm.getStatusBadgeClass(each.dinstatus))"
+                                          label="@load(vm.translateStatus(each.dinstatus))"/>
+                                </td>
+                                <td>
+                                    <small label="@load(vm.formatDate(each.dinstartedat))"/>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary btn-sm" 
+                                                onClick="@command('viewJobDetail', job=each)">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-outline-warning btn-sm" 
+                                                visible="@load(each.dinstatus == 'running')"
+                                                onClick="@command('pauseJob', job=each)">
+                                            <i class="fas fa-pause"></i>
+                                        </button>
+                                        <button class="btn btn-outline-success btn-sm" 
+                                                visible="@load(each.dinstatus == 'paused')"
+                                                onClick="@command('resumeJob', job=each)">
+                                            <i class="fas fa-play"></i>
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-sm" 
+                                                onClick="@command('cancelJob', job=each)">
+                                            <i class="fas fa-stop"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</zk>

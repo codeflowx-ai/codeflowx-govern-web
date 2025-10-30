@@ -119,12 +119,14 @@ public class AgentsDashboardViewModel extends BaseFront<AgentsDashboardViewModel
     
     /**
      * Carga el dashboard de salud de agentes
+     * NOTA: La vista V_AGENT_HEALTH_DASHBOARD puede no existir en<｜place▁holder▁no▁784｜> BD,
+     * por lo que este método no es crítico y los KPIs se calculan desde las tablas reales
      */
     private void loadHealthDashboard() {
         try {
             log.debug("Cargando dashboard de salud de agentes");
             
-            // VIEW - usar findAllView()
+            // VIEW - usar findAllView() - puede fallar si la vista no existe
             PageParams pageParams = PageParams.builder()
                 .maxRows(1)
                 .pageActual(1)
@@ -141,10 +143,13 @@ public class AgentsDashboardViewModel extends BaseFront<AgentsDashboardViewModel
                 healthDashboard = result.getContent().get(0);
                 log.info("Dashboard de salud cargado correctamente");
             } else {
-                log.warn("No se encontraron datos del dashboard de salud");
+                log.debug("No se encontraron datos del dashboard de salud (la vista puede no existir)");
+                healthDashboard = null;
             }
         } catch (Exception e) {
-            log.error("Error al cargar dashboard de salud", e);
+            // La vista puede no existir, no es crítico para el funcionamiento del dashboard
+            log.debug("La vista V_AGENT_HEALTH_DASHBOARD no está disponible o no existe: {}", e.getMessage());
+            healthDashboard = null;
         }
     }
     
