@@ -1,289 +1,315 @@
 package com.codeflowx.platform.viewmodel.playground;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.zkoss.bind.annotation.*;
+
+import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
-import com.codeflowx.framework.zkoss.BaseFront;
-import com.codeflowx.govern.entity.playground.*;
-import codeflowx.nocode.persist.Criteria;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.Evaluation;
-import codeflowx.nocode.persist.Operation;
-import codeflowx.nocode.persist.PageParams;
-import codeflowx.nocode.persist.PageResult;
-import lombok.Getter;
-import lombok.Setter;
+
+import com.codeflowx.govern.entity.agents.Agent;
+import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.entity.playground.PlaygroundChat;
+import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.platform.service.BaseFront;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Getter
-@Setter
-@Init(superclass = true)
-@VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundChatViewModel extends BaseFront<PlaygroundChatViewModel> {
-    private static final long serialVersionUID = 1L;
+public class PlaygroundChatViewModel extends BaseFront {
+
+    private Long sessionId;
+    private PlaygroundSession currentSession;
+    private List<PlaygroundChat> messages = new ArrayList<>();
     
-    @Override
-    public void setBeans(Object bean) {}
+    private String currentPrompt = "";
+    private Model selectedModel;
+    private Agent selectedAgent;
+    private BigDecimal temperature = new BigDecimal("1.0");
+    private Integer maxTokens = 4096;
+    private String systemPrompt = "Eres un asistente útil, preciso y profesional.";
     
-    // Datos de sesión
-    private Long currentSessionId;
-    private String currentSessionName = "New Chat";
-    private List<PlaygroundSession> sessionsList = new ArrayList<>();
-    private List<PlaygroundChat> messagesList = new ArrayList<>();
+    private List<Model> availableModels = new ArrayList<>();
+    private List<Agent> availableAgents = new ArrayList<>();
     
-    // Configuración
-    private String selectedModel = "gpt-4";
-    private Double temperature = 0.7;
-    private Integer maxTokens = 2000;
-    private String messageInput;
-    private boolean isSending = false;
-    
-    // Compliance monitoring
-    private String sessionComplianceStatus = "PENDING_REVIEW";
-    private String sessionGovernanceStatus = "PENDING";
-    private String sessionRiskLevel = "LOW";
-    private int contentViolations = 0;
-    private int biasDetections = 0;
-    private int piiDetections = 0;
-    
-    // Stats
-    private int sessionMessageCount = 0;
-    private long sessionTokens = 0L;
-    private java.math.BigDecimal sessionCost = java.math.BigDecimal.ZERO;
-    private int avgLatency = 0;
-    
+    // Session stats
+    private Integer messageCount = 0;
+    private Long tokensUsed = 0L;
+    private BigDecimal sessionCost = BigDecimal.ZERO;
+
+    @Init(superclass = true)
+    public void init() {
+        logActivity("PLAYGROUND_CHAT", "ACCESS", "Usuario accedió al Chat Playground");
+        loadAvailableModels();
+        loadAvailableAgents();
+        loadOrCreateSession();
+        loadMessages();
+    }
+
     @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
-        initDao();
-        
-        loadSessions();
-        
-        // Cargar sesión actual si viene por parámetro
-        String sessionIdParam = (String) Executions.getCurrent().getParameter("sessionId");
-        if (sessionIdParam != null) {
-            currentSessionId = Long.parseLong(sessionIdParam);
-            loadSessionMessages();
+    }
+
+    @Destroy
+    public void destroy() {
+        logActivity("PLAYGROUND_CHAT", "LEAVE", "Usuario salió del Chat Playground");
+    }
+
+    private void loadAvailableModels() {
+        try {
+            Criterias criterias = new Criterias();
+            criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+        } catch (Exception e) {
+            log.error("Error loading models", e);
         }
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadSessions() {
+
+    private void loadAvailableAgents() {
         try {
-            PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
             Criterias criterias = new Criterias();
-            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "sessiontype", "CHAT"));
+            criterias.addCriteria("agentstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableAgents = getUXCriteriaManager().find(Agent.class, criterias);
+        } catch (Exception e) {
+            log.error("Error loading agents", e);
+        }
+    }
+
+    private void loadOrCreateSession() {
+        try {
+            if (sessionId != null) {
+                currentSession = getUXCriteriaManager().findById(PlaygroundSession.class, sessionId);
+            }
             
-            PageResult<PlaygroundSession> result = businessService.findAllEntity(PlaygroundSession.class, params, criterias);
-            if (result != null && result.getContent() != null) {
-                sessionsList = result.getContent();
+            if (currentSession == null) {
+                currentSession = new PlaygroundSession();
+                currentSession.setSessionname("Chat Session - " + new Timestamp(System.currentTimeMillis()));
+                currentSession.setSessiontype("CHAT");
+                currentSession.setSessionstatus("ACTIVE");
+                currentSession.setSessioncreatedby(getUserName());
+                currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
+                currentSession.setMessagecount(0);
+                currentSession.setTokensused(0L);
+                currentSession.setCost(BigDecimal.ZERO);
+                getUXCriteriaManager().save(currentSession);
             }
         } catch (Exception e) {
-            log.error("Error al cargar sesiones", e);
+            log.error("Error loading/creating session", e);
+            Messagebox.show("Error al cargar la sesión: " + e.getMessage(), 
+                          "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadSessionMessages() {
+
+    private void loadMessages() {
         try {
-            if (currentSessionId == null) return;
-            
-            PageParams params = PageParams.builder().maxRows(100).pageActual(1).build();
-            Criterias criterias = new Criterias();
-            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "playgroundSession.idxplaygroundsession", currentSessionId));
-            
-            PageResult<PlaygroundChat> result = businessService.findAllEntity(PlaygroundChat.class, params, criterias);
-            if (result != null && result.getContent() != null) {
-                messagesList = result.getContent();
-                calculateSessionStats();
+            if (currentSession != null) {
+                messages = currentSession.getSubplaygroundchats();
+                updateSessionStats();
             }
         } catch (Exception e) {
-            log.error("Error al cargar mensajes", e);
+            log.error("Error loading messages", e);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void newSession() {
-        try {
-            PlaygroundSession session = new PlaygroundSession();
-            session.setSessionname("Chat Session " + System.currentTimeMillis());
-            session.setSessiontype("CHAT");
-            session.setSessionstatus("ACTIVE");
-            session.setCompliancestatus("PENDING_REVIEW");
-            session.setGovernancestatus("PENDING");
-            session.setRisklevel("LOW");
-            session.setMessagecount(0);
-            session.setTokensused(0L);
-            session.setCost(java.math.BigDecimal.ZERO);
-            session.setSessioncreatedby(getUser().getUsername());
-            session.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            
-            businessService.save(session);
-            currentSessionId = session.getIdxplaygroundsession();
-            currentSessionName = session.getSessionname();
-            
-            loadSessions();
-            messagesList.clear();
-        } catch (Exception e) {
-            log.error("Error al crear sesión", e);
-            Messagebox.show("Error al crear sesión: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
-        }
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void selectSession(@BindingParam("session") PlaygroundSession session) {
-        currentSessionId = session.getIdxplaygroundsession();
-        currentSessionName = session.getSessionname();
-        loadSessionMessages();
-    }
-    
-    @Command
-    @NotifyChange("*")
+    @NotifyChange({"messages", "currentPrompt", "messageCount", "tokensUsed", "sessionCost"})
     public void sendMessage() {
-        if (messageInput == null || messageInput.trim().isEmpty()) {
+        if (selectedModel == null) {
+            Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         
-        if (currentSessionId == null) {
-            newSession();
-        }
-        
         try {
-            isSending = true;
-            
-            // Guardar mensaje del usuario
+            // Create user message
             PlaygroundChat userMessage = new PlaygroundChat();
-            userMessage.setChatmessage(messageInput);
+            userMessage.setSession(currentSession);
+            userMessage.setChatprompt(currentPrompt);
             userMessage.setChatrole("USER");
-            userMessage.setChatmodel(selectedModel);
+            userMessage.setChatstatus("COMPLETED");
+            userMessage.setModel(selectedModel);
+            if (selectedAgent != null) {
+                userMessage.setAgent(selectedAgent);
+            }
+            userMessage.setChattokensused(estimateTokens(currentPrompt));
+            userMessage.setChatcreatedby(getUserName());
             userMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(userMessage);
             
-            PlaygroundSession session = new PlaygroundSession();
-            session.setIdxplaygroundsession(currentSessionId);
-            userMessage.setPlaygroundSession(session);
-            
-            businessService.save(userMessage);
-            
-            // TODO: Integración con leka-server para obtener respuesta del modelo
-            // Por ahora simulamos respuesta
+            // Simulate assistant response (in production, call AI service)
             PlaygroundChat assistantMessage = new PlaygroundChat();
-            assistantMessage.setChatmessage(null);
-            assistantMessage.setChatresponse("[Respuesta del modelo - Requiere integración con leka-server]");
+            assistantMessage.setSession(currentSession);
+            assistantMessage.setChatprompt(currentPrompt);
+            assistantMessage.setChatresponse("Esta es una respuesta simulada. En producción, aquí iría la respuesta del modelo " + selectedModel.getModelname());
             assistantMessage.setChatrole("ASSISTANT");
-            assistantMessage.setChatmodel(selectedModel);
-            assistantMessage.setChattokens(100);
-            assistantMessage.setChatcost(new java.math.BigDecimal("0.002"));
-            assistantMessage.setChatlatency(1500);
+            assistantMessage.setChatstatus("COMPLETED");
+            assistantMessage.setModel(selectedModel);
+            if (selectedAgent != null) {
+                assistantMessage.setAgent(selectedAgent);
+            }
+            assistantMessage.setChattokensused(estimateTokens("Esta es una respuesta simulada"));
+            assistantMessage.setChatlatency(245);
+            assistantMessage.setChatcost(new BigDecimal("0.0001"));
+            assistantMessage.setChattemperature(temperature);
+            assistantMessage.setChatmaxtokens(maxTokens);
+            assistantMessage.setChatcreatedby("SYSTEM");
             assistantMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
-            assistantMessage.setPlaygroundSession(session);
+            getUXCriteriaManager().save(assistantMessage);
             
-            // Simular análisis de compliance (TODO: integrar con leka-server)
-            assistantMessage.setContentviol(false);
-            assistantMessage.setToxicityscore(new java.math.BigDecimal("0.1"));
-            assistantMessage.setBiasdetected(false);
-            assistantMessage.setPiidetected(false);
+            // Update session
+            currentSession.setMessagecount(currentSession.getMessagecount() + 2);
+            currentSession.setTokensused(currentSession.getTokensused() + userMessage.getChattokensused() + assistantMessage.getChattokensused());
+            currentSession.setCost(currentSession.getCost().add(assistantMessage.getChatcost()));
+            currentSession.setSessionlastaccessat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(currentSession);
             
-            businessService.save(assistantMessage);
+            loadMessages();
+            currentPrompt = "";
             
-            messageInput = "";
-            loadSessionMessages();
+            logActivity("PLAYGROUND_CHAT", "SEND_MESSAGE", "Mensaje enviado en sesión: " + currentSession.getIdxplaygroundsession());
             
         } catch (Exception e) {
-            log.error("Error al enviar mensaje", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
-        } finally {
-            isSending = false;
+            log.error("Error sending message", e);
+            Messagebox.show("Error al enviar el mensaje: " + e.getMessage(), 
+                          "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void clearChat() {
-        Messagebox.show("¿Eliminar todos los mensajes?", "Confirmar", 
-            Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
-            event -> {
-                if (Messagebox.ON_OK.equals(event.getName())) {
-                    messagesList.clear();
-                    // TODO: Eliminar mensajes de BD
-                }
-            });
+    @NotifyChange({"messages", "messageCount", "tokensUsed", "sessionCost"})
+    public void newConversation() {
+        try {
+            currentSession = new PlaygroundSession();
+            currentSession.setSessionname("Chat Session - " + new Timestamp(System.currentTimeMillis()));
+            currentSession.setSessiontype("CHAT");
+            currentSession.setSessionstatus("ACTIVE");
+            currentSession.setSessioncreatedby(getUserName());
+            currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
+            currentSession.setMessagecount(0);
+            currentSession.setTokensused(0L);
+            currentSession.setCost(BigDecimal.ZERO);
+            getUXCriteriaManager().save(currentSession);
+            
+            messages.clear();
+            currentPrompt = "";
+            updateSessionStats();
+            
+            logActivity("PLAYGROUND_CHAT", "NEW_CONVERSATION", "Nueva conversación creada");
+            
+            Messagebox.show("Nueva conversación iniciada", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+        } catch (Exception e) {
+            log.error("Error creating new conversation", e);
+            Messagebox.show("Error al crear nueva conversación: " + e.getMessage(), 
+                          "Error", Messagebox.OK, Messagebox.ERROR);
+        }
     }
-    
+
     @Command
-    public void exportChat() {
-        // TODO: Implementar exportación
-        Messagebox.show("Exportación en desarrollo", "Info", Messagebox.OK, Messagebox.INFORMATION);
+    public void showConfig() {
+        logActivity("PLAYGROUND_CHAT", "SHOW_CONFIG", "Mostrando configuración");
+        // Show config dialog
     }
-    
-    private void calculateSessionStats() {
-        sessionMessageCount = messagesList.size();
-        sessionTokens = messagesList.stream()
-            .mapToLong(m -> m.getChattokens() != null ? m.getChattokens() : 0)
-            .sum();
-        
-        sessionCost = messagesList.stream()
-            .map(m -> m.getChatcost() != null ? m.getChatcost() : java.math.BigDecimal.ZERO)
-            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-        
-        contentViolations = (int) messagesList.stream()
-            .filter(m -> Boolean.TRUE.equals(m.getContentviol()))
-            .count();
-        
-        biasDetections = (int) messagesList.stream()
-            .filter(m -> Boolean.TRUE.equals(m.getBiasdetected()))
-            .count();
-        
-        piiDetections = (int) messagesList.stream()
-            .filter(m -> Boolean.TRUE.equals(m.getPiidetected()))
-            .count();
-        
-        // Calcular risk level basado en violations
-        if (contentViolations > 5 || biasDetections > 3) {
-            sessionRiskLevel = "HIGH";
-        } else if (contentViolations > 2 || biasDetections > 1) {
-            sessionRiskLevel = "MEDIUM";
-        } else {
-            sessionRiskLevel = "LOW";
+
+    private Integer estimateTokens(String text) {
+        // Simple estimation: ~4 characters per token
+        return text != null ? text.length() / 4 : 0;
+    }
+
+    private void updateSessionStats() {
+        if (currentSession != null) {
+            messageCount = currentSession.getMessagecount();
+            tokensUsed = currentSession.getTokensused();
+            sessionCost = currentSession.getCost();
         }
     }
-    
-    public String getGovernanceColor(String status) {
-        if (status == null) return "secondary";
-        switch (status) {
-            case "APPROVED": return "success";
-            case "REJECTED": return "danger";
-            default: return "warning";
-        }
+
+    // Getters and Setters
+    public Long getSessionId() {
+        return sessionId;
     }
-    
-    public String formatDate(Timestamp timestamp) {
-        if (timestamp == null) return "-";
-        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
     }
-    
-    @Destroy
-    public void destroy() {
-        if (sessionsList != null) { 
-            sessionsList.clear(); 
-            sessionsList = null; 
-        }
-        if (messagesList != null) {
-            messagesList.clear();
-            messagesList = null;
-        }
-        businessService = null;
+
+    public List<PlaygroundChat> getMessages() {
+        return messages;
+    }
+
+    public String getCurrentPrompt() {
+        return currentPrompt;
+    }
+
+    public void setCurrentPrompt(String currentPrompt) {
+        this.currentPrompt = currentPrompt;
+    }
+
+    public Model getSelectedModel() {
+        return selectedModel;
+    }
+
+    public void setSelectedModel(Model selectedModel) {
+        this.selectedModel = selectedModel;
+    }
+
+    public Agent getSelectedAgent() {
+        return selectedAgent;
+    }
+
+    public void setSelectedAgent(Agent selectedAgent) {
+        this.selectedAgent = selectedAgent;
+    }
+
+    public BigDecimal getTemperature() {
+        return temperature;
+    }
+
+    public void setTemperature(BigDecimal temperature) {
+        this.temperature = temperature;
+    }
+
+    public Integer getMaxTokens() {
+        return maxTokens;
+    }
+
+    public void setMaxTokens(Integer maxTokens) {
+        this.maxTokens = maxTokens;
+    }
+
+    public String getSystemPrompt() {
+        return systemPrompt;
+    }
+
+    public void setSystemPrompt(String systemPrompt) {
+        this.systemPrompt = systemPrompt;
+    }
+
+    public List<Model> getAvailableModels() {
+        return availableModels;
+    }
+
+    public List<Agent> getAvailableAgents() {
+        return availableAgents;
+    }
+
+    public Integer getMessageCount() {
+        return messageCount;
+    }
+
+    public Long getTokensUsed() {
+        return tokensUsed;
+    }
+
+    public BigDecimal getSessionCost() {
+        return sessionCost;
     }
 }
