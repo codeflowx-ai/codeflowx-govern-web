@@ -93,6 +93,9 @@ public class RagDataSourceOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String ragstatusFilter = "ALL";
+    private String ragsyncstatusFilter = "ALL";
+    private String ragtypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<RagDataSource> filteredItems = new ArrayList<>();
@@ -170,6 +173,24 @@ public class RagDataSourceOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(ragstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragstatus");
+            criteria.setValues(new Object[]{ragstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(ragsyncstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragsyncstatus");
+            criteria.setValues(new Object[]{ragsyncstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(ragtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragtype");
+            criteria.setValues(new Object[]{ragtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +219,9 @@ public class RagDataSourceOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        ragstatusFilter = "ALL";
+        ragsyncstatusFilter = "ALL";
+        ragtypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

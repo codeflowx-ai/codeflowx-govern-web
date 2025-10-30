@@ -92,6 +92,8 @@ public class MonitoringDashboardOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String monalerttypeFilter = "ALL";
+    private String monstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<MonitoringDashboard> filteredItems = new ArrayList<>();
@@ -169,6 +171,18 @@ public class MonitoringDashboardOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(monalerttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "monalerttype");
+            criteria.setValues(new Object[]{monalerttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(monstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "monstatus");
+            criteria.setValues(new Object[]{monstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -197,6 +211,8 @@ public class MonitoringDashboardOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        monalerttypeFilter = "ALL";
+        monstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

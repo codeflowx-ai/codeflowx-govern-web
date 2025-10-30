@@ -93,6 +93,8 @@ public class ModuleActivityOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String dshcosttypeFilter = "ALL";
+    private String dshperiodFilter = "ALL";
     
     // ========== Datos ==========
     private List<ModuleActivity> filteredItems = new ArrayList<>();
@@ -170,6 +172,18 @@ public class ModuleActivityOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(dshcosttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "dshcosttype");
+            criteria.setValues(new Object[]{dshcosttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(dshperiodFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "dshperiod");
+            criteria.setValues(new Object[]{dshperiodFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +212,8 @@ public class ModuleActivityOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        dshcosttypeFilter = "ALL";
+        dshperiodFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

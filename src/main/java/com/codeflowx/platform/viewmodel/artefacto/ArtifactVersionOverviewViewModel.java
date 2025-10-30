@@ -93,6 +93,7 @@ public class ArtifactVersionOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String catdeptypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<ArtifactVersion> filteredItems = new ArrayList<>();
@@ -170,6 +171,12 @@ public class ArtifactVersionOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(catdeptypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "catdeptype");
+            criteria.setValues(new Object[]{catdeptypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +205,7 @@ public class ArtifactVersionOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        catdeptypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

@@ -93,6 +93,7 @@ public class ModelProviderOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String modtasktypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<ModelProvider> filteredItems = new ArrayList<>();
@@ -170,6 +171,12 @@ public class ModelProviderOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(modtasktypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modtasktype");
+            criteria.setValues(new Object[]{modtasktypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +205,7 @@ public class ModelProviderOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        modtasktypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

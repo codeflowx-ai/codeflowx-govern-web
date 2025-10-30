@@ -111,8 +111,25 @@ public class MetricStreamDetailViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         
-        // Obtener parámetros de navegación
-        mode = (String) super.action.name();
+        // Obtener parámetros de navegación - con protección para action null
+
+        
+        if (super.action != null) {
+
+        
+            mode = super.action.name();
+
+        
+        } else {
+
+        
+            mode = (dataParam != null) ? "LOAD" : "NEW";
+
+        
+            log.warn("Action es null, infiriendo modo: {}", mode);
+
+        
+        }
         
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
@@ -129,7 +146,7 @@ public class MetricStreamDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxmetricstream");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad

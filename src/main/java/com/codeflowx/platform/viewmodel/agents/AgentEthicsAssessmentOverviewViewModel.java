@@ -93,6 +93,9 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtassessmentstatusFilter = "ALL";
+    private String agtassessmenttypeFilter = "ALL";
+    private String agtrisklevelFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentEthicsAssessment> filteredItems = new ArrayList<>();
@@ -170,6 +173,25 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtassessmentstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtassessmentstatus");
+            criteria.setValues(new Object[]{agtassessmentstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtassessmenttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtassessmenttype");
+            criteria.setValues(new Object[]{agtassessmenttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtrisklevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtrisklevel");
+            criteria.setValues(new Object[]{agtrisklevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +220,9 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtassessmentstatusFilter = "ALL";
+        agtassessmenttypeFilter = "ALL";
+        agtrisklevelFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

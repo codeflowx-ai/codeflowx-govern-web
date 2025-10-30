@@ -93,6 +93,9 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtcertificationstatusFilter = "ALL";
+    private String agtcompliancelevelFilter = "ALL";
+    private String agttransparencytypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentTransparency> filteredItems = new ArrayList<>();
@@ -170,6 +173,25 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtcertificationstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcertificationstatus");
+            criteria.setValues(new Object[]{agtcertificationstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtcompliancelevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcompliancelevel");
+            criteria.setValues(new Object[]{agtcompliancelevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agttransparencytypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agttransparencytype");
+            criteria.setValues(new Object[]{agttransparencytypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +220,9 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtcertificationstatusFilter = "ALL";
+        agtcompliancelevelFilter = "ALL";
+        agttransparencytypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

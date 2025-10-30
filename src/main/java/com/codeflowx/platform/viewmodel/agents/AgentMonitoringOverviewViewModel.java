@@ -93,6 +93,9 @@ public class AgentMonitoringOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtanomalytypeFilter = "ALL";
+    private String agtmetrictypeFilter = "ALL";
+    private String agtstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentMonitoring> filteredItems = new ArrayList<>();
@@ -170,6 +173,25 @@ public class AgentMonitoringOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtanomalytypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtanomalytype");
+            criteria.setValues(new Object[]{agtanomalytypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtmetrictypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtmetrictype");
+            criteria.setValues(new Object[]{agtmetrictypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +220,9 @@ public class AgentMonitoringOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtanomalytypeFilter = "ALL";
+        agtmetrictypeFilter = "ALL";
+        agtstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

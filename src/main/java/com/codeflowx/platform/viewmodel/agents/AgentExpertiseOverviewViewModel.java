@@ -93,6 +93,10 @@ public class AgentExpertiseOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtexpertiselevelFilter = "ALL";
+    private String agtcertificationstatusFilter = "ALL";
+    private String agtstatusFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentExpertise> filteredItems = new ArrayList<>();
@@ -170,6 +174,30 @@ public class AgentExpertiseOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtexpertiselevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtexpertiselevel");
+            criteria.setValues(new Object[]{agtexpertiselevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtcertificationstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcertificationstatus");
+            criteria.setValues(new Object[]{agtcertificationstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +226,10 @@ public class AgentExpertiseOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtexpertiselevelFilter = "ALL";
+        agtcertificationstatusFilter = "ALL";
+        agtstatusFilter = "ALL";
+        agtpriorityFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

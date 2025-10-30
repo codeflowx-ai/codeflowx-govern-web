@@ -92,6 +92,7 @@ public class SlaComplianceOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String instancetypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<SlaCompliance> filteredItems = new ArrayList<>();
@@ -169,6 +170,12 @@ public class SlaComplianceOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(instancetypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "instancetype");
+            criteria.setValues(new Object[]{instancetypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -197,6 +204,7 @@ public class SlaComplianceOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        instancetypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

@@ -1,109 +1,109 @@
 <?page title="Wizard - Crear Dominio" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
-    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+    <n:div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
          viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.domainingestion.DomainIngestionWizardViewModel')">
         
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
+        <n:div class="row mb-4">
+            <n:div class="col-12">
+                <n:div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="mb-1">
-                            <i class="fas fa-magic me-2"></i>
+                        <h:h2 class="mb-1">
+                            <n:i class="fas fa-magic me-2"></n:i>
                             Wizard de Creación de Dominio
-                        </h2>
-                        <p class="text-muted">Crea un nuevo dominio de negocio paso a paso</p>
-                    </div>
+                        </h:h2>
+                        <h:p class="text-muted">Crea un nuevo dominio de negocio paso a paso</n:p>
+                    </n:div>
                     <button class="btn btn-outline-secondary" onClick="@command('cancelWizard')">
-                        <i class="fas fa-times me-1"></i>Cancelar
+                        <n:i class="fas fa-times me-1"></n:i>Cancelar
                     </button>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Progress Steps -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div class="step-item" forEach="@load(vm.stepsList)">
-                        <div class="d-flex align-items-center">
-                            <div class="step-number @load(vm.getStepNumberClass(each, vm.currentStepIndex))">
-                                <i class="fas fa-check" visible="@load(vm.isStepCompleted(each))"/>
-                                <span visible="@load(!vm.isStepCompleted(each))" label="@load(vm.getStepNumber(each))"/>
-                            </div>
-                            <div class="ms-2">
-                                <div class="fw-bold" label="@load(each.title)"/>
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body">
+                <n:div class="d-flex justify-content-between align-items-center">
+                    <n:div class="step-item" forEach="@load(vm.stepsList)">
+                        <n:div class="d-flex align-items-center">
+                            <n:div class="step-number @load(vm.getStepNumberClass(each, vm.currentStepIndex))">
+                                <n:i class="fas fa-check" visible="@load(vm.isStepCompleted(each))"/>
+                                <n:span visible="@load(!vm.isStepCompleted(each))" label="@load(vm.getStepNumber(each))"/>
+                            </n:div>
+                            <n:div class="ms-2">
+                                <n:div class="fw-bold" label="@load(each.title)"/>
                                 <small class="text-muted" label="@load(each.description)"/>
-                            </div>
-                        </div>
-                        <div class="step-connector" visible="@load(!each.last)">→</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </n:div>
+                        </n:div>
+                        <n:div class="step-connector" visible="@load(!each.last)">→</n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Wizard Content -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
+        <n:div class="card border-0 shadow-sm">
+            <n:div class="card-body p-4">
                 
                 <!-- Step 1: Template Selection -->
-                <div visible="@load(vm.currentStepIndex eq 0)">
-                    <h4 class="mb-4">Paso 1: Selección de Plantilla</h4>
-                    <p class="text-muted mb-4">Selecciona una plantilla predefinida para agilizar la configuración</p>
+                <n:div visible="@load(vm.currentStepIndex eq 0)">
+                    <h:h4 class="mb-4">Paso 1: Selección de Plantilla</n:h4>
+                    <h:p class="text-muted mb-4">Selecciona una plantilla predefinida para agilizar la configuración</n:p>
                     
-                    <div class="row g-3">
-                        <div class="col-md-4" forEach="@load(vm.templatesList)">
-                            <div class="card @load(vm.getTemplateCardClass(each, vm.selectedTemplateId))" 
+                    <n:div class="row g-3">
+                        <n:div class="col-md-4" forEach="@load(vm.templatesList)">
+                            <n:div class="card @load(vm.getTemplateCardClass(each, vm.selectedTemplateId))" 
                                  style="cursor: pointer;" onClick="@command('selectTemplate', template=each)">
-                                <div class="card-body text-center">
-                                    <div class="mb-3" style="font-size: 3rem;" label="@load(each.icon)"/>
-                                    <h5 class="mb-2" label="@load(each.name)"/>
-                                    <p class="text-muted small mb-3" label="@load(each.description)"/>
-                                    <div class="d-flex justify-content-center gap-2 mb-3">
-                                        <span class="badge @load(vm.getComplexityColor(each.complexity))"
+                                <n:div class="card-body text-center">
+                                    <n:div class="mb-3" style="font-size: 3rem;" label="@load(each.icon)"/>
+                                    <h:h5 class="mb-2" label="@load(each.name)"/>
+                                    <h:p class="text-muted small mb-3" label="@load(each.description)"/>
+                                    <n:div class="d-flex justify-content-center gap-2 mb-3">
+                                        <n:span class="badge @load(vm.getComplexityColor(each.complexity))"
                                               label="@load(each.complexity)"/>
-                                        <span class="badge bg-secondary" label="@load(each.estimatedTime)"/>
-                                    </div>
+                                        <n:span class="badge bg-secondary" label="@load(each.estimatedTime)"/>
+                                    </n:div>
                                     <small class="text-muted">
                                         Características:
                                         <ul class="text-start small mt-2" style="list-style: none; padding-left: 0;">
                                             <li forEach="@load(each.features)">
-                                                <i class="fas fa-check text-success me-1"></i>
+                                                <n:i class="fas fa-check text-success me-1"></n:i>
                                                 <label value="@load(each)"/>
                                             </li>
                                         </ul>
                                     </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
                     
-                    <div class="alert alert-info mt-4">
-                        <i class="fas fa-info-circle me-2"></i>
+                    <n:div class="alert alert-info mt-4">
+                        <n:i class="fas fa-info-circle me-2"></n:i>
                         Puedes personalizar toda la configuración después de seleccionar una plantilla
-                    </div>
-                </div>
+                    </n:div>
+                </n:div>
 
                 <!-- Step 2: Basic Info -->
-                <div visible="@load(vm.currentStepIndex eq 1)">
-                    <h4 class="mb-4">Paso 2: Información Básica</h4>
-                    <p class="text-muted mb-4">Define la información fundamental del dominio</p>
+                <n:div visible="@load(vm.currentStepIndex eq 1)">
+                    <h:h4 class="mb-4">Paso 2: Información Básica</n:h4>
+                    <h:p class="text-muted mb-4">Define la información fundamental del dominio</n:p>
                     
-                    <div class="row g-3">
-                        <div class="col-md-12">
+                    <n:div class="row g-3">
+                        <n:div class="col-md-12">
                             <label class="form-label">Nombre del Dominio *</label>
                             <textbox class="form-control" value="@bind(vm.domainName)" 
                                      placeholder="Ej: Fintech Banking"/>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-12">
+                        <n:div class="col-md-12">
                             <label class="form-label">Descripción</label>
                             <textbox class="form-control" value="@bind(vm.domainDescription)" 
                                      rows="3" multiline="true"
                                      placeholder="Describe el propósito del dominio..."/>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Industria *</label>
                             <combobox class="form-control" value="@bind(vm.industry)" buttonVisible="false">
                                 <comboitem label="Selecciona una industria" value=""/>
@@ -115,115 +115,115 @@
                                 <comboitem label="Technology" value="Technology"/>
                                 <comboitem label="Education" value="Education"/>
                             </combobox>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Área de Negocio *</label>
                             <textbox class="form-control" value="@bind(vm.businessArea)" 
                                      placeholder="Ej: Banking & Payments"/>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Icono</label>
                             <textbox class="form-control" value="@bind(vm.domainIcon)" 
                                      placeholder="Emoji o código icono"/>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Color</label>
                             <textbox class="form-control" value="@bind(vm.domainColor)" placeholder="Ej: blue"/>
-                        </div>
-                    </div>
-                </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
 
                 <!-- Step 3: Data Sources -->
-                <div visible="@load(vm.currentStepIndex eq 2)">
-                    <h4 class="mb-4">Paso 3: Fuentes de Datos</h4>
-                    <p class="text-muted mb-4">Selecciona los tipos de fuentes de datos que utilizarás</p>
+                <n:div visible="@load(vm.currentStepIndex eq 2)">
+                    <h:h4 class="mb-4">Paso 3: Fuentes de Datos</n:h4>
+                    <h:p class="text-muted mb-4">Selecciona los tipos de fuentes de datos que utilizarás</n:p>
                     
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="card border @load(vm.getDataSourceCardClass('database', vm.selectedDataSources))"
+                    <n:div class="row g-3">
+                        <n:div class="col-md-6">
+                            <n:div class="card border @load(vm.getDataSourceCardClass('database', vm.selectedDataSources))"
                                  style="cursor: pointer;" onClick="@command('toggleDataSource', type='database')">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-database fa-2x me-3 text-primary"></i>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">Base de Datos</h6>
+                                <n:div class="card-body">
+                                    <n:div class="d-flex align-items-center">
+                                        <n:i class="fas fa-database fa-2x me-3 text-primary"></n:i>
+                                        <n:div class="flex-grow-1">
+                                            <n:h6 class="mb-1">Base de Datos</n:h6>
                                             <small class="text-muted">Conectar bases de datos SQL/NoSQL</small>
-                                        </div>
-                                        <i class="fas fa-check-circle text-success" 
+                                        </n:div>
+                                        <n:i class="fas fa-check-circle text-success" 
                                            visible="@load(vm.isDataSourceSelected('database', vm.selectedDataSources))"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
-                            <div class="card border @load(vm.getDataSourceCardClass('api', vm.selectedDataSources))"
+                        <n:div class="col-md-6">
+                            <n:div class="card border @load(vm.getDataSourceCardClass('api', vm.selectedDataSources))"
                                  style="cursor: pointer;" onClick="@command('toggleDataSource', type='api')">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-plug fa-2x me-3 text-success"></i>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">API Integration</h6>
+                                <n:div class="card-body">
+                                    <n:div class="d-flex align-items-center">
+                                        <n:i class="fas fa-plug fa-2x me-3 text-success"></n:i>
+                                        <n:div class="flex-grow-1">
+                                            <n:h6 class="mb-1">API Integration</n:h6>
                                             <small class="text-muted">Integrar APIs REST</small>
-                                        </div>
-                                        <i class="fas fa-check-circle text-success" 
+                                        </n:div>
+                                        <n:i class="fas fa-check-circle text-success" 
                                            visible="@load(vm.isDataSourceSelected('api', vm.selectedDataSources))"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
-                            <div class="card border @load(vm.getDataSourceCardClass('file', vm.selectedDataSources))"
+                        <n:div class="col-md-6">
+                            <n:div class="card border @load(vm.getDataSourceCardClass('file', vm.selectedDataSources))"
                                  style="cursor: pointer;" onClick="@command('toggleDataSource', type='file')">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-file-upload fa-2x me-3 text-info"></i>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">Upload de Documentos</h6>
+                                <n:div class="card-body">
+                                    <n:div class="d-flex align-items-center">
+                                        <n:i class="fas fa-file-upload fa-2x me-3 text-info"></n:i>
+                                        <n:div class="flex-grow-1">
+                                            <n:h6 class="mb-1">Upload de Documentos</n:h6>
                                             <small class="text-muted">Cargar documentos PDF, Word, etc.</small>
-                                        </div>
-                                        <i class="fas fa-check-circle text-success" 
+                                        </n:div>
+                                        <n:i class="fas fa-check-circle text-success" 
                                            visible="@load(vm.isDataSourceSelected('file', vm.selectedDataSources))"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
-                            <div class="card border @load(vm.getDataSourceCardClass('web', vm.selectedDataSources))"
+                        <n:div class="col-md-6">
+                            <n:div class="card border @load(vm.getDataSourceCardClass('web', vm.selectedDataSources))"
                                  style="cursor: pointer;" onClick="@command('toggleDataSource', type='web')">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-spider fa-2x me-3 text-warning"></i>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1">Web Scraping</h6>
+                                <n:div class="card-body">
+                                    <n:div class="d-flex align-items-center">
+                                        <n:i class="fas fa-spider fa-2x me-3 text-warning"></n:i>
+                                        <n:div class="flex-grow-1">
+                                            <n:h6 class="mb-1">Web Scraping</n:h6>
                                             <small class="text-muted">Extraer datos de páginas web</small>
-                                        </div>
-                                        <i class="fas fa-check-circle text-success" 
+                                        </n:div>
+                                        <n:i class="fas fa-check-circle text-success" 
                                            visible="@load(vm.isDataSourceSelected('web', vm.selectedDataSources))"/>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
                     
-                    <div class="alert alert-warning mt-4">
-                        <i class="fas fa-exclamation-triangle me-2"></i>
+                    <n:div class="alert alert-warning mt-4">
+                        <n:i class="fas fa-exclamation-triangle me-2"></n:i>
                         Puedes configurar las fuentes de datos después de crear el dominio
-                    </div>
-                </div>
+                    </n:div>
+                </n:div>
 
                 <!-- Step 4: Compliance -->
-                <div visible="@load(vm.currentStepIndex eq 3)">
-                    <h4 class="mb-4">Paso 4: Cumplimiento Normativo</h4>
-                    <p class="text-muted mb-4">Configura los marcos de cumplimiento aplicables</p>
+                <n:div visible="@load(vm.currentStepIndex eq 3)">
+                    <h:h4 class="mb-4">Paso 4: Cumplimiento Normativo</n:h4>
+                    <h:p class="text-muted mb-4">Configura los marcos de cumplimiento aplicables</n:p>
                     
-                    <div class="row g-3">
-                        <div class="col-md-12">
+                    <n:div class="row g-3">
+                        <n:div class="col-md-12">
                             <label class="form-label">Marco Regulatorio</label>
                             <combobox class="form-control" value="@bind(vm.regulatoryFramework)" buttonVisible="false">
                                 <comboitem label="Ninguno" value=""/>
@@ -233,9 +233,9 @@
                                 <comboitem label="ISO 27001" value="ISO_27001"/>
                                 <comboitem label="SOC 2" value="SOC2"/>
                             </combobox>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Nivel de Privacidad</label>
                             <combobox class="form-control" value="@bind(vm.privacyLevel)" buttonVisible="false">
                                 <comboitem label="Público" value="public"/>
@@ -243,174 +243,174 @@
                                 <comboitem label="Confidencial" value="confidential"/>
                                 <comboitem label="Restringido" value="restricted"/>
                             </combobox>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Retención de Datos (años)</label>
                             <intbox class="form-control" value="@bind(vm.dataRetentionYears)" 
                                     min="0" max="100"/>
-                        </div>
+                        </n:div>
                         
-                        <div class="col-md-12">
+                        <n:div class="col-md-12">
                             <label class="form-label">Requisitos de Cumplimiento</label>
-                            <div class="d-flex flex-wrap gap-2">
+                            <n:div class="d-flex flex-wrap gap-2">
                                 <label class="form-check">
                                     <checkbox checked="@bind(vm.complianceChecks)"/>
                                     Habilitar verificaciones de cumplimiento
                                 </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
+                </n:div>
 
                 <!-- Step 5: Advanced Features -->
-                <div visible="@load(vm.currentStepIndex eq 4)">
-                    <h4 class="mb-4">Paso 5: Características Avanzadas</h4>
-                    <p class="text-muted mb-4">Habilita RAG, Training y otras características</p>
+                <n:div visible="@load(vm.currentStepIndex eq 4)">
+                    <h:h4 class="mb-4">Paso 5: Características Avanzadas</n:h4>
+                    <h:p class="text-muted mb-4">Habilita RAG, Training y otras características</n:p>
                     
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="card border">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <n:div class="row g-3">
+                        <n:div class="col-md-6">
+                            <n:div class="card border">
+                                <n:div class="card-body">
+                                    <n:div class="d-flex justify-content-between align-items-center mb-3">
                                         <div>
-                                            <h6 class="mb-1">
-                                                <i class="fas fa-search me-2 text-primary"></i>
+                                            <n:h6 class="mb-1">
+                                                <n:i class="fas fa-search me-2 text-primary"></n:i>
                                                 RAG (Retrieval Augmented Generation)
-                                            </h6>
+                                            </n:h6>
                                             <small class="text-muted">Habilita búsqueda semántica sobre los datos</small>
-                                        </div>
+                                        </n:div>
                                         <checkbox checked="@bind(vm.ragEnabled)"/>
-                                    </div>
-                                    <div class="form-text">Permite consultas inteligentes sobre los documentos</div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                    <n:div class="form-text">Permite consultas inteligentes sobre los documentos</n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
-                            <div class="card border">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <n:div class="col-md-6">
+                            <n:div class="card border">
+                                <n:div class="card-body">
+                                    <n:div class="d-flex justify-content-between align-items-center mb-3">
                                         <div>
-                                            <h6 class="mb-1">
-                                                <i class="fas fa-graduation-cap me-2 text-success"></i>
+                                            <n:h6 class="mb-1">
+                                                <n:i class="fas fa-graduation-cap me-2 text-success"></n:i>
                                                 Training de Modelos
-                                            </h6>
+                                            </n:h6>
                                             <small class="text-muted">Genera datasets para fine-tuning</small>
-                                        </div>
+                                        </n:div>
                                         <checkbox checked="@bind(vm.trainingEnabled)"/>
-                                    </div>
-                                    <div class="form-text">Prepara datos para entrenamiento de modelos IA</div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                    <n:div class="form-text">Prepara datos para entrenamiento de modelos IA</n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-12">
-                            <div class="card border">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <n:div class="col-md-12">
+                            <n:div class="card border">
+                                <n:div class="card-body">
+                                    <n:div class="d-flex justify-content-between align-items-center mb-3">
                                         <div>
-                                            <h6 class="mb-1">
-                                                <i class="fas fa-sync me-2 text-info"></i>
+                                            <n:h6 class="mb-1">
+                                                <n:i class="fas fa-sync me-2 text-info"></n:i>
                                                 Ingesta Automática
-                                            </h6>
+                                            </n:h6>
                                             <small class="text-muted">Ejecuta ingestas automáticamente según cron</small>
-                                        </div>
+                                        </n:div>
                                         <checkbox checked="@bind(vm.autoIngestion)"/>
-                                    </div>
-                                    <div class="form-text">Configura ingestas periódicas automáticas</div>
-                                </div>
-                            </div>
-                        </div>
+                                    </n:div>
+                                    <n:div class="form-text">Configura ingestas periódicas automáticas</n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Umbral de Calidad (0-100)</label>
                             <intbox class="form-control" value="@bind(vm.qualityThreshold)" 
                                     min="0" max="100"/>
-                            <div class="form-text">Puntuación mínima para considerar datos válidos</div>
-                        </div>
+                            <n:div class="form-text">Puntuación mínima para considerar datos válidos</n:div>
+                        </n:div>
                         
-                        <div class="col-md-6">
+                        <n:div class="col-md-6">
                             <label class="form-label">Retención (días)</label>
                             <intbox class="form-control" value="@bind(vm.retentionDays)" 
                                     min="1"/>
-                            <div class="form-text">Días que se conservarán los datos ingeridos</div>
-                        </div>
-                    </div>
-                </div>
+                            <n:div class="form-text">Días que se conservarán los datos ingeridos</n:div>
+                        </n:div>
+                    </n:div>
+                </n:div>
 
                 <!-- Step 6: Review -->
-                <div visible="@load(vm.currentStepIndex eq 5)">
-                    <h4 class="mb-4">Paso 6: Revisión y Confirmación</h4>
-                    <p class="text-muted mb-4">Revisa la configuración antes de crear el dominio</p>
+                <n:div visible="@load(vm.currentStepIndex eq 5)">
+                    <h:h4 class="mb-4">Paso 6: Revisión y Confirmación</n:h4>
+                    <h:p class="text-muted mb-4">Revisa la configuración antes de crear el dominio</n:p>
                     
-                    <div class="card border">
-                        <div class="card-body">
-                            <div class="row mb-3">
-                                <div class="col-4 fw-bold">Nombre:</div>
-                                <div class="col-8" label="@load(vm.domainName)"/>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4 fw-bold">Industria:</div>
-                                <div class="col-8" label="@load(vm.industry)"/>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4 fw-bold">Fuentes de Datos:</div>
-                                <div class="col-8">
-                                    <span forEach="@load(vm.selectedDataSources)" class="badge bg-primary me-1">
+                    <n:div class="card border">
+                        <n:div class="card-body">
+                            <n:div class="row mb-3">
+                                <n:div class="col-4 fw-bold">Nombre:</n:div>
+                                <n:div class="col-8" label="@load(vm.domainName)"/>
+                            </n:div>
+                            <n:div class="row mb-3">
+                                <n:div class="col-4 fw-bold">Industria:</n:div>
+                                <n:div class="col-8" label="@load(vm.industry)"/>
+                            </n:div>
+                            <n:div class="row mb-3">
+                                <n:div class="col-4 fw-bold">Fuentes de Datos:</n:div>
+                                <n:div class="col-8">
+                                    <n:span forEach="@load(vm.selectedDataSources)" class="badge bg-primary me-1">
                                         <label value="@load(vm.translateDataSourceType(each))"/>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4 fw-bold">RAG:</div>
-                                <div class="col-8">
-                                    <span class="badge @load(vm.ragEnabled ? 'bg-success' : 'bg-secondary')">
+                                    </n:span>
+                                </n:div>
+                            </n:div>
+                            <n:div class="row mb-3">
+                                <n:div class="col-4 fw-bold">RAG:</n:div>
+                                <n:div class="col-8">
+                                    <n:span class="badge @load(vm.ragEnabled ? 'bg-success' : 'bg-secondary')">
                                         <label value="@load(vm.ragEnabled ? 'Habilitado' : 'Deshabilitado')"/>
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-4 fw-bold">Training:</div>
-                                <div class="col-8">
-                                    <span class="badge @load(vm.trainingEnabled ? 'bg-success' : 'bg-secondary')">
+                                    </n:span>
+                                </n:div>
+                            </n:div>
+                            <n:div class="row mb-3">
+                                <n:div class="col-4 fw-bold">Training:</n:div>
+                                <n:div class="col-8">
+                                    <n:span class="badge @load(vm.trainingEnabled ? 'bg-success' : 'bg-secondary')">
                                         <label value="@load(vm.trainingEnabled ? 'Habilitado' : 'Deshabilitado')"/>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                    </n:span>
+                                </n:div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
                     
-                    <div class="alert alert-info mt-4">
-                        <i class="fas fa-info-circle me-2"></i>
+                    <n:div class="alert alert-info mt-4">
+                        <n:i class="fas fa-info-circle me-2"></n:i>
                         Puedes modificar toda esta configuración después de crear el dominio
-                    </div>
-                </div>
+                    </n:div>
+                </n:div>
 
                 <!-- Navigation Buttons -->
-                <div class="d-flex justify-content-between mt-4">
+                <n:div class="d-flex justify-content-between mt-4">
                     <button class="btn btn-secondary" 
                             onClick="@command('previousStep')"
                             disabled="@load(vm.currentStepIndex eq 0)">
-                        <i class="fas fa-arrow-left me-1"></i>Anterior
+                        <n:i class="fas fa-arrow-left me-1"></n:i>Anterior
                     </button>
                     
                     <button class="btn btn-primary" 
                             onClick="@command('nextStep')"
                             visible="@load(vm.currentStepIndex lt 5)">
-                        Siguiente<i class="fas fa-arrow-right ms-1"></i>
+                        Siguiente<n:i class="fas fa-arrow-right ms-1"></n:i>
                     </button>
                     
                     <button class="btn btn-success" 
                             onClick="@command('createDomain')"
                             visible="@load(vm.currentStepIndex eq 5)">
-                        <i class="fas fa-check me-1"></i>Crear Dominio
+                        <n:i class="fas fa-check me-1"></n:i>Crear Dominio
                     </button>
-                </div>
+                </n:div>
                 
-            </div>
-        </div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>
 

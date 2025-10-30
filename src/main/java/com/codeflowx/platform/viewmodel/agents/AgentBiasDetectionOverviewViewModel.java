@@ -93,6 +93,11 @@ public class AgentBiasDetectionOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtbiastypeFilter = "ALL";
+    private String agtmitigationstatusFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
+    private String agtstatusFilter = "ALL";
+    private String agtverificationstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentBiasDetection> filteredItems = new ArrayList<>();
@@ -170,6 +175,37 @@ public class AgentBiasDetectionOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtbiastypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtbiastype");
+            criteria.setValues(new Object[]{agtbiastypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtmitigationstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtmitigationstatus");
+            criteria.setValues(new Object[]{agtmitigationstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtverificationstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtverificationstatus");
+            criteria.setValues(new Object[]{agtverificationstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +234,11 @@ public class AgentBiasDetectionOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtbiastypeFilter = "ALL";
+        agtmitigationstatusFilter = "ALL";
+        agtpriorityFilter = "ALL";
+        agtstatusFilter = "ALL";
+        agtverificationstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

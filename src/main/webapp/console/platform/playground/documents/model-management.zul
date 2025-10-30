@@ -113,7 +113,7 @@
             <caption label="Currently Loaded Models (@load(vm.loadedModels.size()))"/>
             
             <vlayout>
-                <div forEach="@load(vm.loadedModels)" sclass="model-card loaded">
+                <h:div forEach="@load(vm.loadedModels)" sclass="model-card loaded">
                     <hlayout valign="middle">
                         <label value="✅" style="font-size: 24px; margin-right: 15px;"/>
                         <vlayout>
@@ -121,7 +121,7 @@
                             <label value="Loaded in memory - Ready for use" style="font-size: 12px; color: #22c55e;"/>
                         </vlayout>
                     </hlayout>
-                </div>
+                </h:div>
             </vlayout>
         </groupbox>
         
@@ -160,7 +160,7 @@
                     </row>
                     <row>
                         <cell colspan="2" align="center">
-                            <button label="Register Model" onClick="@command('registerModel')" 
+                            <button label="Register Model" onClick="@command('registerItem')" 
                                     disabled="@load(vm.loading)"
                                     iconSclass="z-icon-plus-circle"
                                     style="background-color: #3b82f6; color: white; padding: 10px 30px;"/>
@@ -181,7 +181,7 @@
                 <tabpanels>
                     <tabpanel forEach="@load(vm.modelsByCategory.entrySet())">
                         <vlayout>
-                            <div forEach="@load(each.value)" sclass="model-card">
+                            <h:div forEach="@load(each.value)" sclass="model-card">
                                 <hlayout valign="middle">
                                     <label value="@load(each.status eq 'LOADED' ? '✅' : '📦')" 
                                            style="font-size: 24px; margin-right: 15px;"/>
@@ -202,7 +202,7 @@
                                             iconSclass="z-icon-download"
                                             style="background-color: #22c55e; color: white;"/>
                                 </hlayout>
-                            </div>
+                            </h:div>
                         </vlayout>
                     </tabpanel>
                 </tabpanels>
@@ -219,14 +219,14 @@
             </caption>
             
             <vlayout height="300px" style="overflow-y: auto; padding: 10px; background: #f8f9fa;">
-                <div forEach="@load(vm.systemLogs)" 
+                <h:div forEach="@load(vm.systemLogs)" 
                      sclass="@load(each.level eq 'INFO' ? 'log-info' : (each.level eq 'SUCCESS' ? 'log-success' : (each.level eq 'ERROR' ? 'log-error' : 'log-warning')))">
                     <label value="@load(each.timestamp) @converter('formatedDate', format='HH:mm:ss')" 
                            style="font-weight: bold; margin-right: 10px;"/>
                     <label value="[@load(each.level)]" style="font-weight: bold; margin-right: 10px;"/>
                     <label value="@load(each.message)" style="margin-right: 10px;"/>
                     <label value="@load(each.details)" style="opacity: 0.8;"/>
-                </div>
+                </h:div>
             </vlayout>
         </groupbox>
         

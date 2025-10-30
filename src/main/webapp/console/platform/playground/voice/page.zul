@@ -2,63 +2,63 @@
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
     
-    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundVoiceViewModel')"
+    <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundVoiceViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
         
         <!-- Header -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body p-4">
+                <n:div class="d-flex justify-content-between align-items-center">
                     <div>
                         <n:h4 class="mb-1 fw-bold">
                             <n:i class="fas fa-microphone text-info me-2"></n:i>Voice Playground
                         </n:h4>
                         <n:p class="text-muted mb-0">Convierte texto a voz y voz a texto</n:p>
-                    </div>
+                    </n:div>
                     <button label="Nueva Sesión" iconSclass="fas fa-plus" 
                             sclass="btn btn-info"
                             onClick="@command('newSession')"/>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-        <div class="row g-4">
+        <n:div class="row g-4">
             <!-- Text to Speech -->
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-info text-white p-3">
+            <n:div class="col-md-6">
+                <n:div class="card border-0 shadow-sm h-100">
+                    <n:div class="card-header bg-info text-white p-3">
                         <n:h5 class="mb-0">
                             <n:i class="fas fa-volume-up me-2"></n:i>Text to Speech
                         </n:h5>
-                    </div>
-                    <div class="card-body p-4">
+                    </n:div>
+                    <n:div class="card-body p-4">
                         <!-- Model Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Modelo</label>
                             <combobox placeholder="Seleccionar modelo..." 
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedTTSModel)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Voice Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Voz</label>
                             <combobox model="@load(vm.availableVoices)"
                                      selectedItem="@bind(vm.selectedVoice)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Language -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Idioma</label>
                             <combobox model="@load(vm.availableLanguages)"
                                      selectedItem="@bind(vm.selectedLanguage)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Speed -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">
                                 Velocidad: <label value="@load(vm.speed)"/>x
                             </label>
@@ -66,16 +66,16 @@
                                    mold="scale" maxpos="200" 
                                    sclass="form-range"/>
                             <n:small class="text-muted">0.25x - 4.0x</n:small>
-                        </div>
+                        </n:div>
 
                         <!-- Text Input -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Texto</label>
                             <textbox multiline="true" rows="6" 
                                     value="@bind(vm.textToConvert)"
                                     sclass="form-control"
                                     placeholder="Escribe el texto que quieres convertir a voz..."/>
-                        </div>
+                        </n:div>
 
                         <button label="Generar Audio" iconSclass="fas fa-play" 
                                 sclass="btn btn-info w-100"
@@ -83,11 +83,11 @@
                                 onClick="@command('generateSpeech')"/>
 
                         <!-- Generated Audio -->
-                        <div if="${not empty vm.generatedAudioUrl}" class="mt-4 p-3 bg-light rounded">
+                        <n:div if="${not empty vm.generatedAudioUrl}" class="mt-4 p-3 bg-light rounded">
                             <n:audio controls="" class="w-100" src="${vm.generatedAudioUrl}">
                                 Tu navegador no soporta el elemento de audio.
                             </n:audio>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
+                            <n:div class="d-flex justify-content-between align-items-center mt-2">
                                 <n:small class="text-muted">
                                     Duración: <label value="@load(vm.audioDuration)"/>s · 
                                     Costo: $<label value="@load(vm.audioCost) @converter('formattedNumber', format='0.0000')"/>
@@ -95,43 +95,43 @@
                                 <button label="Descargar" iconSclass="fas fa-download" 
                                         sclass="btn btn-sm btn-outline-info"
                                         onClick="@command('downloadAudio')"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
 
             <!-- Speech to Text -->
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-primary text-white p-3">
+            <n:div class="col-md-6">
+                <n:div class="card border-0 shadow-sm h-100">
+                    <n:div class="card-header bg-primary text-white p-3">
                         <n:h5 class="mb-0">
                             <n:i class="fas fa-file-audio me-2"></n:i>Speech to Text
                         </n:h5>
-                    </div>
-                    <div class="card-body p-4">
+                    </n:div>
+                    <n:div class="card-body p-4">
                         <!-- Model Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Modelo</label>
                             <combobox placeholder="Seleccionar modelo..." 
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedSTTModel)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Language -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label fw-semibold">Idioma (Opcional)</label>
                             <combobox model="@load(vm.availableLanguages)"
                                      selectedItem="@bind(vm.transcriptionLanguage)"
                                      sclass="form-control"
                                      placeholder="Auto-detectar"/>
-                        </div>
+                        </n:div>
 
                         <!-- Audio Upload -->
-                        <div class="mb-4">
+                        <n:div class="mb-4">
                             <label class="form-label fw-semibold">Archivo de Audio</label>
-                            <div class="border rounded p-4 text-center bg-light">
+                            <n:div class="border rounded p-4 text-center bg-light">
                                 <n:i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></n:i>
                                 <n:p class="mb-2">Arrastra tu archivo de audio aquí</n:p>
                                 <n:p class="small text-muted mb-3">o</n:p>
@@ -141,20 +141,20 @@
                                 <n:p class="small text-muted mt-3 mb-0">
                                     Formatos: MP3, WAV, M4A, FLAC (máx. 25 MB)
                                 </n:p>
-                            </div>
-                        </div>
+                            </n:div>
+                        </n:div>
 
-                        <div if="${not empty vm.selectedAudioFile}" class="mb-3 p-3 bg-light rounded">
-                            <div class="d-flex justify-content-between align-items-center">
+                        <n:div if="${not empty vm.selectedAudioFile}" class="mb-3 p-3 bg-light rounded">
+                            <n:div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <n:i class="fas fa-file-audio me-2"></n:i>
                                     <label value="@load(vm.selectedAudioFile)"/>
-                                </div>
+                                </n:div>
                                 <button iconSclass="fas fa-times" 
                                         sclass="btn btn-sm btn-outline-danger"
                                         onClick="@command('clearAudioFile')"/>
-                            </div>
-                        </div>
+                            </n:div>
+                        </n:div>
 
                         <button label="Transcribir Audio" iconSclass="fas fa-microphone" 
                                 sclass="btn btn-primary w-100"
@@ -162,12 +162,12 @@
                                 onClick="@command('transcribeAudio')"/>
 
                         <!-- Transcription Result -->
-                        <div if="${not empty vm.transcriptionText}" class="mt-4">
+                        <n:div if="${not empty vm.transcriptionText}" class="mt-4">
                             <label class="form-label fw-semibold">Transcripción</label>
-                            <div class="p-3 bg-light rounded">
+                            <n:div class="p-3 bg-light rounded">
                                 <n:p class="mb-0">${vm.transcriptionText}</n:p>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mt-2">
+                            </n:div>
+                            <n:div class="d-flex justify-content-between align-items-center mt-2">
                                 <n:small class="text-muted">
                                     Tiempo: <label value="@load(vm.processingTime)"/>ms · 
                                     Costo: $<label value="@load(vm.transcriptionCost) @converter('formattedNumber', format='0.0000')"/>
@@ -175,21 +175,21 @@
                                 <button label="Copiar" iconSclass="fas fa-copy" 
                                         sclass="btn btn-sm btn-outline-primary"
                                         onClick="@command('copyTranscription')"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- History -->
-        <div class="card border-0 shadow-sm mt-4">
-            <div class="card-header bg-white border-0 p-3">
+        <n:div class="card border-0 shadow-sm mt-4">
+            <n:div class="card-header bg-white border-0 p-3">
                 <n:h6 class="mb-0 fw-bold">
                     <n:i class="fas fa-history me-2"></n:i>Historial
                 </n:h6>
-            </div>
-            <div class="card-body p-0">
+            </n:div>
+            <n:div class="card-body p-0">
                 <grid model="@load(vm.voiceHistory)" emptyMessage="No hay conversiones previas"
                       sclass="table table-hover">
                     <columns>
@@ -214,19 +214,19 @@
                             </label>
                             <label value="@load(each.voiceduration)"/>s
                             <label value="@load(each.voicecreatedat) @converter('formattedDate', format='dd/MM/yyyy HH:mm')"/>
-                            <div class="btn-group btn-group-sm">
+                            <n:div class="btn-group btn-group-sm">
                                 <button iconSclass="fas fa-eye" tooltiptext="Ver"
                                         sclass="btn btn-sm btn-outline-primary"
                                         onClick="@command('viewVoice', voice=each)"/>
                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                         sclass="btn btn-sm btn-outline-danger"
-                                        onClick="@command('deleteVoice', voice=each)"/>
-                            </div>
+                                        onClick="@command('deleteItem', voice=each)"/>
+                            </n:div>
                         </row>
                     </template>
                 </grid>
-            </div>
-        </div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>

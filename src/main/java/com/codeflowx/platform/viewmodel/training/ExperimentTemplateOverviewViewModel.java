@@ -93,6 +93,7 @@ public class ExperimentTemplateOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String artifacttypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<ExperimentTemplate> filteredItems = new ArrayList<>();
@@ -170,6 +171,12 @@ public class ExperimentTemplateOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(artifacttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "artifacttype");
+            criteria.setValues(new Object[]{artifacttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +205,7 @@ public class ExperimentTemplateOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        artifacttypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

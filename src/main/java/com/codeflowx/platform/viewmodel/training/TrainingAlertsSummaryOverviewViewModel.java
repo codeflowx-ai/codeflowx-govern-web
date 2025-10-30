@@ -92,6 +92,7 @@ public class TrainingAlertsSummaryOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String artifacttypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<TrainingAlertsSummary> filteredItems = new ArrayList<>();
@@ -169,6 +170,12 @@ public class TrainingAlertsSummaryOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(artifacttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "artifacttype");
+            criteria.setValues(new Object[]{artifacttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -197,6 +204,7 @@ public class TrainingAlertsSummaryOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        artifacttypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

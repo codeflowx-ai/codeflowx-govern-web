@@ -93,6 +93,11 @@ public class AgentAlertOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtalerttypeFilter = "ALL";
+    private String agtstatusFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
+    private String agtimpactlevelFilter = "ALL";
+    private String agturgencylevelFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentAlert> filteredItems = new ArrayList<>();
@@ -170,6 +175,36 @@ public class AgentAlertOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtalerttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtalerttype");
+            criteria.setValues(new Object[]{agtalerttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtimpactlevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtimpactlevel");
+            criteria.setValues(new Object[]{agtimpactlevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agturgencylevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agturgencylevel");
+            criteria.setValues(new Object[]{agturgencylevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +233,11 @@ public class AgentAlertOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtalerttypeFilter = "ALL";
+        agtstatusFilter = "ALL";
+        agtpriorityFilter = "ALL";
+        agtimpactlevelFilter = "ALL";
+        agturgencylevelFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

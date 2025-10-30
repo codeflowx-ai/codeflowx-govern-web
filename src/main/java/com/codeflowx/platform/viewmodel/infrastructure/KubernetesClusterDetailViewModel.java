@@ -114,8 +114,25 @@ public class KubernetesClusterDetailViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         
-        // Obtener parámetros de navegación
-        mode = (String) super.action.name();
+        // Obtener parámetros de navegación - con protección para action null
+
+        
+        if (super.action != null) {
+
+        
+            mode = super.action.name();
+
+        
+        } else {
+
+        
+            mode = (dataParam != null) ? "LOAD" : "NEW";
+
+        
+            log.warn("Action es null, infiriendo modo: {}", mode);
+
+        
+        }
         
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
@@ -132,7 +149,7 @@ public class KubernetesClusterDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxkubernetescluster");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/infrastructure/infrastructure-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/infrastructure/infrastructure-overview.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad

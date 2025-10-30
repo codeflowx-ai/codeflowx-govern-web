@@ -93,6 +93,8 @@ public class AgentRollbackOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtrollbackstatusFilter = "ALL";
+    private String agtrollbacktypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentRollback> filteredItems = new ArrayList<>();
@@ -170,6 +172,19 @@ public class AgentRollbackOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtrollbackstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtrollbackstatus");
+            criteria.setValues(new Object[]{agtrollbackstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtrollbacktypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtrollbacktype");
+            criteria.setValues(new Object[]{agtrollbacktypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +213,8 @@ public class AgentRollbackOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtrollbackstatusFilter = "ALL";
+        agtrollbacktypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

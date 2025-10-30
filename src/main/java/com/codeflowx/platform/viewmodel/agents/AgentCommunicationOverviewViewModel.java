@@ -93,6 +93,10 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtcommunicationtypeFilter = "ALL";
+    private String agtmessagetypeFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
+    private String agtstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentCommunication> filteredItems = new ArrayList<>();
@@ -170,6 +174,30 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtcommunicationtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcommunicationtype");
+            criteria.setValues(new Object[]{agtcommunicationtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtmessagetypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtmessagetype");
+            criteria.setValues(new Object[]{agtmessagetypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +226,10 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtcommunicationtypeFilter = "ALL";
+        agtmessagetypeFilter = "ALL";
+        agtpriorityFilter = "ALL";
+        agtstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

@@ -93,6 +93,7 @@ public class AgentDeploymentOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtdeploymentstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentDeployment> filteredItems = new ArrayList<>();
@@ -170,6 +171,13 @@ public class AgentDeploymentOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtdeploymentstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtdeploymentstatus");
+            criteria.setValues(new Object[]{agtdeploymentstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +206,7 @@ public class AgentDeploymentOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtdeploymentstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

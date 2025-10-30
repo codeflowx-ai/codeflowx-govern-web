@@ -93,6 +93,8 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtdecisiontypeFilter = "ALL";
+    private String agtstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentDecision> filteredItems = new ArrayList<>();
@@ -170,6 +172,19 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtdecisiontypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtdecisiontype");
+            criteria.setValues(new Object[]{agtdecisiontypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +213,8 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtdecisiontypeFilter = "ALL";
+        agtstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

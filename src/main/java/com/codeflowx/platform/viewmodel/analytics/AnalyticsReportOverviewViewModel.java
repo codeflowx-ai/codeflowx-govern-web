@@ -93,6 +93,8 @@ public class AnalyticsReportOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String anlreporttypeFilter = "ALL";
+    private String anlstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AnalyticsReport> filteredItems = new ArrayList<>();
@@ -170,6 +172,18 @@ public class AnalyticsReportOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(anlreporttypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "anlreporttype");
+            criteria.setValues(new Object[]{anlreporttypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(anlstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "anlstatus");
+            criteria.setValues(new Object[]{anlstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +212,8 @@ public class AnalyticsReportOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        anlreporttypeFilter = "ALL";
+        anlstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

@@ -31,7 +31,7 @@
 									<a
 										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
 										class="waves-effect waves-light"
-										onClick="@command('registerAgentApproval')"
+										onClick="@command('registerItem')"
 										label="Registrar Agent Approval">
 									</a>
 								</div>
@@ -48,8 +48,10 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.total{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total</p>
+								<fragment exps="@load(vm.totalItems)">
+					<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
@@ -57,8 +59,10 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activos</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.active{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activos</p>
+								<fragment exps="@load(vm.activeItems)">
+					<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
@@ -66,20 +70,14 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Pendientes</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.pending{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Pendientes</p>
+								<fragment exps="@load(vm.pendingApproval)">
+					<![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
-					<h:div class="col-md-3">
-						<h:div class="card shadow-sm border-0"
-							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
-							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Inactivos</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.inactive{entity.class_name}s)"></h2>
-							</h:div>
-						</h:div>
-					</h:div>
+					<!-- KPI "Inactivos" eliminado - propiedad inactiveItems no existe en ViewModel -->
 				</h:div>
 			</div>
 			<div class="section filters">
@@ -169,7 +167,7 @@
 								<template name="model" var="agents">
 									<row
 										style="text-align:right;cursor:pointer;"
-										onClick="@command('viewAgentApprovalDetails', agentsId=agents.idxagentapproval)">
+										onClick="@command('viewItemDetails', itemId=agents.idxagentapproval)">
 										<label
 											value="@load(agents.idxagentapproval) @converter(vm.fieldConverter)">
 										</label>
@@ -197,14 +195,14 @@
 											class="d-flex">
 											<div class="edit">
 												<a
-													onClick="@command('viewAgentApprovalDetails', agentsId=agents.idxagentapproval)"
+													onClick="@command('viewItemDetails', itemId=agents.idxagentapproval)"
 													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
 													sclass="waves-effect waves-success"
 													tooltiptext="Ver detalles" />
 											</div>
 											<div class="delete">
 												<a
-													onClick="@command('deleteAgentApproval', agentsId=agents.idxagentapproval)"
+													onClick="@command('deleteItem', itemId=agents.idxagentapproval)"
 													iconSclass="fa-light fa-nfc-trash fa-xl"
 													sclass="waves-effect waves-danger"
 													tooltiptext="Eliminar" />

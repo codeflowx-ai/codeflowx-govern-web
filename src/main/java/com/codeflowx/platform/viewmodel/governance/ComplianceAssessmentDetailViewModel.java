@@ -121,8 +121,25 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         
-        // Obtener parámetros de navegación
-        mode = (String) super.action.name();
+        // Obtener parámetros de navegación - con protección para action null
+
+        
+        if (super.action != null) {
+
+        
+            mode = super.action.name();
+
+        
+        } else {
+
+        
+            mode = (dataParam != null) ? "LOAD" : "NEW";
+
+        
+            log.warn("Action es null, infiriendo modo: {}", mode);
+
+        
+        }
         
         if (dataParam != null) {
             id = Long.parseLong(String.valueOf(dataParam));
@@ -138,7 +155,7 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta id");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad

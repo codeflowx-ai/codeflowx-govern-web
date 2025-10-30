@@ -93,6 +93,11 @@ public class AgentToolOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtauthenticationtypeFilter = "ALL";
+    private String agtlicensetypeFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
+    private String agtstatusFilter = "ALL";
+    private String agttooltypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentTool> filteredItems = new ArrayList<>();
@@ -170,6 +175,37 @@ public class AgentToolOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtauthenticationtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtauthenticationtype");
+            criteria.setValues(new Object[]{agtauthenticationtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtlicensetypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtlicensetype");
+            criteria.setValues(new Object[]{agtlicensetypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agttooltypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agttooltype");
+            criteria.setValues(new Object[]{agttooltypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +234,11 @@ public class AgentToolOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtauthenticationtypeFilter = "ALL";
+        agtlicensetypeFilter = "ALL";
+        agtpriorityFilter = "ALL";
+        agtstatusFilter = "ALL";
+        agttooltypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

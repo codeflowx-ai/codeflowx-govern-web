@@ -93,6 +93,8 @@ public class AgentCollaborationOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtcollaborationtypeFilter = "ALL";
+    private String agtstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentCollaboration> filteredItems = new ArrayList<>();
@@ -170,6 +172,18 @@ public class AgentCollaborationOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtcollaborationtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcollaborationtype");
+            criteria.setValues(new Object[]{agtcollaborationtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +212,8 @@ public class AgentCollaborationOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtcollaborationtypeFilter = "ALL";
+        agtstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

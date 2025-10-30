@@ -93,6 +93,8 @@ public class AgentHealthOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtavailabilitystatusFilter = "ALL";
+    private String agthealthstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentHealth> filteredItems = new ArrayList<>();
@@ -170,6 +172,18 @@ public class AgentHealthOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtavailabilitystatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtavailabilitystatus");
+            criteria.setValues(new Object[]{agtavailabilitystatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agthealthstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agthealthstatus");
+            criteria.setValues(new Object[]{agthealthstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +212,8 @@ public class AgentHealthOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtavailabilitystatusFilter = "ALL";
+        agthealthstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

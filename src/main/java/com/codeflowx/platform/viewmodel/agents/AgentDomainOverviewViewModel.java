@@ -93,6 +93,9 @@ public class AgentDomainOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtmaturitylevelFilter = "ALL";
+    private String agtpriorityFilter = "ALL";
+    private String agtstatusFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentDomain> filteredItems = new ArrayList<>();
@@ -170,6 +173,24 @@ public class AgentDomainOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(agtmaturitylevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtmaturitylevel");
+            criteria.setValues(new Object[]{agtmaturitylevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtpriorityFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtpriority");
+            criteria.setValues(new Object[]{agtpriorityFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +219,9 @@ public class AgentDomainOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtmaturitylevelFilter = "ALL";
+        agtpriorityFilter = "ALL";
+        agtstatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

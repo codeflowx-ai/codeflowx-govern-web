@@ -113,8 +113,25 @@ public class AuditLogDetailViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         
-        // Obtener parámetros de navegación
-        mode = (String) super.action.name();
+        // Obtener parámetros de navegación - con protección para action null
+
+        
+        if (super.action != null) {
+
+        
+            mode = super.action.name();
+
+        
+        } else {
+
+        
+            mode = (dataParam != null) ? "LOAD" : "NEW";
+
+        
+            log.warn("Action es null, infiriendo modo: {}", mode);
+
+        
+        }
         
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {

@@ -93,6 +93,7 @@ public class NotificationPreferenceOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String ntfchanneltypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<NotificationPreference> filteredItems = new ArrayList<>();
@@ -170,6 +171,12 @@ public class NotificationPreferenceOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(ntfchanneltypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ntfchanneltype");
+            criteria.setValues(new Object[]{ntfchanneltypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +205,7 @@ public class NotificationPreferenceOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        ntfchanneltypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

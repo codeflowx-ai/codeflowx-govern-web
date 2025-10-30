@@ -116,8 +116,14 @@ public class AgentAlertDetailViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         
-        // Obtener parámetros de navegación
-        mode = (String) super.action.name();
+        // Obtener parámetros de navegación - con protección para action null
+        if (super.action != null) {
+            mode = super.action.name();
+        } else {
+            // Si action es null, intentar determinar el modo por el contexto
+            mode = (dataParam != null) ? "LOAD" : "NEW";
+            log.warn("Action es null, infiriendo modo: {}", mode);
+        }
         
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
@@ -134,7 +140,7 @@ public class AgentAlertDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxagentalert");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("gobierno/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
         }
         
         // Inicializar validador de unicidad
@@ -166,7 +172,7 @@ public class AgentAlertDetailViewModel extends MasterPage {
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
-                appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+                appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
             
@@ -191,7 +197,7 @@ public class AgentAlertDetailViewModel extends MasterPage {
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
     
@@ -227,7 +233,7 @@ public class AgentAlertDetailViewModel extends MasterPage {
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
             
         } catch (Exception e) {
             log.error("Error al guardar", e);

@@ -141,6 +141,24 @@ public class RagSystemOverviewViewModel extends BaseFront<RagSystemOverviewViewM
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragcompliance", filterCompliance));
         }
         
+        if (!"ALL".equals(ragstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragstatus");
+            criteria.setValues(new Object[]{ragstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(ragsyncstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragsyncstatus");
+            criteria.setValues(new Object[]{ragsyncstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(ragtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragtype");
+            criteria.setValues(new Object[]{ragtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     

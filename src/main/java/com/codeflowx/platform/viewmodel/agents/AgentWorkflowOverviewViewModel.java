@@ -93,6 +93,8 @@ public class AgentWorkflowOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtstatusFilter = "ALL";
+    private String agtworkflowtypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentWorkflow> filteredItems = new ArrayList<>();
@@ -170,6 +172,19 @@ public class AgentWorkflowOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtstatus");
+            criteria.setValues(new Object[]{agtstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtworkflowtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtworkflowtype");
+            criteria.setValues(new Object[]{agtworkflowtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +213,8 @@ public class AgentWorkflowOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtstatusFilter = "ALL";
+        agtworkflowtypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

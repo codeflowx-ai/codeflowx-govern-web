@@ -93,6 +93,7 @@ public class ServingEndpointOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String instancetypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<ServingEndpoint> filteredItems = new ArrayList<>();
@@ -170,6 +171,12 @@ public class ServingEndpointOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(instancetypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "instancetype");
+            criteria.setValues(new Object[]{instancetypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +205,7 @@ public class ServingEndpointOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        instancetypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

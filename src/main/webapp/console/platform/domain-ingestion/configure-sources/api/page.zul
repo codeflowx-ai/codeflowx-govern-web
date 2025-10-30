@@ -1,29 +1,29 @@
 <?page title="Configurar API" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
-    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+    <n:div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
          viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.domainingestion.ConfigureApiViewModel')">
         
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="mb-1">
-                    <i class="fas fa-plug me-2"></i>
+        <n:div class="row mb-4">
+            <n:div class="col-12">
+                <h:h2 class="mb-1">
+                    <n:i class="fas fa-plug me-2"></n:i>
                     Configurar Fuente API
-                </h2>
-                <p class="text-muted">Configura fuentes de datos desde APIs REST</p>
-            </div>
-        </div>
+                </h:h2>
+                <h:p class="text-muted">Configura fuentes de datos desde APIs REST</n:p>
+            </n:div>
+        </n:div>
 
         <!-- Formulario -->
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Nueva Fuente API</h5>
-                    </div>
-                    <div class="card-body">
+        <n:div class="row">
+            <n:div class="col-lg-8">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white">
+                        <h:h5 class="mb-0">Nueva Fuente API</n:h5>
+                    </n:div>
+                    <n:div class="card-body">
                         <form>
-                            <div class="mb-3">
+                            <n:div class="mb-3">
                                 <label class="form-label">Dominio *</label>
                                 <combobox class="form-control" value="@bind(vm.selectedDomain)" 
                                          model="@load(vm.domainsList)" buttonVisible="false">
@@ -31,31 +31,31 @@
                                         <comboitem label="${each.dindomainname}" value="${each}"/>
                                     </template>
                                 </combobox>
-                            </div>
+                            </n:div>
                             
-                            <div class="mb-3">
+                            <n:div class="mb-3">
                                 <label class="form-label">Nombre *</label>
                                 <textbox class="form-control" value="@bind(vm.dataSource.dindsname)" 
                                         placeholder="Nombre descriptivo de la fuente"/>
-                            </div>
+                            </n:div>
                             
-                            <div class="mb-3">
+                            <n:div class="mb-3">
                                 <label class="form-label">Descripción</label>
                                 <textbox class="form-control" multiline="true" rows="3" 
                                         value="@bind(vm.dataSource.dindsdescription)" 
                                         placeholder="Descripción de la fuente de datos"/>
-                            </div>
+                            </n:div>
                             
-                            <div class="row">
-                                <div class="col-md-12 mb-3">
+                            <n:div class="row">
+                                <n:div class="col-md-12 mb-3">
                                     <label class="form-label">Endpoint URL *</label>
                                     <textbox class="form-control" value="@bind(vm.dataSource.dindsendpoint)" 
                                             placeholder="https://api.example.com/v1/data"/>
-                                </div>
-                            </div>
+                                </n:div>
+                            </n:div>
                             
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
+                            <n:div class="row">
+                                <n:div class="col-md-6 mb-3">
                                     <label class="form-label">Tipo de Autenticación *</label>
                                     <combobox class="form-control" value="@bind(vm.dataSource.dindsauthtype)" 
                                              buttonVisible="false">
@@ -64,66 +64,66 @@
                                         <comboitem label="OAuth2" value="oauth2"/>
                                         <comboitem label="None" value="none"/>
                                     </combobox>
-                                </div>
-                                <div class="col-md-6 mb-3">
+                                </n:div>
+                                <n:div class="col-md-6 mb-3">
                                     <label class="form-label">API Key / Token</label>
                                     <textbox class="form-control" type="password" 
                                             value="@bind(vm.dataSource.dindsapikey)" 
                                             placeholder="Token de autenticación"/>
-                                </div>
-                            </div>
+                                </n:div>
+                            </n:div>
                             
-                            <div class="mb-3">
+                            <n:div class="mb-3">
                                 <label class="form-label">Parámetros (JSON)</label>
                                 <textbox class="form-control" multiline="true" rows="4" 
                                         value="@bind(vm.dataSource.dindsparameters)" 
                                         placeholder='{"param1": "value1", "param2": "value2"}'/>
-                            </div>
+                            </n:div>
                             
-                            <div class="mb-3">
+                            <n:div class="mb-3">
                                 <checkbox checked="@bind(vm.dataSource.dindsenabled)" label="Habilitar fuente"/>
-                            </div>
+                            </n:div>
                             
-                            <div class="d-flex justify-content-end gap-2">
+                            <n:div class="d-flex justify-content-end gap-2">
                                 <button class="btn btn-secondary" onClick="@command('cancel')">Cancelar</button>
-                                <button class="btn btn-primary" onClick="@command('saveDataSource')">
-                                    <i class="fas fa-save me-1"></i>Guardar
+                                <button class="btn btn-primary" onClick="@command('saveItem')">
+                                    <n:i class="fas fa-save me-1"></n:i>Guardar
                                 </button>
-                            </div>
+                            </n:div>
                         </form>
-                    </div>
-                </div>
-            </div>
+                    </n:div>
+                </n:div>
+            </n:div>
             
             <!-- Panel de ayuda -->
-            <div class="col-lg-4">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h6 class="mb-0"><i class="fas fa-info-circle me-2"></i>Información</h6>
-                    </div>
-                    <div class="card-body">
-                        <p class="small">Configura una fuente de datos que consume información desde una API REST externa.</p>
+            <n:div class="col-lg-4">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white">
+                        <n:h6 class="mb-0"><n:i class="fas fa-info-circle me-2"></n:i>Información</n:h6>
+                    </n:div>
+                    <n:div class="card-body">
+                        <h:p class="small">Configura una fuente de datos que consume información desde una API REST externa.</n:p>
                         <hr/>
-                        <p class="small"><strong>Tipos de autenticación:</strong></p>
+                        <h:p class="small"><strong>Tipos de autenticación:</strong></n:p>
                         <ul class="small">
                             <li><strong>Bearer Token:</strong> Token JWT o similar</li>
                             <li><strong>API Key:</strong> Clave de API en headers</li>
                             <li><strong>OAuth2:</strong> Flujo OAuth2 completo</li>
                         </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Lista de fuentes existentes -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="mb-0">Fuentes API Configuradas</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
+        <n:div class="row mt-4">
+            <n:div class="col-12">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white">
+                        <h:h5 class="mb-0">Fuentes API Configuradas</n:h5>
+                    </n:div>
+                    <n:div class="card-body p-0">
+                        <n:div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead class="table-light">
                                     <tr>
@@ -146,30 +146,30 @@
                                             <label value="@load(each.domain.dindomainname)"/>
                                         </td>
                                         <td>
-                                            <span class="@load(vm.getStatusBadge(each.dindsstatus))" 
+                                            <n:span class="@load(vm.getStatusBadge(each.dindsstatus))" 
                                                   label="@load(vm.translateStatus(each.dindsstatus))"/>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group btn-group-sm">
+                                            <n:div class="btn-group btn-group-sm">
                                                 <button class="btn btn-outline-primary" 
                                                         onClick="@command('editSource', source=each)">
-                                                    <i class="fas fa-edit"></i>
+                                                    <n:i class="fas fa-edit"></n:i>
                                                 </button>
                                                 <button class="btn btn-outline-danger" 
-                                                        onClick="@command('deleteSource', source=each)">
-                                                    <i class="fas fa-trash"></i>
+                                                        onClick="@command('deleteItem', source=each)">
+                                                    <n:i class="fas fa-trash"></n:i>
                                                 </button>
-                                            </div>
+                                            </n:div>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>
 

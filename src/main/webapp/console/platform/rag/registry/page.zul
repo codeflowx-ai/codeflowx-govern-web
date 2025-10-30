@@ -1,55 +1,55 @@
 <?page title="RAG Registry" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
-    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+    <n:div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
          viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.rag.RagRegistryViewModel')">
         
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <h2 class="mb-1">
-                    <i class="fas fa-folder-open me-2"></i>
+        <n:div class="row mb-4">
+            <n:div class="col-12">
+                <h:h2 class="mb-1">
+                    <n:i class="fas fa-folder-open me-2"></n:i>
                     Registro de Sistemas RAG
-                </h2>
-                <p class="text-muted">Gestión y configuración de sistemas RAG</p>
-            </div>
-        </div>
+                </h:h2>
+                <h:p class="text-muted">Gestión y configuración de sistemas RAG</n:p>
+            </n:div>
+        </n:div>
 
         <!-- Barra de acciones -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="input-group">
-                    <span class="input-group-text bg-white">
-                        <i class="fas fa-search text-muted"></i>
-                    </span>
+        <n:div class="row mb-4">
+            <n:div class="col-md-6">
+                <n:div class="input-group">
+                    <n:span class="input-group-text bg-white">
+                        <n:i class="fas fa-search text-muted"></n:i>
+                    </n:span>
                     <textbox class="form-control" placeholder="Buscar por nombre, descripción o tags..."
                              value="@bind(vm.searchText)" instant="true"
                              onChange="@command('searchRegistry')"/>
-                </div>
-            </div>
-            <div class="col-md-6 text-end">
-                <div class="btn-group">
+                </n:div>
+            </n:div>
+            <n:div class="col-md-6 text-end">
+                <n:div class="btn-group">
                     <button class="btn btn-outline-secondary" 
                             onClick="@command('toggleView', view='grid')"
                             disabled="@load(vm.viewMode eq 'grid')">
-                        <i class="fas fa-th"></i>
+                        <n:i class="fas fa-th"></n:i>
                     </button>
                     <button class="btn btn-outline-secondary" 
                             onClick="@command('toggleView', view='list')"
                             disabled="@load(vm.viewMode eq 'list')">
-                        <i class="fas fa-list"></i>
+                        <n:i class="fas fa-list"></n:i>
                     </button>
-                </div>
+                </n:div>
                 <button class="btn btn-primary ms-2" onClick="@command('showCreateModal')">
-                    <i class="fas fa-plus me-1"></i>Nuevo Sistema RAG
+                    <n:i class="fas fa-plus me-1"></n:i>Nuevo Sistema RAG
                 </button>
-            </div>
-        </div>
+            </n:div>
+        </n:div>
 
         <!-- Filtros -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3">
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body">
+                <n:div class="row g-3">
+                    <n:div class="col-md-3">
                         <combobox class="form-control" placeholder="Estado"
                                   value="@bind(vm.filterStatus)" buttonVisible="false"
                                   onChange="@command('applyFilters')">
@@ -58,8 +58,8 @@
                             <comboitem label="Inactivo" value="inactive"/>
                             <comboitem label="Borrador" value="draft"/>
                         </combobox>
-                    </div>
-                    <div class="col-md-3">
+                    </n:div>
+                    <n:div class="col-md-3">
                         <combobox class="form-control" placeholder="Tipo"
                                   value="@bind(vm.filterType)" buttonVisible="false"
                                   onChange="@command('applyFilters')">
@@ -69,8 +69,8 @@
                             <comboitem label="Code Assistant" value="CODE_ASSISTANT"/>
                             <comboitem label="Support" value="SUPPORT"/>
                         </combobox>
-                    </div>
-                    <div class="col-md-3">
+                    </n:div>
+                    <n:div class="col-md-3">
                         <combobox class="form-control" placeholder="Rendimiento"
                                   value="@bind(vm.filterPerformance)" buttonVisible="false"
                                   onChange="@command('applyFilters')">
@@ -79,106 +79,106 @@
                             <comboitem label="Bueno (70-90%)" value="good"/>
                             <comboitem label="Regular (<70%)" value="poor"/>
                         </combobox>
-                    </div>
-                    <div class="col-md-3">
+                    </n:div>
+                    <n:div class="col-md-3">
                         <button class="btn btn-outline-secondary w-100" onClick="@command('clearFilters')">
-                            <i class="fas fa-times me-1"></i>Limpiar Filtros
+                            <n:i class="fas fa-times me-1"></n:i>Limpiar Filtros
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Vista Grid -->
-        <div class="row g-4" visible="@load(vm.viewMode eq 'grid')">
-            <div class="col-md-4" forEach="@load(vm.registryList)">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-header bg-white border-0 pt-3">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div class="flex-grow-1">
-                                <h5 class="mb-1" label="@load(each.ragsystemname)"/>
+        <n:div class="row g-4" visible="@load(vm.viewMode eq 'grid')">
+            <n:div class="col-md-4" forEach="@load(vm.registryList)">
+                <n:div class="card border-0 shadow-sm h-100">
+                    <n:div class="card-header bg-white border-0 pt-3">
+                        <n:div class="d-flex justify-content-between align-items-start">
+                            <n:div class="flex-grow-1">
+                                <h:h5 class="mb-1" label="@load(each.ragsystemname)"/>
                                 <small class="text-muted" label="@load(concat('v', each.ragversion))"/>
-                            </div>
-                            <span class="@load(vm.getStatusColor(each.ragstatus))"
+                            </n:div>
+                            <n:span class="@load(vm.getStatusColor(each.ragstatus))"
                                   label="@load(each.ragstatus)"/>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p class="text-muted small mb-3" label="@load(each.ragdescription)"/>
+                        </n:div>
+                    </n:div>
+                    <n:div class="card-body">
+                        <h:p class="text-muted small mb-3" label="@load(each.ragdescription)"/>
                         
                         <!-- Métricas -->
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <div class="text-center p-2 bg-light rounded">
-                                    <div class="small text-muted">Rendimiento</div>
+                        <n:div class="row g-2 mb-3">
+                            <n:div class="col-6">
+                                <n:div class="text-center p-2 bg-light rounded">
+                                    <n:div class="small text-muted">Rendimiento</n:div>
                                     <strong label="@load(each.ragoverallscore)"/>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center p-2 bg-light rounded">
-                                    <div class="small text-muted">Precisión</div>
+                                </n:div>
+                            </n:div>
+                            <n:div class="col-6">
+                                <n:div class="text-center p-2 bg-light rounded">
+                                    <n:div class="small text-muted">Precisión</n:div>
                                     <strong label="@load(each.ragaccuracyscore)"/>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center p-2 bg-light rounded">
-                                    <div class="small text-muted">Fuentes</div>
+                                </n:div>
+                            </n:div>
+                            <n:div class="col-6">
+                                <n:div class="text-center p-2 bg-light rounded">
+                                    <n:div class="small text-muted">Fuentes</n:div>
                                     <strong label="@load(each.ragdatasources)"/>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="text-center p-2 bg-light rounded">
-                                    <div class="small text-muted">Documentos</div>
+                                </n:div>
+                            </n:div>
+                            <n:div class="col-6">
+                                <n:div class="text-center p-2 bg-light rounded">
+                                    <n:div class="small text-muted">Documentos</n:div>
                                     <strong label="@load(each.ragdocuments)"/>
-                                </div>
-                            </div>
-                        </div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
                         
                         <!-- Tags -->
-                        <div class="mb-3" visible="@load(not empty each.ragtags)">
-                            <div class="d-flex flex-wrap gap-1">
-                                <span class="badge bg-secondary" forEach="@load(vm.getTags(each.ragtags))">
+                        <n:div class="mb-3" visible="@load(not empty each.ragtags)">
+                            <n:div class="d-flex flex-wrap gap-1">
+                                <n:span class="badge bg-secondary" forEach="@load(vm.getTags(each.ragtags))">
                                     <label value="@load(each)"/>
-                                </span>
-                            </div>
-                        </div>
+                                </n:span>
+                            </n:div>
+                        </n:div>
                         
-                        <div class="d-flex justify-content-between align-items-center">
+                        <n:div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted">
-                                <i class="fas fa-user me-1"></i>
+                                <n:i class="fas fa-user me-1"></n:i>
                                 <label value="@load(each.ragcreatedby)"/>
                             </small>
                             <small class="text-muted" label="@load(vm.formatDate(each.ragcreatedat))"/>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white border-0">
-                        <div class="btn-group w-100">
+                        </n:div>
+                    </n:div>
+                    <n:div class="card-footer bg-white border-0">
+                        <n:div class="btn-group w-100">
                             <button class="btn btn-sm btn-outline-primary" 
                                     onClick="@command('viewSystem', system=each)">
-                                <i class="fas fa-eye"></i>
+                                <n:i class="fas fa-eye"></n:i>
                             </button>
                             <button class="btn btn-sm btn-outline-secondary" 
                                     onClick="@command('editSystem', system=each)">
-                                <i class="fas fa-edit"></i>
+                                <n:i class="fas fa-edit"></n:i>
                             </button>
                             <button class="btn btn-sm btn-outline-danger" 
-                                    onClick="@command('deleteSystem', system=each)">
-                                <i class="fas fa-trash"></i>
+                                    onClick="@command('deleteItem', system=each)">
+                                <n:i class="fas fa-trash"></n:i>
                             </button>
                             <button class="btn btn-sm btn-outline-info" 
                                     onClick="@command('downloadConfig', system=each)">
-                                <i class="fas fa-download"></i>
+                                <n:i class="fas fa-download"></n:i>
                             </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Vista List -->
-        <div class="card border-0 shadow-sm" visible="@load(vm.viewMode eq 'list')">
-            <div class="card-body p-0">
-                <div class="table-responsive">
+        <n:div class="card border-0 shadow-sm" visible="@load(vm.viewMode eq 'list')">
+            <n:div class="card-body p-0">
+                <n:div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
@@ -199,85 +199,85 @@
                                         <strong label="@load(each.ragsystemname)"/>
                                         <br/>
                                         <small class="text-muted" label="@load(each.ragversion)"/>
-                                    </div>
+                                    </n:div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info" label="@load(each.ragtype)"/>
+                                    <n:span class="badge bg-info" label="@load(each.ragtype)"/>
                                 </td>
                                 <td class="text-center">
-                                    <div class="d-flex align-items-center justify-content-center">
-                                        <div class="progress" style="width: 60px; height: 8px;">
-                                            <div class="progress-bar bg-success" 
-                                                 style="@load(concat('width: ', each.ragoverallscore, '%'))"></div>
-                                        </div>
-                                        <span class="ms-2 small" label="@load(each.ragoverallscore)"/>
-                                    </div>
+                                    <n:div class="d-flex align-items-center justify-content-center">
+                                        <n:div class="progress" style="width: 60px; height: 8px;">
+                                            <n:div class="progress-bar bg-success" 
+                                                 style="@load(concat('width: ', each.ragoverallscore, '%'))"></n:div>
+                                        </n:div>
+                                        <n:span class="ms-2 small" label="@load(each.ragoverallscore)"/>
+                                    </n:div>
                                 </td>
                                 <td class="text-center">
-                                    <span class="small" label="@load(each.ragaccuracyscore)"/>
+                                    <n:span class="small" label="@load(each.ragaccuracyscore)"/>
                                 </td>
                                 <td class="text-center">
-                                    <span label="@load(concat(each.ragdatasources, ' / ', each.ragdocuments))"/>
+                                    <n:span label="@load(concat(each.ragdatasources, ' / ', each.ragdocuments))"/>
                                 </td>
                                 <td class="text-center">
-                                    <span class="@load(vm.getStatusColor(each.ragstatus))"
+                                    <n:span class="@load(vm.getStatusColor(each.ragstatus))"
                                           label="@load(each.ragstatus)"/>
                                 </td>
                                 <td>
                                     <small label="@load(each.ragcreatedby)"/>
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
+                                    <n:div class="btn-group btn-group-sm">
                                         <button class="btn btn-outline-primary btn-sm" 
                                                 onClick="@command('viewSystem', system=each)">
-                                            <i class="fas fa-eye"></i>
+                                            <n:i class="fas fa-eye"></n:i>
                                         </button>
                                         <button class="btn btn-outline-secondary btn-sm" 
                                                 onClick="@command('editSystem', system=each)">
-                                            <i class="fas fa-edit"></i>
+                                            <n:i class="fas fa-edit"></n:i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm" 
-                                                onClick="@command('deleteSystem', system=each)">
-                                            <i class="fas fa-trash"></i>
+                                                onClick="@command('deleteItem', system=each)">
+                                            <n:i class="fas fa-trash"></n:i>
                                         </button>
-                                    </div>
+                                    </n:div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Modal de Creación/Edición -->
         <window id="createEditModal" title="@load(vm.isEditMode ? 'Editar Sistema RAG' : 'Crear Sistema RAG')"
                 border="normal" width="800px" mode="modal" 
                 visible="@load(vm.showModal)" onClose="@command('closeModal')">
-            <div class="p-3">
-                <div class="row g-3">
+            <n:div class="p-3">
+                <n:div class="row g-3">
                     <!-- Nombre -->
-                    <div class="col-12">
+                    <n:div class="col-12">
                         <label class="form-label">Nombre del Sistema *</label>
                         <textbox class="form-control" value="@bind(vm.systemName)" 
                                  placeholder="Ej: Knowledge Base RAG"/>
-                    </div>
+                    </n:div>
                     
                     <!-- Descripción -->
-                    <div class="col-12">
+                    <n:div class="col-12">
                         <label class="form-label">Descripción</label>
                         <textbox class="form-control" value="@bind(vm.systemDescription)" 
                                  rows="3" multiline="true"
                                  placeholder="Descripción del sistema RAG"/>
-                    </div>
+                    </n:div>
                     
                     <!-- Versión y Tipo -->
-                    <div class="col-md-6">
+                    <n:div class="col-md-6">
                         <label class="form-label">Versión *</label>
                         <textbox class="form-control" value="@bind(vm.systemVersion)" 
                                  placeholder="1.0.0"/>
-                    </div>
+                    </n:div>
                     
-                    <div class="col-md-6">
+                    <n:div class="col-md-6">
                         <label class="form-label">Tipo *</label>
                         <combobox class="form-control" value="@bind(vm.systemType)" buttonVisible="false">
                             <comboitem label="Knowledge Base" value="KNOWLEDGE_BASE"/>
@@ -285,19 +285,19 @@
                             <comboitem label="Code Assistant" value="CODE_ASSISTANT"/>
                             <comboitem label="Support" value="SUPPORT"/>
                         </combobox>
-                    </div>
+                    </n:div>
                     
                     <!-- Estado y Nivel de Riesgo -->
-                    <div class="col-md-6">
+                    <n:div class="col-md-6">
                         <label class="form-label">Estado *</label>
                         <combobox class="form-control" value="@bind(vm.systemStatus)" buttonVisible="false">
                             <comboitem label="Activo" value="ACTIVE"/>
                             <comboitem label="Inactivo" value="INACTIVE"/>
                             <comboitem label="Borrador" value="DRAFT"/>
                         </combobox>
-                    </div>
+                    </n:div>
                     
-                    <div class="col-md-6">
+                    <n:div class="col-md-6">
                         <label class="form-label">Nivel de Riesgo</label>
                         <combobox class="form-control" value="@bind(vm.systemRiskLevel)" buttonVisible="false">
                             <comboitem label="Bajo" value="LOW"/>
@@ -305,28 +305,28 @@
                             <comboitem label="Alto" value="HIGH"/>
                             <comboitem label="Crítico" value="CRITICAL"/>
                         </combobox>
-                    </div>
+                    </n:div>
                     
                     <!-- Tags -->
-                    <div class="col-12">
+                    <n:div class="col-12">
                         <label class="form-label">Tags (separados por comas)</label>
                         <textbox class="form-control" value="@bind(vm.systemTags)" 
                                  placeholder="knowledge-base, documentation, technical"/>
-                    </div>
-                </div>
+                    </n:div>
+                </n:div>
                 
                 <!-- Botones -->
-                <div class="d-flex justify-content-end gap-2 mt-4">
+                <n:div class="d-flex justify-content-end gap-2 mt-4">
                     <button class="btn btn-secondary" onClick="@command('closeModal')">
                         Cancelar
                     </button>
-                    <button class="btn btn-primary" onClick="@command('saveSystem')">
-                        <i class="fas fa-save me-1"></i>
+                    <button class="btn btn-primary" onClick="@command('saveItem')">
+                        <n:i class="fas fa-save me-1"></n:i>
                         Guardar
                     </button>
-                </div>
-            </div>
+                </n:div>
+            </n:div>
         </window>
 
-    </div>
+    </n:div>
 </zk>

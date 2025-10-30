@@ -93,6 +93,10 @@ public class AgentApprovalOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtapprovallevelFilter = "ALL";
+    private String agtapprovalstatusFilter = "ALL";
+    private String agtapprovaltypeFilter = "ALL";
+    private String agtapproverroleFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentApproval> filteredItems = new ArrayList<>();
@@ -170,6 +174,31 @@ public class AgentApprovalOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtapprovallevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtapprovallevel");
+            criteria.setValues(new Object[]{agtapprovallevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtapprovalstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtapprovalstatus");
+            criteria.setValues(new Object[]{agtapprovalstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtapprovaltypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtapprovaltype");
+            criteria.setValues(new Object[]{agtapprovaltypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtapproverroleFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtapproverrole");
+            criteria.setValues(new Object[]{agtapproverroleFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +227,10 @@ public class AgentApprovalOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtapprovallevelFilter = "ALL";
+        agtapprovalstatusFilter = "ALL";
+        agtapprovaltypeFilter = "ALL";
+        agtapproverroleFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

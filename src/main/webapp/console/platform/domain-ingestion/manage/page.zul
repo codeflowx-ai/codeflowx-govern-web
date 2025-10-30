@@ -1,31 +1,31 @@
 <?page title="Gestión de Dominios" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
-    <div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
+    <n:div class="container-fluid p-4" apply="org.zkoss.bind.BindComposer"
          viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.domainingestion.DomainManagementViewModel')">
         
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
+        <n:div class="row mb-4">
+            <n:div class="col-12">
+                <n:div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="mb-1">
-                            <i class="fas fa-cog me-2"></i>
+                        <h:h2 class="mb-1">
+                            <n:i class="fas fa-cog me-2"></n:i>
                             Gestión de Dominios
-                        </h2>
-                        <p class="text-muted">Administra y configura tus dominios de negocio</p>
-                    </div>
+                        </h:h2>
+                        <h:p class="text-muted">Administra y configura tus dominios de negocio</n:p>
+                    </n:div>
                     <button class="btn btn-primary" onClick="@command('createNewDomain')">
-                        <i class="fas fa-plus me-1"></i>Nuevo Dominio
+                        <n:i class="fas fa-plus me-1"></n:i>Nuevo Dominio
                     </button>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Filtros -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-4">
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body">
+                <n:div class="row g-3">
+                    <n:div class="col-md-4">
                         <combobox class="form-control" placeholder="Industria"
                                   value="@bind(vm.filterIndustry)" buttonVisible="false"
                                   onChange="@command('applyFilters')">
@@ -35,8 +35,8 @@
                             <comboitem label="E-commerce" value="E-commerce"/>
                             <comboitem label="Legal" value="Legal"/>
                         </combobox>
-                    </div>
-                    <div class="col-md-4">
+                    </n:div>
+                    <n:div class="col-md-4">
                         <combobox class="form-control" placeholder="Estado"
                                   value="@bind(vm.filterStatus)" buttonVisible="false"
                                   onChange="@command('applyFilters')">
@@ -45,28 +45,28 @@
                             <comboitem label="Inactivo" value="inactive"/>
                             <comboitem label="Borrador" value="draft"/>
                         </combobox>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white">
-                                <i class="fas fa-search text-muted"></i>
-                            </span>
+                    </n:div>
+                    <n:div class="col-md-4">
+                        <n:div class="input-group">
+                            <n:span class="input-group-text bg-white">
+                                <n:i class="fas fa-search text-muted"></n:i>
+                            </n:span>
                             <textbox class="form-control" placeholder="Buscar..."
                                      value="@bind(vm.searchText)" instant="true"
                                      onChange="@command('searchDomains')"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
         <!-- Tabla de dominios -->
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white py-3">
-                <h5 class="mb-0">Dominios Registrados</h5>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
+        <n:div class="card border-0 shadow-sm">
+            <n:div class="card-header bg-white py-3">
+                <h:h5 class="mb-0">Dominios Registrados</n:h5>
+            </n:div>
+            <n:div class="card-body p-0">
+                <n:div class="table-responsive">
                     <table class="table table-hover mb-0">
                         <thead class="table-light">
                             <tr>
@@ -83,14 +83,14 @@
                         <tbody>
                             <tr forEach="@load(vm.domainsList)">
                                 <td>
-                                    <div class="d-flex align-items-center">
-                                        <span class="me-2" style="font-size: 1.5rem;" label="@load(each.dindomainicon)"/>
+                                    <n:div class="d-flex align-items-center">
+                                        <n:span class="me-2" style="font-size: 1.5rem;" label="@load(each.dindomainicon)"/>
                                         <div>
                                             <strong label="@load(each.dindomainname)"/>
                                             <br/>
                                             <small class="text-muted" label="@load(each.dinbusinessarea)"/>
-                                        </div>
-                                    </div>
+                                        </n:div>
+                                    </n:div>
                                 </td>
                                 <td>
                                     <label value="@load(each.dinindustry)"/>
@@ -99,43 +99,43 @@
                                     <strong label="@load(each.dintotaldocuments)"/>
                                 </td>
                                 <td class="text-center">
-                                    <span class="@load(vm.getStatusColor(each.dinstatus))"
+                                    <n:span class="@load(vm.getStatusColor(each.dinstatus))"
                                           label="@load(vm.translateStatus(each.dinstatus))"/>
                                 </td>
                                 <td class="text-center">
-                                    <i class="fas fa-check-circle text-success" visible="@load(each.dinragenabled)"/>
-                                    <i class="fas fa-times-circle text-secondary" visible="@load(!each.dinragenabled)"/>
+                                    <n:i class="fas fa-check-circle text-success" visible="@load(each.dinragenabled)"/>
+                                    <n:i class="fas fa-times-circle text-secondary" visible="@load(!each.dinragenabled)"/>
                                 </td>
                                 <td class="text-center">
-                                    <i class="fas fa-check-circle text-success" visible="@load(each.dintrainingenabled)"/>
-                                    <i class="fas fa-times-circle text-secondary" visible="@load(!each.dintrainingenabled)"/>
+                                    <n:i class="fas fa-check-circle text-success" visible="@load(each.dintrainingenabled)"/>
+                                    <n:i class="fas fa-times-circle text-secondary" visible="@load(!each.dintrainingenabled)"/>
                                 </td>
                                 <td>
                                     <small label="@load(vm.formatDate(each.dinlastupdate))"/>
                                 </td>
                                 <td class="text-center">
-                                    <div class="btn-group btn-group-sm">
+                                    <n:div class="btn-group btn-group-sm">
                                         <button class="btn btn-outline-primary btn-sm" 
                                                 onClick="@command('viewDomainDetail', domain=each)">
-                                            <i class="fas fa-eye"></i>
+                                            <n:i class="fas fa-eye"></n:i>
                                         </button>
                                         <button class="btn btn-outline-secondary btn-sm" 
                                                 onClick="@command('editDomain', domain=each)">
-                                            <i class="fas fa-edit"></i>
+                                            <n:i class="fas fa-edit"></n:i>
                                         </button>
                                         <button class="btn btn-outline-danger btn-sm" 
-                                                onClick="@command('deleteDomain', domain=each)">
-                                            <i class="fas fa-trash"></i>
+                                                onClick="@command('deleteItem', domain=each)">
+                                            <n:i class="fas fa-trash"></n:i>
                                         </button>
-                                    </div>
+                                    </n:div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>
 

@@ -2,95 +2,95 @@
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
     
-    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundImageViewModel')"
+    <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundImageViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
         
         <!-- Header -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body p-4">
+                <n:div class="d-flex justify-content-between align-items-center">
                     <div>
                         <n:h4 class="mb-1 fw-bold">
                             <n:i class="fas fa-image text-success me-2"></n:i>Generación de Imágenes
                         </n:h4>
                         <n:p class="text-muted mb-0">Crea imágenes únicas a partir de descripciones textuales</n:p>
-                    </div>
+                    </n:div>
                     <button label="Nueva Sesión" iconSclass="fas fa-plus" 
                             sclass="btn btn-success"
                             onClick="@command('newSession')"/>
-                </div>
-            </div>
-        </div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-        <div class="row g-4">
+        <n:div class="row g-4">
             <!-- Configuration Panel -->
-            <div class="col-md-3">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 p-3">
+            <n:div class="col-md-3">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white border-0 p-3">
                         <n:h6 class="mb-0 fw-bold">
                             <n:i class="fas fa-cog me-2"></n:i>Configuración
                         </n:h6>
-                    </div>
-                    <div class="card-body p-3">
+                    </n:div>
+                    <n:div class="card-body p-3">
                         <!-- Model Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Modelo</label>
                             <combobox placeholder="Seleccionar modelo..." 
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedModel)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Image Size -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Tamaño</label>
                             <combobox model="@load(vm.availableSizes)"
                                      selectedItem="@bind(vm.selectedSize)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Quality -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Calidad</label>
                             <combobox model="@load(vm.availableQualities)"
                                      selectedItem="@bind(vm.selectedQuality)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Format -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Formato</label>
                             <combobox model="@load(vm.availableFormats)"
                                      selectedItem="@bind(vm.selectedFormat)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Style -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Estilo (Opcional)</label>
                             <textbox value="@bind(vm.style)" 
                                     sclass="form-control"
                                     placeholder="ej: realistic, cartoon"/>
-                        </div>
+                        </n:div>
 
                         <!-- Session Info -->
-                        <div class="border-top pt-3 mt-3">
+                        <n:div class="border-top pt-3 mt-3">
                             <n:p class="small text-muted mb-2">
                                 <n:strong>Imágenes:</n:strong> <label value="@load(vm.imageCount)"/>
                             </n:p>
                             <n:p class="small text-muted mb-0">
                                 <n:strong>Costo Total:</n:strong> $<label value="@load(vm.totalCost) @converter('formattedNumber', format='0.00')"/>
                             </n:p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
 
             <!-- Generation Area -->
-            <div class="col-md-9">
+            <n:div class="col-md-9">
                 <!-- Prompt Input -->
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body p-4">
+                <n:div class="card border-0 shadow-sm mb-4">
+                    <n:div class="card-body p-4">
                         <label class="form-label fw-semibold">Prompt</label>
                         <textbox multiline="true" rows="3" 
                                 value="@bind(vm.prompt)"
@@ -103,58 +103,58 @@
                                 sclass="form-control mb-3"
                                 placeholder="Elementos que no quieres en la imagen..."/>
                         
-                        <div class="d-flex justify-content-end">
+                        <n:div class="d-flex justify-content-end">
                             <button label="Generar Imagen" iconSclass="fas fa-magic" 
                                     sclass="btn btn-success btn-lg"
                                     disabled="@load(empty vm.prompt)"
                                     onClick="@command('generateImage')"/>
-                        </div>
-                    </div>
-                </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
 
                 <!-- Generated Images Grid -->
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 p-3">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white border-0 p-3">
                         <n:h6 class="mb-0 fw-bold">
                             <n:i class="fas fa-images me-2"></n:i>Imágenes Generadas
                         </n:h6>
-                    </div>
-                    <div class="card-body p-4">
-                        <div if="${empty vm.generatedImages}" class="text-center text-muted py-5">
+                    </n:div>
+                    <n:div class="card-body p-4">
+                        <n:div if="${empty vm.generatedImages}" class="text-center text-muted py-5">
                             <n:i class="fas fa-image fa-3x mb-3 opacity-25"></n:i>
                             <n:p>No hay imágenes generadas aún</n:p>
-                        </div>
+                        </n:div>
                         
-                        <div class="row g-4">
-                            <div forEach="${vm.generatedImages}" class="col-md-4">
-                                <div class="card border-0 shadow-sm h-100">
+                        <n:div class="row g-4">
+                            <n:div forEach="${vm.generatedImages}" class="col-md-4">
+                                <n:div class="card border-0 shadow-sm h-100">
                                     <n:img src="${each.imageurl}" class="card-img-top" 
                                            style="height: 250px; object-fit: cover;" alt="Generated image"/>
-                                    <div class="card-body p-3">
+                                    <n:div class="card-body p-3">
                                         <n:p class="small text-muted mb-2">${each.imageprompt}</n:p>
-                                        <div class="d-flex justify-content-between align-items-center">
+                                        <n:div class="d-flex justify-content-between align-items-center">
                                             <n:span class="badge bg-success">${each.imagestatus}</n:span>
-                                            <div class="btn-group btn-group-sm">
+                                            <n:div class="btn-group btn-group-sm">
                                                 <button iconSclass="fas fa-download" tooltiptext="Descargar"
                                                         sclass="btn btn-sm btn-outline-primary"
                                                         onClick="@command('downloadImage', image=each)"/>
                                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                                         sclass="btn btn-sm btn-outline-danger"
-                                                        onClick="@command('deleteImage', image=each)"/>
-                                            </div>
-                                        </div>
+                                                        onClick="@command('deleteItem', image=each)"/>
+                                            </n:div>
+                                        </n:div>
                                         <n:p class="mb-0 mt-2 text-muted" style="font-size: 0.75rem;">
                                             <label value="@load(each.imagegenerationtime)"/>ms · 
                                             $<label value="@load(each.imagecost) @converter('formattedNumber', format='0.0000')"/>
                                         </n:p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>

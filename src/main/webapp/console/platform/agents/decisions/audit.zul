@@ -6,7 +6,7 @@
 	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
 	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
 	<idspace
-		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.agents.AgentDecisionAuditOverviewViewModel')"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.audit.AgentDecisionAuditOverviewViewModel')"
 		validationMessages="@id('vmsgs')">
 
 		<div class="row" style="background-color:;">
@@ -90,38 +90,38 @@
 										align="center" />
 								</columns>
 
-								<template name="model" var="agents">
+								<template name="model" var="audit">
 									<row
 										style="text-align:right;cursor:pointer;"
-										onClick="@command('viewAgentDecisionAuditDetails', agentsId=agents.totalItems)">
+										onClick="@command('viewItemDetails', itemId=audit.totalItems)">
 										<label
-											value="@load(agents.totalItems) @converter(vm.fieldConverter)">
+											value="@load(audit.totalItems) @converter(vm.fieldConverter)">
 										</label>
 
 										<label
-											value="@load(agents.activeItems) @converter(vm.fieldConverter)">
+											value="@load(audit.activeItems) @converter(vm.fieldConverter)">
 										</label>
 
 										<label
-											value="@load(agents.deployedItems) @converter(vm.fieldConverter)">
+											value="@load(audit.deployedItems) @converter(vm.fieldConverter)">
 										</label>
 
 										<label
-											value="@load(agents.trainingItems) @converter(vm.fieldConverter)">
+											value="@load(audit.trainingItems) @converter(vm.fieldConverter)">
 										</label>
 
 										<label
-											value="@load(agents.offlineItems) @converter(vm.fieldConverter)">
+											value="@load(audit.offlineItems) @converter(vm.fieldConverter)">
 										</label>
 
 										<label
-											value="@load(agents.avgScore) @converter(vm.fieldConverter)">
+											value="@load(audit.avgScore) @converter(vm.fieldConverter)">
 										</label>
 										<cell align="center"
 											class="d-flex">
 											<div class="edit">
 												<a
-													onClick="@command('viewAgentDecisionAuditDetails', agentsId=agents.totalItems)"
+													onClick="@command('viewItemDetails', itemId=audit.totalItems)"
 													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
 													sclass="waves-effect waves-success"
 													tooltiptext="Ver detalles" />

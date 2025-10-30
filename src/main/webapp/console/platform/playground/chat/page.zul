@@ -2,61 +2,61 @@
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
     
-    <div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundChatViewModel')"
+    <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundChatViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
         
         <!-- Header -->
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-center">
+        <n:div class="card border-0 shadow-sm mb-4">
+            <n:div class="card-body p-4">
+                <n:div class="d-flex justify-content-between align-items-center">
                     <div>
                         <n:h4 class="mb-1 fw-bold">
                             <n:i class="fas fa-comments text-primary me-2"></n:i>Chat Playground
                         </n:h4>
                         <n:p class="text-muted mb-0">Experimenta con modelos de lenguaje conversacionales</n:p>
-                    </div>
-                    <div class="d-flex gap-2">
+                    </n:div>
+                    <n:div class="d-flex gap-2">
                         <button label="Nueva Conversación" iconSclass="fas fa-plus" 
                                 sclass="btn btn-primary"
                                 onClick="@command('newConversation')"/>
                         <button label="Configuración" iconSclass="fas fa-cog" 
                                 sclass="btn btn-outline-secondary"
                                 onClick="@command('showConfig')"/>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-        <div class="row g-4">
+        <n:div class="row g-4">
             <!-- Chat Configuration Panel -->
-            <div class="col-md-3">
-                <div class="card border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 p-3">
+            <n:div class="col-md-3">
+                <n:div class="card border-0 shadow-sm">
+                    <n:div class="card-header bg-white border-0 p-3">
                         <n:h6 class="mb-0 fw-bold">
                             <n:i class="fas fa-sliders-h me-2"></n:i>Configuración
                         </n:h6>
-                    </div>
-                    <div class="card-body p-3">
+                    </n:div>
+                    <n:div class="card-body p-3">
                         <!-- Model Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Modelo</label>
                             <combobox placeholder="Seleccionar modelo..." 
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedModel)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Agent Selection -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Agente (Opcional)</label>
                             <combobox placeholder="Seleccionar agente..." 
                                      model="@load(vm.availableAgents)"
                                      selectedItem="@bind(vm.selectedAgent)"
                                      sclass="form-control"/>
-                        </div>
+                        </n:div>
 
                         <!-- Temperature -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">
                                 Temperatura: <label value="@load(vm.temperature)"/>
                             </label>
@@ -64,27 +64,27 @@
                                    mold="scale" maxpos="200" 
                                    sclass="form-range"/>
                             <n:small class="text-muted">Controla la creatividad (0.0 - 2.0)</n:small>
-                        </div>
+                        </n:div>
 
                         <!-- Max Tokens -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Max Tokens</label>
                             <intbox value="@bind(vm.maxTokens)" 
                                    sclass="form-control"
                                    placeholder="4096"/>
-                        </div>
+                        </n:div>
 
                         <!-- System Prompt -->
-                        <div class="mb-3">
+                        <n:div class="mb-3">
                             <label class="form-label small fw-semibold">System Prompt</label>
                             <textbox multiline="true" rows="4" 
                                     value="@bind(vm.systemPrompt)"
                                     sclass="form-control"
                                     placeholder="Eres un asistente útil..."/>
-                        </div>
+                        </n:div>
 
                         <!-- Session Info -->
-                        <div class="border-top pt-3 mt-3">
+                        <n:div class="border-top pt-3 mt-3">
                             <n:p class="small text-muted mb-2">
                                 <n:strong>Mensajes:</n:strong> <label value="@load(vm.messageCount)"/>
                             </n:p>
@@ -94,53 +94,53 @@
                             <n:p class="small text-muted mb-0">
                                 <n:strong>Costo:</n:strong> $<label value="@load(vm.sessionCost) @converter('formattedNumber', format='0.0000')"/>
                             </n:p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
 
             <!-- Chat Area -->
-            <div class="col-md-9">
-                <div class="card border-0 shadow-sm" style="height: calc(100vh - 250px);">
+            <n:div class="col-md-9">
+                <n:div class="card border-0 shadow-sm" style="height: calc(100vh - 250px);">
                     <!-- Messages Container -->
-                    <div class="card-body p-4" style="overflow-y: auto; height: calc(100% - 80px);" id="chatMessages">
-                        <div if="${empty vm.messages}" class="text-center text-muted py-5">
+                    <n:div class="card-body p-4" style="overflow-y: auto; height: calc(100% - 80px);" id="chatMessages">
+                        <n:div if="${empty vm.messages}" class="text-center text-muted py-5">
                             <n:i class="fas fa-comments fa-3x mb-3 opacity-25"></n:i>
                             <n:p>No hay mensajes aún. ¡Comienza una conversación!</n:p>
-                        </div>
+                        </n:div>
                         
-                        <div forEach="${vm.messages}" class="mb-3">
-                            <div if="${each.chatrole eq 'USER'}" class="d-flex justify-content-end">
-                                <div class="card bg-primary text-white border-0 shadow-sm" style="max-width: 75%;">
-                                    <div class="card-body p-3">
+                        <n:div forEach="${vm.messages}" class="mb-3">
+                            <n:div if="${each.chatrole eq 'USER'}" class="d-flex justify-content-end">
+                                <n:div class="card bg-primary text-white border-0 shadow-sm" style="max-width: 75%;">
+                                    <n:div class="card-body p-3">
                                         <n:p class="mb-0 small">${each.chatprompt}</n:p>
                                         <n:p class="mb-0 mt-2 opacity-75" style="font-size: 0.7rem;">
                                             <label value="@load(each.chatcreatedat) @converter('formattedDate', format='HH:mm')"/>
                                         </n:p>
-                                    </div>
-                                </div>
-                            </div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
                             
-                            <div if="${each.chatrole eq 'ASSISTANT'}" class="d-flex justify-content-start">
-                                <div class="card bg-light border-0 shadow-sm" style="max-width: 75%;">
-                                    <div class="card-body p-3">
+                            <n:div if="${each.chatrole eq 'ASSISTANT'}" class="d-flex justify-content-start">
+                                <n:div class="card bg-light border-0 shadow-sm" style="max-width: 75%;">
+                                    <n:div class="card-body p-3">
                                         <n:p class="mb-0 small">${each.chatresponse}</n:p>
-                                        <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <n:div class="d-flex justify-content-between align-items-center mt-2">
                                             <n:p class="mb-0 text-muted" style="font-size: 0.7rem;">
                                                 <label value="@load(each.chatcreatedat) @converter('formattedDate', format='HH:mm')"/>
                                                 · <label value="@load(each.chattokensused)"/> tokens
                                                 · <label value="@load(each.chatlatency)"/>ms
                                             </n:p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                        </n:div>
+                                    </n:div>
+                                </n:div>
+                            </n:div>
+                        </n:div>
+                    </n:div>
 
                     <!-- Input Area -->
-                    <div class="card-footer bg-white border-top p-3">
-                        <div class="d-flex gap-2">
+                    <n:div class="card-footer bg-white border-top p-3">
+                        <n:div class="d-flex gap-2">
                             <textbox multiline="true" rows="2" 
                                     value="@bind(vm.currentPrompt)"
                                     sclass="form-control"
@@ -150,11 +150,11 @@
                                     sclass="btn btn-primary"
                                     disabled="@load(empty vm.currentPrompt)"
                                     onClick="@command('sendMessage')"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        </n:div>
+                    </n:div>
+                </n:div>
+            </n:div>
+        </n:div>
 
-    </div>
+    </n:div>
 </zk>

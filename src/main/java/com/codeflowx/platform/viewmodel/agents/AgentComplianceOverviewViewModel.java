@@ -93,6 +93,10 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String agtcertificationstatusFilter = "ALL";
+    private String agtcompliancestatusFilter = "ALL";
+    private String agtcompliancetypeFilter = "ALL";
+    private String agtrisklevelFilter = "ALL";
     
     // ========== Datos ==========
     private List<AgentCompliance> filteredItems = new ArrayList<>();
@@ -170,6 +174,31 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        
+        if (!"ALL".equals(agtcertificationstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcertificationstatus");
+            criteria.setValues(new Object[]{agtcertificationstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtcompliancestatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcompliancestatus");
+            criteria.setValues(new Object[]{agtcompliancestatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtcompliancetypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtcompliancetype");
+            criteria.setValues(new Object[]{agtcompliancetypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(agtrisklevelFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agtrisklevel");
+            criteria.setValues(new Object[]{agtrisklevelFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -198,6 +227,10 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        agtcertificationstatusFilter = "ALL";
+        agtcompliancestatusFilter = "ALL";
+        agtcompliancetypeFilter = "ALL";
+        agtrisklevelFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

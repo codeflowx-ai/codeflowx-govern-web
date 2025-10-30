@@ -92,6 +92,9 @@ public class PromptTestResultsOverviewViewModel extends MasterPage {
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
+    private String prmapprovalstatusFilter = "ALL";
+    private String prmstatusFilter = "ALL";
+    private String prmtypeFilter = "ALL";
     
     // ========== Datos ==========
     private List<PromptTestResults> filteredItems = new ArrayList<>();
@@ -169,6 +172,24 @@ public class PromptTestResultsOverviewViewModel extends MasterPage {
             criterias.addCriteria(criteria);
         }
         
+        if (!"ALL".equals(prmapprovalstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmapprovalstatus");
+            criteria.setValues(new Object[]{prmapprovalstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(prmstatusFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmstatus");
+            criteria.setValues(new Object[]{prmstatusFilter});
+            criterias.addCriteria(criteria);
+        }
+        
+        if (!"ALL".equals(prmtypeFilter)) {
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmtype");
+            criteria.setValues(new Object[]{prmtypeFilter});
+            criterias.addCriteria(criteria);
+        }
+        
         return criterias;
     }
     
@@ -197,6 +218,9 @@ public class PromptTestResultsOverviewViewModel extends MasterPage {
         log.debug("Limpiando filtros");
         searchTerm = "";
         statusFilter = "ALL";
+        prmapprovalstatusFilter = "ALL";
+        prmstatusFilter = "ALL";
+        prmtypeFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }

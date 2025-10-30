@@ -9,9 +9,9 @@
 		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.infrastructure.InfrastructureTemplateOverviewViewModel')"
 		validationMessages="@id('vmsgs')">
 
-		<div class="row" style="background-color:;">
+		<h:div class="row" style="background-color:;">
 			<div><!-- Titulo pantalla -->
-				<div class="left tittle-principal">
+				<h:div class="left tittle-principal">
 					<h:h2 class="mb-sm-0">
 						<h:i class="fa-sharp-duotone fa-solid fa-cloud me-2"></h:i>
 						<label value="Rastructure Template" />
@@ -19,37 +19,39 @@
 					<h:p class="text-muted">
 						<label value="Gestión de Rastructure Template" />
 					</h:p>
-				</div>
-			</div>
-			<div class="col-lg-12 s-bot ">
-				<div class="card">
-					<div class="card-header">
-						<div class="d-flex align-items-center flex-wrap gap-2">
-							<div class="flex-grow-1"></div>
-							<div class="flex-shrink-0">
-								<div class="hstack text-nowrap gap-2 d-flex">
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-12 s-bot ">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1"></h:div>
+							<h:div class="flex-shrink-0">
+								<h:div class="hstack text-nowrap gap-2 d-flex">
 									<a
 										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
 										class="waves-effect waves-light"
-										onClick="@command('registerInfrastructureTemplate')"
+										onClick="@command('registerItem')"
 										label="Registrar Rastructure Template">
 									</a>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
 				<!--end col-->
-			</div>
-			<div class="col-lg-12 s-bot ">
+			</h:div>
+			<h:div class="col-lg-12 s-bot ">
 				<!-- Métricas Resumen -->
 				<h:div class="row g-3 mb-4">
 					<h:div class="col-md-3">
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.total{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total</h:p>
+								<fragment exps="@load(vm.totalItems)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
@@ -57,8 +59,10 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activos</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.active{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activos</h:p>
+								<fragment exps="@load(vm.activeItems)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
@@ -66,8 +70,10 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Pendientes</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.pending{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Pendientes</h:p>
+								<fragment exps="@load(vm.pendingApproval)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
@@ -75,15 +81,17 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							    <p class="mb-2" style="font-size: 14px; opacity: 0.9;">Inactivos</p>
-								<h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent="@load(vm.inactive{entity.class_name}s)"></h2>
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Inactivos</h:p>
+								<fragment exps="@load(vm.inactiveItems)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
 							</h:div>
 						</h:div>
 					</h:div>
 				</h:div>
-			</div>
-			<div class="section filters">
-				<div class="search-bar">
+			</h:div>
+			<h:div class="section filters">
+				<h:div class="search-bar">
 					<!-- Búsqueda por texto -->
 					<textbox value="@bind(vm.searchTerm)"
 						placeholder="Buscar..."
@@ -97,20 +105,20 @@
 						<comboitem label="TIPO 1" value="TYPE1" />
 						<comboitem label="TIPO 2" value="TYPE2" />
 					</combobox>
-				</div>
-				<div class="filter-icons">
+				</h:div>
+				<h:div class="filter-icons">
 					<a tooltiptext="Buscar"
 						iconSclass="fa-duotone fa-magnifying-glass-waveform"
 						onClick="@command('applyFilters')" />
 					<a tooltiptext="Limpiar"
 						iconSclass="fa-duotone fa-broom-wide"
 						onClick="@command('clearFilters')" />
-				</div>
-			</div>
-			<div class="col-xxl-12 s-bot">
-				<div class="card">
-					<div class="card-body">
-						<div id="divTemplate" sclass="col-lg-12">
+				</h:div>
+			</h:div>
+			<h:div class="col-xxl-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div id="divTemplate" sclass="col-lg-12">
 							<!-- listado -->
 							<grid model="@load(vm.filteredItems)"
 								style="overflow:auto;">
@@ -148,7 +156,7 @@
 								<template name="model" var="infrastructure">
 									<row
 										style="text-align:right;cursor:pointer;"
-										onClick="@command('viewInfrastructureTemplateDetails', infrastructureId=infrastructure.idxinfrastructuretemplate)">
+										onClick="@command('viewItemDetails', itemId=infrastructure.idxinfrastructuretemplate)">
 										<label
 											value="@load(infrastructure.idxinfrastructuretemplate) @converter(vm.fieldConverter)">
 										</label>
@@ -174,20 +182,20 @@
 										</label>
 										<cell align="center"
 											class="d-flex">
-											<div class="edit">
+											<h:div class="edit">
 												<a
-													onClick="@command('viewInfrastructureTemplateDetails', infrastructureId=infrastructure.idxinfrastructuretemplate)"
+													onClick="@command('viewItemDetails', itemId=infrastructure.idxinfrastructuretemplate)"
 													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
 													sclass="waves-effect waves-success"
 													tooltiptext="Ver detalles" />
-											</div>
-											<div class="delete">
+											</h:div>
+											<h:div class="delete">
 												<a
-													onClick="@command('deleteInfrastructureTemplate', infrastructureId=infrastructure.idxinfrastructuretemplate)"
+													onClick="@command('deleteItem', itemId=infrastructure.idxinfrastructuretemplate)"
 													iconSclass="fa-light fa-nfc-trash fa-xl"
 													sclass="waves-effect waves-danger"
 													tooltiptext="Eliminar" />
-											</div>
+											</h:div>
 										</cell>
 									</row>
 								</template>
@@ -204,10 +212,10 @@
 									<footer></footer>
 								</foot>
 							</grid>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div><!--end col-->
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div><!--end col-->
 	</idspace>
 </zk>
