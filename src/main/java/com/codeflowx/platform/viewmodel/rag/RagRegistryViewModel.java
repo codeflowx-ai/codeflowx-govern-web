@@ -219,7 +219,7 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
             
             if (isEditMode && currentSystemId != null) {
                 // Editar
-                system = businessService.findEntity(RagSystem.class, currentSystemId);
+                system = businessService.findById(RagSystem.class, currentSystemId);
                 if (system == null) {
                     Messagebox.show("Sistema no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
                     return;

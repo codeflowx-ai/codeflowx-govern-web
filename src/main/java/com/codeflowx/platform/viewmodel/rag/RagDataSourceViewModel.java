@@ -244,7 +244,7 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             
             if (isEditMode && currentSourceId != null) {
                 // Editar
-                source = businessService.findEntity(RagDataSource.class, currentSourceId);
+                source = businessService.findById(RagDataSource.class, currentSourceId);
                 if (source == null) {
                     Messagebox.show("Fuente no encontrada", "Error", Messagebox.OK, Messagebox.ERROR);
                     return;
@@ -258,7 +258,7 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             }
             
             // Actualizar campos
-            RagSystem ragSystem = businessService.findEntity(RagSystem.class, sourceRagSystemId);
+            RagSystem ragSystem = businessService.findById(RagSystem.class, sourceRagSystemId);
             if (ragSystem == null) {
                 Messagebox.show("Sistema RAG no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
                 return;

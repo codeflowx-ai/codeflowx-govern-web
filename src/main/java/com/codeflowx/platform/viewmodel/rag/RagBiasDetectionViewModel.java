@@ -3,15 +3,25 @@ package com.codeflowx.platform.viewmodel.rag;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.zkoss.bind.annotation.*;
+
+import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
+
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.rag.RagDataSource;
 import com.codeflowx.govern.entity.rag.RagSystem;
+
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -134,16 +144,17 @@ public class RagBiasDetectionViewModel extends BaseFront<RagBiasDetectionViewMod
             int compliantSources = 0;
             
             for (RagDataSource source : sourcesList) {
-                Integer biasScore = source.getRagdsbiasscore();
+                java.math.BigDecimal biasScore = source.getRagdsbiasscore();
                 if (biasScore != null) {
-                    totalScore += biasScore;
+                    double score = biasScore.doubleValue();
+                    totalScore += score;
                     countWithScore++;
                     
-                    if (biasScore >= 70) {
+                    if (score >= 70) {
                         highRiskSources++;
                     }
                     
-                    if (biasScore < 70) {
+                    if (score < 70) {
                         compliantSources++;
                     }
                 }
@@ -176,10 +187,10 @@ public class RagBiasDetectionViewModel extends BaseFront<RagBiasDetectionViewMod
                     break;
                 case "MEDIUM":
                     criterias.addCriteria(new Criteria(Operation.AND, Evaluation.GREATER_EQUALS, "ragdsbiasscore", 30));
-                    criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LESS, "ragdsbiasscore", 70));
+                    criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LESS_THAN_EQUALS, "ragdsbiasscore", 70));
                     break;
                 case "LOW":
-                    criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LESS, "ragdsbiasscore", 30));
+                    criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LESS_THAN_EQUALS, "ragdsbiasscore", 30));
                     break;
             }
         }
@@ -259,8 +270,8 @@ public class RagBiasDetectionViewModel extends BaseFront<RagBiasDetectionViewMod
     @Command
     @NotifyChange("*")
     public void reportToGovernance(@BindingParam("source") RagDataSource source) {
-        Integer biasScore = source.getRagdsbiasscore();
-        if (biasScore == null || biasScore < 70) {
+        java.math.BigDecimal biasScore = source.getRagdsbiasscore();
+        if (biasScore == null || biasScore.doubleValue() < 70) {
             Messagebox.show("Solo se pueden reportar fuentes de alto riesgo (score >= 70)", 
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
@@ -280,10 +291,10 @@ public class RagBiasDetectionViewModel extends BaseFront<RagBiasDetectionViewMod
                         // INTEGRACIÓN CON GOBIERNO: Registrar alerta de alto riesgo
                         String alertDescription = String.format(
                             "ALTO RIESGO - Sesgo detectado: Fuente '%s' (ID: %d) con score %d. " +
-                            "Sistema RAG: %s. Documentos afectados: %d. Requiere revisión inmediata.",
+            "Sistema RAG: %s. Documentos afectados: %d. Requiere revisión inmediata.",
                             source.getRagdssourcename(),
                             source.getIdxragdatasource(),
-                            biasScore,
+            biasScore.intValue(),
                             getRagSystemName(source.getRagSystem()),
                             source.getRagdsdocumentcount()
                         );

@@ -127,20 +127,20 @@ public class RagComplianceViewModel extends BaseFront<RagComplianceViewModel> {
             
             for (RagSystem system : systemsList) {
                 // Conformes
-                if ("COMPLIANT".equals(system.getRagcompliancestatus())) {
+                if ("COMPLIANT".equals(system.getRagcompliance())) {
                     compliantSystems++;
                 }
                 
                 // Alertas (sistemas no conformes o críticos)
-                if ("NON_COMPLIANT".equals(system.getRagcompliancestatus()) || 
+                if ("NON_COMPLIANT".equals(system.getRagcompliance()) || 
                     "CRITICAL".equals(system.getRagrisklevel())) {
                     activeAlerts++;
                 }
                 
                 // Score global
-                Integer score = system.getRagcompliancescore();
+                java.math.BigDecimal score = system.getRagoverallscore();
                 if (score != null) {
-                    totalScore += score;
+                    totalScore += score.doubleValue();
                 }
             }
             
@@ -198,7 +198,7 @@ public class RagComplianceViewModel extends BaseFront<RagComplianceViewModel> {
         Criterias criterias = new Criterias();
         
         if (filterCompliance != null && !filterCompliance.trim().isEmpty()) {
-            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragcompliancestatus", filterCompliance));
+            criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragcompliance", filterCompliance));
         }
         
         if (filterRiskLevel != null && !filterRiskLevel.trim().isEmpty()) {
@@ -283,7 +283,7 @@ public class RagComplianceViewModel extends BaseFront<RagComplianceViewModel> {
                 "Verificación de cumplimiento iniciada: " + system.getRagsystemname());
             
             // INTEGRACIÓN CON GOBIERNO: Si se detectan problemas, alertar
-            if ("NON_COMPLIANT".equals(system.getRagcompliancestatus())) {
+            if ("NON_COMPLIANT".equals(system.getRagcompliance())) {
                 logActivity("ALERTAR", "GOVERNANCE", system.getIdxragsystem(), 
                     "Sistema NO CONFORME requiere revisión: " + system.getRagsystemname());
             }
@@ -364,7 +364,7 @@ public class RagComplianceViewModel extends BaseFront<RagComplianceViewModel> {
     // Helpers
     
     public boolean hasActiveAlerts(RagSystem system) {
-        return "NON_COMPLIANT".equals(system.getRagcompliancestatus()) || 
+        return "NON_COMPLIANT".equals(system.getRagcompliance()) || 
                "CRITICAL".equals(system.getRagrisklevel());
     }
     

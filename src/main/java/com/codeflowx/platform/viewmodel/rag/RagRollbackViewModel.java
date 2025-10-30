@@ -211,7 +211,7 @@ public class RagRollbackViewModel extends BaseFront<RagRollbackViewModel> {
             }
             
             // Cargar sistema actual
-            RagSystem system = businessService.findEntity(RagSystem.class, rollbackRagSystemId);
+            RagSystem system = businessService.findById(RagSystem.class, rollbackRagSystemId);
             if (system != null) {
                 currentVersion = system.getRagversion();
             }
@@ -261,7 +261,7 @@ public class RagRollbackViewModel extends BaseFront<RagRollbackViewModel> {
             // Crear rollback
             RagRollback rollback = new RagRollback();
             
-            RagSystem ragSystem = businessService.findEntity(RagSystem.class, rollbackRagSystemId);
+            RagSystem ragSystem = businessService.findById(RagSystem.class, rollbackRagSystemId);
             if (ragSystem == null) {
                 Messagebox.show("Sistema RAG no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
                 return;

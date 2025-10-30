@@ -98,12 +98,11 @@ public class RagDataSourceDetailViewModel extends MasterPage {
     // ========== Validadores ==========
     private UniqueValidator unique;
     
-    private String originalRagname = null;
+    private String originalRagdssourcename = null;
     
     // ========== Listas para combos (FK) ==========
-    private List<String> availableRagtypes = new ArrayList<>();
-    private List<String> availableRagstatuss = new ArrayList<>();
-    private List<String> availableRagsyncstatuss = new ArrayList<>();
+    private List<String> availableRagdssourcetypes = new ArrayList<>();
+    private List<String> availableRagdsindexstatuss = new ArrayList<>();
     
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     
@@ -145,9 +144,8 @@ public class RagDataSourceDetailViewModel extends MasterPage {
         currentRagDataSource = new RagDataSource();
         editing = false;
         pageTitle = "Crear Nuevo";
-        loadRagtypes();
-        loadRagstatuss();
-        loadRagsyncstatuss();
+        loadRagdssourcetypes();
+        loadRagdsindexstatuss();
     }
     
     private void loadItem(Long id) {
@@ -168,18 +166,17 @@ public class RagDataSourceDetailViewModel extends MasterPage {
             }
             
             editing = true;
-            pageTitle = "Editar: " + currentRagDataSource.getRagname();
-        loadRagtypes();
-        loadRagstatuss();
-        loadRagsyncstatuss();
+            pageTitle = "Editar: " + currentRagDataSource.getRagdssourcename();
+            loadRagdssourcetypes();
+            loadRagdsindexstatuss();
             
             // Cargar tags/roles existentes desde JSON
             
             // Guardar valores originales para validación de unicidad
-            originalRagname = currentRagDataSource.getRagname();
+            originalRagdssourcename = currentRagDataSource.getRagdssourcename();
             
             // Auditar carga de registro
-            logActivity("CONSULTA", "RAGRAGDATASOURCES", id, "Consulta: " + currentRagDataSource.getRagname());
+            logActivity("CONSULTA", "RAGDATASOURCES", id, "Consulta: " + currentRagDataSource.getRagdssourcename());
             
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
@@ -207,15 +204,15 @@ public class RagDataSourceDetailViewModel extends MasterPage {
             if (isNew) {
                 businessService.save(currentRagDataSource);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "RAGRAGDATASOURCES", currentRagDataSource.getIdxragdatasource(), 
-                    "Creado: " + currentRagDataSource.getRagname());
+                logActivity("CREACION", "RAGDATASOURCES", currentRagDataSource.getIdxragdatasource(), 
+                    "Creado: " + currentRagDataSource.getRagdssourcename());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 businessService.update(currentRagDataSource);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "RAGRAGDATASOURCES", currentRagDataSource.getIdxragdatasource(), 
-                    "Actualizado: " + currentRagDataSource.getRagname());
+                logActivity("EDICION", "RAGDATASOURCES", currentRagDataSource.getIdxragdatasource(), 
+                    "Actualizado: " + currentRagDataSource.getRagdssourcename());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
@@ -239,25 +236,19 @@ public class RagDataSourceDetailViewModel extends MasterPage {
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
         
-        if (currentRagDataSource.getRagname() == null || currentRagDataSource.getRagname().trim().isEmpty()) {
-            errors.append("- Name\n");
+        if (currentRagDataSource.getRagdssourcename() == null || currentRagDataSource.getRagdssourcename().trim().isEmpty()) {
+            errors.append("- Source Name\n");
         }
-        if (currentRagDataSource.getRagname() != null && currentRagDataSource.getRagname().length() > 255) {
-            errors.append("- Name no puede exceder 255 caracteres\n");
+        if (currentRagDataSource.getRagdssourcename() != null && currentRagDataSource.getRagdssourcename().length() > 255) {
+            errors.append("- Source Name no puede exceder 255 caracteres\n");
         }
-        if (currentRagDataSource.getRagtype() == null || currentRagDataSource.getRagtype().trim().isEmpty()) {
-            errors.append("- Type\n");
+        if (currentRagDataSource.getRagdssourcetype() == null || currentRagDataSource.getRagdssourcetype().trim().isEmpty()) {
+            errors.append("- Source Type\n");
         }
-        if (currentRagDataSource.getRagstatus() == null || currentRagDataSource.getRagstatus().trim().isEmpty()) {
-            errors.append("- Status\n");
+        if (currentRagDataSource.getRagdsindexstatus() == null || currentRagDataSource.getRagdsindexstatus().trim().isEmpty()) {
+            errors.append("- Index Status\n");
         }
-        if (currentRagDataSource.getRagcreatedby() == null || currentRagDataSource.getRagcreatedby().trim().isEmpty()) {
-            errors.append("- Created By\n");
-        }
-        if (currentRagDataSource.getRagcreatedby() != null && currentRagDataSource.getRagcreatedby().length() > 255) {
-            errors.append("- Created By no puede exceder 255 caracteres\n");
-        }
-        if (currentRagDataSource.getRagcreatedat() == null) {
+        if (currentRagDataSource.getRagdscreatedat() == null) {
             errors.append("- Created At\n");
         }
         
@@ -279,25 +270,20 @@ public class RagDataSourceDetailViewModel extends MasterPage {
         appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
     }
     
-    private void loadRagtypes() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagtypes.add("OPTION_1");
-        availableRagtypes.add("OPTION_2");
-        availableRagtypes.add("OPTION_3");
+    private void loadRagdssourcetypes() {
+        // Cargar tipos de fuente
+        availableRagdssourcetypes.add("FILE_SYSTEM");
+        availableRagdssourcetypes.add("API");
+        availableRagdssourcetypes.add("DATABASE");
+        availableRagdssourcetypes.add("WEB_SCRAPING");
     }
     
-    private void loadRagstatuss() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagstatuss.add("OPTION_1");
-        availableRagstatuss.add("OPTION_2");
-        availableRagstatuss.add("OPTION_3");
-    }
-    
-    private void loadRagsyncstatuss() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagsyncstatuss.add("OPTION_1");
-        availableRagsyncstatuss.add("OPTION_2");
-        availableRagsyncstatuss.add("OPTION_3");
+    private void loadRagdsindexstatuss() {
+        // Cargar estados de indexación
+        availableRagdsindexstatuss.add("PENDING");
+        availableRagdsindexstatuss.add("IN_PROGRESS");
+        availableRagdsindexstatuss.add("COMPLETED");
+        availableRagdsindexstatuss.add("FAILED");
     }
     
     /**
@@ -341,17 +327,13 @@ public class RagDataSourceDetailViewModel extends MasterPage {
             // Limpiar listas de FK
             
             // Limpiar listas de LIST_STRING
-            if (availableRagtypes != null) {
-                availableRagtypes.clear();
-                availableRagtypes = null;
+            if (availableRagdssourcetypes != null) {
+                availableRagdssourcetypes.clear();
+                availableRagdssourcetypes = null;
             }
-            if (availableRagstatuss != null) {
-                availableRagstatuss.clear();
-                availableRagstatuss = null;
-            }
-            if (availableRagsyncstatuss != null) {
-                availableRagsyncstatuss.clear();
-                availableRagsyncstatuss = null;
+            if (availableRagdsindexstatuss != null) {
+                availableRagdsindexstatuss.clear();
+                availableRagdsindexstatuss = null;
             }
             
             // Limpiar colecciones @OneToMany
