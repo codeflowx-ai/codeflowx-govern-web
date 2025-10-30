@@ -7,7 +7,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.zkoss.bind.annotation.*;
+import org.zkoss.bind.annotation.AfterCompose;
+import org.zkoss.bind.annotation.BindingParam;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.ContextParam;
+import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -218,6 +225,37 @@ public class DomainIngestionWizardViewModel extends BaseFront<DomainIngestionWiz
 		if (!validateStep(1)) return false;
 		if (!validateStep(2)) return false;
 		return true;
+	}
+
+	private void clear() {
+		// Reset step
+		currentStepIndex = 0;
+		initSteps();
+		initTemplates();
+
+		// Reset basic info
+		domainName = null;
+		domainDescription = null;
+		industry = null;
+		businessArea = null;
+		domainIcon = null;
+		domainColor = null;
+
+		// Reset data sources
+		selectedDataSources = new java.util.HashSet<>();
+
+		// Reset compliance
+		regulatoryFramework = null;
+		privacyLevel = null;
+		dataRetentionYears = 1;
+		complianceChecks = true;
+
+		// Reset advanced features
+		ragEnabled = false;
+		trainingEnabled = false;
+		autoIngestion = false;
+		qualityThreshold = 70;
+		retentionDays = 365;
 	}
 
 	private boolean isEmpty(String s) { return s == null || s.trim().isEmpty(); }

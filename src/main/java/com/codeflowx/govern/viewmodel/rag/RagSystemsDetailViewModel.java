@@ -8,21 +8,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 
+import org.enartframework.nocode.dao.IEntityLocal;
+import org.enartframework.suinsit.Context;
 import org.enartframework.web.exception.UiException;
 import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
-import org.enartframework.nocode.dao.IEntityLocal;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
+import org.zkoss.bind.annotation.Destroy;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.Selectors;
@@ -31,25 +31,17 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.govern.entity.rag.RagSystem;
-import com.codeflowx.govern.entity.rag.RagDataSource;
-import com.codeflowx.govern.entity.rag.RagVersion;
-import com.codeflowx.govern.entity.functions.rag.CalculateIndexHealth;
 import com.codeflowx.govern.entity.procedures.rag.IngestDocuments;
+import com.codeflowx.govern.entity.rag.RagDataSource;
+import com.codeflowx.govern.entity.rag.RagSystem;
+import com.codeflowx.govern.entity.rag.RagVersion;
+
 import codeflowx.nocode.persist.BusinessService;
-import codeflowx.nocode.persist.Criteria;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.Evaluation;
-import codeflowx.nocode.persist.Operation;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.zkoss.bind.annotation.Destroy;
 
 /**
  * ViewModel para DETALLE/EDICIÓN/CREACIÓN de sistemas RAG
@@ -157,7 +149,7 @@ public class RagSystemsDetailViewModel extends MasterPage {
         currentRagSystem.setRagupdatedat(new Timestamp(System.currentTimeMillis()));
         currentRagSystem.setRagcreatedby(getUser().getUsername());
         currentRagSystem.setRagstatus("DRAFT");
-        currentRagSystem.setRagapprovalstatus("PENDING");
+        currentRagSystem.setRaggovernancestatus("PENDING");
         currentRagSystem.setRagversion("1.0");
         
         editing = false;
@@ -181,10 +173,10 @@ public class RagSystemsDetailViewModel extends MasterPage {
                 return;
             }
             
-            log.info("Sistema RAG cargado: {}", currentRagSystem.getRagname());
+            log.info("Sistema RAG cargado: {}", currentRagSystem.getRagsystemname());
             
             editing = true;
-            pageTitle = "Editar Sistema RAG: " + currentRagSystem.getRagname();
+            pageTitle = "Editar Sistema RAG: " + currentRagSystem.getRagsystemname();
             
             // Cargar información descendente
             loadRagDataSources();
@@ -209,15 +201,15 @@ public class RagSystemsDetailViewModel extends MasterPage {
             totalDataSources = (long) ragDataSources.size();
             totalVersions = (long) ragVersions.size();
             
-            // Contar fuentes activas
+            // Contar fuentes indexadas (usamos estado de indexación de la fuente)
             activeDataSources = ragDataSources.stream()
-                .filter(ds -> "ACTIVE".equals(ds.getRagstatus()))
+                .filter(ds -> "COMPLETED".equals(ds.getRagdsindexstatus()))
                 .count();
-            
+
             // Sumar documentos totales de todas las fuentes
             totalDocuments = ragDataSources.stream()
-                .filter(ds -> ds.getRagdocumentcount() != null)
-                .mapToLong(RagDataSource::getRagdocumentcount)
+                .filter(ds -> ds.getRagdsdocumentcount() != null)
+                .mapToLong(ds -> ds.getRagdsdocumentcount().longValue())
                 .sum();
             
             // Calcular index health (simplificado)
@@ -317,10 +309,10 @@ public class RagSystemsDetailViewModel extends MasterPage {
     @NotifyChange("*")
     public void saveRagSystem() {
         try {
-            log.info("Guardando sistema RAG: {}", currentRagSystem.getRagname());
+            log.info("Guardando sistema RAG: {}", currentRagSystem.getRagsystemname());
             
             // Validaciones de negocio
-            if (currentRagSystem.getRagname() == null || currentRagSystem.getRagname().trim().isEmpty()) {
+            if (currentRagSystem.getRagsystemname() == null || currentRagSystem.getRagsystemname().trim().isEmpty()) {
                 Messagebox.show("El nombre del sistema RAG es requerido",
                     "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
@@ -335,14 +327,14 @@ public class RagSystemsDetailViewModel extends MasterPage {
             if (currentRagSystem.getIdxragsystem() == null) {
                 businessService.save(currentRagSystem);
                 log.info("Sistema RAG creado exitosamente: ID={}, nombre={}",
-                    currentRagSystem.getIdxragsystem(), currentRagSystem.getRagname());
+                    currentRagSystem.getIdxragsystem(), currentRagSystem.getRagsystemname());
                 Messagebox.show("Sistema RAG creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 currentRagSystem.setRagupdatedat(new Timestamp(System.currentTimeMillis()));
                 businessService.update(currentRagSystem);
                 log.info("Sistema RAG actualizado exitosamente: ID={}, nombre={}",
-                    currentRagSystem.getIdxragsystem(), currentRagSystem.getRagname());
+                    currentRagSystem.getIdxragsystem(), currentRagSystem.getRagsystemname());
                 Messagebox.show("Sistema RAG actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }

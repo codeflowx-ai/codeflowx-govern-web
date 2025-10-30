@@ -349,7 +349,7 @@ public class RagAccessControlViewModel extends BaseFront<RagAccessControlViewMod
         
         Messagebox.show(
             "Permisos configurados para: " + system.getRagsystemname() + "\n\n" +
-            "Nivel de acceso: " + (system.getRagaccesslevel() != null ? system.getRagaccesslevel() : "No configurado"),
+            "Estado de gobierno: " + (system.getRaggovernancestatus() != null ? system.getRaggovernancestatus() : "No configurado"),
             "Permisos del Sistema", 
             Messagebox.OK, 
             Messagebox.INFORMATION);

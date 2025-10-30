@@ -89,15 +89,15 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
     @NotifyChange("*")
     public void saveDataSource() {
         if (selectedDomain == null) {
-            Messagebox.show("Seleccione un dominio", "Validación", Messagebox.OK, Messagebox.WARNING);
+            Messagebox.show("Seleccione un dominio", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         if (dataSource.getDindsname() == null || dataSource.getDindsname().trim().isEmpty()) {
-            Messagebox.show("Ingrese un nombre", "Validación", Messagebox.OK, Messagebox.WARNING);
+            Messagebox.show("Ingrese un nombre", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         if (dataSource.getDindsurl() == null || dataSource.getDindsurl().trim().isEmpty()) {
-            Messagebox.show("Ingrese una URL", "Validación", Messagebox.OK, Messagebox.WARNING);
+            Messagebox.show("Ingrese una URL", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         
