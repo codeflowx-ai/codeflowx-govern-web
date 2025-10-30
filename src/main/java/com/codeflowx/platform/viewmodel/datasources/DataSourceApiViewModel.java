@@ -39,7 +39,7 @@ public class DataSourceApiViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("DATA_SOURCES_API", "ACCESS", "Usuario accedió a APIs de Data Sources");
+        logActivity("ACCESS", "DATA_SOURCES_API", null, "Usuario accedió a APIs de Data Sources");
         loadDataSourceApis();
     }
 
@@ -50,19 +50,19 @@ public class DataSourceApiViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("DATA_SOURCES_API", "LEAVE", "Usuario salió de APIs de Data Sources");
+        logActivity("LEAVE", "DATA_SOURCES_API", null, "Usuario salió de APIs de Data Sources");
     }
 
     private void loadDataSourceApis() {
         try {
             if (datasourceId != null) {
-                dataSource = getUXCriteriaManager().findById(DataSource.class, datasourceId);
+                dataSource = businessService.findById(DataSource.class, datasourceId);
                 if (dataSource != null) {
                     apiList = dataSource.getSubdatasourceapis();
                 }
             } else {
                 Criterias criterias = new Criterias();
-                apiList = getUXCriteriaManager().find(DataSourceApi.class, criterias);
+                apiList = businessService.find(DataSourceApi.class, criterias);
             }
         } catch (Exception e) {
             log.error("Error loading data source APIs", e);
@@ -85,7 +85,7 @@ public class DataSourceApiViewModel extends BaseFront {
             selectedApi.setDataSource(dataSource);
         }
         
-        logActivity("DATA_SOURCES_API", "CREATE_INIT", "Iniciando creación de nueva API");
+        logActivity("CREATE_INIT", "DATA_SOURCES_API", null, "Iniciando creación de nueva API");
     }
 
     @Command
@@ -103,10 +103,10 @@ public class DataSourceApiViewModel extends BaseFront {
             }
             
             selectedApi.setApiupdatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(selectedApi);
+            businessService.save(selectedApi);
             
             Messagebox.show("API guardada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            logActivity("DATA_SOURCES_API", "SAVE", "API guardada: " + selectedApi.getApiname());
+            logActivity("SAVE", "DATA_SOURCES_API", selectedApi.getIdxdatasourceapi(), "API guardada: " + selectedApi.getApiname());
             
             loadDataSourceApis();
             selectedApi = null;
@@ -120,7 +120,7 @@ public class DataSourceApiViewModel extends BaseFront {
     @NotifyChange({"selectedApi"})
     public void edit(DataSourceApi api) {
         selectedApi = api;
-        logActivity("DATA_SOURCES_API", "EDIT_INIT", "Editando API: " + api.getApiname());
+        logActivity("EDIT_INIT", "DATA_SOURCES_API", api.getIdxdatasourceapi(), "Editando API: " + api.getApiname());
     }
 
     @Command
@@ -130,10 +130,10 @@ public class DataSourceApiViewModel extends BaseFront {
             api.setApilasttestat(new Timestamp(System.currentTimeMillis()));
             api.setApitestresult("Test ejecutado correctamente");
             api.setApistatus("ACTIVE");
-            getUXCriteriaManager().save(api);
+            businessService.save(api);
             
             Messagebox.show("Test de conexión exitoso", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            logActivity("DATA_SOURCES_API", "TEST", "Test de conexión: " + api.getApiname());
+            logActivity("TEST", "DATA_SOURCES_API", api.getIdxdatasourceapi(), "Test de conexión: " + api.getApiname());
             
             loadDataSourceApis();
         } catch (Exception e) {
@@ -152,10 +152,10 @@ public class DataSourceApiViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        getUXCriteriaManager().remove(api);
+                        businessService.removeFromID(DataSourceApi.class, api.getIdxdatasourceapi());
                         Messagebox.show("API eliminada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         
-                        logActivity("DATA_SOURCES_API", "DELETE", "API eliminada: " + api.getApiname());
+                        logActivity("DELETE", "DATA_SOURCES_API", api.getIdxdatasourceapi(), "API eliminada: " + api.getApiname());
                         loadDataSourceApis();
                         if (selectedApi != null && selectedApi.getIdxdatasourceapi().equals(api.getIdxdatasourceapi())) {
                             selectedApi = null;
@@ -172,7 +172,7 @@ public class DataSourceApiViewModel extends BaseFront {
     @NotifyChange({"selectedApi"})
     public void cancel() {
         selectedApi = null;
-        logActivity("DATA_SOURCES_API", "CANCEL", "Cancelada edición/creación");
+        logActivity("CANCEL", "DATA_SOURCES_API", null, "Cancelada edición/creación");
     }
 
     // Getters and Setters

@@ -56,7 +56,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("DATA_SOURCES", "ACCESS", "Usuario accedió al módulo de Data Sources");
+        logActivity("ACCESS", "DATA_SOURCES", null, "Usuario accedió al módulo de Data Sources");
         loadDataSources();
         calculateStatistics();
     }
@@ -69,13 +69,13 @@ public class DataSourceOverviewViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("DATA_SOURCES", "LEAVE", "Usuario salió del módulo de Data Sources");
+        logActivity("LEAVE", "DATA_SOURCES", null, "Usuario salió del módulo de Data Sources");
     }
 
     private void loadDataSources() {
         try {
             Criterias criterias = new Criterias();
-            allDataSources = getUXCriteriaManager().find(DataSource.class, criterias);
+            allDataSources = businessService.find(DataSource.class, criterias);
             applyFilters();
         } catch (Exception e) {
             log.error("Error loading data sources", e);
@@ -111,7 +111,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
         filterType = null;
         filterStatus = null;
         applyFilters();
-        logActivity("DATA_SOURCES", "CLEAR_FILTERS", "Filtros limpiados");
+        logActivity("CLEAR_FILTERS", "DATA_SOURCES", null, "Filtros limpiados");
     }
 
     @Command
@@ -119,18 +119,18 @@ public class DataSourceOverviewViewModel extends BaseFront {
                    "activeDataSources", "syncingDataSources", "errorDataSources"})
     public void showCreateDialog() {
         // Navigate to create page or show dialog
-        logActivity("DATA_SOURCES", "CREATE_INIT", "Iniciando creación de nueva fuente de datos");
+        logActivity("CREATE_INIT", "DATA_SOURCES", null, "Iniciando creación de nueva fuente de datos");
     }
 
     @Command
     public void viewDetails(DataSource item) {
-        logActivity("DATA_SOURCES", "VIEW_DETAILS", "Viendo detalles de: " + item.getDsname());
+        logActivity("VIEW_DETAILS", "DATA_SOURCES", item.getIdxdatasource(), "Viendo detalles de: " + item.getDsname());
         // Navigate to details
     }
 
     @Command
     public void editDataSource(DataSource item) {
-        logActivity("DATA_SOURCES", "EDIT_INIT", "Editando fuente de datos: " + item.getDsname());
+        logActivity("EDIT_INIT", "DATA_SOURCES", item.getIdxdatasource(), "Editando fuente de datos: " + item.getDsname());
         // Navigate to edit page
     }
 
@@ -141,12 +141,12 @@ public class DataSourceOverviewViewModel extends BaseFront {
             item.setDsstatus("SYNCING");
             item.setDssyncstatus("IN_PROGRESS");
             item.setDsupdatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(item);
+            businessService.save(item);
             
             Messagebox.show("Sincronización iniciada para: " + item.getDsname(), 
                           "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             
-            logActivity("DATA_SOURCES", "SYNC", "Sincronización iniciada: " + item.getDsname());
+            logActivity("SYNC", "DATA_SOURCES", item.getIdxdatasource(), "Sincronización iniciada: " + item.getDsname());
             loadDataSources();
             calculateStatistics();
         } catch (Exception e) {
@@ -165,11 +165,11 @@ public class DataSourceOverviewViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        getUXCriteriaManager().remove(item);
+                        businessService.removeFromID(DataSource.class, item.getIdxdatasource());
                         Messagebox.show("Fuente de datos eliminada correctamente", 
                                       "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         
-                        logActivity("DATA_SOURCES", "DELETE", "Fuente de datos eliminada: " + item.getDsname());
+                        logActivity("DELETE", "DATA_SOURCES", item.getIdxdatasource(), "Fuente de datos eliminada: " + item.getDsname());
                         loadDataSources();
                         calculateStatistics();
                     } catch (Exception e) {
@@ -184,7 +184,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
     @Command
     @NotifyChange({"dataSourcesList"})
     public void changePage() {
-        logActivity("DATA_SOURCES", "PAGE_CHANGE", "Cambio a página: " + activePage);
+        logActivity("PAGE_CHANGE", "DATA_SOURCES", null, "Cambio a página: " + activePage);
     }
 
     @NotifyChange({"totalDataSources", "activeDataSources", "syncingDataSources", "errorDataSources"})
