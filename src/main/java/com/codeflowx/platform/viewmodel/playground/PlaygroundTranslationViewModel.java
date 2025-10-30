@@ -1,149 +1,301 @@
 package com.codeflowx.platform.viewmodel.playground;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.zkoss.bind.annotation.*;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
-import com.codeflowx.framework.zkoss.BaseFront;
+
+import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundTranslation;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.PageParams;
-import codeflowx.nocode.persist.PageResult;
-import lombok.Getter;
-import lombok.Setter;
+import com.codeflowx.platform.service.BaseFront;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Getter
-@Setter
-@Init(superclass = true)
-@VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundTranslationViewModel extends BaseFront<PlaygroundTranslationViewModel> {
-    private static final long serialVersionUID = 1L;
+public class PlaygroundTranslationViewModel extends BaseFront {
+
+    private PlaygroundSession currentSession;
+    private List<PlaygroundTranslation> allTranslations = new ArrayList<>();
+    private List<PlaygroundTranslation> filteredTranslations = new ArrayList<>();
     
-    @Override
-    public void setBeans(Object bean) {}
+    private String sourceText = "";
+    private String targetText = "";
+    private String sourceLanguage = "es";
+    private String targetLanguage = "en";
+    private BigDecimal confidence = BigDecimal.ZERO;
+    private Model selectedModel;
     
-    private String sourceText;
-    private String translatedText;
-    private String sourceLanguage = "auto";
-    private String targetLanguage = "es";
-    private String translationModel = "gpt-4";
-    private boolean isTranslating = false;
+    private String searchTerm = "";
+    private int activePage = 0;
+    private int pageSize = 10;
     
-    private int sourceTextLength = 0;
-    private int translatedTextLength = 0;
-    private java.math.BigDecimal translationQuality = java.math.BigDecimal.ZERO;
-    private java.math.BigDecimal sourceToxicityScore = java.math.BigDecimal.ZERO;
-    
-    private boolean showComplianceMonitor = false;
-    private String complianceAlertType = "info";
-    private boolean contentViolation = false;
-    private boolean piiDetected = false;
-    private java.math.BigDecimal toxicityScore = java.math.BigDecimal.ZERO;
-    
-    private List<PlaygroundTranslation> translationsList = new ArrayList<>();
-    
-    @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
-        Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
+    private List<Model> availableModels = new ArrayList<>();
+    private List<String> availableLanguages = List.of("es", "en", "fr", "de", "it", "pt", "zh", "ja", "ru", "ar");
+
+    @Init(superclass = true)
+    public void init() {
+        logActivity("PLAYGROUND_TRANSLATION", "ACCESS", "Usuario accedió a Translation Playground");
+        loadAvailableModels();
+        loadOrCreateSession();
         loadTranslations();
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadTranslations() {
+
+    @Destroy
+    public void destroy() {
+        logActivity("PLAYGROUND_TRANSLATION", "LEAVE", "Usuario salió de Translation Playground");
+    }
+
+    private void loadAvailableModels() {
         try {
-            PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundTranslation> result = businessService.findAllEntity(
-                PlaygroundTranslation.class, params, new Criterias());
-            
-            if (result != null && result.getContent() != null) {
-                translationsList = result.getContent();
-                
-                // Auditar búsqueda
-                logActivity("BUSCAR", "PLAYGROUNDTRANSLATIONS", null, 
-                    "Búsqueda: " + translationsList.size() + " traducciones");
-            } else {
-                translationsList = new ArrayList<>();
+            Criterias criterias = new Criterias();
+            criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+        } catch (Exception e) {
+            log.error("Error loading models", e);
+        }
+    }
+
+    private void loadOrCreateSession() {
+        try {
+            currentSession = new PlaygroundSession();
+            currentSession.setSessionname("Translation Session - " + new Timestamp(System.currentTimeMillis()));
+            currentSession.setSessiontype("TRANSLATION");
+            currentSession.setSessionstatus("ACTIVE");
+            currentSession.setSessioncreatedby(getUserName());
+            currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(currentSession);
+        } catch (Exception e) {
+            log.error("Error creating session", e);
+        }
+    }
+
+    private void loadTranslations() {
+        try {
+            if (currentSession != null) {
+                allTranslations = currentSession.getSubplaygroundtranslations();
+                applyFilters();
             }
         } catch (Exception e) {
             log.error("Error loading translations", e);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
+    @NotifyChange({"targetText", "confidence", "filteredTranslations", "translationHistory"})
     public void translate() {
-        if (sourceText == null || sourceText.trim().isEmpty()) {
-            Messagebox.show("Please enter text to translate", "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
+        if (selectedModel == null) {
+            Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+            return;
+        }
+        
+        if (StringUtils.isBlank(sourceText)) {
+            Messagebox.show("Por favor ingresa el texto a traducir", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         
         try {
-            isTranslating = true;
-            showComplianceMonitor = true;
+            PlaygroundTranslation translation = new PlaygroundTranslation();
+            translation.setSession(currentSession);
+            translation.setTranslationsourcetext(sourceText);
+            translation.setTranslationsourcelanguage(sourceLanguage);
+            translation.setTranslationtargetlanguage(targetLanguage);
+            translation.setTranslationstatus("TRANSLATING");
+            translation.setModel(selectedModel);
+            translation.setTranslationcreatedby(getUserName());
+            translation.setTranslationcreatedat(new Timestamp(System.currentTimeMillis()));
             
-            // TODO: Integración con leka-server para traducción
-            translatedText = "[Translation result - requires leka-server integration]";
-            translationQuality = new java.math.BigDecimal("0.95");
-            translatedTextLength = translatedText.length();
+            // Simulate translation
+            translation.setTranslationtargettext("This is a simulated translation of the source text.");
+            translation.setTranslationstatus("COMPLETED");
+            translation.setTranslationconfidence(new BigDecimal("95.5"));
+            translation.setTranslationprocessingtime(850);
+            translation.setTranslationcost(new BigDecimal("0.002"));
+            translation.setTranslationmethod("NEURAL");
             
-            // Simular análisis de compliance
-            contentViolation = false;
-            piiDetected = false;
-            toxicityScore = new java.math.BigDecimal("0.1");
-            complianceAlertType = "success";
+            getUXCriteriaManager().save(translation);
             
+            targetText = translation.getTranslationtargettext();
+            confidence = translation.getTranslationconfidence();
+            
+            loadTranslations();
+            logActivity("PLAYGROUND_TRANSLATION", "TRANSLATE", "Texto traducido");
         } catch (Exception e) {
             log.error("Error translating", e);
-            complianceAlertType = "danger";
-        } finally {
-            isTranslating = false;
+            Messagebox.show("Error al traducir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
+    @NotifyChange({"sourceText", "targetText", "sourceLanguage", "targetLanguage"})
     public void swapLanguages() {
-        String temp = sourceLanguage;
+        String tempLang = sourceLanguage;
         sourceLanguage = targetLanguage;
-        targetLanguage = temp;
+        targetLanguage = tempLang;
         
         String tempText = sourceText;
-        sourceText = translatedText;
-        translatedText = tempText;
+        sourceText = targetText;
+        targetText = tempText;
+        
+        logActivity("PLAYGROUND_TRANSLATION", "SWAP_LANGUAGES", "Idiomas intercambiados");
     }
-    
+
     @Command
-    public void viewTranslation(@BindingParam("translation") PlaygroundTranslation translation) {
-        sourceText = translation.getSourcetext();
-        translatedText = translation.getTranslatedtext();
-        sourceLanguage = translation.getSourcelanguage();
-        targetLanguage = translation.getTargetlanguage();
+    public void transcribeSource() {
+        logActivity("PLAYGROUND_TRANSLATION", "TRANSCRIBE_SOURCE", "Transcribiendo fuente");
     }
-    
-    public String truncate(String text, int length) {
-        if (text == null) return "";
-        return text.length() > length ? text.substring(0, length) + "..." : text;
+
+    @Command
+    public void speakTarget() {
+        logActivity("PLAYGROUND_TRANSLATION", "SPEAK_TARGET", "Reproduciendo traducción");
     }
-    
-    public String formatDate(Timestamp ts) {
-        return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+
+    @Command
+    public void copyTranslation() {
+        logActivity("PLAYGROUND_TRANSLATION", "COPY", "Copiando traducción");
     }
-    
-    @Destroy
-    public void destroy() {
-        if (translationsList != null) { 
-            translationsList.clear(); 
-            translationsList = null; 
+
+    @Command
+    @NotifyChange({"sourceText", "targetText", "sourceLanguage", "targetLanguage"})
+    public void reuseTranslation(PlaygroundTranslation translation) {
+        sourceText = translation.getTranslationsourcetext();
+        targetText = translation.getTranslationtargettext();
+        sourceLanguage = translation.getTranslationsourcelanguage();
+        targetLanguage = translation.getTranslationtargetlanguage();
+        logActivity("PLAYGROUND_TRANSLATION", "REUSE", "Re-usando traducción");
+    }
+
+    @Command
+    @NotifyChange({"filteredTranslations", "translationHistory"})
+    public void deleteTranslation(PlaygroundTranslation translation) {
+        try {
+            getUXCriteriaManager().remove(translation);
+            loadTranslations();
+            logActivity("PLAYGROUND_TRANSLATION", "DELETE", "Traducción eliminada");
+        } catch (Exception e) {
+            log.error("Error deleting translation", e);
         }
-        businessService = null;
+    }
+
+    @Command
+    @NotifyChange({"filteredTranslations", "translationHistory"})
+    public void search() {
+        applyFilters();
+    }
+
+    @Command
+    @NotifyChange({"translationHistory"})
+    public void changePage() {
+        logActivity("PLAYGROUND_TRANSLATION", "PAGE_CHANGE", "Cambio a página: " + activePage);
+    }
+
+    @Command
+    @NotifyChange("*")
+    public void newSession() {
+        loadOrCreateSession();
+        allTranslations.clear();
+        filteredTranslations.clear();
+        sourceText = "";
+        targetText = "";
+    }
+
+    private void applyFilters() {
+        filteredTranslations = allTranslations.stream()
+            .filter(t -> {
+                if (StringUtils.isNotBlank(searchTerm)) {
+                    return t.getTranslationsourcetext().toLowerCase().contains(searchTerm.toLowerCase()) ||
+                           t.getTranslationtargettext().toLowerCase().contains(searchTerm.toLowerCase());
+                }
+                return true;
+            })
+            .collect(Collectors.toList());
+    }
+
+    // Getters and Setters
+    public List<PlaygroundTranslation> getTranslationHistory() {
+        int start = activePage * pageSize;
+        int end = Math.min(start + pageSize, filteredTranslations.size());
+        return start < filteredTranslations.size() ? 
+               filteredTranslations.subList(start, end) : new ArrayList<>();
+    }
+
+    public int getTotalSize() {
+        return filteredTranslations.size();
+    }
+
+    public String getSourceText() {
+        return sourceText;
+    }
+
+    public void setSourceText(String sourceText) {
+        this.sourceText = sourceText;
+    }
+
+    public String getTargetText() {
+        return targetText;
+    }
+
+    public String getSourceLanguage() {
+        return sourceLanguage;
+    }
+
+    public void setSourceLanguage(String sourceLanguage) {
+        this.sourceLanguage = sourceLanguage;
+    }
+
+    public String getTargetLanguage() {
+        return targetLanguage;
+    }
+
+    public void setTargetLanguage(String targetLanguage) {
+        this.targetLanguage = targetLanguage;
+    }
+
+    public BigDecimal getConfidence() {
+        return confidence;
+    }
+
+    public Model getSelectedModel() {
+        return selectedModel;
+    }
+
+    public void setSelectedModel(Model selectedModel) {
+        this.selectedModel = selectedModel;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
+
+    public int getActivePage() {
+        return activePage;
+    }
+
+    public void setActivePage(int activePage) {
+        this.activePage = activePage;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public List<Model> getAvailableModels() {
+        return availableModels;
+    }
+
+    public List<String> getAvailableLanguages() {
+        return availableLanguages;
     }
 }

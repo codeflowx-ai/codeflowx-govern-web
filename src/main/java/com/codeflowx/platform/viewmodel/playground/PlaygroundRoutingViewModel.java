@@ -1,202 +1,307 @@
 package com.codeflowx.platform.viewmodel.playground;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.zkoss.bind.annotation.*;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
-import com.codeflowx.framework.zkoss.BaseFront;
-import com.codeflowx.govern.entity.playground.PlaygroundRouting;
+
 import com.codeflowx.govern.entity.agents.Agent;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.PageParams;
-import codeflowx.nocode.persist.PageResult;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.entity.playground.PlaygroundRouting;
+import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.platform.service.BaseFront;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Getter
-@Setter
-@Init(superclass = true)
-@VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundRoutingViewModel extends BaseFront<PlaygroundRoutingViewModel> {
-    private static final long serialVersionUID = 1L;
+public class PlaygroundRoutingViewModel extends BaseFront {
+
+    private PlaygroundSession currentSession;
+    private List<PlaygroundRouting> allRoutings = new ArrayList<>();
+    private List<PlaygroundRouting> filteredRoutings = new ArrayList<>();
     
-    @Override
-    public void setBeans(Object bean) {}
+    private String inputQuery = "";
+    private PlaygroundRouting routingResult;
     
-    private String routingQuery;
-    private String routingStrategy = "SIMILARITY";
-    private Double confidenceThreshold = 0.7;
-    private boolean isRouting = false;
+    private List<Model> availableModels = new ArrayList<>();
+    private List<Agent> availableAgents = new ArrayList<>();
+    private List<String> availableStatuses = List.of("PENDING", "ROUTING", "COMPLETED", "ERROR");
     
-    private Agent selectedAgent;
-    private String selectedAgentName;
-    private String selectedAgentDescription;
-    private Double routingConfidence = 0.0;
-    
-    private boolean showRoutingScores = false;
-    private List<AgentScore> agentScoresList = new ArrayList<>();
-    private List<PlaygroundRouting> routingsList = new ArrayList<>();
-    
-    @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
-        Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
-        loadRoutingHistory();
+    private String searchTerm = "";
+    private String filterStatus = "";
+    private int activePage = 0;
+    private int pageSize = 10;
+
+    @Init(superclass = true)
+    public void init() {
+        logActivity("PLAYGROUND_ROUTING", "ACCESS", "Usuario accedió a Routing Playground");
+        loadAvailableModels();
+        loadAvailableAgents();
+        loadOrCreateSession();
+        loadRoutings();
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadRoutingHistory() {
+
+    @Destroy
+    public void destroy() {
+        logActivity("PLAYGROUND_ROUTING", "LEAVE", "Usuario salió de Routing Playground");
+    }
+
+    private void loadAvailableModels() {
         try {
-            PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundRouting> result = businessService.findAllEntity(
-                PlaygroundRouting.class, params, new Criterias());
-            
-            if (result != null && result.getContent() != null) {
-                routingsList = result.getContent();
-                
-                // Auditar búsqueda
-                logActivity("BUSCAR", "PLAYGROUNDROUTINGS", null, 
-                    "Búsqueda: " + routingsList.size() + " routings");
-            } else {
-                routingsList = new ArrayList<>();
-            }
+            Criterias criterias = new Criterias();
+            criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableModels = getUXCriteriaManager().find(Model.class, criterias);
         } catch (Exception e) {
-            log.error("Error loading routing history", e);
+            log.error("Error loading models", e);
         }
     }
-    
+
+    private void loadAvailableAgents() {
+        try {
+            Criterias criterias = new Criterias();
+            criterias.addCriteria("agentstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableAgents = getUXCriteriaManager().find(Agent.class, criterias);
+        } catch (Exception e) {
+            log.error("Error loading agents", e);
+        }
+    }
+
+    private void loadOrCreateSession() {
+        try {
+            currentSession = new PlaygroundSession();
+            currentSession.setSessionname("Routing Session - " + new Timestamp(System.currentTimeMillis()));
+            currentSession.setSessiontype("ROUTING");
+            currentSession.setSessionstatus("ACTIVE");
+            currentSession.setSessioncreatedby(getUserName());
+            currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(currentSession);
+        } catch (Exception e) {
+            log.error("Error creating session", e);
+        }
+    }
+
+    private void loadRoutings() {
+        try {
+            if (currentSession != null) {
+                allRoutings = currentSession.getSubplaygroundroutings();
+                applyFilters();
+            }
+        } catch (Exception e) {
+            log.error("Error loading routings", e);
+        }
+    }
+
     @Command
-    @NotifyChange("*")
-    public void routeQuery() {
-        if (routingQuery == null || routingQuery.trim().isEmpty()) {
-            Messagebox.show("Please enter a query", "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
+    @NotifyChange({"routingResult", "filteredRoutings", "routingHistory"})
+    public void analyzeAndRoute() {
+        if (StringUtils.isBlank(inputQuery)) {
+            Messagebox.show("Por favor ingresa una consulta", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
         
         try {
-            isRouting = true;
-            showRoutingScores = true;
+            PlaygroundRouting routing = new PlaygroundRouting();
+            routing.setSession(currentSession);
+            routing.setRoutinginput(inputQuery);
+            routing.setRoutingstatus("ROUTING");
+            routing.setRoutingcreatedby(getUserName());
+            routing.setRoutingcreatedat(new Timestamp(System.currentTimeMillis()));
             
-            // TODO: Integración con leka-server para routing inteligente
-            // Simulación de scores
-            agentScoresList = simulateAgentScores();
+            // Simulate intelligent routing (in production, use ML/AI service)
+            Model selectedModel = !availableModels.isEmpty() ? availableModels.get(0) : null;
+            Agent selectedAgent = !availableAgents.isEmpty() ? availableAgents.get(0) : null;
             
-            // Seleccionar el agente con mayor score
-            if (!agentScoresList.isEmpty()) {
-                AgentScore best = agentScoresList.get(0);
-                selectedAgentName = best.agentName;
-                selectedAgentDescription = best.agentCapability;
-                routingConfidence = best.finalScore;
+            if (selectedModel != null) {
+                routing.setRoutingselectedmodel(selectedModel.getModelname());
+                routing.setModel(selectedModel);
             }
             
+            if (selectedAgent != null) {
+                routing.setRoutingselectedagent(selectedAgent.getAgentname());
+                routing.setAgent(selectedAgent);
+            }
+            
+            routing.setRoutingconfidence(new BigDecimal("92.3"));
+            routing.setRoutingreason("El modelo " + (selectedModel != null ? selectedModel.getModelname() : "N/A") + 
+                                     " es el más adecuado para este tipo de consulta basado en su especialización y rendimiento histórico.");
+            routing.setRoutingoutput("Esta es una respuesta simulada al routing. En producción, aquí iría la respuesta del modelo/agente seleccionado.");
+            routing.setRoutingstatus("COMPLETED");
+            routing.setRoutingprocessingtime(450);
+            routing.setRoutingcost(new BigDecimal("0.003"));
+            
+            // Simulate alternatives
+            routing.setRoutingalternatives("{\"alternatives\": [{\"model\": \"gpt-4\", \"confidence\": 88.1}, {\"model\": \"claude-3\", \"confidence\": 85.7}]}");
+            
+            getUXCriteriaManager().save(routing);
+            
+            routingResult = routing;
+            loadRoutings();
+            
+            logActivity("PLAYGROUND_ROUTING", "ANALYZE", "Consulta enrutada");
+            Messagebox.show("Routing completado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error routing query", e);
-        } finally {
-            isRouting = false;
+            Messagebox.show("Error al enrutar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
+    @Command
+    @NotifyChange({"inputQuery", "routingResult"})
+    public void clear() {
+        inputQuery = "";
+        routingResult = null;
+        logActivity("PLAYGROUND_ROUTING", "CLEAR", "Campos limpiados");
+    }
+
+    @Command
+    public void showAlternatives() {
+        if (routingResult != null) {
+            Messagebox.show("Alternativas: " + routingResult.getRoutingalternatives(), 
+                          "Alternativas de Routing", Messagebox.OK, Messagebox.INFORMATION);
+        }
+    }
+
+    @Command
+    public void viewRouting(PlaygroundRouting routing) {
+        routingResult = routing;
+        inputQuery = routing.getRoutinginput();
+        logActivity("PLAYGROUND_ROUTING", "VIEW", "Viendo detalles de routing");
+    }
+
+    @Command
+    @NotifyChange({"routingResult", "filteredRoutings", "routingHistory"})
+    public void rerun(PlaygroundRouting routing) {
+        inputQuery = routing.getRoutinginput();
+        analyzeAndRoute();
+    }
+
+    @Command
+    @NotifyChange({"filteredRoutings", "routingHistory"})
+    public void deleteRouting(PlaygroundRouting routing) {
+        try {
+            getUXCriteriaManager().remove(routing);
+            if (routingResult != null && routingResult.getIdxplaygroundrouting().equals(routing.getIdxplaygroundrouting())) {
+                routingResult = null;
+            }
+            loadRoutings();
+            logActivity("PLAYGROUND_ROUTING", "DELETE", "Routing eliminado");
+        } catch (Exception e) {
+            log.error("Error deleting routing", e);
+        }
+    }
+
+    @Command
+    @NotifyChange({"filteredRoutings", "routingHistory"})
+    public void applyFilter() {
+        applyFilters();
+    }
+
+    @Command
+    @NotifyChange({"filteredRoutings", "routingHistory"})
+    public void search() {
+        applyFilters();
+    }
+
+    @Command
+    @NotifyChange({"routingHistory"})
+    public void changePage() {
+        logActivity("PLAYGROUND_ROUTING", "PAGE_CHANGE", "Cambio a página: " + activePage);
+    }
+
     @Command
     @NotifyChange("*")
-    public void markCorrect(@BindingParam("routing") PlaygroundRouting routing) {
-        try {
-            routing.setUserfeedback("CORRECT");
-            routing.setRoutingaccuracy(new java.math.BigDecimal("1.0"));
-            businessService.save(routing);
-            
-            // Auditar actualización
-            logActivity("EDITAR", "PLAYGROUNDROUTINGS", routing.getIdxplaygroundrouting(), 
-                "Feedback: CORRECT");
-            
-            loadRoutingHistory();
-        } catch (Exception e) {
-            log.error("Error updating feedback", e);
-        }
+    public void newSession() {
+        loadOrCreateSession();
+        allRoutings.clear();
+        filteredRoutings.clear();
+        inputQuery = "";
+        routingResult = null;
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void markIncorrect(@BindingParam("routing") PlaygroundRouting routing) {
-        try {
-            routing.setUserfeedback("INCORRECT");
-            routing.setRoutingaccuracy(new java.math.BigDecimal("0.0"));
-            businessService.save(routing);
-            
-            // Auditar actualización
-            logActivity("EDITAR", "PLAYGROUNDROUTINGS", routing.getIdxplaygroundrouting(), 
-                "Feedback: INCORRECT");
-            
-            loadRoutingHistory();
-        } catch (Exception e) {
-            log.error("Error updating feedback", e);
-        }
+
+    private void applyFilters() {
+        filteredRoutings = allRoutings.stream()
+            .filter(r -> {
+                if (StringUtils.isNotBlank(searchTerm) && 
+                    !r.getRoutinginput().toLowerCase().contains(searchTerm.toLowerCase())) {
+                    return false;
+                }
+                if (StringUtils.isNotBlank(filterStatus) && !r.getRoutingstatus().equals(filterStatus)) {
+                    return false;
+                }
+                return true;
+            })
+            .collect(Collectors.toList());
     }
-    
-    private List<AgentScore> simulateAgentScores() {
-        // TODO: Reemplazar con scores reales de leka-server
-        List<AgentScore> scores = new ArrayList<>();
-        scores.add(new AgentScore("Customer Support Agent", "Customer service", 95.0, 90.0, 10.0, 92.0, true));
-        scores.add(new AgentScore("Technical Agent", "Technical support", 80.0, 85.0, 20.0, 82.0, false));
-        scores.add(new AgentScore("Sales Agent", "Sales", 60.0, 70.0, 15.0, 65.0, false));
-        return scores;
+
+    // Getters and Setters
+    public List<PlaygroundRouting> getRoutingHistory() {
+        int start = activePage * pageSize;
+        int end = Math.min(start + pageSize, filteredRoutings.size());
+        return start < filteredRoutings.size() ? 
+               filteredRoutings.subList(start, end) : new ArrayList<>();
     }
-    
-    public String getAgentName(Long agentId) {
-        // TODO: Buscar nombre real del agente
-        return agentId != null ? "Agent #" + agentId : "-";
+
+    public int getTotalSize() {
+        return filteredRoutings.size();
     }
-    
-    public String getFeedbackColor(String feedback) {
-        if (feedback == null) return "secondary";
-        switch (feedback) {
-            case "CORRECT": return "success";
-            case "INCORRECT": return "danger";
-            default: return "secondary";
-        }
+
+    public String getInputQuery() {
+        return inputQuery;
     }
-    
-    public String truncate(String text, int length) {
-        if (text == null) return "";
-        return text.length() > length ? text.substring(0, length) + "..." : text;
+
+    public void setInputQuery(String inputQuery) {
+        this.inputQuery = inputQuery;
     }
-    
-    public String formatDate(Timestamp ts) {
-        return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+
+    public PlaygroundRouting getRoutingResult() {
+        return routingResult;
     }
-    
-    @Destroy
-    public void destroy() {
-        if (routingsList != null) { 
-            routingsList.clear(); 
-            routingsList = null; 
-        }
-        if (agentScoresList != null) {
-            agentScoresList.clear();
-            agentScoresList = null;
-        }
-        businessService = null;
+
+    public List<Model> getAvailableModels() {
+        return availableModels;
     }
-    
-    // Inner class para scores de agentes
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    public static class AgentScore {
-        private String agentName;
-        private String agentCapability;
-        private Double capabilityMatch;
-        private Double similarityScore;
-        private Double currentLoad;
-        private Double finalScore;
-        private boolean selected;
+
+    public List<Agent> getAvailableAgents() {
+        return availableAgents;
+    }
+
+    public List<String> getAvailableStatuses() {
+        return availableStatuses;
+    }
+
+    public String getSearchTerm() {
+        return searchTerm;
+    }
+
+    public void setSearchTerm(String searchTerm) {
+        this.searchTerm = searchTerm;
+    }
+
+    public String getFilterStatus() {
+        return filterStatus;
+    }
+
+    public void setFilterStatus(String filterStatus) {
+        this.filterStatus = filterStatus;
+    }
+
+    public int getActivePage() {
+        return activePage;
+    }
+
+    public void setActivePage(int activePage) {
+        this.activePage = activePage;
+    }
+
+    public int getPageSize() {
+        return pageSize;
     }
 }

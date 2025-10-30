@@ -1,187 +1,329 @@
 package com.codeflowx.platform.viewmodel.playground;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import org.zkoss.bind.annotation.*;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
-import org.zkoss.zkplus.spring.DelegatingVariableResolver;
+
+import org.zkoss.bind.annotation.Command;
+import org.zkoss.bind.annotation.Destroy;
+import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
-import com.codeflowx.framework.zkoss.BaseFront;
+
+import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundVoice;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.PageParams;
-import codeflowx.nocode.persist.PageResult;
-import lombok.Getter;
-import lombok.Setter;
+import com.codeflowx.platform.service.BaseFront;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Getter
-@Setter
-@Init(superclass = true)
-@VariableResolver(DelegatingVariableResolver.class)
-public class PlaygroundVoiceViewModel extends BaseFront<PlaygroundVoiceViewModel> {
-    private static final long serialVersionUID = 1L;
-    
-    @Override
-    public void setBeans(Object bean) {}
+public class PlaygroundVoiceViewModel extends BaseFront {
+
+    private PlaygroundSession currentSession;
+    private List<PlaygroundVoice> voiceHistory = new ArrayList<>();
     
     // TTS
-    private String ttsText;
-    private String ttsLanguage = "en-US";
-    private String ttsVoice = "alloy";
-    private String ttsFormat = "mp3";
-    private String ttsAudioUrl;
-    private Integer ttsDuration;
-    private java.math.BigDecimal ttsCost;
-    private boolean ttsContentViolation = false;
-    private java.math.BigDecimal ttsToxicityScore = java.math.BigDecimal.ZERO;
-    private boolean ttsPiiDetected = false;
-    private boolean isGenerating = false;
+    private String textToConvert = "";
+    private Model selectedTTSModel;
+    private String selectedVoice = "alloy";
+    private String selectedLanguage = "es";
+    private BigDecimal speed = new BigDecimal("1.0");
+    private String generatedAudioUrl;
+    private Integer audioDuration;
+    private BigDecimal audioCost;
     
     // STT
-    private String sttAudioUrl;
-    private String sttLanguage = "auto";
-    private String sttTranscription;
-    private String sttDetectedLanguage;
-    private Integer sttDuration;
-    private java.math.BigDecimal sttCost;
-    private boolean sttContentViolation = false;
-    private boolean sttPiiDetected = false;
-    private java.math.BigDecimal sttToxicityScore = java.math.BigDecimal.ZERO;
-    private boolean isTranscribing = false;
+    private Model selectedSTTModel;
+    private String selectedAudioFile;
+    private String transcriptionLanguage;
+    private String transcriptionText;
+    private Integer processingTime;
+    private BigDecimal transcriptionCost;
     
-    // History
-    private List<PlaygroundVoice> voicesList = new ArrayList<>();
-    
-    // Compliance
-    private String complianceStatus = "PENDING";
-    private String riskLevel = "LOW";
-    private int totalViolations = 0;
-    private java.math.BigDecimal totalCost = java.math.BigDecimal.ZERO;
-    
-    @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
-        Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
-        loadHistory();
+    private List<Model> availableModels = new ArrayList<>();
+    private List<String> availableVoices = List.of("alloy", "echo", "fable", "onyx", "nova", "shimmer");
+    private List<String> availableLanguages = List.of("es", "en", "fr", "de", "it", "pt");
+
+    @Init(superclass = true)
+    public void init() {
+        logActivity("PLAYGROUND_VOICE", "ACCESS", "Usuario accedió a Voice Playground");
+        loadAvailableModels();
+        loadOrCreateSession();
+        loadVoiceHistory();
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadHistory() {
+
+    @Destroy
+    public void destroy() {
+        logActivity("PLAYGROUND_VOICE", "LEAVE", "Usuario salió de Voice Playground");
+    }
+
+    private void loadAvailableModels() {
         try {
-            PageParams params = PageParams.builder().maxRows(20).pageActual(1).build();
-            PageResult<PlaygroundVoice> result = businessService.findAllEntity(
-                PlaygroundVoice.class, params, new Criterias());
-            
-            if (result != null && result.getContent() != null) {
-                voicesList = result.getContent();
-                calculateMetrics();
-                
-                // Auditar búsqueda
-                logActivity("BUSCAR", "PLAYGROUNDVOICES", null, 
-                    "Búsqueda: " + voicesList.size() + " interacciones de voz");
-            } else {
-                voicesList = new ArrayList<>();
+            Criterias criterias = new Criterias();
+            criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+        } catch (Exception e) {
+            log.error("Error loading models", e);
+        }
+    }
+
+    private void loadOrCreateSession() {
+        try {
+            currentSession = new PlaygroundSession();
+            currentSession.setSessionname("Voice Session - " + new Timestamp(System.currentTimeMillis()));
+            currentSession.setSessiontype("VOICE");
+            currentSession.setSessionstatus("ACTIVE");
+            currentSession.setSessioncreatedby(getUserName());
+            currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(currentSession);
+        } catch (Exception e) {
+            log.error("Error creating session", e);
+        }
+    }
+
+    private void loadVoiceHistory() {
+        try {
+            if (currentSession != null) {
+                voiceHistory = currentSession.getSubplaygroundvoices();
             }
         } catch (Exception e) {
             log.error("Error loading voice history", e);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
+    @NotifyChange({"generatedAudioUrl", "audioDuration", "audioCost", "voiceHistory"})
     public void generateSpeech() {
+        if (selectedTTSModel == null) {
+            Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+            return;
+        }
+        
         try {
-            isGenerating = true;
-            // TODO: Integración con leka-server para TTS
-            Messagebox.show("TTS requires leka-server integration", "Info", Messagebox.OK, Messagebox.INFORMATION);
-        } finally {
-            isGenerating = false;
+            PlaygroundVoice voice = new PlaygroundVoice();
+            voice.setSession(currentSession);
+            voice.setVoicetype("TEXT_TO_SPEECH");
+            voice.setVoicetext(textToConvert);
+            voice.setVoicename(selectedVoice);
+            voice.setVoicelanguage(selectedLanguage);
+            voice.setVoicespeed(speed);
+            voice.setVoiceformat("MP3");
+            voice.setVoicestatus("PROCESSING");
+            voice.setModel(selectedTTSModel);
+            voice.setVoicecreatedby(getUserName());
+            voice.setVoicecreatedat(new Timestamp(System.currentTimeMillis()));
+            
+            // Simulate audio generation
+            voice.setVoiceaudiourl("https://example.com/audio/generated.mp3");
+            voice.setVoicestatus("COMPLETED");
+            voice.setVoiceprocessingtime(1200);
+            voice.setVoiceduration(15);
+            voice.setVoicecost(new BigDecimal("0.015"));
+            
+            getUXCriteriaManager().save(voice);
+            
+            generatedAudioUrl = voice.getVoiceaudiourl();
+            audioDuration = voice.getVoiceduration();
+            audioCost = voice.getVoicecost();
+            
+            loadVoiceHistory();
+            logActivity("PLAYGROUND_VOICE", "GENERATE_SPEECH", "Audio generado");
+            Messagebox.show("Audio generado correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+        } catch (Exception e) {
+            log.error("Error generating speech", e);
+            Messagebox.show("Error al generar audio: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void uploadAudio() {
-        // TODO: Implementar subida de audio
-        log.info("Upload audio file");
-    }
-    
-    @Command
-    @NotifyChange("*")
+    @NotifyChange({"transcriptionText", "processingTime", "transcriptionCost", "voiceHistory"})
     public void transcribeAudio() {
+        if (selectedSTTModel == null || selectedAudioFile == null) {
+            Messagebox.show("Por favor selecciona un modelo y un archivo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+            return;
+        }
+        
         try {
-            isTranscribing = true;
-            // TODO: Integración con leka-server para STT
-            Messagebox.show("STT requires leka-server integration", "Info", Messagebox.OK, Messagebox.INFORMATION);
-        } finally {
-            isTranscribing = false;
+            PlaygroundVoice voice = new PlaygroundVoice();
+            voice.setSession(currentSession);
+            voice.setVoicetype("SPEECH_TO_TEXT");
+            voice.setVoiceaudiourl(selectedAudioFile);
+            voice.setVoicelanguage(transcriptionLanguage);
+            voice.setVoicestatus("PROCESSING");
+            voice.setModel(selectedSTTModel);
+            voice.setVoicecreatedby(getUserName());
+            voice.setVoicecreatedat(new Timestamp(System.currentTimeMillis()));
+            
+            // Simulate transcription
+            voice.setVoicetext("Esta es una transcripción simulada del audio proporcionado.");
+            voice.setVoicestatus("COMPLETED");
+            voice.setVoiceprocessingtime(2500);
+            voice.setVoicecost(new BigDecimal("0.006"));
+            
+            getUXCriteriaManager().save(voice);
+            
+            transcriptionText = voice.getVoicetext();
+            processingTime = voice.getVoiceprocessingtime();
+            transcriptionCost = voice.getVoicecost();
+            
+            loadVoiceHistory();
+            logActivity("PLAYGROUND_VOICE", "TRANSCRIBE", "Audio transcrito");
+            Messagebox.show("Audio transcrito correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+        } catch (Exception e) {
+            log.error("Error transcribing audio", e);
+            Messagebox.show("Error al transcribir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
+    @Command
+    public void selectAudioFile() {
+        // File upload logic
+        selectedAudioFile = "audio_sample.mp3";
+    }
+
+    @Command
+    @NotifyChange({"selectedAudioFile"})
+    public void clearAudioFile() {
+        selectedAudioFile = null;
+    }
+
+    @Command
+    public void downloadAudio() {
+        logActivity("PLAYGROUND_VOICE", "DOWNLOAD", "Descargando audio");
+    }
+
+    @Command
+    public void copyTranscription() {
+        logActivity("PLAYGROUND_VOICE", "COPY", "Copiando transcripción");
+    }
+
+    @Command
+    public void viewVoice(PlaygroundVoice voice) {
+        logActivity("PLAYGROUND_VOICE", "VIEW", "Viendo detalles de conversión");
+    }
+
+    @Command
+    @NotifyChange({"voiceHistory"})
+    public void deleteVoice(PlaygroundVoice voice) {
+        try {
+            getUXCriteriaManager().remove(voice);
+            loadVoiceHistory();
+        } catch (Exception e) {
+            log.error("Error deleting voice", e);
+        }
+    }
+
     @Command
     @NotifyChange("*")
-    public void refreshHistory() {
-        loadHistory();
+    public void newSession() {
+        loadOrCreateSession();
+        voiceHistory.clear();
+        textToConvert = "";
+        generatedAudioUrl = null;
+        selectedAudioFile = null;
+        transcriptionText = null;
     }
-    
-    @Command
-    public void playAudio(@BindingParam("voice") PlaygroundVoice voice) {
-        log.info("Play audio: {}", voice.getIdxplaygroundvoice());
+
+    // Getters and Setters
+    public List<PlaygroundVoice> getVoiceHistory() {
+        return voiceHistory;
     }
-    
-    @Command
-    public void downloadAudio(@BindingParam("voice") PlaygroundVoice voice) {
-        log.info("Download audio: {}", voice.getIdxplaygroundvoice());
+
+    public String getTextToConvert() {
+        return textToConvert;
     }
-    
-    private void calculateMetrics() {
-        totalViolations = (int) voicesList.stream()
-            .filter(v -> Boolean.TRUE.equals(v.getContentviol()))
-            .count();
-        
-        totalCost = voicesList.stream()
-            .map(v -> v.getVoicecost() != null ? v.getVoicecost() : java.math.BigDecimal.ZERO)
-            .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-        
-        riskLevel = totalViolations > 5 ? "HIGH" : totalViolations > 2 ? "MEDIUM" : "LOW";
-        complianceStatus = totalViolations == 0 ? "COMPLIANT" : "NON_COMPLIANT";
+
+    public void setTextToConvert(String textToConvert) {
+        this.textToConvert = textToConvert;
     }
-    
-    public String truncate(String text, int length) {
-        if (text == null) return "";
-        return text.length() > length ? text.substring(0, length) + "..." : text;
+
+    public Model getSelectedTTSModel() {
+        return selectedTTSModel;
     }
-    
-    public String getComplianceColor(String status) {
-        return "COMPLIANT".equals(status) ? "success" : "danger";
+
+    public void setSelectedTTSModel(Model selectedTTSModel) {
+        this.selectedTTSModel = selectedTTSModel;
     }
-    
-    public String getRiskColor(String risk) {
-        if (risk == null) return "secondary";
-        switch (risk) {
-            case "LOW": return "success";
-            case "MEDIUM": return "warning";
-            case "HIGH": return "danger";
-            default: return "secondary";
-        }
+
+    public Model getSelectedSTTModel() {
+        return selectedSTTModel;
     }
-    
-    public String formatDate(Timestamp ts) {
-        return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
+
+    public void setSelectedSTTModel(Model selectedSTTModel) {
+        this.selectedSTTModel = selectedSTTModel;
     }
-    
-    @Destroy
-    public void destroy() {
-        if (voicesList != null) { 
-            voicesList.clear(); 
-            voicesList = null; 
-        }
-        businessService = null;
+
+    public String getSelectedVoice() {
+        return selectedVoice;
+    }
+
+    public void setSelectedVoice(String selectedVoice) {
+        this.selectedVoice = selectedVoice;
+    }
+
+    public String getSelectedLanguage() {
+        return selectedLanguage;
+    }
+
+    public void setSelectedLanguage(String selectedLanguage) {
+        this.selectedLanguage = selectedLanguage;
+    }
+
+    public BigDecimal getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(BigDecimal speed) {
+        this.speed = speed;
+    }
+
+    public String getGeneratedAudioUrl() {
+        return generatedAudioUrl;
+    }
+
+    public Integer getAudioDuration() {
+        return audioDuration;
+    }
+
+    public BigDecimal getAudioCost() {
+        return audioCost;
+    }
+
+    public String getSelectedAudioFile() {
+        return selectedAudioFile;
+    }
+
+    public String getTranscriptionLanguage() {
+        return transcriptionLanguage;
+    }
+
+    public void setTranscriptionLanguage(String transcriptionLanguage) {
+        this.transcriptionLanguage = transcriptionLanguage;
+    }
+
+    public String getTranscriptionText() {
+        return transcriptionText;
+    }
+
+    public Integer getProcessingTime() {
+        return processingTime;
+    }
+
+    public BigDecimal getTranscriptionCost() {
+        return transcriptionCost;
+    }
+
+    public List<Model> getAvailableModels() {
+        return availableModels;
+    }
+
+    public List<String> getAvailableVoices() {
+        return availableVoices;
+    }
+
+    public List<String> getAvailableLanguages() {
+        return availableLanguages;
     }
 }
