@@ -10,20 +10,71 @@ Objetivo: desacoplar la lógica RAG (ingesta, embeddings, búsqueda, métricas) 
 
 ### Arquitectura de separación (Gestión vs Ejecución)
 
-- Gestión (Java + PostgreSQL)
-  - Qué: alta/edición de sistemas RAG, fuentes, versiones; permisos (ACL/policies), vinculación a proyectos/tenants, tokens, cuotas/consumo, auditoría, reporting.
-  - Dónde: suinsit.nova.web (JPA + vistas SQL). UI ZK + APIs internas. Persistencia de metadatos y estado funcional.
-  - Entidades sugeridas: RagSystem, RagDataSource, RagVersion, RagPolicy (ACL), RagProjectLink, RagApiToken, RagConsumption, RagAuditLog.
+#### Capa de Gestión, Gobierno y Auditoría (Java + PostgreSQL)
 
-- Ejecución RAG (leka-server, Python)
-  - Qué: chunking, embeddings, índices/colecciones Qdrant, búsqueda/retrieval, reindex, limpieza de vectores, métricas técnicas.
-  - Dónde: microservicio Python con Qdrant/Redis/S3 según aplique.
-  - Persistencia: Qdrant (vectores+payload); opcional blobs en S3/FS.
+**Responsabilidad:** Metadatos, configuración, gobierno, permisos, auditoría, consumo/costes, integración con proyectos.
 
-- Contrato
-  - Java decide “qué/para quién”; leka ejecuta el “cómo”.
-  - Estados sincronizados: Java guarda flags/fechas (lastIndexAt, indexStatus, docCount), leka expone métricas y progresos.
-  - Seguridad: JWT con scopes rag:*; filtros por tenant/proyecto trasladados a payload filters en Qdrant.
+**Entidades JPA (PostgreSQL):**
+- `RagSystem` (id, name, type, status, approvalStatus, projectId, tenantId, version, vectorBackend[qdrant|cohere|pinecone], connectionRef, createdBy, createdAt...)
+- `RagDataSource` (id, systemId, name, kind[documents|api|database|web], connectionConfig, syncFrequency, lastSyncAt, indexStatus, docCount, ragReady, complianceTags)
+- `RagVersion` (id, systemId, version, changes, embeddingsVersion, configSnapshot, createdAt, promotedBy)
+- `RagPolicy` (id, systemId, subjectType[role|user|project], subjectId, actions[search|ingest|admin], scope)
+- `RagApiToken` (id, systemId, tokenHash, scopes[], expiresAt, rateLimit)
+- `RagConsumption` (id, systemId, projectId, period, tokens, requests, cost, provider)
+- `RagAuditLog` (id, actor, action, entity, entityId, details, timestamp)
+
+**Funciones:**
+- CRUD de sistemas RAG, datasources, versiones
+- Vinculación a proyectos/tenants/agentes
+- Gestión de permisos y tokens (ACL, JWT scopes)
+- Registro de dominios de negocio y datasets para entrenamiento
+- Configuración de compliance/retención/lineage de datos
+- Auditoría completa de acciones (búsquedas, ingestas, rollbacks)
+- Consolidación de métricas de consumo/costes (tokens, requests, proveedores)
+- Workflows de aprobación (governance status)
+- Reporting y exportación de estadísticas
+
+**Dónde:** `suinsit.nova.web` (portal ZK, JPA, vistas SQL, workflow BPMN)
+
+---
+
+#### Capa de Ejecución RAG (leka-server, Python)
+
+**Responsabilidad:** Chunking, embeddings, vectorización, índices, búsqueda semántica, retrieval, reindex, evaluación técnica.
+
+**Persistencia:**
+- Qdrant/Cohere/Pinecone (vectores + payload: {systemId, datasourceId, projectId, domainId, docId, section, metadata, embeddingsVersion})
+- Redis (caché de búsquedas, rate limiting)
+- S3/FS (blobs opcionales: PDFs, datasets raw)
+
+**Funciones:**
+- Ingesta de documentos/datasets (chunking según estrategia configurable)
+- Generación de embeddings (OpenAI, Azure, Cohere, Local/Ollama)
+- Upsert a colecciones/índices vectoriales (con payload filters por tenant/proyecto/dominio)
+- Búsqueda semántica (query + top-k + filtros de payload)
+- Reindex incremental (por cambio de embeddings_version o configuración)
+- Rollback de vectores (restaurar snapshot de versión anterior)
+- Evaluación de calidad (retrieval precision, relevancia, coverage, distribución chunks)
+- Métricas técnicas (latencia, RPS, hit/miss ratio, coste por query)
+- Limpieza y garbage collection de vectores huérfanos
+
+**Dónde:** microservicio Python FastAPI + Celery (tareas async) + Qdrant/Cohere/Pinecone
+
+---
+
+#### Contrato de integración
+
+- **Quién decide qué:** Java gestiona catálogo, aprobaciones, cuotas; leka ejecuta pipelines.
+- **Estados sincronizados:** Java persiste flags (`indexStatus`, `lastIndexAt`, `docCount`, `embeddingsVersion`); leka expone progresos y métricas.
+- **Seguridad:** JWT con scopes `rag:search`, `rag:ingest`, `rag:admin`; filtros de tenant/proyecto se trasladan a Qdrant payload_filters o namespace en Pinecone/Cohere.
+- **Datasets de dominio:** Metadatos (DomainDataset: filePath, compliance, isRagReady, trainingRelevance) en Java; chunks/embeddings/índices en leka-server tras ingesta.
+- **Flujo típico:**
+  1. Java: usuario crea RagSystem + RagDataSource (metadatos).
+  2. Java: botón "Ingestar" → POST /rag/systems/{id}/ingest (leka).
+  3. Leka: procesa (chunking, embeddings, upsert a Qdrant/Cohere/Pinecone), devuelve taskId.
+  4. Java: actualiza indexStatus=IN_PROGRESS, muestra toast con taskId.
+  5. Leka: al terminar, callback/webhook o polling → Java actualiza indexStatus=COMPLETED, docCount, lastIndexAt.
+  6. Java: audita en RagAuditLog; actualiza consumo en RagConsumption (tokens/cost).
 
 ### Soporte multi-backend vectorial (Qdrant, Cohere, Pinecone, ...)
 
@@ -80,6 +131,43 @@ El diseño de leka-server debe contemplar múltiples proveedores de base vectori
 - GET /rag/governance/access-control      (ACL)
 
 Nota: los GET admiten filtros por query params; todos devuelven JSON paginado `{content, total, page, size}` cuando aplique.
+
+---
+
+### Domain Ingestion: Gestión de Datasets para Entrenamiento de Dominios
+
+Los datasets para entrenamiento de dominios de negocio (AgentDomain, DomainDataset) se gestionan con la misma separación:
+
+**Gestión (Java):**
+- Módulo: `platform/viewmodel/domainingestion/*`
+- ViewModels: DomainManagementViewModel, DomainIngestionWizardViewModel, ConfigureDocumentsViewModel, ConfigureApiViewModel, ConfigureDatabaseViewModel, ConfigureWebScrapingViewModel, JobMonitorViewModel
+- Entidades: Domain, DomainDataset, AgentDomain
+- Campos gestionados en Java:
+  - Metadatos del dataset: name, description, datasetType, filePath, fileFormat, recordCount, columnCount, schemaVersion
+  - Compliance: complianceTags, retentionPolicy, dataLineage, sourceMetadata
+  - Configuración RAG: isRagReady (boolean), ragMetadata (JSON), trainingRelevance (1-10)
+  - Frecuencia y auditoría: ingestionFrequency, lastIngested, dataQualityScore
+  - Relación con dominios: domainId (FK a AgentDomain/Domain)
+
+**Ejecución (leka-server):**
+- Datasets reales: chunks, embeddings, índices vectoriales
+- Ingesta y procesamiento: parseo de archivos (CSV, JSON, Parquet), chunking, embeddings batch
+- Indexación en Qdrant/Cohere/Pinecone con payload: {domainId, datasetId, projectId, tenantId, ...}
+- Evaluación de calidad: data profiling, bias detection, coverage análisis
+- Métricas: embedding generation progress, chunk distribution stats, document coverage
+
+**Endpoints adicionales (leka-server) para Domain Ingestion:**
+- POST /domains/{domainId}/datasets/{datasetId}/ingest (ingesta de dataset a índice vectorial)
+- GET /domains/{domainId}/datasets/{datasetId}/progress (progreso de ingesta/embeddings)
+- GET /domains/{domainId}/coverage (cobertura de conocimiento del dominio)
+- POST /domains/{domainId}/rebuild (rebuild de índice completo para un dominio)
+- GET /domains/{domainId}/quality (métricas de calidad del dominio: bias, coverage, consistency)
+
+**Integración en ViewModels de Domain Ingestion:**
+- `DomainManagementViewModel.loadDomains()`: permanece en DB (metadatos), métricas de coverage/quality desde GET /domains/{id}/coverage.
+- `DomainIngestionWizardViewModel.finishDomain()`: crea Domain en DB; si `ragEnabled=true`, lanza POST /domains/{id}/ingest.
+- `ConfigureDocumentsViewModel.uploadDataset()`: guarda DomainDataset en DB (metadatos); lanza POST /domains/{domainId}/datasets/{datasetId}/ingest.
+- `JobMonitorViewModel.loadJobs()`: si los jobs de ingesta están en leka, GET /jobs?type=ingestion&domainId=; si en Java (workflow BPMN), permanece en DB.
 
 ---
 
@@ -147,17 +235,56 @@ Nota: los GET admiten filtros por query params; todos devuelven JSON paginado `{
 
 ### Mapa Gestión vs Ejecución por ViewModel (resumen)
 
-- Gestión (DB Java):
-  - RagSystemsOverview/Detail (atributos de sistema, approval, relación con proyectos, tokens)
-  - RagDataSource* (metadatos de fuentes, conexión referenciada, estados de sincronización)
-  - RagVersion* (metadatos de versionado)
-  - RagAccessControl (políticas ACL), RagCompliance, RagBiasDetection (config y decisiones de gobierno)
-  - Audit/Consumption (RagAuditLog, RagConsumption)
+#### Gestión (DB Java - PostgreSQL/JPA):
 
-- Ejecución (leka-server):
-  - indexDataSources, rebuildIndex, rollbackVersion, createVersion (materialización en índices)
-  - Panels: metrics-summary, usage-by-agent, retrieval-quality, health, coverage, embedding-progress, statistics, chunk-distribution, search-analytics
-  - Search/QA endpoints
+**Módulos de gestión RAG:**
+- RagSystemsOverview/Detail (atributos de sistema, approval, relación con proyectos, tokens, **NO vectores**)
+- RagDataSource* (metadatos de fuentes: nombre, tipo, conexión, frecuencia sync, compliance, **NO chunks/embeddings**)
+- RagVersion* (metadatos de versionado: cambios, configuración, **NO snapshots vectoriales**)
+- RagAccessControl (políticas ACL, permisos a nivel catálogo)
+- RagCompliance (config y decisiones de gobierno, **NO análisis técnico de bias**)
+- RagBiasDetection (configuración de umbrales y reglas, **NO ejecución de detección**)
+- Audit/Consumption (RagAuditLog: acciones de usuario; RagConsumption: tokens/costes consolidados)
+
+**Módulos de gestión de Dominios:**
+- DomainManagementViewModel (CRUD de dominios de negocio: nombre, industria, categoría, status, **NO vectores de conocimiento**)
+- DomainIngestionWizardViewModel (creación de dominios: templates, fuentes, compliance, flags ragEnabled/trainingEnabled, **NO procesamiento**)
+- ConfigureDocuments/Api/Database/WebScraping (configuración de fuentes de datos: parámetros de conexión, formatos, frecuencias, **NO extracción real**)
+- JobMonitorViewModel (monitoreo de jobs si están en Java/BPMN; si en leka, solo visualización)
+- AgentDomain (dominio con datasets[JSONB]: referencias a datasets, **NO embeddings**)
+- DomainDataset (metadata: filePath, format, recordCount, compliance, isRagReady, trainingRelevance, **NO vectores**)
+
+**Qué permanece en BusinessService (DB):**
+- Crear/editar/borrar sistemas RAG, datasources, versiones, dominios, datasets
+- Gestión de permisos, tokens, políticas de acceso
+- Workflows de aprobación (BPMN)
+- Auditoría de acciones de usuario
+- Consolidación de métricas de consumo/facturación
+
+---
+
+#### Ejecución (leka-server - Python + Qdrant/Cohere/Pinecone):
+
+**Operaciones vectoriales:**
+- indexDataSources, rebuildIndex, rollbackVersion, createVersion (**materialización real en índices**)
+- Ingesta de datasets: chunking (estrategias: fixed-size, semantic, sliding-window), embeddings batch, upsert vectorial
+- Búsqueda semántica: query expansion, retrieval top-k, reranking
+- Evaluación técnica de calidad: precision/recall, coverage de chunks, distribución semántica
+- Bias detection ejecutado (análisis estadístico/ML sobre vectores)
+
+**Panels de métricas técnicas:**
+- metrics-summary, usage-by-agent (desde logs de Qdrant/proveedor)
+- retrieval-quality (precision@k, recall@k, MRR)
+- health (estado de colecciones, latencia promedio)
+- embedding-progress (% completado, ETA, velocidad de ingesta)
+- statistics, chunk-distribution (histogramas, densidad semántica)
+- search-analytics (top queries, hit/miss ratio)
+
+**Qué NO existe en Java DB:**
+- Vectores, chunks, embeddings
+- Payload de Qdrant/Cohere/Pinecone
+- Snapshots de índices
+- Logs de queries semánticas (solo auditoría de "quién buscó qué" en RagAuditLog)
 
 ### Checklist de implementación
 
@@ -190,19 +317,87 @@ Nota: los GET admiten filtros por query params; todos devuelven JSON paginado `{
 - Errores: mensajes de negocio del leka-server se muestran tal cual; reconexión automática en 5s opcional para paneles métricos.
 
 ### Checklist por archivo (extracto)
-- govern/viewmodel/rag/RagSystemsOverviewViewModel.java: loadData, loadMetrics → API; filtros → query params.
-- govern/viewmodel/rag/RagSystemsDetailViewModel.java: CRUD sistema, datasources, versions, indexDataSources → API.
-- platform/viewmodel/rag/*OverviewViewModel.java: todos los `findAll(View/Entity)` → GET endpoints arriba.
-- platform/viewmodel/rag/*DetailViewModel.java: CRUD → POST/PUT/DELETE; navegación intacta.
-- platform/viewmodel/rag/RagRollbackViewModel.java: rollback → POST /rag/systems/{id}/rollback.
-- platform/viewmodel/rag/RagAccessControlViewModel.java: ACL → GET/PUT /rag/governance/access-control.
-- platform/viewmodel/rag/RagComplianceViewModel.java: cumplimiento → GET /rag/governance/compliance.
-- platform/viewmodel/rag/RagBiasDetectionViewModel.java: sesgos → GET /rag/governance/bias-detection.
+
+**ViewModels RAG (govern & platform):**
+- govern/viewmodel/rag/RagSystemsOverviewViewModel.java: loadData, loadMetrics → **DB (metadatos) + API (métricas técnicas)**.
+- govern/viewmodel/rag/RagSystemsDetailViewModel.java: CRUD sistema → **DB**; datasources/versions metadata → **DB**; indexDataSources → **POST /rag/systems/{id}/ingest (API)**.
+- platform/viewmodel/rag/*OverviewViewModel.java: todos los `findAll(View/Entity)` de metadatos → **DB**; panels de métricas → **GET endpoints API**.
+- platform/viewmodel/rag/*DetailViewModel.java: CRUD → **DB**; navegación intacta.
+- platform/viewmodel/rag/RagRollbackViewModel.java: metadata de rollback → **DB**; ejecución → **POST /rag/systems/{id}/rollback (API)**.
+- platform/viewmodel/rag/RagAccessControlViewModel.java: políticas ACL → **DB**; enforcement payload filters → **PUT /rag/governance/access-control (API)**.
+- platform/viewmodel/rag/RagComplianceViewModel.java: configuración cumplimiento → **DB**; análisis técnico → **GET /rag/governance/compliance (API)**.
+- platform/viewmodel/rag/RagBiasDetectionViewModel.java: umbrales/reglas → **DB**; detección ejecutada → **GET /rag/governance/bias-detection (API)**.
+
+**ViewModels Domain Ingestion:**
+- platform/viewmodel/domainingestion/DomainManagementViewModel.java: CRUD dominios → **DB**; métricas coverage/quality → **GET /domains/{id}/coverage (API)**.
+- platform/viewmodel/domainingestion/DomainIngestionWizardViewModel.java: creación dominio → **DB**; si ragEnabled → **POST /domains/{id}/ingest (API)**.
+- platform/viewmodel/domainingestion/Configure*.java: guardar DomainDataset → **DB**; lanzar ingesta → **POST /domains/{domainId}/datasets/{datasetId}/ingest (API)**.
+- platform/viewmodel/domainingestion/JobMonitorViewModel.java: jobs en BPMN → **DB**; jobs de ingesta en leka → **GET /jobs?type=ingestion (API)**.
 
 ### Siguientes pasos
 1) Definir OpenAPI en leka-server con estos endpoints y DTOs.
 2) Generar cliente Java (OpenAPI Generator) y publicarlo (Maven interno).
 3) Sustituir llamadas por `RagApiClient` en ViewModels listados (otro chat).
 4) Pruebas end-to-end con Qdrant en staging (colecciones por sistema/tenant).
+
+---
+
+## Resumen Ejecutivo
+
+### ¿Qué se gestiona en Java (suinsit.nova.web)?
+
+**Catálogo y configuración:**
+- Sistemas RAG (nombre, tipo, versión, estado, aprobación, proyecto/tenant, backend vectorial seleccionado)
+- Fuentes de datos (nombre, tipo, parámetros de conexión, frecuencia sync, compliance, estado)
+- Versiones (metadata de cambios, configuración)
+- Dominios de negocio (AgentDomain con categorías, skills, knowledgeAreas, datasets[referencias])
+- Datasets para entrenamiento (DomainDataset: metadatos, filePath, compliance, isRagReady, trainingRelevance)
+
+**Gobierno y seguridad:**
+- Políticas de acceso (ACL: quién puede buscar/ingestar en qué sistemas)
+- Tokens de API (scopes, rate limits, expiración)
+- Configuración de umbrales de compliance y bias detection
+- Workflows de aprobación (BPMN)
+
+**Auditoría y facturación:**
+- Registro de acciones de usuario (RagAuditLog)
+- Consolidación de consumo/costes (RagConsumption: tokens, requests, cost por proveedor)
+
+### ¿Qué se ejecuta en leka-server (Python)?
+
+**Procesamiento vectorial:**
+- Chunking de documentos/datasets (estrategias configurables)
+- Generación de embeddings (OpenAI/Azure/Cohere/Local)
+- Upsert a índices vectoriales (Qdrant colecciones, Cohere índices, Pinecone namespaces)
+- Búsqueda semántica (retrieval top-k, reranking)
+- Reindex, rollback de vectores, garbage collection
+
+**Métricas técnicas:**
+- Retrieval quality (precision@k, recall, MRR)
+- Index health (latencia, disponibilidad, tamaño)
+- Embedding progress (%, ETA, velocidad)
+- Coverage analysis, chunk distribution, search analytics
+- Bias detection ejecutado (análisis estadístico sobre vectores)
+
+**Backends soportados:**
+- Qdrant (colecciones + payload filters por tenant)
+- Cohere (embeddings + vector DB + rerank)
+- Pinecone (índices + namespaces + metadata filters)
+
+### Puntos de integración clave
+
+1. **CRUD de metadatos:** Java (DB)
+2. **Ingesta/Indexación:** Java lanza → leka ejecuta → Java actualiza estado
+3. **Búsquedas:** Java audita → leka ejecuta → Java registra consumo
+4. **Métricas de UI:** leka expone → Java consulta y presenta
+5. **Gobierno:** Java configura reglas → leka las aplica (filters, ACL)
+6. **Datasets de dominio:** Java guarda metadatos → leka procesa e indexa chunks/embeddings
+
+### Dependencias de despliegue
+
+- Java requiere: leka-server disponible (health check antes de mostrar botones de ingesta)
+- Leka requiere: Qdrant/Cohere/Pinecone configurado por tenant; credenciales en vault
+- Autenticación: JWT emitido por Java, validado por leka (scopes rag:*)
+- Observabilidad: correlation-id propagado en ambas capas; traces en APM
 
 

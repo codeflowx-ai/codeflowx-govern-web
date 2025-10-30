@@ -100,12 +100,12 @@ public class RagSystemDetailViewModel extends MasterPage {
     // ========== Validadores ==========
     private UniqueValidator unique;
     
-    private String originalRagname = null;
+    private String originalRagsystemname = null;
     
     // ========== Listas para combos (FK) ==========
     private List<String> availableRagtypes = new ArrayList<>();
     private List<String> availableRagstatuss = new ArrayList<>();
-    private List<String> availableRagapprovalstatuss = new ArrayList<>();
+    private List<String> availableRaggovernancestatuss = new ArrayList<>();
     
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     
@@ -153,7 +153,7 @@ public class RagSystemDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadRagtypes();
         loadRagstatuss();
-        loadRagapprovalstatuss();
+        loadRaggovernancestatuss();
     }
     
     private void loadItem(Long id) {
@@ -174,18 +174,18 @@ public class RagSystemDetailViewModel extends MasterPage {
             }
             
             editing = true;
-            pageTitle = "Editar: " + currentRagSystem.getRagname();
-        loadRagtypes();
-        loadRagstatuss();
-        loadRagapprovalstatuss();
+            pageTitle = "Editar: " + currentRagSystem.getRagsystemname();
+            loadRagtypes();
+            loadRagstatuss();
+            loadRaggovernancestatuss();
             
             // Cargar tags/roles existentes desde JSON
             
             // Guardar valores originales para validación de unicidad
-            originalRagname = currentRagSystem.getRagname();
+            originalRagsystemname = currentRagSystem.getRagsystemname();
             
             // Auditar carga de registro
-            logActivity("CONSULTA", "RAGRAGSYSTEMS", id, "Consulta: " + currentRagSystem.getRagname());
+            logActivity("CONSULTA", "RAGSYSTEMS", id, "Consulta: " + currentRagSystem.getRagsystemname());
             
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
@@ -213,15 +213,15 @@ public class RagSystemDetailViewModel extends MasterPage {
             if (isNew) {
                 businessService.save(currentRagSystem);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "RAGRAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
-                    "Creado: " + currentRagSystem.getRagname());
+                logActivity("CREACION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
+                    "Creado: " + currentRagSystem.getRagsystemname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 businessService.update(currentRagSystem);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "RAGRAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
-                    "Actualizado: " + currentRagSystem.getRagname());
+                logActivity("EDICION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
+                    "Actualizado: " + currentRagSystem.getRagsystemname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
@@ -245,11 +245,11 @@ public class RagSystemDetailViewModel extends MasterPage {
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
         
-        if (currentRagSystem.getRagname() == null || currentRagSystem.getRagname().trim().isEmpty()) {
-            errors.append("- Name\n");
+        if (currentRagSystem.getRagsystemname() == null || currentRagSystem.getRagsystemname().trim().isEmpty()) {
+            errors.append("- System Name\n");
         }
-        if (currentRagSystem.getRagname() != null && currentRagSystem.getRagname().length() > 255) {
-            errors.append("- Name no puede exceder 255 caracteres\n");
+        if (currentRagSystem.getRagsystemname() != null && currentRagSystem.getRagsystemname().length() > 255) {
+            errors.append("- System Name no puede exceder 255 caracteres\n");
         }
         if (currentRagSystem.getRagtype() == null || currentRagSystem.getRagtype().trim().isEmpty()) {
             errors.append("- Type\n");
@@ -263,11 +263,8 @@ public class RagSystemDetailViewModel extends MasterPage {
         if (currentRagSystem.getRagstatus() == null || currentRagSystem.getRagstatus().trim().isEmpty()) {
             errors.append("- Status\n");
         }
-        if (currentRagSystem.getRagcreatedby() == null || currentRagSystem.getRagcreatedby().trim().isEmpty()) {
-            errors.append("- Created By\n");
-        }
-        if (currentRagSystem.getRagcreatedby() != null && currentRagSystem.getRagcreatedby().length() > 255) {
-            errors.append("- Created By no puede exceder 255 caracteres\n");
+        if (currentRagSystem.getRagcompliance() == null || currentRagSystem.getRagcompliance().trim().isEmpty()) {
+            errors.append("- Compliance\n");
         }
         if (currentRagSystem.getRagcreatedat() == null) {
             errors.append("- Created At\n");
@@ -292,24 +289,26 @@ public class RagSystemDetailViewModel extends MasterPage {
     }
     
     private void loadRagtypes() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagtypes.add("OPTION_1");
-        availableRagtypes.add("OPTION_2");
-        availableRagtypes.add("OPTION_3");
+        // Cargar tipos de sistema RAG
+        availableRagtypes.add("KNOWLEDGE_BASE");
+        availableRagtypes.add("LEGAL_ASSISTANT");
+        availableRagtypes.add("CODE_ASSISTANT");
+        availableRagtypes.add("SUPPORT");
     }
     
     private void loadRagstatuss() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagstatuss.add("OPTION_1");
-        availableRagstatuss.add("OPTION_2");
-        availableRagstatuss.add("OPTION_3");
+        // Cargar estados de sistema RAG
+        availableRagstatuss.add("ACTIVE");
+        availableRagstatuss.add("INACTIVE");
+        availableRagstatuss.add("DRAFT");
+        availableRagstatuss.add("ARCHIVED");
     }
     
-    private void loadRagapprovalstatuss() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagapprovalstatuss.add("OPTION_1");
-        availableRagapprovalstatuss.add("OPTION_2");
-        availableRagapprovalstatuss.add("OPTION_3");
+    private void loadRaggovernancestatuss() {
+        // Cargar estados de gobierno
+        availableRaggovernancestatuss.add("APPROVED");
+        availableRaggovernancestatuss.add("REJECTED");
+        availableRaggovernancestatuss.add("PENDING");
     }
     
     private void loadSubragragdatasources() {
@@ -429,9 +428,9 @@ public class RagSystemDetailViewModel extends MasterPage {
                 availableRagstatuss.clear();
                 availableRagstatuss = null;
             }
-            if (availableRagapprovalstatuss != null) {
-                availableRagapprovalstatuss.clear();
-                availableRagapprovalstatuss = null;
+            if (availableRaggovernancestatuss != null) {
+                availableRaggovernancestatuss.clear();
+                availableRaggovernancestatuss = null;
             }
             
             // Limpiar colecciones @OneToMany

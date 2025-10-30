@@ -100,7 +100,7 @@ public class RagVersionDetailViewModel extends MasterPage {
     
     
     // ========== Listas para combos (FK) ==========
-    private List<String> availableRagstatuss = new ArrayList<>();
+    private List<String> availableRagvstatuss = new ArrayList<>();
     
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     
@@ -142,7 +142,7 @@ public class RagVersionDetailViewModel extends MasterPage {
         currentRagVersion = new RagVersion();
         editing = false;
         pageTitle = "Crear Nuevo";
-        loadRagstatuss();
+        loadRagvstatuss();
     }
     
     private void loadItem(Long id) {
@@ -163,15 +163,15 @@ public class RagVersionDetailViewModel extends MasterPage {
             }
             
             editing = true;
-            pageTitle = "Editar: " + currentRagVersion.getRagversion();
-        loadRagstatuss();
+            pageTitle = "Editar: " + currentRagVersion.getRagvversionnumber();
+            loadRagvstatuss();
             
             // Cargar tags/roles existentes desde JSON
             
             // Guardar valores originales para validación de unicidad
             
             // Auditar carga de registro
-            logActivity("CONSULTA", "RAGRAGVERSIONS", id, "Consulta: " + currentRagVersion.getRagversion());
+            logActivity("CONSULTA", "RAGVERSIONS", id, "Consulta: " + currentRagVersion.getRagvversionnumber());
             
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
@@ -199,15 +199,15 @@ public class RagVersionDetailViewModel extends MasterPage {
             if (isNew) {
                 businessService.save(currentRagVersion);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "RAGRAGVERSIONS", currentRagVersion.getIdxragversion(), 
-                    "Creado: " + currentRagVersion.getRagversion());
+                logActivity("CREACION", "RAGVERSIONS", currentRagVersion.getIdxragversion(), 
+                    "Creado: " + currentRagVersion.getRagvversionnumber());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 businessService.update(currentRagVersion);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "RAGRAGVERSIONS", currentRagVersion.getIdxragversion(), 
-                    "Actualizado: " + currentRagVersion.getRagversion());
+                logActivity("EDICION", "RAGVERSIONS", currentRagVersion.getIdxragversion(), 
+                    "Actualizado: " + currentRagVersion.getRagvversionnumber());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
@@ -231,22 +231,16 @@ public class RagVersionDetailViewModel extends MasterPage {
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
         
-        if (currentRagVersion.getRagversion() == null || currentRagVersion.getRagversion().trim().isEmpty()) {
-            errors.append("- Version\n");
+        if (currentRagVersion.getRagvversionnumber() == null || currentRagVersion.getRagvversionnumber().trim().isEmpty()) {
+            errors.append("- Version Number\n");
         }
-        if (currentRagVersion.getRagversion() != null && currentRagVersion.getRagversion().length() > 50) {
-            errors.append("- Version no puede exceder 50 caracteres\n");
+        if (currentRagVersion.getRagvversionnumber() != null && currentRagVersion.getRagvversionnumber().length() > 50) {
+            errors.append("- Version Number no puede exceder 50 caracteres\n");
         }
-        if (currentRagVersion.getRagstatus() == null || currentRagVersion.getRagstatus().trim().isEmpty()) {
+        if (currentRagVersion.getRagvstatus() == null || currentRagVersion.getRagvstatus().trim().isEmpty()) {
             errors.append("- Status\n");
         }
-        if (currentRagVersion.getRagcreatedby() == null || currentRagVersion.getRagcreatedby().trim().isEmpty()) {
-            errors.append("- Created By\n");
-        }
-        if (currentRagVersion.getRagcreatedby() != null && currentRagVersion.getRagcreatedby().length() > 255) {
-            errors.append("- Created By no puede exceder 255 caracteres\n");
-        }
-        if (currentRagVersion.getRagcreatedat() == null) {
+        if (currentRagVersion.getRagvcreatedat() == null) {
             errors.append("- Created At\n");
         }
         
@@ -268,11 +262,12 @@ public class RagVersionDetailViewModel extends MasterPage {
         appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
     }
     
-    private void loadRagstatuss() {
-        // TODO: Cargar valores desde configuración o BD
-        availableRagstatuss.add("OPTION_1");
-        availableRagstatuss.add("OPTION_2");
-        availableRagstatuss.add("OPTION_3");
+    private void loadRagvstatuss() {
+        // Cargar estados de versión RAG
+        availableRagvstatuss.add("ACTIVE");
+        availableRagvstatuss.add("STABLE");
+        availableRagvstatuss.add("FAILED");
+        availableRagvstatuss.add("ARCHIVED");
     }
     
     /**
@@ -316,9 +311,9 @@ public class RagVersionDetailViewModel extends MasterPage {
             // Limpiar listas de FK
             
             // Limpiar listas de LIST_STRING
-            if (availableRagstatuss != null) {
-                availableRagstatuss.clear();
-                availableRagstatuss = null;
+            if (availableRagvstatuss != null) {
+                availableRagvstatuss.clear();
+                availableRagvstatuss = null;
             }
             
             // Limpiar colecciones @OneToMany
