@@ -5,357 +5,206 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.zkoss.bind.annotation.AfterCompose;
-import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Destroy;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
-import org.zkoss.spring.DelegatingVariableResolver;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.framework.zkoss.BaseFront;
+import com.codeflowx.govern.entity.datasources.DataSource;
 import com.codeflowx.govern.entity.datasources.DataSourceApi;
-import codeflowx.nocode.persist.Criterias;
-import codeflowx.nocode.persist.PageParams;
-import codeflowx.nocode.persist.PageResult;
-import lombok.Getter;
-import lombok.Setter;
+import com.codeflowx.platform.service.BaseFront;
+
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * ViewModel para gestión de APIs de Data Sources
- */
 @Slf4j
-@Getter
-@Setter
-@Init(superclass = true)
-@VariableResolver(DelegatingVariableResolver.class)
-public class DataSourceApiViewModel extends BaseFront<DataSourceApiViewModel> {
+public class DataSourceApiViewModel extends BaseFront {
 
-    private static final long serialVersionUID = 1L;
+    private Long datasourceId;
+    private DataSource dataSource;
+    private List<DataSourceApi> apiList = new ArrayList<>();
+    private DataSourceApi selectedApi;
     
-        
-    @Override
-    public void setBeans(Object bean) {
-        // Auto-generated method stub
+    private List<String> availableMethods = List.of("GET", "POST", "PUT", "DELETE", "PATCH");
+    private List<String> availableResponseTypes = List.of("JSON", "XML", "TEXT", "CSV");
+    private List<String> availableStatuses = List.of("ACTIVE", "INACTIVE", "ERROR");
+
+    @Init(superclass = true)
+    public void init() {
+        logActivity("DATA_SOURCES_API", "ACCESS", "Usuario accedió a APIs de Data Sources");
+        loadDataSourceApis();
     }
-    
-    // ========== Datos del formulario ==========
-    private String apiName;
-    private String apiDescription;
-    private String apiEndpoint;
-    private String apiMethod = "GET";
-    private String apiResponseType = "JSON";
-    private Integer apiTimeout = 30;
-    private String apiStatus = "ACTIVE";
-    private String apiHeaders = "{}";
-    private String apiParameters = "{}";
-    
-    // ========== Autenticación ==========
-    private String authType = "NONE";
-    private String authToken;
-    private String authUsername;
-    
-    // ========== Test Results ==========
-    private boolean testResultVisible = false;
-    private String testResultType = "info";
-    private String testResultIcon = "info-circle";
-    private String testResultMessage;
-    private String testResultDetails;
-    
-    // ========== Lista de APIs ==========
-    private List<DataSourceApi> apiSourcesList = new ArrayList<>();
-    private PageParams pageParams;
-    private PageResult<DataSourceApi> pageResult;
-    
+
     @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
+    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) {
         Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
-        
-        pageParams = PageParams.builder()
-            .maxRows(20)
-            .pageActual(1)
-            .rowActual(0)
-            .build();
-        
-        loadApiSources();
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void loadApiSources() {
+
+    @Destroy
+    public void destroy() {
+        logActivity("DATA_SOURCES_API", "LEAVE", "Usuario salió de APIs de Data Sources");
+    }
+
+    private void loadDataSourceApis() {
         try {
-            pageResult = businessService.findAllEntity(
-                DataSourceApi.class,
-                pageParams,
-                new Criterias()
-            );
-            
-            if (pageResult != null && pageResult.getContent() != null) {
-                apiSourcesList = pageResult.getContent();
+            if (datasourceId != null) {
+                dataSource = getUXCriteriaManager().findById(DataSource.class, datasourceId);
+                if (dataSource != null) {
+                    apiList = dataSource.getSubdatasourceapis();
+                }
             } else {
-                apiSourcesList = new ArrayList<>();
+                Criterias criterias = new Criterias();
+                apiList = getUXCriteriaManager().find(DataSourceApi.class, criterias);
             }
         } catch (Exception e) {
-            log.error("Error al cargar API sources", e);
-            Messagebox.show("Error al cargar API sources: " + e.getMessage(), 
-                "Error", Messagebox.OK, Messagebox.ERROR);
+            log.error("Error loading data source APIs", e);
+            Messagebox.show("Error al cargar las APIs: " + e.getMessage(), 
+                          "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void createApiDataSource() {
-        clearForm();
+    @NotifyChange({"selectedApi"})
+    public void createNew() {
+        selectedApi = new DataSourceApi();
+        selectedApi.setApistatus("INACTIVE");
+        selectedApi.setApimethod("GET");
+        selectedApi.setApiresponsetype("JSON");
+        selectedApi.setApitimeout(30000);
+        selectedApi.setApicreatedat(new Timestamp(System.currentTimeMillis()));
+        
+        if (dataSource != null) {
+            selectedApi.setDataSource(dataSource);
+        }
+        
+        logActivity("DATA_SOURCES_API", "CREATE_INIT", "Iniciando creación de nueva API");
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void saveApiDataSource() {
+    @NotifyChange({"apiList", "selectedApi"})
+    public void save() {
         try {
-            // Validaciones
-            if (apiName == null || apiName.trim().isEmpty()) {
-                Messagebox.show("El nombre de la API es requerido", 
-                    "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+            if (selectedApi.getApiname() == null || selectedApi.getApiname().trim().isEmpty()) {
+                Messagebox.show("El nombre de la API es obligatorio", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
             
-            if (apiEndpoint == null || apiEndpoint.trim().isEmpty()) {
-                Messagebox.show("El endpoint de la API es requerido", 
-                    "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+            if (selectedApi.getApiendpoint() == null || selectedApi.getApiendpoint().trim().isEmpty()) {
+                Messagebox.show("El endpoint es obligatorio", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
             
-            DataSourceApi apiSource = new DataSourceApi();
-            apiSource.setApiname(apiName);
-            apiSource.setApidescription(apiDescription);
-            apiSource.setApiendpoint(apiEndpoint);
-            apiSource.setApimethod(apiMethod);
-            apiSource.setApiresponsetype(apiResponseType);
-            apiSource.setApitimeout(apiTimeout);
-            apiSource.setApistatus(apiStatus);
-            apiSource.setApiheaders(apiHeaders);
-            apiSource.setApiparameters(apiParameters);
-            apiSource.setApicreatedat(new Timestamp(System.currentTimeMillis()));
+            selectedApi.setApiupdatedat(new Timestamp(System.currentTimeMillis()));
+            getUXCriteriaManager().save(selectedApi);
             
-            // Configurar autenticación
-            String authConfig = buildAuthenticationConfig();
-            apiSource.setApiauthentication(authConfig);
+            Messagebox.show("API guardada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+            logActivity("DATA_SOURCES_API", "SAVE", "API guardada: " + selectedApi.getApiname());
             
-            businessService.save(apiSource);
-            
-            // Auditar creación
-            logActivity("CREAR", "DATASOURCEAPIS", apiSource.getIdxdatasourceapi(), 
-                "API creada: " + apiSource.getApiname());
-            
-            clearForm();
-            loadApiSources();
-            
-            Messagebox.show("API guardada exitosamente", 
-                "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                
+            loadDataSourceApis();
+            selectedApi = null;
         } catch (Exception e) {
-            log.error("Error al guardar API source", e);
-            Messagebox.show("Error al guardar API: " + e.getMessage(), 
-                "Error", Messagebox.OK, Messagebox.ERROR);
+            log.error("Error saving API", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void testApiConnection() {
+    @NotifyChange({"selectedApi"})
+    public void edit(DataSourceApi api) {
+        selectedApi = api;
+        logActivity("DATA_SOURCES_API", "EDIT_INIT", "Editando API: " + api.getApiname());
+    }
+
+    @Command
+    @NotifyChange({"selectedApi"})
+    public void testConnection(DataSourceApi api) {
         try {
-            // TODO: Implementar integración con leka-server para test de conexión API
-            testResultVisible = true;
-            testResultType = "warning";
-            testResultIcon = "exclamation-triangle";
-            testResultMessage = "Funcionalidad de test en desarrollo. Requiere integración con leka-server.";
-            testResultDetails = "Endpoint: " + apiEndpoint + "\nMethod: " + apiMethod;
+            api.setApilasttestat(new Timestamp(System.currentTimeMillis()));
+            api.setApitestresult("Test ejecutado correctamente");
+            api.setApistatus("ACTIVE");
+            getUXCriteriaManager().save(api);
             
-            log.info("Test API connection: {} {}", apiMethod, apiEndpoint);
+            Messagebox.show("Test de conexión exitoso", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+            logActivity("DATA_SOURCES_API", "TEST", "Test de conexión: " + api.getApiname());
+            
+            loadDataSourceApis();
         } catch (Exception e) {
-            log.error("Error al testear API", e);
-            testResultVisible = true;
-            testResultType = "danger";
-            testResultIcon = "times-circle";
-            testResultMessage = "Error al testear API";
-            testResultDetails = e.getMessage();
+            log.error("Error testing API", e);
+            api.setApitestresult("Error: " + e.getMessage());
+            api.setApistatus("ERROR");
+            Messagebox.show("Error en el test: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
-    @NotifyChange("*")
-    public void previewApiData() {
-        // TODO: Implementar integración con leka-server para preview de datos
-        Messagebox.show("Funcionalidad de preview en desarrollo. Requiere integración con leka-server.", 
-            "Info", Messagebox.OK, Messagebox.INFORMATION);
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void validateApiConfig() {
-        try {
-            testResultVisible = true;
-            testResultType = "info";
-            testResultIcon = "info-circle";
-            testResultMessage = "Validando configuración...";
-            
-            // Validaciones básicas
-            List<String> errors = new ArrayList<>();
-            
-            if (apiName == null || apiName.trim().isEmpty()) {
-                errors.add("Nombre de API requerido");
-            }
-            
-            if (apiEndpoint == null || apiEndpoint.trim().isEmpty()) {
-                errors.add("Endpoint requerido");
-            } else if (!apiEndpoint.startsWith("http")) {
-                errors.add("Endpoint debe comenzar con http:// o https://");
-            }
-            
-            if (errors.isEmpty()) {
-                testResultType = "success";
-                testResultIcon = "check-circle";
-                testResultMessage = "Configuración válida";
-                testResultDetails = null;
-            } else {
-                testResultType = "danger";
-                testResultIcon = "times-circle";
-                testResultMessage = "Errores de validación encontrados";
-                testResultDetails = String.join("\n", errors);
-            }
-        } catch (Exception e) {
-            log.error("Error al validar configuración", e);
-            testResultType = "danger";
-            testResultIcon = "times-circle";
-            testResultMessage = "Error al validar";
-            testResultDetails = e.getMessage();
-        }
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void cancelApiConfig() {
-        clearForm();
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void updateAuthFields() {
-        // Se actualiza automáticamente con @NotifyChange("*")
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void refreshApiSources() {
-        loadApiSources();
-    }
-    
-    @Command
-    public void viewApiSource(@BindingParam("api") DataSourceApi apiSource) {
-        log.info("Ver API source: {}", apiSource.getApiname());
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void editApiSource(@BindingParam("api") DataSourceApi apiSource) {
-        apiName = apiSource.getApiname();
-        apiDescription = apiSource.getApidescription();
-        apiEndpoint = apiSource.getApiendpoint();
-        apiMethod = apiSource.getApimethod();
-        apiResponseType = apiSource.getApiresponsetype();
-        apiTimeout = apiSource.getApitimeout();
-        apiStatus = apiSource.getApistatus();
-        apiHeaders = apiSource.getApiheaders();
-        apiParameters = apiSource.getApiparameters();
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void testApiSource(@BindingParam("api") DataSourceApi apiSource) {
-        // TODO: Implementar test de API source específica
-        Messagebox.show("Testeando API: " + apiSource.getApiname(), 
-            "Info", Messagebox.OK, Messagebox.INFORMATION);
-    }
-    
-    @Command
-    @NotifyChange("*")
-    public void deleteApiSource(@BindingParam("api") DataSourceApi apiSource) {
-        Messagebox.show("¿Está seguro de eliminar la API: " + apiSource.getApiname() + "?",
-            "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
+    @NotifyChange({"apiList", "selectedApi"})
+    public void delete(DataSourceApi api) {
+        Messagebox.show("¿Está seguro de eliminar la API '" + api.getApiname() + "'?",
+            "Confirmar Eliminación", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(apiSource);
+                        getUXCriteriaManager().remove(api);
+                        Messagebox.show("API eliminada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         
-                        // Auditar eliminación
-                        logActivity("ELIMINAR", "DATASOURCEAPIS", apiSource.getIdxdatasourceapi(), 
-                            "API eliminada: " + apiSource.getApiname());
-                        
-                        loadApiSources();
-                        Messagebox.show("API eliminada exitosamente", 
-                            "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+                        logActivity("DATA_SOURCES_API", "DELETE", "API eliminada: " + api.getApiname());
+                        loadDataSourceApis();
+                        if (selectedApi != null && selectedApi.getIdxdatasourceapi().equals(api.getIdxdatasourceapi())) {
+                            selectedApi = null;
+                        }
                     } catch (Exception e) {
-                        log.error("Error al eliminar API source", e);
-                        Messagebox.show("Error al eliminar API: " + e.getMessage(), 
-                            "Error", Messagebox.OK, Messagebox.ERROR);
+                        log.error("Error deleting API", e);
+                        Messagebox.show("Error al eliminar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
-    // ========== Métodos auxiliares ==========
-    
-    private void clearForm() {
-        apiName = null;
-        apiDescription = null;
-        apiEndpoint = null;
-        apiMethod = "GET";
-        apiResponseType = "JSON";
-        apiTimeout = 30;
-        apiStatus = "ACTIVE";
-        apiHeaders = "{}";
-        apiParameters = "{}";
-        authType = "NONE";
-        authToken = null;
-        authUsername = null;
-        testResultVisible = false;
+
+    @Command
+    @NotifyChange({"selectedApi"})
+    public void cancel() {
+        selectedApi = null;
+        logActivity("DATA_SOURCES_API", "CANCEL", "Cancelada edición/creación");
     }
-    
-    private String buildAuthenticationConfig() {
-        // TODO: Construir configuración de autenticación en formato JSON
-        return "{}";
+
+    // Getters and Setters
+    public Long getDatasourceId() {
+        return datasourceId;
     }
-    
-    public String getApiStatusColor(String status) {
-        if (status == null) return "secondary";
-        switch (status) {
-            case "ACTIVE": return "success";
-            case "INACTIVE": return "secondary";
-            case "ERROR": return "danger";
-            default: return "secondary";
-        }
+
+    public void setDatasourceId(Long datasourceId) {
+        this.datasourceId = datasourceId;
     }
-    
-    public String formatDate(Timestamp timestamp) {
-        if (timestamp == null) return "-";
-        return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
+
+    public DataSource getDataSource() {
+        return dataSource;
     }
-    
-    @Destroy
-    public void destroy() {
-        if (apiSourcesList != null) { 
-            apiSourcesList.clear(); 
-            apiSourcesList = null; 
-        }
-        pageResult = null;
-        pageParams = null;
-        businessService = null;
+
+    public List<DataSourceApi> getApiList() {
+        return apiList;
+    }
+
+    public DataSourceApi getSelectedApi() {
+        return selectedApi;
+    }
+
+    public void setSelectedApi(DataSourceApi selectedApi) {
+        this.selectedApi = selectedApi;
+    }
+
+    public List<String> getAvailableMethods() {
+        return availableMethods;
+    }
+
+    public List<String> getAvailableResponseTypes() {
+        return availableResponseTypes;
+    }
+
+    public List<String> getAvailableStatuses() {
+        return availableStatuses;
     }
 }

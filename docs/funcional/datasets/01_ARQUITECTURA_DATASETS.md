@@ -13,6 +13,21 @@ Los datasets son el núcleo del conocimiento y entrenamiento de agentes, modelos
 - **Gestión de metadatos, gobierno y auditoría** (Java + PostgreSQL)
 - **Procesamiento, embeddings y vectorización** (leka-server + Python)
 
+### Documentos Relacionados
+
+Este documento es la **arquitectura general de datasets** y su integración con leka-server. Para detalles de implementación específica:
+
+- **Domain Ingestion (Implementado):** `docs/funcional/domain-ingestion/01_IMPLEMENTACION_DOMAIN_INGESTION.md`
+  - Entidades JPA: Domain, DomainDataSource, IngestionJob, DomainSector
+  - ViewModels: 8 ViewModels completamente implementados
+  - Pantallas ZUL: 8 pantallas (Dashboard, Wizard, Gestión, Monitor, 4× Configure Sources)
+  - Estado: ✅ Completado Fase 1 (metadatos y UI)
+  - **Pendiente:** Integración con leka-server para procesamiento real
+
+- **RAG Systems:** `docs/funcional/rag/09_INTEGRACION_LEKA_SERVER.md`
+  - Arquitectura de sistemas RAG
+  - Integración con Qdrant/Cohere/Pinecone
+
 ---
 
 ## 📊 TIPOS DE DATASETS
@@ -127,52 +142,160 @@ CREATE TABLE AGTAGENTDOMAINS (
 );
 ```
 
-**2. DomainDataset (Datasets de Dominio)**
+**2. Domain (Dominios de Negocio - Implementado)**
 ```sql
-CREATE TABLE DOMDOMAINDATASETS (
-    IDXDOMAINDATASET BIGSERIAL PRIMARY KEY,
-    IDDOMAINS0 BIGINT REFERENCES AGTAGENTDOMAINS(IDXAGENTDOMAIN),  -- FK al dominio
+CREATE TABLE DIN_DOMAIN (
+    IDXDOMAIN BIGSERIAL PRIMARY KEY,
     
     -- Identificación
-    DOMNAME VARCHAR(255) NOT NULL,
-    DOMDESCRIPTION TEXT,
-    DOMDATASETTYPE VARCHAR(50) NOT NULL,  -- TRAINING, EVALUATION, RAG, BENCHMARK
+    DINDOMAINNAME VARCHAR(200) NOT NULL,
+    DINDOMAINDESCRIPTION VARCHAR(1000),
+    DINDOMAINICON VARCHAR(50),  -- Emoji o icono
+    DINDOMAINCOLOR VARCHAR(50),  -- Color para UI
+    DININDUSTRY VARCHAR(200),  -- Industria
+    DINBUSINESSAREA VARCHAR(200),  -- Área de negocio
     
-    -- Almacenamiento (referencias, NO datos reales)
-    DOMFILEPATH VARCHAR(500),  -- Path en S3/FS
-    DOMFILEFORMAT VARCHAR(50),  -- CSV, JSON, Parquet, PDF, etc.
-    DOMFILESIZEBYTES BIGINT,
-    DOMRECORDCOUNT BIGINT,
-    DOMCOLUMNCOUNT INTEGER,
-    DOMSCHEMAVERSION VARCHAR(50),
+    -- Estado y Progreso
+    DINSTATUS VARCHAR(50),  -- active, inactive, error, draft
+    DINPROGRESS INTEGER,  -- % de progreso 0-100
+    DINTOTALDOCUMENTS INTEGER,  -- Total documentos
+    DINTOTALWEBPAGES INTEGER,  -- Total páginas web
+    DINTOTALAPIS INTEGER,  -- Total APIs
+    DINVERSION VARCHAR(50),
     
-    -- Calidad y compliance (metadata)
-    DOMDATAQUALITYSCORE DECIMAL(5,2),
-    DOMCOMPLIANCETAGS JSONB,
-    DOMRETENTIONPOLICY JSONB,
-    DOMDATALINEAGE JSONB,  -- De dónde viene, transformaciones
-    DOMSOURCEMETADATA JSONB,
+    -- Compliance y Regulación
+    DINREGULATORYFRAMEWORK VARCHAR(500),  -- GDPR, HIPAA, SOC2, etc.
+    DINDATARETENTIONYEARS INTEGER,
+    DINPRIVACYLEVEL VARCHAR(50),  -- public, internal, confidential, restricted
+    DINCOMPLIANCESTATUS VARCHAR(50),  -- compliant, non_compliant, under_review
+    DINQUALITYSCORE INTEGER,  -- 0-100
     
     -- Configuración RAG
-    DOMISRAGREADY BOOLEAN DEFAULT false,  -- Listo para indexar en leka-server
-    DOMRAGMETADATA JSONB,  -- Estrategia chunking, embedding model, etc.
-    DOMTRAININGRELEVANCE INTEGER,  -- 1-10 relevancia para entrenamiento
+    DINRAGENABLED BOOLEAN DEFAULT false,
+    DINRAGDOCUMENTCOUNT INTEGER,
+    DINRAGLASTINDEXED TIMESTAMP,
+    DINRAGSEARCHQUERIES INTEGER,
     
-    -- Sincronización
-    DOMLASTINGESTED TIMESTAMP,
-    DOMINGESTIONFREQUENCY VARCHAR(50),  -- DAILY, WEEKLY, MONTHLY, ON_DEMAND
-    DOMINGESTIONSTATUS VARCHAR(50),  -- PENDING, IN_PROGRESS, COMPLETED, FAILED
-    DOMLASTERROR TEXT,
+    -- Configuración Training
+    DINTRAININGENABLED BOOLEAN DEFAULT false,
+    DINTRAININGCONTENTCOUNT INTEGER,
+    DINTRAININGLASTGENERATED TIMESTAMP,
+    DINTRAININGRELEVANCESCORE INTEGER,
+    
+    -- Auto Ingestion
+    DINAUTOINGESTION BOOLEAN DEFAULT false,
+    DINQUALITYTHRESHOLD INTEGER,  -- Umbral calidad 0-100
+    DINRETENTIONDAYS INTEGER,
+    DINCOMPLIANCECHECKS BOOLEAN DEFAULT true,
     
     -- Auditoría
-    DOMCREATEDBY VARCHAR(255) NOT NULL,
-    DOMUPDATEDBY VARCHAR(255),
-    DOMCREATEDAT TIMESTAMP NOT NULL,
-    DOMUPDATEDAT TIMESTAMP
+    DINCREATEDAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    DINUPDATEDAT TIMESTAMP,
+    DINLASTUPDATE TIMESTAMP,
+    DINCREATEDBY VARCHAR(200),
+    DINUPDATEDBY VARCHAR(200)
 );
 ```
 
-**3. DatasetConsumption (Consumo y Costes)**
+**3. DomainDataSource (Fuentes de Datos - Implementado)**
+```sql
+CREATE TABLE DIN_DATA_SOURCE (
+    IDXDATASOURCE BIGSERIAL PRIMARY KEY,
+    IDXDOMAIN BIGINT NOT NULL REFERENCES DIN_DOMAIN(IDXDOMAIN),
+    
+    -- Identificación
+    DINDSNAME VARCHAR(300) NOT NULL,
+    DINDSDESCRIPTION VARCHAR(1000),
+    DINDSTYPE VARCHAR(50) NOT NULL,  -- database, api, file, web
+    DINDSSTATUS VARCHAR(50),  -- active, inactive, error
+    
+    -- Database específico
+    DINDSCONNECTIONSTRING VARCHAR(500),
+    DINDSDATABASETYPE VARCHAR(50),  -- postgresql, mysql, mongodb, oracle, sqlserver
+    DINDSTABLES TEXT,  -- JSON array de tablas
+    
+    -- API específico
+    DINDSENDPOINT VARCHAR(500),
+    DINDSAUTHTYPE VARCHAR(50),  -- bearer, api_key, oauth2
+    DINDSAPIKEY VARCHAR(500),
+    DINDSTOKEN VARCHAR(1000),
+    DINDSPARAMETERS TEXT,  -- JSON de parámetros
+    
+    -- Web Scraping específico
+    DINDSURL VARCHAR(500),
+    DINDSSELECTORS TEXT,  -- JSON de selectores CSS/XPath
+    DINDSMAXPAGES INTEGER,
+    DINDSDELAY INTEGER,  -- Delay en ms entre requests
+    
+    -- File/Document específico
+    DINDSFILEPATH VARCHAR(500),
+    DINDSFILETYPE VARCHAR(50),
+    DINDSSUPPORTEDFORMATS TEXT,  -- JSON array de formatos
+    
+    -- Opciones de Procesamiento
+    DINDSEXTRACTTABLES BOOLEAN DEFAULT false,
+    DINDSEXTRACTNUMBERS BOOLEAN DEFAULT false,
+    DINDSEXTRACTENTITIES BOOLEAN DEFAULT false,
+    DINDSQUALITYTHRESHOLD INTEGER,
+    DINDSENABLED BOOLEAN DEFAULT true,
+    
+    -- Metadata y Sincronización
+    DINDSLASTSYNC TIMESTAMP,
+    DINDSRECORDCOUNT INTEGER,
+    DINDSCONFIGURATION TEXT,  -- JSON configuración adicional
+    DINDSMETADATA TEXT,  -- JSON metadata
+    
+    -- Auditoría
+    DINDSCREATEDAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    DINDSUPDATEDAT TIMESTAMP
+);
+```
+
+**4. IngestionJob (Jobs de Ingesta - Implementado)**
+```sql
+CREATE TABLE DIN_INGESTION_JOB (
+    IDXINGESTIONJOB BIGSERIAL PRIMARY KEY,
+    IDXDOMAIN BIGINT NOT NULL REFERENCES DIN_DOMAIN(IDXDOMAIN),
+    IDXDOMAINSECTOR BIGINT REFERENCES DIN_SECTOR(IDXDOMAINSECTOR),
+    
+    -- Identificación
+    DINJOBNAME VARCHAR(300) NOT NULL,
+    DINJOBTYPE VARCHAR(50) NOT NULL,  -- document_upload, web_scraping, api, database
+    DINSTATUS VARCHAR(50) NOT NULL,  -- pending, running, completed, failed, paused, queued
+    
+    -- Progreso
+    DINPROGRESS INTEGER DEFAULT 0,  -- % 0-100
+    DINTOTALRECORDS INTEGER,
+    DINPROCESSEDRECORDS INTEGER DEFAULT 0,
+    DINFAILEDRECORDS INTEGER DEFAULT 0,
+    
+    -- Tiempos
+    DINSTARTEDAT TIMESTAMP,
+    DINCOMPLETEDAT TIMESTAMP,
+    DINESTIMATEDCOMPLETION TIMESTAMP,
+    
+    -- Métricas
+    DINPROCESSINGTIME INTEGER,  -- Segundos
+    DINSUCCESSRATE DOUBLE PRECISION,
+    DINQUALITYSCORE INTEGER,
+    
+    -- Web Scraping específico
+    DINSCRAPEDPAGES INTEGER,
+    DINTOTALPAGES INTEGER,
+    
+    -- Configuración y errores
+    DINCONFIGURATION TEXT,  -- JSON
+    DINMETADATA TEXT,  -- JSON
+    DINERRORMESSAGE VARCHAR(2000),
+    DINDATASETPATH VARCHAR(500),  -- Path al dataset procesado
+    
+    -- Auditoría
+    DINCREATEDAT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    DINUPDATEDAT TIMESTAMP
+);
+```
+
+**5. DatasetConsumption (Consumo y Costes)**
 ```sql
 CREATE TABLE DATASETCONSUMPTION (
     IDXDATASETCONSUMPTION BIGSERIAL PRIMARY KEY,
@@ -196,7 +319,7 @@ CREATE TABLE DATASETCONSUMPTION (
 );
 ```
 
-**4. DatasetAuditLog (Auditoría de Datasets)**
+**6. DatasetAuditLog (Auditoría de Datasets)**
 ```sql
 CREATE TABLE DATASETAUDITLOG (
     IDXDATASETAUDITLOG BIGSERIAL PRIMARY KEY,
@@ -416,7 +539,38 @@ CREATE TABLE DATASETAUDITLOG (
 
 ---
 
+---
+
+## 📚 REFERENCIAS A DOCUMENTACIÓN EXISTENTE
+
+- **Implementación Domain Ingestion:** `docs/funcional/domain-ingestion/01_IMPLEMENTACION_DOMAIN_INGESTION.md`
+  - Entidades implementadas: Domain, DomainDataSource, IngestionJob, DomainSector
+  - ViewModels: DomainManagementViewModel, DomainIngestionWizardViewModel, Configure*, JobMonitorViewModel
+  - Pantallas ZUL ya creadas (8 pantallas)
+  - Scripts SQL: domain_ingestion.sql
+
+- **Integración RAG:** `docs/funcional/rag/09_INTEGRACION_LEKA_SERVER.md`
+  - Arquitectura RAG Systems
+  - Endpoints leka-server para RAG
+  - ViewModels de RAG
+
+---
+
 ## 📁 ESTRUCTURA DE DATOS EN JAVA (Metadatos)
+
+### Domain campos clave ya implementados
+
+Campos de configuración RAG en tabla `DIN_DOMAIN`:
+- `dinragenabled`: BOOLEAN - Habilita indexación RAG
+- `dinragdocumentcount`: INTEGER - Documentos indexados
+- `dinraglastindexed`: TIMESTAMP - Última indexación
+- `dinragsearchqueries`: INTEGER - Total queries RAG
+
+Campos de configuración Training:
+- `dintrainingenabled`: BOOLEAN - Habilita entrenamiento
+- `dintrainingcontentcount`: INTEGER - Contenido de training
+- `dintraininglastgenerated`: TIMESTAMP - Último training
+- `dintrainingrelevancescore`: INTEGER - Score de relevancia
 
 ### AgentDomain.agtdatasets (JSONB)
 ```json
@@ -537,39 +691,54 @@ CREATE TABLE DATASETAUDITLOG (
 
 ### Módulo: Domain Ingestion (platform/viewmodel/domainingestion)
 
-**DomainManagementViewModel:**
-- `loadDomains()` → **DB** (BusinessService.findAllEntity)
-- `loadDomainMetrics()` → **API** (GET /domains/{id}/coverage para cada dominio)
-- `createDomain()`, `updateDomain()`, `deleteDomain()` → **DB**
+> **Estado actual:** ✅ Implementado Fase 1 (metadatos y UI). Pendiente: integración con leka-server.
 
-**DomainIngestionWizardViewModel:**
-- `finishDomain()` → **DB** (crea Domain + DomainDatasets)
-- Si `ragEnabled=true` y datasets con `isRagReady=true`:
-  - Lanza **API**: `POST /domains/{domainId}/ingest-all`
-  - Guarda taskIds en tabla de Jobs o en memoria
-  - Redirige a JobMonitorViewModel con taskIds
+**DomainManagementViewModel** (✅ Implementado)
+- `loadDomains()` → **DB** (BusinessService.findAllEntity con Criterias)
+- `searchDomains()` → **DB** (filtros por nombre, industria, status)
+- `createDomain()`, `editDomain()`, `deleteDomain()` → **DB** con confirmación
+- **Pendiente:** `loadDomainMetrics()` → **API** (GET /domains/{id}/coverage para métricas de conocimiento)
 
-**ConfigureDocumentsViewModel:**
-- `uploadDocument()` → Sube a S3/FS, guarda path en **DB** (DomainDataset.filePath)
-- `validateDocument()` → **API**: `POST /datasets/validate` (formato, schema, calidad)
-- `ingestDocument()` → **API**: `POST /domains/{domainId}/datasets/{datasetId}/ingest`
+**DomainIngestionWizardViewModel** (✅ Implementado)
+- Wizard 6 pasos con validación por paso
+- `selectTemplate()` → Auto-configura industria, privacy, regulatory según template (Fintech, Healthcare, E-commerce)
+- `toggleDataSource()` → Selección múltiple (database, api, file, web)
+- `finishDomain()` → **DB** (crea Domain en estado "draft")
+- **Pendiente:** Si `dinragenabled=true` → lanzar **API**: `POST /domains/{domainId}/ingest-all`
 
-**ConfigureApiViewModel:**
-- `testConnection()` → Guarda config en **DB** (connectionConfig JSONB)
-- `scheduleIngestion()` → Guarda frecuencia en **DB** + crea job en BPMN o **API** (scheduling en leka)
+**ConfigureDocumentsViewModel** (✅ Implementado)
+- `loadDataSources()` → **DB** (lista DomainDataSource con type='file')
+- `saveDataSource()` → **DB** (guarda config: filePath, fileType, supportedFormats, extractTables/Numbers/Entities)
+- `deleteDataSource()` → **DB** con confirmación
+- **Pendiente:** `uploadDocument()` → Sube a S3/FS + **API**: `POST /domains/{domainId}/datasets/{datasetId}/ingest`
+- **Pendiente:** `validateDocument()` → **API**: `POST /datasets/validate`
 
-**ConfigureDatabaseViewModel:**
-- Similar a ConfigureApi: config en **DB**, extracción/ingesta en **API**
+**ConfigureApiViewModel** (✅ Implementado)
+- `loadApiSources()` → **DB** (lista DomainDataSource con type='api')
+- `saveApiSource()` → **DB** (endpoint, authType, apiKey, token, parameters JSON)
+- **Pendiente:** `testConnection()` → **API**: `GET /datasources/test-connection`
+- **Pendiente:** `scheduleIngestion()` → **API**: `POST /jobs/schedule` (cron expression)
 
-**ConfigureWebScrapingViewModel:**
-- Config de scraping en **DB**, ejecución en **API** (POST /datasets/scrape + /ingest)
+**ConfigureDatabaseViewModel** (✅ Implementado)
+- `loadDatabaseSources()` → **DB** (lista DomainDataSource con type='database')
+- `saveDatabaseSource()` → **DB** (connectionString, databaseType, tables JSON)
+- **Pendiente:** `testConnection()` → **API**: `POST /datasources/test-connection`
+- **Pendiente:** `extractData()` → **API**: `POST /domains/{domainId}/datasources/{datasourceId}/extract-and-ingest`
 
-**JobMonitorViewModel:**
-- `loadJobs()` → Mixto:
-  - Jobs BPMN (workflows de aprobación) → **DB** (historicProcessInstance)
-  - Jobs de ingesta/procesamiento → **API** (GET /jobs?type=ingestion&domainId=)
-- `viewJobDetails()` → **API** (GET /jobs/{taskId} con logs y progreso)
-- `cancelJob()` → **API** (DELETE /jobs/{taskId})
+**ConfigureWebScrapingViewModel** (✅ Implementado)
+- `loadWebSources()` → **DB** (lista DomainDataSource con type='web')
+- `saveWebSource()` → **DB** (url, selectors JSON, maxPages, delay)
+- **Pendiente:** `testScraping()` → **API**: `POST /datasources/test-scraping` (preview de 1 página)
+- **Pendiente:** `startScraping()` → **API**: `POST /domains/{domainId}/datasources/{datasourceId}/scrape-and-ingest`
+
+**JobMonitorViewModel** (✅ Implementado)
+- `loadJobs()` → **DB** (BusinessService.findAllEntity con filtros por dominio/tipo/estado)
+- `pauseJob()`, `resumeJob()`, `cancelJob()` → **DB** (cambio de estado en IngestionJob)
+- `refreshJobs()` → **DB** (reload cada N segundos)
+- **Pendiente:** Integrar con **API** para jobs reales de leka-server:
+  - `loadJobs()` → **API**: `GET /jobs?domainId=&type=&status=`
+  - `viewJobLogs()` → **API**: `GET /jobs/{taskId}/logs`
+  - `pauseJob()`, `cancelJob()` → **API**: `PUT /jobs/{taskId}/pause`, `DELETE /jobs/{taskId}`
 
 ---
 
@@ -799,70 +968,203 @@ leka:
 
 ## ✅ CHECKLIST DE IMPLEMENTACIÓN
 
-### Fase 1: Infraestructura
-- [ ] Crear LekaServerClient (Feign con timeouts, retries, circuit breaker)
-- [ ] Definir DTOs (IngestRequestDto, ProgressDto, CoverageDto, etc.)
-- [ ] Configurar JWT propagation y X-Request-Id
-- [ ] Health check endpoint (GET /health) y validación pre-ingesta
+### ✅ Fase 1: Gestión de Metadatos (COMPLETADO)
 
-### Fase 2: Entidades y DB
-- [ ] Verificar/crear tabla DomainDataset con campos isRagReady, ragMetadata, ingestionStatus
-- [ ] Crear tabla DatasetConsumption
-- [ ] Crear tabla DatasetAuditLog
-- [ ] Migración de datos existentes si aplica
+- [x] Entidades JPA: Domain, DomainDataSource, IngestionJob, DomainSector
+- [x] Scripts SQL: domain_ingestion.sql con 4 tablas
+- [x] ViewModels: 8 ViewModels con patrón BaseFront
+- [x] Pantallas ZUL: Dashboard, Wizard, Gestión, Monitor, 4× Configure Sources
+- [x] Validaciones y auditoría (logActivity)
+- [x] CRUD completo de dominios y fuentes de datos
 
-### Fase 3: ViewModels - Domain Ingestion
-- [ ] DomainManagementViewModel: integrar GET /domains/{id}/coverage
-- [ ] DomainIngestionWizardViewModel: integrar POST /domains/{id}/ingest-all
-- [ ] ConfigureDocumentsViewModel: integrar POST /datasets/{id}/ingest
-- [ ] JobMonitorViewModel: integrar GET /jobs?type=ingestion
+**Resultado:** Sistema funcional para gestionar metadatos de dominios y configurar fuentes. Datos se guardan en PostgreSQL. UI operativa.
 
-### Fase 4: ViewModels - RAG
-- [ ] RagDataSourceViewModel: integrar POST /rag/datasources/{id}/ingest
+---
+
+### 🔄 Fase 2: Integración con leka-server (PENDIENTE)
+
+#### 2.1 Infraestructura
+- [ ] Crear LekaServerClient (Feign/WebClient con timeouts, retries, circuit breaker)
+- [ ] Definir DTOs (IngestRequestDto, ProgressDto, CoverageDto, JobDto, etc.)
+- [ ] Configurar JWT propagation y X-Request-Id generation
+- [ ] Health check endpoint (GET /health) y validación de disponibilidad
+- [ ] Configuración en application.yml (url, timeouts, retries)
+
+#### 2.2 Nuevas Entidades y Extensiones DB
+- [ ] Extender Domain con campos: dinragindexstatus, dinraglastindexedat, dinragtaskid
+- [ ] Crear tabla DatasetConsumption (consumo por dataset/periodo)
+- [ ] Crear tabla DatasetAuditLog (auditoría específica de datasets)
+- [ ] Opcional: tabla DatasetJob (si jobs se gestionan también en Java, no solo en leka)
+
+#### 2.3 ViewModels - Domain Ingestion (Integración API)
+- [ ] **DomainManagementViewModel:**
+  - Añadir `loadDomainCoverage()` → GET /domains/{id}/coverage
+  - Añadir comando `indexDomain()` → POST /domains/{id}/ingest-all
+  - Mostrar métricas de cobertura en UI (topics, keywords, coverage%)
+
+- [ ] **DomainIngestionWizardViewModel:**
+  - En `finishDomain()`, si `dinragenabled=true`:
+    - POST /domains/{id}/ingest-all → obtener taskId
+    - Guardar taskId en Domain.dinragtaskid
+    - Redirigir a JobMonitor con taskId destacado
+
+- [ ] **ConfigureDocumentsViewModel:**
+  - Añadir `uploadDocument()` → Upload a S3/FS + POST /domains/{domainId}/datasources/{datasourceId}/ingest
+  - Añadir `validateDocument()` → POST /datasets/validate (formato, schema)
+  - Mostrar preview de documento antes de ingestar
+
+- [ ] **ConfigureApiViewModel:**
+  - Añadir `testConnection()` → GET /datasources/test-connection
+  - Añadir `scheduleIngestion()` → POST /jobs/schedule (cron)
+  - Mostrar resultado de test en modal
+
+- [ ] **ConfigureDatabaseViewModel:**
+  - Añadir `testConnection()` → POST /datasources/test-connection
+  - Añadir `extractData()` → POST /domains/{domainId}/datasources/{id}/extract-and-ingest
+  - Mostrar preview de primeras filas
+
+- [ ] **ConfigureWebScrapingViewModel:**
+  - Añadir `testScraping()` → POST /datasources/test-scraping (preview 1 página)
+  - Añadir `startScraping()` → POST /domains/{domainId}/datasources/{id}/scrape-and-ingest
+  - Mostrar HTML preview
+
+- [ ] **JobMonitorViewModel:**
+  - Mixto: cargar jobs de DB + jobs de leka-server (API)
+  - GET /jobs?domainId=&type=&status= para jobs de leka
+  - GET /jobs/{taskId}/logs para ver logs en tiempo real
+  - PUT /jobs/{taskId}/pause, DELETE /jobs/{taskId} para control desde leka
+
+#### 2.4 ViewModels - RAG (Integración API)
+- [ ] RagDataSourceViewModel: POST /rag/datasources/{id}/ingest
 - [ ] DocumentCoverageAnalysisOverviewViewModel: GET /rag/datasources/coverage-analysis
 - [ ] EmbeddingGenerationProgressOverviewViewModel: GET /rag/datasources/embedding-progress
 - [ ] DatasourceStatisticsOverviewViewModel: GET /rag/datasources/statistics
 - [ ] ChunkDistributionStatsOverviewViewModel: GET /rag/quality/chunk-distribution
 
-### Fase 5: Gobierno
-- [ ] RagBiasDetectionViewModel: integrar POST /datasets/{id}/bias-detection
-- [ ] RagComplianceViewModel: integrar GET /datasets/{id}/compliance-check
-- [ ] Actualizar workflows BPMN para incluir validación de bias/compliance
+#### 2.5 Gobierno y Compliance
+- [ ] RagBiasDetectionViewModel: POST /datasets/{id}/bias-detection
+- [ ] RagComplianceViewModel: GET /datasets/{id}/compliance-check
+- [ ] Workflows BPMN: validación de bias/compliance antes de aprobar
 
-### Fase 6: Auditoría y Consumo
-- [ ] Persistir en DatasetAuditLog tras cada comando exitoso
-- [ ] Polling/webhook para actualizar ingestionStatus
-- [ ] Consolidar consumo en DatasetConsumption (cron job o event-driven)
-- [ ] Dashboard de costes por dataset/dominio/proyecto
+#### 2.6 Auditoría y Consumo
+- [ ] Persistir en DatasetAuditLog tras cada comando (con taskId si aplica)
+- [ ] Polling/webhook para actualizar ingestionStatus (PENDING → IN_PROGRESS → COMPLETED/FAILED)
+- [ ] Cron job para consolidar consumo: GET /consumption?startDate=&endDate= → guardar en DatasetConsumption
+- [ ] Dashboard de costes por dataset/dominio/proyecto/tenant
 
-### Fase 7: Testing
-- [ ] Unit tests de LekaServerClient (mocks)
+#### 2.7 Testing
+- [ ] Unit tests de LekaServerClient (mocks, WireMock)
 - [ ] Integration tests con leka-server en staging
-- [ ] End-to-end: crear dominio → subir dataset → ingestar → buscar → verificar resultados
-- [ ] Performance tests (ingesta de 10k+ documentos)
+- [ ] End-to-end: crear dominio → configurar fuente → ingestar → verificar índice en Qdrant
+- [ ] Performance tests (ingesta de 10k+ documentos, medir throughput)
+- [ ] Resilience tests (timeout, circuit breaker, retry)
 
 ---
 
-## 🚀 DECISIONES PENDIENTES
+## 🚀 DECISIONES TÉCNICAS PENDIENTES
 
+### Procesamiento
 1. **Estrategia de chunking por defecto:** ¿Semantic (spacy/langchain) o Fixed-size (512 tokens)?
-2. **Embedding model por defecto:** ¿OpenAI text-embedding-3-small o Azure?
-3. **Vector backend por defecto:** ¿Qdrant self-hosted o Pinecone cloud?
-4. **Política de retención:** ¿Eliminar vectores automáticamente tras X meses o manual?
-5. **Notificaciones:** ¿Webhook de leka → Java o polling cada N segundos?
-6. **Rate limiting:** ¿Por tenant, por proyecto o por usuario?
-7. **Costes:** ¿Mostrar en tiempo real o consolidado diario/mensual?
+2. **Embedding model por defecto:** ¿OpenAI text-embedding-3-small, Azure, o Cohere embed-multilingual-v3.0?
+3. **Vector backend por defecto:** ¿Qdrant self-hosted, Cohere (managed) o Pinecone cloud?
+
+### Operaciones
+4. **Política de retención de vectores:** ¿Eliminar automáticamente tras X meses o manual?
+5. **Sincronización de estado:** ¿Webhook de leka → Java (push) o polling cada N segundos (pull)?
+6. **Jobs de ingesta:** ¿Gestionar en leka-server (Celery) o en Java (BPMN/Quartz)?
+
+### Seguridad y Costes
+7. **Rate limiting:** ¿Por tenant, por proyecto, por usuario o combinado?
+8. **Costes:** ¿Mostrar en tiempo real (dashboard) o consolidado diario/mensual (reporting)?
+9. **Encriptación:** ¿Vectores encriptados at-rest en Qdrant o solo en tránsito?
+
+### Escalabilidad
+10. **Colecciones Qdrant:** ¿Una colección por tenant o una global con payload filters?
+11. **Sharding:** ¿Particionar índices grandes por fecha/categoría o monolítico?
+12. **Caché de búsquedas:** ¿Redis para queries frecuentes o siempre fresh from Qdrant?
 
 ---
 
 ## 📚 REFERENCIAS
 
-- Documento RAG: `docs/funcional/rag/09_INTEGRACION_LEKA_SERVER.md`
-- Entidades JPA: `nocode.service.entitys/src/main/java/com/codeflowx/govern/entity/`
-- ViewModels: `src/main/java/com/codeflowx/platform/viewmodel/domainingestion/`
-- Leka-server docs: `leka-server-documents/`, `leka-server-serving-evaluation/`
+- **Implementación Domain Ingestion:** `docs/funcional/domain-ingestion/01_IMPLEMENTACION_DOMAIN_INGESTION.md` ✅ Completado
+- **Integración RAG:** `docs/funcional/rag/09_INTEGRACION_LEKA_SERVER.md`
+- **Entidades JPA:** `nocode.service.entitys/src/main/java/com/codeflowx/govern/entity/domainingestion/`
+- **ViewModels:** `src/main/java/com/codeflowx/platform/viewmodel/domainingestion/`
+- **Pantallas ZUL:** `src/main/webapp/console/platform/domain-ingestion/`
+- **Scripts SQL:** `nocode.service.entitys/src/main/resources/sql-scripts/domain_ingestion.sql`
+- **Leka-server:** `leka-server-documents/`, `leka-server-serving-evaluation/`
 
 ---
 
-**Próximos pasos:** Validar con el equipo y empezar implementación por fases.
+## 📊 RESUMEN EJECUTIVO
+
+### Estado Actual (Octubre 2025)
+
+**✅ Completado (Fase 1):**
+- Gestión de metadatos de dominios (Domain, DomainDataSource, IngestionJob)
+- UI completa: 8 pantallas ZUL operativas
+- ViewModels con patrón BaseFront: 8 ViewModels
+- CRUD, validaciones, auditoría básica (Ssoractividad)
+- Wizard de creación de dominios con templates
+- Configuración de fuentes de datos (API, Database, Web, Documents)
+- Monitor de jobs (estados en DB)
+
+**🔄 Pendiente (Fase 2):**
+- Integración con leka-server para procesamiento real
+- Chunking, embeddings, indexación vectorial
+- Métricas técnicas de coverage, quality, bias
+- Jobs asíncronos con progreso en tiempo real
+- Consolidación de consumo/costes
+- Testing end-to-end con Qdrant/Cohere/Pinecone
+
+### Arquitectura Final (Objetivo)
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  USUARIOS (Portal ZK)                    │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────┐
+│         GESTIÓN (Java + PostgreSQL)                      │
+│  - Metadatos de dominios, datasets, fuentes             │
+│  - Compliance, permisos, auditoría                       │
+│  - Configuración de procesamiento                        │
+│  - ViewModels: domainingestion/*, agents/*, rag/*        │
+│  - Entidades: Domain, DomainDataSource, IngestionJob     │
+└──────────────────┬──────────────────────────────────────┘
+                   │ HTTP/gRPC (LekaServerClient)
+                   │ JWT + X-Request-Id
+┌──────────────────▼──────────────────────────────────────┐
+│         EJECUCIÓN (leka-server + Python)                 │
+│  - Chunking (estrategias configurables)                  │
+│  - Embeddings (OpenAI/Azure/Cohere/Local)                │
+│  - Indexación (Qdrant/Cohere/Pinecone)                   │
+│  - Búsqueda semántica (retrieval + reranking)            │
+│  - Métricas técnicas (coverage, quality, bias)           │
+│  - Jobs asíncronos (Celery + Redis)                      │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────┐
+│    PERSISTENCIA VECTORIAL (Multi-backend)                │
+│  - Qdrant (colecciones + payload filters)                │
+│  - Cohere (índices + rerank)                             │
+│  - Pinecone (namespaces + metadata filters)              │
+└──────────────────────────────────────────────────────────┘
+```
+
+### Próximos Pasos Inmediatos
+
+1. **Definir OpenAPI de leka-server** (endpoints de datasets, jobs, búsqueda)
+2. **Generar LekaServerClient** (OpenAPI Generator + Maven)
+3. **Implementar Fase 2** (otro chat AI con este documento como guía)
+4. **Testing en staging** (Qdrant + datasets de prueba)
+5. **Despliegue progresivo** (dominios piloto → producción)
+
+---
+
+**Documento creado:** 2025-10-30  
+**Versión:** 1.0  
+**Estado:** Arquitectura Definida + Fase 1 Implementada ✅  
+**Próximo:** Fase 2 - Integración leka-server 🔄
 
