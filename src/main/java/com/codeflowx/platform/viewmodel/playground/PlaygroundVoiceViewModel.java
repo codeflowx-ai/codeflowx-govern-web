@@ -52,7 +52,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_VOICE", "ACCESS", "Usuario accedió a Voice Playground");
+        logActivity("PLAYGROUND_VOICE", "ACCESS", null, "Usuario accedió a Voice Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadVoiceHistory();
@@ -60,14 +60,14 @@ public class PlaygroundVoiceViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_VOICE", "LEAVE", "Usuario salió de Voice Playground");
+        logActivity("PLAYGROUND_VOICE", "LEAVE", null, "Usuario salió de Voice Playground");
     }
 
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+            availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);
         }
@@ -81,7 +81,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
         } catch (Exception e) {
             log.error("Error creating session", e);
         }
@@ -126,14 +126,14 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setVoiceduration(15);
             voice.setVoicecost(new BigDecimal("0.015"));
             
-            getUXCriteriaManager().save(voice);
+            businessService.save(voice);
             
             generatedAudioUrl = voice.getVoiceaudiourl();
             audioDuration = voice.getVoiceduration();
             audioCost = voice.getVoicecost();
             
             loadVoiceHistory();
-            logActivity("PLAYGROUND_VOICE", "GENERATE_SPEECH", "Audio generado");
+            logActivity("PLAYGROUND_VOICE", "GENERATE_SPEECH", null, "Audio generado");
             Messagebox.show("Audio generado correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error generating speech", e);
@@ -166,14 +166,14 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setVoiceprocessingtime(2500);
             voice.setVoicecost(new BigDecimal("0.006"));
             
-            getUXCriteriaManager().save(voice);
+            businessService.save(voice);
             
             transcriptionText = voice.getVoicetext();
             processingTime = voice.getVoiceprocessingtime();
             transcriptionCost = voice.getVoicecost();
             
             loadVoiceHistory();
-            logActivity("PLAYGROUND_VOICE", "TRANSCRIBE", "Audio transcrito");
+            logActivity("PLAYGROUND_VOICE", "TRANSCRIBE", null, "Audio transcrito");
             Messagebox.show("Audio transcrito correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error transcribing audio", e);
@@ -195,24 +195,24 @@ public class PlaygroundVoiceViewModel extends BaseFront {
 
     @Command
     public void downloadAudio() {
-        logActivity("PLAYGROUND_VOICE", "DOWNLOAD", "Descargando audio");
+        logActivity("PLAYGROUND_VOICE", "DOWNLOAD", null, "Descargando audio");
     }
 
     @Command
     public void copyTranscription() {
-        logActivity("PLAYGROUND_VOICE", "COPY", "Copiando transcripción");
+        logActivity("PLAYGROUND_VOICE", "COPY", null, "Copiando transcripción");
     }
 
     @Command
     public void viewVoice(PlaygroundVoice voice) {
-        logActivity("PLAYGROUND_VOICE", "VIEW", "Viendo detalles de conversión");
+        logActivity("PLAYGROUND_VOICE", "VIEW", null, "Viendo detalles de conversión");
     }
 
     @Command
     @NotifyChange({"voiceHistory"})
     public void deleteVoice(PlaygroundVoice voice) {
         try {
-            getUXCriteriaManager().remove(voice);
+            businessService.removeFromID(PlaygroundVoice.class, voice.getIdxplaygroundvoice());
             loadVoiceHistory();
         } catch (Exception e) {
             log.error("Error deleting voice", e);

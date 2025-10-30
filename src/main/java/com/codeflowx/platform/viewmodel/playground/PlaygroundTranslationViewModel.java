@@ -47,7 +47,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_TRANSLATION", "ACCESS", "Usuario accedió a Translation Playground");
+        logActivity("PLAYGROUND_TRANSLATION", "ACCESS", null, "Usuario accedió a Translation Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadTranslations();
@@ -55,14 +55,14 @@ public class PlaygroundTranslationViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_TRANSLATION", "LEAVE", "Usuario salió de Translation Playground");
+        logActivity("PLAYGROUND_TRANSLATION", "LEAVE", null, "Usuario salió de Translation Playground");
     }
 
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+            availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);
         }
@@ -76,7 +76,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
         } catch (Exception e) {
             log.error("Error creating session", e);
         }
@@ -125,13 +125,13 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             translation.setTranslationcost(new BigDecimal("0.002"));
             translation.setTranslationmethod("NEURAL");
             
-            getUXCriteriaManager().save(translation);
+            businessService.save(translation);
             
             targetText = translation.getTranslationtargettext();
             confidence = translation.getTranslationconfidence();
             
             loadTranslations();
-            logActivity("PLAYGROUND_TRANSLATION", "TRANSLATE", "Texto traducido");
+            logActivity("PLAYGROUND_TRANSLATION", "TRANSLATE", null, "Texto traducido");
         } catch (Exception e) {
             log.error("Error translating", e);
             Messagebox.show("Error al traducir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
@@ -149,22 +149,22 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         sourceText = targetText;
         targetText = tempText;
         
-        logActivity("PLAYGROUND_TRANSLATION", "SWAP_LANGUAGES", "Idiomas intercambiados");
+        logActivity("PLAYGROUND_TRANSLATION", "SWAP_LANGUAGES", null, "Idiomas intercambiados");
     }
 
     @Command
     public void transcribeSource() {
-        logActivity("PLAYGROUND_TRANSLATION", "TRANSCRIBE_SOURCE", "Transcribiendo fuente");
+        logActivity("PLAYGROUND_TRANSLATION", "TRANSCRIBE_SOURCE", null, "Transcribiendo fuente");
     }
 
     @Command
     public void speakTarget() {
-        logActivity("PLAYGROUND_TRANSLATION", "SPEAK_TARGET", "Reproduciendo traducción");
+        logActivity("PLAYGROUND_TRANSLATION", "SPEAK_TARGET", null, "Reproduciendo traducción");
     }
 
     @Command
     public void copyTranslation() {
-        logActivity("PLAYGROUND_TRANSLATION", "COPY", "Copiando traducción");
+        logActivity("PLAYGROUND_TRANSLATION", "COPY", null, "Copiando traducción");
     }
 
     @Command
@@ -174,16 +174,16 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         targetText = translation.getTranslationtargettext();
         sourceLanguage = translation.getTranslationsourcelanguage();
         targetLanguage = translation.getTranslationtargetlanguage();
-        logActivity("PLAYGROUND_TRANSLATION", "REUSE", "Re-usando traducción");
+        logActivity("PLAYGROUND_TRANSLATION", "REUSE", null, "Re-usando traducción");
     }
 
     @Command
     @NotifyChange({"filteredTranslations", "translationHistory"})
     public void deleteTranslation(PlaygroundTranslation translation) {
         try {
-            getUXCriteriaManager().remove(translation);
+            businessService.removeFromID(PlaygroundTranslation.class, translation.getIdxplaygroundtranslation());
             loadTranslations();
-            logActivity("PLAYGROUND_TRANSLATION", "DELETE", "Traducción eliminada");
+            logActivity("PLAYGROUND_TRANSLATION", "DELETE", null, "Traducción eliminada");
         } catch (Exception e) {
             log.error("Error deleting translation", e);
         }

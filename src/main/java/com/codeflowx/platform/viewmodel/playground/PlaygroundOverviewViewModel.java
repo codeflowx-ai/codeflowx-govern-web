@@ -48,7 +48,7 @@ public class PlaygroundOverviewViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND", "ACCESS", "Usuario accedió al módulo de Playground");
+        logActivity("PLAYGROUND", "ACCESS", null, "Usuario accedió al módulo de Playground");
         loadSessions();
         calculateStatistics();
     }
@@ -60,13 +60,13 @@ public class PlaygroundOverviewViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND", "LEAVE", "Usuario salió del módulo de Playground");
+        logActivity("PLAYGROUND", "LEAVE", null, "Usuario salió del módulo de Playground");
     }
 
     private void loadSessions() {
         try {
             Criterias criterias = new Criterias();
-            allSessions = getUXCriteriaManager().find(PlaygroundSession.class, criterias);
+            allSessions = businessService.find(PlaygroundSession.class, criterias);
             applyFilters();
         } catch (Exception e) {
             log.error("Error loading playground sessions", e);
@@ -91,37 +91,37 @@ public class PlaygroundOverviewViewModel extends BaseFront {
 
     @Command
     public void createSession() {
-        logActivity("PLAYGROUND", "CREATE_INIT", "Iniciando creación de nueva sesión");
+        logActivity("PLAYGROUND", "CREATE_INIT", null, "Iniciando creación de nueva sesión");
         // Navigate to create session or show dialog
     }
 
     @Command
     public void openChat() {
-        logActivity("PLAYGROUND", "OPEN_CHAT", "Abriendo módulo de Chat");
+        logActivity("PLAYGROUND", "OPEN_CHAT", null, "Abriendo módulo de Chat");
         Executions.sendRedirect("/console/platform/playground/chat/page.zul");
     }
 
     @Command
     public void openImage() {
-        logActivity("PLAYGROUND", "OPEN_IMAGE", "Abriendo módulo de Generación de Imágenes");
+        logActivity("PLAYGROUND", "OPEN_IMAGE", null, "Abriendo módulo de Generación de Imágenes");
         Executions.sendRedirect("/console/platform/playground/image/page.zul");
     }
 
     @Command
     public void openVoice() {
-        logActivity("PLAYGROUND", "OPEN_VOICE", "Abriendo módulo de Voz");
+        logActivity("PLAYGROUND", "OPEN_VOICE", null, "Abriendo módulo de Voz");
         Executions.sendRedirect("/console/platform/playground/voice/page.zul");
     }
 
     @Command
     public void openTranslation() {
-        logActivity("PLAYGROUND", "OPEN_TRANSLATION", "Abriendo módulo de Traducción");
+        logActivity("PLAYGROUND", "OPEN_TRANSLATION", null, "Abriendo módulo de Traducción");
         Executions.sendRedirect("/console/platform/playground/translation/page.zul");
     }
 
     @Command
     public void openRouting() {
-        logActivity("PLAYGROUND", "OPEN_ROUTING", "Abriendo módulo de Routing");
+        logActivity("PLAYGROUND", "OPEN_ROUTING", null, "Abriendo módulo de Routing");
         Executions.sendRedirect("/console/platform/playground/routing/page.zul");
     }
 
@@ -156,7 +156,7 @@ public class PlaygroundOverviewViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        getUXCriteriaManager().remove(session);
+                        businessService.removeFromID(PlaygroundSession.class, session.getIdxplaygroundsession());
                         Messagebox.show("Sesión eliminada correctamente", 
                                       "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         

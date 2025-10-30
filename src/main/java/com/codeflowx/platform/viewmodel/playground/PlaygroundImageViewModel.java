@@ -46,7 +46,7 @@ public class PlaygroundImageViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_IMAGE", "ACCESS", "Usuario accedió a Image Playground");
+        logActivity("PLAYGROUND_IMAGE", "ACCESS", null, "Usuario accedió a Image Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadGeneratedImages();
@@ -54,7 +54,7 @@ public class PlaygroundImageViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_IMAGE", "LEAVE", "Usuario salió de Image Playground");
+        logActivity("PLAYGROUND_IMAGE", "LEAVE", null, "Usuario salió de Image Playground");
     }
 
     private void loadAvailableModels() {
@@ -62,7 +62,7 @@ public class PlaygroundImageViewModel extends BaseFront {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modeltype", Operation.EQUAL, "IMAGE", Evaluation.STRING);
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+            availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);
         }
@@ -76,7 +76,7 @@ public class PlaygroundImageViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
         } catch (Exception e) {
             log.error("Error creating session", e);
         }
@@ -121,12 +121,12 @@ public class PlaygroundImageViewModel extends BaseFront {
             image.setImagegenerationtime(3500);
             image.setImagecost(new BigDecimal("0.04"));
             
-            getUXCriteriaManager().save(image);
+            businessService.save(image);
             loadGeneratedImages();
             prompt = "";
             negativePrompt = "";
             
-            logActivity("PLAYGROUND_IMAGE", "GENERATE", "Imagen generada");
+            logActivity("PLAYGROUND_IMAGE", "GENERATE", null, "Imagen generada");
             Messagebox.show("Imagen generada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error generating image", e);
@@ -136,7 +136,7 @@ public class PlaygroundImageViewModel extends BaseFront {
 
     @Command
     public void downloadImage(PlaygroundImage image) {
-        logActivity("PLAYGROUND_IMAGE", "DOWNLOAD", "Descargando imagen");
+        logActivity("PLAYGROUND_IMAGE", "DOWNLOAD", null, "Descargando imagen");
         // Download logic
     }
 
@@ -144,9 +144,9 @@ public class PlaygroundImageViewModel extends BaseFront {
     @NotifyChange({"generatedImages", "imageCount", "totalCost"})
     public void deleteImage(PlaygroundImage image) {
         try {
-            getUXCriteriaManager().remove(image);
+            businessService.removeFromID(PlaygroundImage.class, image.getIdxplaygroundimage());
             loadGeneratedImages();
-            logActivity("PLAYGROUND_IMAGE", "DELETE", "Imagen eliminada");
+            logActivity("PLAYGROUND_IMAGE", "DELETE", null, "Imagen eliminada");
         } catch (Exception e) {
             log.error("Error deleting image", e);
         }

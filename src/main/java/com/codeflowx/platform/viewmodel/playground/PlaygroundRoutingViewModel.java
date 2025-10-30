@@ -46,7 +46,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_ROUTING", "ACCESS", "Usuario accedió a Routing Playground");
+        logActivity("PLAYGROUND_ROUTING", "ACCESS", null, "Usuario accedió a Routing Playground");
         loadAvailableModels();
         loadAvailableAgents();
         loadOrCreateSession();
@@ -55,14 +55,14 @@ public class PlaygroundRoutingViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_ROUTING", "LEAVE", "Usuario salió de Routing Playground");
+        logActivity("PLAYGROUND_ROUTING", "LEAVE", null, "Usuario salió de Routing Playground");
     }
 
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+            availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);
         }
@@ -72,7 +72,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("agentstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableAgents = getUXCriteriaManager().find(Agent.class, criterias);
+            availableAgents = businessService.find(Agent.class, criterias);
         } catch (Exception e) {
             log.error("Error loading agents", e);
         }
@@ -86,7 +86,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
         } catch (Exception e) {
             log.error("Error creating session", e);
         }
@@ -144,12 +144,12 @@ public class PlaygroundRoutingViewModel extends BaseFront {
             // Simulate alternatives
             routing.setRoutingalternatives("{\"alternatives\": [{\"model\": \"gpt-4\", \"confidence\": 88.1}, {\"model\": \"claude-3\", \"confidence\": 85.7}]}");
             
-            getUXCriteriaManager().save(routing);
+            businessService.save(routing);
             
             routingResult = routing;
             loadRoutings();
             
-            logActivity("PLAYGROUND_ROUTING", "ANALYZE", "Consulta enrutada");
+            logActivity("PLAYGROUND_ROUTING", "ANALYZE", null, "Consulta enrutada");
             Messagebox.show("Routing completado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error routing query", e);
@@ -162,7 +162,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     public void clear() {
         inputQuery = "";
         routingResult = null;
-        logActivity("PLAYGROUND_ROUTING", "CLEAR", "Campos limpiados");
+        logActivity("PLAYGROUND_ROUTING", "CLEAR", null, "Campos limpiados");
     }
 
     @Command
@@ -177,7 +177,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     public void viewRouting(PlaygroundRouting routing) {
         routingResult = routing;
         inputQuery = routing.getRoutinginput();
-        logActivity("PLAYGROUND_ROUTING", "VIEW", "Viendo detalles de routing");
+        logActivity("PLAYGROUND_ROUTING", "VIEW", null, "Viendo detalles de routing");
     }
 
     @Command
@@ -191,12 +191,12 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     @NotifyChange({"filteredRoutings", "routingHistory"})
     public void deleteRouting(PlaygroundRouting routing) {
         try {
-            getUXCriteriaManager().remove(routing);
+            businessService.removeFromID(PlaygroundRouting.class, routing.getIdxplaygroundrouting());
             if (routingResult != null && routingResult.getIdxplaygroundrouting().equals(routing.getIdxplaygroundrouting())) {
                 routingResult = null;
             }
             loadRoutings();
-            logActivity("PLAYGROUND_ROUTING", "DELETE", "Routing eliminado");
+            logActivity("PLAYGROUND_ROUTING", "DELETE", null, "Routing eliminado");
         } catch (Exception e) {
             log.error("Error deleting routing", e);
         }

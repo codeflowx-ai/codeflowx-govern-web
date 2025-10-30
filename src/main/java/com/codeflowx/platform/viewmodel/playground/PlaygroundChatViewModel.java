@@ -52,7 +52,7 @@ public class PlaygroundChatViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_CHAT", "ACCESS", "Usuario accedió al Chat Playground");
+        logActivity("PLAYGROUND_CHAT", "ACCESS", null, "Usuario accedió al Chat Playground");
         loadAvailableModels();
         loadAvailableAgents();
         loadOrCreateSession();
@@ -66,14 +66,14 @@ public class PlaygroundChatViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_CHAT", "LEAVE", "Usuario salió del Chat Playground");
+        logActivity("PLAYGROUND_CHAT", "LEAVE", null, "Usuario salió del Chat Playground");
     }
 
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = getUXCriteriaManager().find(Model.class, criterias);
+            availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);
         }
@@ -83,7 +83,7 @@ public class PlaygroundChatViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("agentstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableAgents = getUXCriteriaManager().find(Agent.class, criterias);
+            availableAgents = businessService.find(Agent.class, criterias);
         } catch (Exception e) {
             log.error("Error loading agents", e);
         }
@@ -92,7 +92,7 @@ public class PlaygroundChatViewModel extends BaseFront {
     private void loadOrCreateSession() {
         try {
             if (sessionId != null) {
-                currentSession = getUXCriteriaManager().findById(PlaygroundSession.class, sessionId);
+                currentSession = businessService.findById(PlaygroundSession.class, sessionId);
             }
             
             if (currentSession == null) {
@@ -105,7 +105,7 @@ public class PlaygroundChatViewModel extends BaseFront {
                 currentSession.setMessagecount(0);
                 currentSession.setTokensused(0L);
                 currentSession.setCost(BigDecimal.ZERO);
-                getUXCriteriaManager().save(currentSession);
+                businessService.save(currentSession);
             }
         } catch (Exception e) {
             log.error("Error loading/creating session", e);
@@ -147,7 +147,7 @@ public class PlaygroundChatViewModel extends BaseFront {
             userMessage.setChattokensused(estimateTokens(currentPrompt));
             userMessage.setChatcreatedby(getUserName());
             userMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(userMessage);
+            businessService.save(userMessage);
             
             // Simulate assistant response (in production, call AI service)
             PlaygroundChat assistantMessage = new PlaygroundChat();
@@ -167,14 +167,14 @@ public class PlaygroundChatViewModel extends BaseFront {
             assistantMessage.setChatmaxtokens(maxTokens);
             assistantMessage.setChatcreatedby("SYSTEM");
             assistantMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(assistantMessage);
+            businessService.save(assistantMessage);
             
             // Update session
             currentSession.setMessagecount(currentSession.getMessagecount() + 2);
             currentSession.setTokensused(currentSession.getTokensused() + userMessage.getChattokensused() + assistantMessage.getChattokensused());
             currentSession.setCost(currentSession.getCost().add(assistantMessage.getChatcost()));
             currentSession.setSessionlastaccessat(new Timestamp(System.currentTimeMillis()));
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
             
             loadMessages();
             currentPrompt = "";
@@ -201,13 +201,13 @@ public class PlaygroundChatViewModel extends BaseFront {
             currentSession.setMessagecount(0);
             currentSession.setTokensused(0L);
             currentSession.setCost(BigDecimal.ZERO);
-            getUXCriteriaManager().save(currentSession);
+            businessService.save(currentSession);
             
             messages.clear();
             currentPrompt = "";
             updateSessionStats();
             
-            logActivity("PLAYGROUND_CHAT", "NEW_CONVERSATION", "Nueva conversación creada");
+            logActivity("PLAYGROUND_CHAT", "NEW_CONVERSATION", null, "Nueva conversación creada");
             
             Messagebox.show("Nueva conversación iniciada", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
@@ -219,7 +219,7 @@ public class PlaygroundChatViewModel extends BaseFront {
 
     @Command
     public void showConfig() {
-        logActivity("PLAYGROUND_CHAT", "SHOW_CONFIG", "Mostrando configuración");
+        logActivity("PLAYGROUND_CHAT", "SHOW_CONFIG", null, "Mostrando configuración");
         // Show config dialog
     }
 
