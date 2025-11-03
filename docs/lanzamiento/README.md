@@ -205,6 +205,37 @@
 
 ---
 
+### **11. COMPARATIVA COMPETIDORES** (42 KB) 🔥
+📄 [`COMPARATIVA_COMPETIDORES.md`](COMPARATIVA_COMPETIDORES.md)
+
+**Audiencia:** Ventas, partners, respuesta RFPs  
+**Formato:** Análisis diferenciadores vs 11 competidores
+
+**Contenido:**
+- 🥊 **11 competidores analizados:** EAB, RecordPoint, Raidu, Complee, Vanta, AceGuard, Adeptiv AI, Modulos, Collibra, SelfComply, Daiki
+- 🥊 **Tabla comparativa:** 12 criterios diferenciadores
+- 🥊 **8 diferenciadores críticos CodeflowX:**
+  1. Gobierno completo ciclo vida (NO solo monitorización)
+  2. GPAI compliance (Art. 51-55) - Adapters, fine-tuning, merge
+  3. Multi-framework integrado (6 frameworks vs 1)
+  4. Infraestructura completa incluida (20+ microservicios)
+  5. Framework as Software (NO tool adaptado)
+  6. Logs inmutables criptográficos (Art. 19)
+  7. Procesos automatizados (22 workflows BPMN)
+  8. Soberanía europea real (on-premise completo)
+- 🥊 **Respuesta objeciones:** "Adeptiv también hace on-premises", "Collibra es líder", etc.
+- 🥊 **Posicionamiento comercial:** Elevator pitch, mensajes clave
+- 🥊 **Estrategia GO-TO-MARKET:** Atacar fecha GPAI, enfatizar "Framework as Software"
+
+**Usar Para:**  
+- Responder "¿Por qué no usar [competidor]?"
+- Presentaciones ventas comparativas
+- Battle cards equipo comercial
+- RFPs donde cliente evalúa múltiples vendors
+- Posicionamiento único: "No somos otro tool, somos framework completo"
+
+---
+
 ## 🎯 RESUMEN EJECUTIVO ESTRATEGIA
 
 ### **POSICIONAMIENTO:**
