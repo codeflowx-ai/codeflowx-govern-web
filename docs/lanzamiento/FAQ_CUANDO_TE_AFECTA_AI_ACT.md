@@ -30,6 +30,30 @@
 
 ---
 
+## 🌍 MARCOS COMPLEMENTARIOS - COBERTURA GLOBAL
+
+**CodeflowX no solo cubre EU AI Act, también implementa:**
+
+### **Normativa Europea**
+- **RGPD (2016/679):** Integración completa protección datos personales
+- **Directiva Copyright (2019/790):** Art. 53.1.c GPAI (Text and Data Mining)
+
+### **Estándares Internacionales ISO**
+- **ISO/IEC 42001:2023:** Sistema de gestión de IA (certificable)
+- **ISO/IEC 38507:2022:** Gobernanza de TI para uso de IA en organizaciones
+- **ISO/IEC 23894:2023:** Gestión de riesgos de IA (marco técnico)
+
+### **Marcos de Referencia Globales**
+- **OECD AI Principles:** Principios adoptados por 50+ países (IA confiable, ética)
+- **ICO UK Guidance:** Transparencia y accountability en IA (Reino Unido)
+- **IEEE Ethically Aligned Design (EAD):** Diseño IA alineado con valores humanos
+
+**Total:** CodeflowX implementa **6 frameworks de cumplimiento integrados** (no como herramientas separadas)
+
+**Ventaja competitiva:** Si tu cliente opera internacionalmente, cumples múltiples jurisdicciones simultáneamente.
+
+---
+
 ## 📋 FAQ DETALLADO - RESPUESTAS DIRECTAS
 
 ### **P1: ¿Si uso adapters (LoRA) soy proveedor GPAI?**
