@@ -65,6 +65,26 @@ CodeflowX automatiza todo el papeleo, documentación y controles que exige la le
 
 **Total: 32 artículos aplicables + 13 anexos técnicos cubiertos por CodeflowX**
 
+### **Certificaciones y Estándares Adicionales**
+
+CodeflowX no solo cumple EU AI Act, también implementa:
+
+**Normativas Europeas:**
+- RGPD (protección datos personales): Integración completa
+- Directiva Derechos Autor UE: Para contenido generado con IA
+
+**Certificaciones Internacionales:**
+- ISO 42001: Sistema de gestión de IA (estándar mundial)
+- ISO 38507: Gobernanza de TI para IA
+- ISO 23894: Gestión de riesgos de IA
+
+**Buenas Prácticas Internacionales:**
+- OECD AI Principles: Principios éticos IA (adoptados por 50+ países)
+- ICO UK: Guía protección datos en IA (Reino Unido)
+- IEEE Ethical AI: Diseño IA ético
+
+**Mensaje para clientes:** "No solo cumplimos la ley europea, seguimos mejores prácticas mundiales"
+
 ---
 
 ## DIAPOSITIVA 2: MODELO DE PARTNER - TU BENEFICIO
