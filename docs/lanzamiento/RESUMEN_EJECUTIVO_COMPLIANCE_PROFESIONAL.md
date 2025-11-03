@@ -43,10 +43,22 @@
 - Art. 73: Notificación de incidentes graves a autoridades
 
 ### **Alineación con Normativa Complementaria:**
+
+**Normativa Europea:**
 - Reglamento (UE) 2016/679 (RGPD): Integración completa
+- Directiva (UE) 2019/790: Derechos de autor (Art. 53.1.c GPAI)
+
+**Estándares Internacionales ISO:**
 - ISO/IEC 42001:2023: Sistema de gestión de IA
+- ISO/IEC 38507:2022: Gobernanza de TI para uso de IA en organizaciones
 - ISO/IEC 23894:2023: Gestión de riesgos de IA
-- Directiva (UE) 2019/790: Derechos de autor (Art. 53.1.c)
+
+**Marcos de Referencia Complementarios:**
+- OECD AI Principles: IA innovadora, confiable y ética
+- ICO UK Guidance: Transparencia, accountability y protección de datos en IA
+- IEEE Ethically Aligned Design (EAD): Diseño alineado con valores humanos
+
+**Cobertura:** CodeflowX implementa requisitos de **6 frameworks de cumplimiento** de forma integrada, no como herramientas aisladas
 
 ---
 
