@@ -38,38 +38,42 @@ www.codeflowx.ai
 
 ---
 
-## **EL PROBLEMA QUE RESUELVE CODEFLOWX**
+## **EL PROBLEMA DE TUS CLIENTES**
 
-### **Empresas usando IA enfrentan:**
+### **Tus clientes usando IA enfrentan:**
 
-**🚨 Compliance inminente:**
-- **2 Feb 2025:** Prácticas prohibidas (Art. 5) → **75 DÍAS**
-- **2 Ago 2025:** GPAI fine-tuning/adapters (Art. 51-55) → **9 MESES**
-- **2 Ago 2026:** Sistemas alto riesgo (Art. 6-29) → **21 MESES**
+**🚨 Deadlines legales inminentes:**
+- **2 Feb 2025:** Prácticas prohibidas → **75 DÍAS**
+- **2 Ago 2025:** GPAI (fine-tuning, adapters) → **9 MESES**
+- **2 Ago 2026:** Sistemas alto riesgo → **21 MESES**
 
-**Multas devastadoras:**
-- Hasta **35M€** o **7% facturación global** (lo mayor)
-- Sin compliance → No pueden operar en UE
+**Multas que pueden quebrar empresas:**
+- Hasta **35M€** o **7% facturación global**
+- Sin compliance → Prohibido operar en UE
 
-**Complejidad técnica:**
-- 85 artículos + 13 anexos EU AI Act
-- 6 ISOs internacionales
-- GDPR + normativas sectoriales
+**Complejidad inabordable internamente:**
+- 85 artículos + 13 anexos AI Act
+- 6 ISOs para certificación
+- Clasificación 31 subcategorías Anexo III
 - Evaluación 100+ métricas por modelo
-- Documentación técnica exhaustiva
+- Documentación técnica exhaustiva (Anexo IV)
 
 ---
 
-### **Mercado objetivo:**
+### **Oportunidad para tu consultora:**
 
-**500.000+ empresas UE** usando IA en producción:
-- Banca, seguros, salud (sectores regulados)
-- RRHH tech (filtrado CVs, evaluación desempeño)
-- SaaS companies (chatbots, RAG, agentes)
-- Marketing agencies (generación contenido IA)
-- Consultoras tech (fine-tuning modelos para clientes)
+**Nueva línea de negocio compliance IA**
 
-**TAM estimado:** 2.5B€ en España, 15B€ en Europa (2025-2027)
+Tus clientes actuales te preguntarán:
+- *"¿Cumplimos con AI Act?"*
+- *"¿Cómo clasificamos nuestros sistemas?"*
+- *"¿Necesitamos FRIA?"*
+- *"¿Qué hacemos con fine-tuning?"*
+
+**Sin CodeflowX:** Proyectos 6-12 meses manuales  
+**Con CodeflowX:** Proyectos 2-4 semanas automatizados
+
+**Tu valor:** Expertise + Plataforma líder = Servicio premium diferenciado
 
 ---
 
@@ -144,13 +148,13 @@ www.codeflowx.ai
 
 ---
 
-### **VENTAJAS PARTNER:**
+### **POR QUÉ PARTNERSHIP CODEFLOWX:**
 
-✅ **Producto maduro:** +12 meses ingeniería, production-ready  
-✅ **Diferenciación brutal:** Nadie tiene 6 ISOs + GPAI compliance  
-✅ **Urgencia mercado:** Deadlines 2025-2026 forzando adopción  
-✅ **Margen alto:** Producto premium, clientes enterprise  
-✅ **Revenue recurrente:** Licencias anuales + servicios profesionales  
+✅ **Producto maduro:** Production-ready, probado en clientes reales  
+✅ **Diferenciación única:** Nadie más tiene 6 ISOs + 92% AI Act + GPAI  
+✅ **Urgencia mercado:** Tus clientes necesitan solución YA (deadlines 2025)  
+✅ **Cierre proyectos:** Automatización 70% → Más proyectos en menos tiempo  
+✅ **Revenue adicional:** Nueva línea negocio sin desarrollar producto  
 
 ---
 
@@ -219,27 +223,28 @@ www.codeflowx.ai
 
 ## **BENEFICIOS PARTNERSHIP CODEFLOWX**
 
-### **PARA TU NEGOCIO:**
+### **PARA TU CONSULTORA:**
 
-**🚀 Nueva Línea Negocio:**
-- Servicio premium compliance IA
-- Diferenciación vs competencia
-- Acceso mercado 2.5B€ (España) / 15B€ (Europa)
+**🚀 Nueva Línea Negocio Inmediata:**
+- Ofrece servicio compliance IA a cartera actual
+- Sin desarrollar producto propio (años + millones €)
+- Diferenciación brutal vs competencia
 
-**💰 Revenue Recurrente:**
-- Licencias anuales renovables
+**💰 Revenue Adicional:**
+- Proyectos implementación CodeflowX
 - Servicios profesionales complementarios
-- Upselling certificaciones (ISO 42001, etc.)
+- Formación y certificación clientes
+- Mantenimiento y soporte ongoing
 
-**🏆 Posicionamiento Líder:**
-- Único partner con 6 ISOs + 92% AI Act
+**🏆 Posicionamiento Experto:**
 - Thought leadership EU AI Act
+- Partner tecnológico único (6 ISOs + 92% AI Act)
 - Referencias clientes enterprise
 
-**🛡️ Protección Inversión:**
-- Producto maduro (+12 meses ingeniería)
-- Roadmap público transparente
-- Soberanía europea (sin vendor lock-in USA)
+**⚡ Velocidad Cierre Proyectos:**
+- Automatización 70% tareas compliance
+- Más clientes en menos tiempo
+- Margen superior (menos horas consultoría)
 
 ---
 
