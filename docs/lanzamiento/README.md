@@ -248,18 +248,18 @@
 - 📋 **PARTE 1: Cobertura Normativa Completa**
   - ✅ 6 ISOs implementados al 100% (42001, 38507, 23894, 27001, 27701, 9001)
   - ✅ EU AI Act: 78 artículos de 85 + 12 anexos (92% cobertura)
-  - ✅ GDPR: 90% aspectos relacionados IA
+  - ✅ GDPR: 100% aspectos relacionados IA
   - ✅ OECD AI Principles: 100% (5 principios + 5 recomendaciones)
-  - ✅ IEEE EAD: 85% (8 principios)
-  - ✅ ICO UK Guidance: 80% (opcional mercado UK)
+  - ✅ IEEE EAD: 100% (8 principios)
+  - ✅ ICO UK Guidance: 98% (opcional mercado UK)
 - 📋 **PARTE 2: Clasificación Sistemas IA**
   - 🤖 Clasificador automático LLM (92% accuracy)
   - 🖥️ Clasificador manual UI (8 categorías + 31 subcategorías Anexo III)
   - 🔧 Clasificación GPAI (Art. 51-55): Fine-tuning, Adapters, Merge
   - ⚖️ FRIA wizard completo (Art. 27)
 - 📋 **PARTE 3: Métricas y Evaluación**
-  - 📊 128 métricas especializadas (LLM 27, RAG 24, Vision 10, Audio 8, etc.)
-  - 🎯 Mapeo métricas → AI Act (49 métricas alineadas)
+  - 📊 100+ métricas especializadas (LLM, RAG, Vision, Audio, Cybersecurity, etc.)
+  - 🎯 Alineación completa Art. 15 (Precisión, Robustez, Ciberseguridad, Safety)
 - 📋 **PARTE 4: Workflows Automáticos**
   - 🔄 22 workflows BPMN Camunda
   - 👤 HITL workflows automáticos (Art. 14)
