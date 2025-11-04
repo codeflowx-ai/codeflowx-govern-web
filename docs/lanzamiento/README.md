@@ -236,13 +236,44 @@
 
 ---
 
-### **12. DOCUMENTO CONSULTORAS CLASIFICACIÓN MODELOS** (41 KB) ⭐🔥
+### **12. DOCUMENTO CONSULTORAS CLASIFICACIÓN MODELOS** (41 KB) ⭐
 📄 [`DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.md`](DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.md)  
 📄 [`DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.docx`](DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.docx) (31 KB)  
 📄 [`DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.pdf`](DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.pdf) (155 KB)
 
 **Audiencia:** Consultoras especializadas en clasificación modelos IA y compliance regulatorio  
 **Formato:** Documento técnico (34 páginas) - Versión comercial sin NDA
+
+---
+
+### **13. PRESENTACIÓN PARTNERS TECNOLÓGICOS** (7.7 KB) 🔥
+📄 [`PRESENTACION_PARTNERS_TECNOLOGICOS.md`](PRESENTACION_PARTNERS_TECNOLOGICOS.md)  
+📄 [`PRESENTACION_PARTNERS_TECNOLOGICOS.pptx`](PRESENTACION_PARTNERS_TECNOLOGICOS.pptx) (56 KB)  
+📄 [`PRESENTACION_PARTNERS_TECNOLOGICOS.pdf`](PRESENTACION_PARTNERS_TECNOLOGICOS.pdf) (54 KB)
+
+**Audiencia:** Partners tecnológicos, consultoras, integradores, C-level  
+**Formato:** Presentación comercial 6 diapositivas ejecutivas
+
+**Contenido:**
+- 🎯 **Diapositiva 1:** Portada - Programa Partners Tecnológicos
+- 🚨 **Diapositiva 2:** Problema y contexto (Deadlines AI Act, multas 35M€, TAM 15B€ Europa)
+- 🏗️ **Diapositiva 3:** Qué es CodeflowX (3 pilares: Gobierno, Evaluación, Compliance)
+- ⚡ **Diapositiva 4:** Diferenciadores clave (8 diferenciadores vs competidores)
+- 🤝 **Diapositiva 5:** Modelo colaboración (3 modalidades personalizadas)
+- 🚀 **Diapositiva 6:** Beneficios y próximos pasos (negocio + clientes)
+
+**Características:**
+- Sin detalles técnicos sensibles
+- Sin precios específicos (personalizados)
+- Sin roadmap interno
+- Enfoque valor negocio C-level
+- Tono profesional decisión estratégica
+
+**Usar Para:**
+- Reuniones partners potenciales
+- First contact consultoras tech
+- Pitch deck integradores
+- Presentaciones comerciales ejecutivas
 
 **Contenido:**
 - 📋 **PARTE 1: Cobertura Normativa Completa**
