@@ -236,6 +236,58 @@
 
 ---
 
+### **12. DOCUMENTO CONSULTORAS CLASIFICACIÓN MODELOS** (192 KB) ⭐🔥
+📄 [`DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.md`](DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.md)
+
+**Audiencia:** Consultoras especializadas en clasificación modelos IA y compliance regulatorio  
+**Formato:** Documento técnico exhaustivo (45 páginas)
+
+**Contenido:**
+- 📋 **PARTE 1: Cobertura Normativa Completa**
+  - ✅ 6 ISOs implementados (42001, 38507, 23894, 27001, 27701, 9001)
+  - ✅ EU AI Act: 62 artículos + 12 anexos (73% cobertura)
+  - ✅ GDPR: 90% aspectos relacionados IA
+  - ✅ OECD AI Principles: 100% (5 principios + 5 recomendaciones)
+  - ✅ IEEE EAD: 85% (8 principios)
+  - ✅ ICO UK Guidance: 80% (opcional mercado UK)
+- 📋 **PARTE 2: Clasificación Sistemas IA**
+  - 🤖 Clasificador automático LLM (92% accuracy)
+  - 🖥️ Clasificador manual UI (8 categorías + 31 subcategorías Anexo III)
+  - 🔧 Clasificación GPAI (Art. 51-55): Fine-tuning, Adapters, Merge
+  - ⚖️ FRIA wizard completo (Art. 27)
+- 📋 **PARTE 3: Métricas y Evaluación**
+  - 📊 128 métricas especializadas (LLM 27, RAG 24, Vision 10, Audio 8, etc.)
+  - 🎯 Mapeo métricas → AI Act (49 métricas alineadas)
+- 📋 **PARTE 4: Workflows Automáticos**
+  - 🔄 22 workflows BPMN Camunda
+  - 👤 HITL workflows automáticos (Art. 14)
+- 📋 **PARTE 5: Diferenciadores Competitivos**
+  - ⚔️ Comparativa vs competidores típicos
+  - 💼 3 casos de uso para consultoras
+- 📋 **PARTE 6: Roadmap y Fechas Clave**
+  - 📅 Deadlines EU AI Act (2 Feb 2025, 2 Ago 2025, 2 Ago 2026, 2 Ago 2027)
+  - 🗓️ Roadmap CodeflowX Q4 2024 - Q2 2025
+- 📋 **PARTE 7: Propuesta Partners**
+  - 🤝 3 modalidades colaboración (Certificados, White Label, Servicios Conjuntos)
+  - 💰 Modelo económico y propuesta valor
+- 📋 **PARTE 8: Evidencias Técnicas**
+  - 🏗️ Arquitectura completa (K8s, 20+ microservicios)
+  - 💻 Stack tecnológico detallado
+
+**Anexos:**
+- ✅ Listado completo 62 artículos AI Act cubiertos
+- ✅ Glosario técnico especializado
+
+**Usar Para:**  
+- Responder preguntas técnicas consultoras clasificación
+- Demostrar profundidad técnica y cobertura normativa
+- Propuestas partnership consultoras especializadas
+- Due diligence técnica clientes enterprise
+- Responder RFPs detallados con requisitos normativos específicos
+- Presentaciones a comités técnicos y legales
+
+---
+
 ## 🎯 RESUMEN EJECUTIVO ESTRATEGIA
 
 ### **POSICIONAMIENTO:**
