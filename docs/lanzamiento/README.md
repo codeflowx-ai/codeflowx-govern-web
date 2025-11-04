@@ -261,20 +261,17 @@
   - 📊 100+ métricas especializadas (LLM, RAG, Vision, Audio, Cybersecurity, etc.)
   - 🎯 Alineación completa Art. 15 (Precisión, Robustez, Ciberseguridad, Safety)
 - 📋 **PARTE 4: Workflows Automáticos**
-  - 🔄 22 workflows BPMN Camunda
+  - 🔄 22 workflows BPMN automatizados
   - 👤 HITL workflows automáticos (Art. 14)
 - 📋 **PARTE 5: Diferenciadores Competitivos**
   - ⚔️ Comparativa vs competidores típicos
   - 💼 3 casos de uso para consultoras
-- 📋 **PARTE 6: Roadmap y Fechas Clave**
-  - 📅 Deadlines EU AI Act (2 Feb 2025, 2 Ago 2025, 2 Ago 2026, 2 Ago 2027)
-  - 🗓️ Roadmap CodeflowX Q4 2024 - Q2 2025
-- 📋 **PARTE 7: Propuesta Partners**
-  - 🤝 3 modalidades colaboración (Certificados, White Label, Servicios Conjuntos)
-  - 💰 Modelo económico y propuesta valor
-- 📋 **PARTE 8: Evidencias Técnicas**
-  - 🏗️ Arquitectura completa (K8s, 20+ microservicios)
-  - 💻 Stack tecnológico detallado
+- 📋 **PARTE 6: Colaboración Consultoras**
+  - 🤝 Enfoque partnership largo plazo (personalizado)
+  - 💼 Perfil consultora ideal y beneficios colaboración
+- 📋 **PARTE 7: Arquitectura y Capacidades**
+  - 🏗️ Arquitectura general (sin detalles implementación)
+  - 🔒 Seguridad, integración, escalabilidad
 
 **Anexos:**
 - ✅ Listado completo 62 artículos AI Act cubiertos
