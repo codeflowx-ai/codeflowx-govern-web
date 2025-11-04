@@ -242,7 +242,7 @@
 📄 [`DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.pdf`](DOCUMENTO_CONSULTORAS_CLASIFICACION_MODELOS.pdf) (155 KB)
 
 **Audiencia:** Consultoras especializadas en clasificación modelos IA y compliance regulatorio  
-**Formato:** Documento técnico exhaustivo (45 páginas)
+**Formato:** Documento técnico (34 páginas) - Versión comercial sin NDA
 
 **Contenido:**
 - 📋 **PARTE 1: Cobertura Normativa Completa**
