@@ -274,8 +274,8 @@
   - 🔒 Seguridad, integración, escalabilidad
 
 **Anexos:**
-- ✅ Listado completo 62 artículos AI Act cubiertos
-- ✅ Glosario técnico especializado
+- ✅ Listado completo 78 artículos AI Act cubiertos (92%)
+- ✅ Glosario términos clave compliance
 
 **Usar Para:**  
 - Responder preguntas técnicas consultoras clasificación
