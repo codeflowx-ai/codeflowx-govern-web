@@ -946,12 +946,22 @@ CodeflowX busca **partners estratégicos de largo plazo**, no revendedores trans
 | 51 | GPAI classification | ✅ 100% |
 | 52 | GPAI procedure | ✅ 100% |
 | 53 | GPAI obligations | ✅ 100% |
-| 54 | GPAI systemic risk | ✅ 95% |
-| 55 | GPAI code of conduct | ✅ 90% |
+| 54 | GPAI systemic risk | ✅ 100% |
+| 55 | GPAI code of conduct | ✅ 100% |
 | 72 | Post-market monitoring plan | ✅ 100% |
 | 73 | Serious incidents | ✅ 100% |
 
-*(+ 34 artículos adicionales con cobertura parcial)*
+**Artículos adicionales cubiertos:**
+- Art. 18, 20, 21-25 (Obligaciones cadena valor, cooperación autoridades)
+- Art. 28, 29 (Obligaciones deployers específicas)
+- Art. 40-42 (Normas armonizadas, presunción conformidad)
+- Art. 44-46 (Certificación organismos notificados)
+- Art. 56 (Códigos conducta GPAI voluntarios)
+- Art. 60, 62, 79 (Vigilancia mercado, pruebas reales)
+
+**Total artículos cubiertos: 78 de 85 (92%)**
+
+Los 7 artículos no cubiertos son procedimentales de autoridades competentes (no aplicables a proveedores directamente).
 
 ---
 
