@@ -656,7 +656,7 @@ CodeflowX implementa un **sistema de evaluación completo** cubriendo:
 
 ### **4.1 WORKFLOWS BPMN IMPLEMENTADOS (22 workflows)**
 
-CodeflowX utiliza **Camunda BPM** para automatizar compliance:
+CodeflowX utiliza **motor BPMN propio** para automatizar compliance:
 
 | Workflow BPMN | Trigger | Duración | Estado |
 |---------------|---------|----------|--------|
