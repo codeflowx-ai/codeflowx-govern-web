@@ -822,134 +822,43 @@ CodeflowX implementa **HITL workflows** con escalación automática:
 
 ---
 
-## 📊 PARTE 6: ROADMAP Y FECHAS CLAVE
+## 📊 PARTE 6: COLABORACIÓN CON CONSULTORAS
 
-### **6.1 DEADLINES EU AI ACT**
+### **6.1 ENFOQUE PARTNERSHIP**
 
-| Fecha | Obligación | Afecta a | CodeflowX Ready |
-|-------|-----------|----------|----------------|
-| **2 Feb 2025** | Prácticas prohibidas (Art. 5) | TODOS los sistemas IA | ✅ Listo |
-| **2 Ago 2025** | Obligaciones GPAI (Art. 51-55) | Proveedores GPAI | ✅ Listo |
-| **2 Ago 2026** | Sistemas alto riesgo (Art. 6-29) | Sistemas Anexo III | ✅ Listo |
-| **2 Ago 2027** | Sistemas alto riesgo (productos Anexo I) | Productos con CE marking previo | ✅ Listo |
+CodeflowX busca **partners estratégicos de largo plazo**, no revendedores transaccionales.
 
-**Estado CodeflowX:** ✅ **100% preparados para todas las fechas**
+**Modelo de colaboración:**
+- Partnerships personalizados según perfil consultora
+- Enfoque win-win basado en valor aportado
+- Formación y certificación consultores
+- Soporte técnico y comercial
+- Co-desarrollo oportunidades
 
----
+**Perfil consultora ideal:**
+- Experiencia compliance IA, GDPR, ISOs
+- Cartera clientes enterprise o sectores regulados
+- Capacidad implementación y change management
+- Visión largo plazo (no transaccional)
 
-### **6.2 ROADMAP CODEFLOWX (Q4 2024 - Q2 2025)**
+**Beneficios partnership:**
+- Acceso plataforma tecnológica líder mercado
+- Diferenciación competitiva (único con 6 ISOs + 92% AI Act)
+- Nuevas líneas negocio (clasificación, evaluación, compliance)
+- Formación especializada EU AI Act
+- Soporte técnico prioritario
+- Co-branding y materiales comerciales
 
-#### **Q4 2024 (Oct-Dic):**
-- ✅ Clasificador automático LLM
-- ✅ FRIA wizard completo
-- ✅ QMS 13 módulos (Art. 17)
-- ✅ Immutable logging (Art. 19)
-- ✅ 128 métricas evaluación
-
-#### **Q1 2025 (Ene-Mar):**
-- ✅ GPAI compliance (Art. 51-55)
-- ✅ Multi-framework ISO 42001, 38507
-- ✅ 22 workflows BPMN
-- ✅ Conformity assessment (Art. 43)
-- 🔄 EU Database integration (Art. 71) - En desarrollo
-
-#### **Q2 2025 (Abr-Jun):**
-- 🔄 AI Act full compliance audit (3rd party)
-- 🔄 ISO 42001 certification
-- 🔄 ENISA cybersecurity guidelines
-- 🔄 ICO UK specific features
+**Condiciones específicas:**
+- Negociadas caso por caso según valor aportado
+- Modelo adaptado a cada consultora (tamaño, sector, geografía)
+- Flexibilidad comercial y técnica
 
 ---
 
-## 📊 PARTE 7: PROPUESTA PARA CONSULTORAS
+## 📊 PARTE 7: ARQUITECTURA Y CAPACIDADES TÉCNICAS
 
-### **7.1 MODELO DE PARTNERSHIP**
-
-CodeflowX ofrece **3 modalidades de colaboración** con consultoras:
-
-#### **A. Programa Partners Certificados**
-
-**Qué incluye:**
-- ✅ Formación 40 horas (online + presencial)
-- ✅ Certificación consultores (2 por empresa)
-- ✅ Licencias demo ilimitadas
-- ✅ Acceso documentación técnica completa
-- ✅ Soporte técnico prioritario
-- ✅ Co-branding materiales comerciales
-- ✅ Comisión 20-30% ventas referidas
-
-**Requisitos:**
-- Experiencia compliance IA / GDPR
-- Mínimo 5 consultores
-- Compromiso 3+ clientes año
-
----
-
-#### **B. White Label (OEM)**
-
-**Qué incluye:**
-- ✅ Plataforma CodeflowX branded consultora
-- ✅ Hosting dedicado (on-premise o cloud)
-- ✅ Customización UI (logos, colores)
-- ✅ API completa para integraciones
-- ✅ Soporte L2/L3
-
-**Pricing:**
-- Setup fee: 20-50K€
-- Licencia anual por tenant: 10-30K€
-- Revenue share: 10-15%
-
----
-
-#### **C. Servicios Profesionales Conjuntos**
-
-**Qué incluye:**
-- ✅ Proyectos conjuntos (50/50 revenue)
-- ✅ CodeflowX: Plataforma + Soporte técnico
-- ✅ Consultora: Implementación + Change management
-- ✅ SLA conjunto cliente final
-
-**Target:**
-- Grandes corporaciones (>1000 empleados)
-- Carteras >20 sistemas IA
-- Compliance multi-jurisdicción
-
----
-
-### **7.2 PROPUESTA ECONÓMICA TIPO**
-
-**Proyecto: Clasificación + Compliance 50 sistemas IA**
-
-**Scope:**
-- Clasificación 50 sistemas según Anexo III
-- FRIA para 10 sistemas alto riesgo
-- Conformity assessment 5 sistemas críticos
-- Training 20 usuarios
-- Soporte 6 meses
-
-**Pricing (solo CodeflowX):**
-- Licencias plataforma (1 año): 45.000€
-- Setup + Customización: 15.000€
-- Training 20 usuarios: 8.000€
-- Soporte 6 meses: 12.000€
-- **TOTAL: 80.000€**
-
-**Pricing con Consultora Partner (co-selling):**
-- Licencias plataforma: 45.000€ → 36.000€ (20% discount)
-- Servicios profesionales consultora: 40.000€
-- **TOTAL CLIENTE: 76.000€**
-- **Revenue consultora: 40.000€ + 7.200€ (comisión) = 47.200€**
-
-**Win-Win:**
-- Cliente ahorra 4.000€ (-5%)
-- Consultora gana 47.200€ (59% proyecto)
-- CodeflowX gana 36.000€ (41% proyecto)
-
----
-
-## 📊 PARTE 8: EVIDENCIAS TÉCNICAS
-
-### **8.1 ARQUITECTURA GENERAL**
+### **7.1 ARQUITECTURA GENERAL**
 
 **Componentes principales:**
 - Plataforma web centralizada gobierno IA
@@ -967,7 +876,7 @@ CodeflowX ofrece **3 modalidades de colaboración** con consultoras:
 
 ---
 
-### **8.2 CARACTERÍSTICAS TÉCNICAS**
+### **7.2 CARACTERÍSTICAS TÉCNICAS**
 
 **Seguridad:**
 - Autenticación multi-factor
@@ -1004,34 +913,6 @@ CodeflowX ofrece **3 modalidades de colaboración** con consultoras:
 **Equipo Partnerships:**
 - Manuel González - CTO & Co-founder
 - Email: manuel.gonzalez@codeflowx.ai
-
----
-
-### **Próximos Pasos Sugeridos**
-
-**Para Consultoras Interesadas:**
-
-1. **Demo personalizada** (1 hora)
-   - Clasificación automática en vivo
-   - FRIA wizard
-   - Dashboard compliance
-
-2. **Workshop técnico** (medio día)
-   - Arquitectura detallada
-   - APIs y integraciones
-   - Casos de uso sector específico
-
-3. **Pilot project** (4-8 semanas)
-   - 10-20 sistemas cliente real
-   - Licencias gratuitas pilot
-   - Soporte técnico dedicado
-   - Co-creación caso de éxito
-
-4. **Partnership agreement**
-   - Firma programa partners
-   - Training consultores
-   - Certificación
-   - Inicio co-selling
 
 ---
 
@@ -1074,17 +955,11 @@ CodeflowX ofrece **3 modalidades de colaboración** con consultoras:
 
 ---
 
-### **ANEXO B: GLOSARIO TÉCNICO**
+### **ANEXO B: GLOSARIO TÉRMINOS CLAVE**
 
-**Accuracy:** Precisión del modelo (TP+TN)/(TP+TN+FP+FN)
+**Adapter:** Módulo que modifica comportamiento modelo GPAI (ej: LoRA)
 
-**Adapter:** Módulo pequeño que modifica comportamiento GPAI (ej: LoRA)
-
-**Anexo III:** Lista 8 categorías sistemas alto riesgo EU AI Act
-
-**BLEU:** Métrica similitud n-gramas (0-1)
-
-**BPMN:** Business Process Model and Notation (workflows)
+**Anexo III:** Lista 8 categorías sistemas alto riesgo EU AI Act (31 subcategorías)
 
 **CE Marking:** Marca conformidad europea productos
 
@@ -1092,25 +967,21 @@ CodeflowX ofrece **3 modalidades de colaboración** con consultoras:
 
 **DPIA:** Data Protection Impact Assessment (Art. 35 GDPR)
 
-**FLOPs:** Floating Point Operations (cálculo computacional)
+**FLOPs:** Floating Point Operations - Métrica capacidad computacional modelo
 
-**FRIA:** Fundamental Rights Impact Assessment (Art. 27)
+**FRIA:** Fundamental Rights Impact Assessment (Art. 27 AI Act)
 
-**GPAI:** General Purpose AI (modelos fundación)
+**GPAI:** General Purpose AI - Modelos de propósito general (Art. 51-55)
 
-**HITL:** Human-In-The-Loop (supervisión humana)
+**HITL:** Human-In-The-Loop - Supervisión humana decisiones críticas (Art. 14)
 
-**Immutable Log:** Log no modificable (hash chains)
+**Immutable Log:** Registro no modificable con trazabilidad completa (Art. 19)
 
-**nDCG:** Normalized Discounted Cumulative Gain (ranking quality)
+**QMS:** Quality Management System - Sistema gestión calidad (Art. 17)
 
-**QMS:** Quality Management System (Art. 17)
+**RAG:** Retrieval-Augmented Generation - Sistemas IA con recuperación información
 
-**RAG:** Retrieval-Augmented Generation
-
-**ROUGE:** Recall-Oriented Understudy for Gisting Evaluation
-
-**Systemic Risk:** Riesgo sistémico GPAI (>10^25 FLOPs)
+**Systemic Risk:** Riesgo sistémico GPAI (>10^25 FLOPs de entrenamiento)
 
 ---
 
