@@ -605,114 +605,50 @@ CodeflowX implementa clasificador específico para **General Purpose AI Models**
 
 ## 📊 PARTE 3: MÉTRICAS Y EVALUACIÓN
 
-### **3.1 SISTEMA DE EVALUACIÓN (128 MÉTRICAS)**
+### **3.1 SISTEMA DE EVALUACIÓN**
 
-CodeflowX implementa el **sistema de evaluación más completo del mercado**:
+CodeflowX implementa un **sistema de evaluación completo** cubriendo:
 
-| Categoría | Métricas | Microservicio | Estado |
-|-----------|----------|---------------|--------|
-| **LLM Evaluation** | 27 | leka-llm-evaluation | ✅ Producción |
-| **RAG Evaluation** | 24 | leka-rag-evaluation | ✅ Producción |
-| **Vision (CV)** | 10 | leka-server-serving-evaluation | ✅ Producción |
-| **Audio** | 8 | leka-server-serving-evaluation | ✅ Producción |
-| **Embeddings** | 12 | leka-server-serving-evaluation | ✅ Producción |
-| **LLM-Judge** | 10 | leka-llm-evaluation | ✅ Producción |
-| **Cybersecurity** | 12 | leka-bias-detection | ✅ Producción |
-| **Reranker** | 6 | leka-server-serving-evaluation | ✅ Producción |
-| **Prompt Safety** | 8 | leka-prompt-governance | ✅ Producción |
-| **Vector Index** | 11 | leka-server-serving-evaluation | ✅ Producción |
+| Categoría | Cobertura | Alineación AI Act |
+|-----------|-----------|-------------------|
+| **LLM Evaluation** | Text generation y code generation | Art. 15 (Precisión, Factuality) |
+| **RAG Evaluation** | Retrieval, generation, combined metrics | Art. 15 (Hallucination detection) |
+| **Computer Vision** | Clasificación, detección, segmentación | Art. 15 (Accuracy) |
+| **Audio Processing** | Transcripción, quality metrics | Art. 15 (Precisión) |
+| **Embeddings** | Similitud, correlación, distancia | Art. 15 (Robustness) |
+| **LLM-as-Judge** | Evaluación cualitativa escalable | Art. 14 (Human oversight) |
+| **Cybersecurity** | Adversarial robustness, jailbreak, injection | Art. 15 (Cybersecurity) |
+| **Prompt Safety** | Inyección, toxicity, quality | Art. 15 (Safety) |
+| **Bias Detection** | Fairness across demographics | Art. 10 (Data quality) |
 
-**Total: 128 métricas especializadas**
+**Total: 100+ métricas especializadas production-ready**
 
----
-
-#### **Métricas LLM (27 métricas)**
-
-**Text Generation (15):**
-- ✅ BLEU (1-4, Cumulative)
-- ✅ ROUGE (1, 2, L, W-1.2)
-- ✅ BERTScore (Precision, Recall, F1)
-- ✅ METEOR
-- ✅ Exact Match
-- ✅ **Perplexity** (Art. 15 - precisión)
-- ✅ **Toxicity** (Art. 15 - safety)
-- ✅ **Factuality** (Art. 15 - accuracy)
-- ✅ Diversity (Distinct-1, Distinct-2)
-- ✅ Coherence, Fluency, Relevance, Completeness, Consistency
-
-**Code Generation (12):**
-- ✅ Syntax Correctness, Logic Correctness
-- ✅ Efficiency (time/space complexity)
-- ✅ Readability, Documentation
-- ✅ Test Coverage, Security
-- ✅ Maintainability (cyclomatic complexity)
-- ✅ Performance, Memory Usage
-- ✅ Error Handling, Best Practices
+**Capacidades principales:**
+- Evaluación automatizada multi-modelo
+- Detección hallucinations y toxicity
+- Adversarial robustness testing
+- Bias y fairness analysis
+- Performance benchmarking
+- Compliance scoring automático
 
 ---
 
-#### **Métricas RAG (24 métricas)**
+### **3.2 ALINEACIÓN CON EU AI ACT**
 
-**Retrieval (10):**
-- ✅ Precision@K, Recall@K, F1@K (K=1,5,10,20)
-- ✅ nDCG (Normalized Discounted Cumulative Gain)
-- ✅ MRR (Mean Reciprocal Rank)
-- ✅ MAP (Mean Average Precision)
-- ✅ Hit Rate, Coverage, Diversity
-- ✅ Latency, Throughput
+**Cobertura requisitos Art. 15:**
 
-**Generation (8):**
-- ✅ Faithfulness (contexto adherence)
-- ✅ Answer Relevance
-- ✅ Answer Correctness
-- ✅ Context Utilization
-- ✅ **Hallucination Detection** (Art. 15)
-- ✅ Citation Quality
-- ✅ BLEU/ROUGE/BERTScore (RAG-specific)
+| Requisito Art. 15 | Capacidad CodeflowX | Cobertura |
+|------------------|---------------------|-----------|
+| **Precisión** | Evaluación accuracy modelos | ✅ Completa |
+| **Robustez** | Testing adversarial y consistencia | ✅ Completa |
+| **Ciberseguridad** | Detección vulnerabilidades y ataques | ✅ Completa |
+| **Safety** | Toxicity, hallucination detection | ✅ Completa |
 
-**Combined (6):**
-- ✅ Context Relevance
-- ✅ Context Coverage
-- ✅ Context Diversity
-- ✅ Source Attribution
-- ✅ End-to-End Quality
-- ✅ User Satisfaction
-
----
-
-#### **Métricas Cybersecurity (12 métricas)**
-
-**Alineadas con Art. 15 (Robustness & Cybersecurity):**
-
-- ✅ **Jailbreak Detection** (intentos escaping)
-- ✅ **Prompt Injection** (malicious input detection)
-- ✅ **Data Leakage** (training data exposure)
-- ✅ **Privacy Violations** (PII detection)
-- ✅ **Toxicity** (harmful content)
-- ✅ **Bias Amplification** (unfair treatment)
-- ✅ **Adversarial Robustness** (attack resistance)
-- ✅ Consistency (response stability)
-- ✅ Reliability (error rate)
-- ✅ Compliance (regulatory adherence)
-- ✅ Vulnerability Score
-- ✅ Threat Level (overall assessment)
-
-**Tecnología:** Librerías especializadas adversarial testing, toxicity detection, PII detection
-
----
-
-### **3.2 MAPEO MÉTRICAS → AI ACT**
-
-| Artículo AI Act | Requisito | Métricas CodeflowX | Evidencia |
-|----------------|-----------|-------------------|-----------|
-| **Art. 15.1** | Precisión (Accuracy) | Accuracy, F1, Precision, Recall | ✅ 10 métricas |
-| **Art. 15.2** | Robustez (Robustness) | Adversarial Robustness, Consistency | ✅ 8 métricas |
-| **Art. 15.3** | Ciberseguridad (Cybersecurity) | Jailbreak, Injection, Data Leakage | ✅ 12 métricas |
-| **Art. 15.4** | Safety | Toxicity, Hallucination, Risk Score | ✅ 6 métricas |
-| **Art. 10.2** | Calidad datos (Data Quality) | Data Quality Score, Completeness, Bias | ✅ 8 métricas |
-| **Art. 13.3.b.2** | Explicabilidad (Explainability) | SHAP, LIME, Feature Importance | ✅ 5 métricas |
-
-**Total: 49 métricas directamente alineadas con AI Act**
+**Otros artículos cubiertos:**
+- **Art. 10:** Calidad datos y bias detection
+- **Art. 13:** Transparencia (explainability)
+- **Art. 14:** Human oversight metrics
+- **Art. 26:** Post-market monitoring metrics
 
 ---
 
@@ -802,7 +738,7 @@ CodeflowX implementa **HITL workflows** con escalación automática:
 | **31 subcategorías Anexo III** | ✅ Completo | ⚠️ 8-12 categorías básicas |
 | **FRIA wizard integrado** | ✅ 6 pasos Art. 27 | ❌ PDF checklist |
 | **GPAI compliance (Art. 51-55)** | ✅ Fine-tuning + Adapters | ❌ No soportado |
-| **128 métricas evaluación** | ✅ Producción | ⚠️ 10-20 métricas básicas |
+| **Sistema evaluación completo** | ✅ 100+ métricas | ⚠️ 10-20 métricas básicas |
 | **Workflows BPMN automáticos** | ✅ 22 workflows | ❌ Manuales |
 | **Immutable logging (Art. 19)** | ✅ Hash chains criptográficos | ⚠️ Logs editables |
 | **ISOs cubiertos** | ✅ 6 ISOs (42001, 38507, etc.) | ⚠️ 1-2 ISOs |
