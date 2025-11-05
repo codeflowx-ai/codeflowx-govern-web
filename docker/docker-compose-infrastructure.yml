@@ -1,0 +1,207 @@
+version: '3.8'
+
+# CodeflowX Infrastructure Stack
+# Qdrant + MinIO + OpenSearch + PostgreSQL + TimescaleDB
+
+networks:
+  codeflowx-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  qdrant_storage:
+  qdrant_snapshots:
+  minio_data:
+  opensearch_data:
+
+services:
+  
+  # ============================================================
+  # POSTGRESQL + TIMESCALEDB (Base datos relacional + time-series)
+  # ============================================================
+  postgres:
+    image: timescale/timescaledb:latest-pg15
+    container_name: codeflowx-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=codeflowx
+      - POSTGRES_USER=codeflowx_user
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme_secure_password}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=es_ES.UTF-8 --lc-ctype=es_ES.UTF-8
+    command:
+      - postgres
+      - -c
+      - shared_buffers=2GB
+      - -c
+      - effective_cache_size=6GB
+      - -c
+      - work_mem=256MB
+      - -c
+      - maintenance_work_mem=512MB
+      - -c
+      - max_connections=200
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U codeflowx_user -d codeflowx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - codeflowx-network
+  
+  # ============================================================
+  # QDRANT (Vector database para embeddings + RAG)
+  # ============================================================
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: codeflowx-qdrant
+    restart: unless-stopped
+    ports:
+      - "6333:6333"  # HTTP API
+      - "6334:6334"  # gRPC
+    volumes:
+      - qdrant_storage:/qdrant/storage
+      - qdrant_snapshots:/qdrant/snapshots
+    environment:
+      - QDRANT__SERVICE__GRPC_PORT=6334
+      - QDRANT__SERVICE__HTTP_PORT=6333
+      - QDRANT__LOG_LEVEL=INFO
+      - QDRANT__STORAGE__STORAGE_PATH=/qdrant/storage
+      - QDRANT__STORAGE__SNAPSHOTS_PATH=/qdrant/snapshots
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - codeflowx-network
+  
+  # ============================================================
+  # MINIO (Object storage S3-compatible para archivos)
+  # ============================================================
+  minio:
+    image: minio/minio:RELEASE.2024-01-31T20-20-33Z
+    container_name: codeflowx-minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"  # API
+      - "9001:9001"  # Console UI
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=codeflowx_admin
+      - MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-changeme_minio_password_min8chars}
+      - MINIO_BROWSER_REDIRECT_URL=http://localhost:9001
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - codeflowx-network
+  
+  # ============================================================
+  # OPENSEARCH (Logs, auditoría, full-text search)
+  # ============================================================
+  opensearch:
+    image: opensearchproject/opensearch:2.11.1
+    container_name: codeflowx-opensearch
+    restart: unless-stopped
+    ports:
+      - "9200:9200"  # HTTP API
+      - "9600:9600"  # Performance Analyzer
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    environment:
+      - cluster.name=codeflowx-cluster
+      - node.name=opensearch-node1
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms2g -Xmx2g"
+      - DISABLE_SECURITY_PLUGIN=true  # Disable para desarrollo local
+      - DISABLE_INSTALL_DEMO_CONFIG=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - codeflowx-network
+  
+  # ============================================================
+  # OPENSEARCH DASHBOARDS (Kibana-like UI)
+  # ============================================================
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.11.1
+    container_name: codeflowx-opensearch-dashboards
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    depends_on:
+      opensearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - codeflowx-network
+  
+  # ============================================================
+  # OLLAMA (Modelos LLM locales - Llama, Mistral)
+  # ============================================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: codeflowx-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama_models:/root/.ollama
+    environment:
+      - OLLAMA_ORIGINS=*
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - codeflowx-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]  # Si tienes GPU
+  
+  # ============================================================
+  # REDIS (Cache + feature flags + kill-switch blocking)
+  # ============================================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: codeflowx-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 512mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - codeflowx-network
+

@@ -1,0 +1,320 @@
+# CodeflowX Infrastructure Helm Chart - Default Values
+
+global:
+  namespace: codeflowx-govern-systems  # Infraestructura separada de aplicaciones
+  storageClass: fast-ssd  # Ajustar según cloud provider (gp3, premium-rwo, etc.)
+
+# ============================================================
+# POSTGRESQL + TIMESCALEDB
+# ============================================================
+postgresql:
+  enabled: true
+  image:
+    repository: timescale/timescaledb
+    tag: latest-pg15
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # Master
+  
+  auth:
+    database: codeflowx
+    username: codeflowx_user
+    password: "CHANGEME_SECURE_PASSWORD"  # Override en values-production.yaml
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 100Gi
+      storageClass: fast-ssd
+    
+    resources:
+      requests:
+        memory: 4Gi
+        cpu: 2
+      limits:
+        memory: 8Gi
+        cpu: 4
+    
+    configuration: |
+      # PostgreSQL tuning
+      shared_buffers = 2GB
+      effective_cache_size = 6GB
+      work_mem = 256MB
+      maintenance_work_mem = 512MB
+      max_connections = 200
+      checkpoint_timeout = 15min
+      
+      # TimescaleDB
+      timescaledb.telemetry_level = off
+  
+  service:
+    type: ClusterIP
+    port: 5432
+
+# ============================================================
+# QDRANT (Vector Database)
+# ============================================================
+qdrant:
+  enabled: true
+  image:
+    repository: qdrant/qdrant
+    tag: v1.7.4
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # Para HA: 3
+  
+  persistence:
+    storage:
+      enabled: true
+      size: 50Gi
+      storageClass: fast-ssd
+    snapshots:
+      enabled: true
+      size: 20Gi
+      storageClass: standard
+  
+  config:
+    grpcPort: 6334
+    httpPort: 6333
+    logLevel: INFO
+  
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
+  
+  service:
+    type: ClusterIP
+    httpPort: 6333
+    grpcPort: 6334
+
+# ============================================================
+# MINIO (Object Storage)
+# ============================================================
+minio:
+  enabled: true
+  image:
+    repository: minio/minio
+    tag: RELEASE.2024-01-31T20-20-33Z
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # Para HA: 4 (distributed mode)
+  
+  auth:
+    rootUser: codeflowx_admin
+    rootPassword: "CHANGEME_MINIO_PASSWORD_MIN_8_CHARS"
+  
+  persistence:
+    enabled: true
+    size: 500Gi
+    storageClass: standard  # Object storage no necesita fast-ssd
+  
+  resources:
+    requests:
+      memory: 2Gi
+      cpu: 1
+    limits:
+      memory: 4Gi
+      cpu: 2
+  
+  service:
+    type: ClusterIP
+    apiPort: 9000
+    consolePort: 9001
+  
+  ingress:
+    enabled: true
+    hostname: minio.codeflowx.local
+    consoleHostname: minio-console.codeflowx.local
+
+# ============================================================
+# OPENSEARCH (Logs + Auditoría)
+# ============================================================
+opensearch:
+  enabled: true
+  image:
+    repository: opensearchproject/opensearch
+    tag: 2.11.1
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # Para HA: 3 (cluster)
+  
+  clusterName: codeflowx-opensearch
+  
+  config:
+    # OpenSearch config
+    opensearch.yml: |
+      cluster.name: codeflowx-opensearch
+      network.host: 0.0.0.0
+      discovery.type: single-node
+      plugins.security.disabled: true  # Desarrollo - En producción: configurar security
+  
+  persistence:
+    enabled: true
+    size: 200Gi
+    storageClass: fast-ssd
+  
+  resources:
+    requests:
+      memory: 6Gi
+      cpu: 2
+    limits:
+      memory: 8Gi
+      cpu: 4
+  
+  javaOpts: "-Xms4g -Xmx4g"
+  
+  service:
+    type: ClusterIP
+    httpPort: 9200
+    performancePort: 9600
+
+# OpenSearch Dashboards
+opensearchDashboards:
+  enabled: true
+  image:
+    repository: opensearchproject/opensearch-dashboards
+    tag: 2.11.1
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  
+  config:
+    opensearch_dashboards.yml: |
+      server.name: codeflowx-dashboards
+      server.host: "0.0.0.0"
+      opensearch.hosts: ["http://opensearch:9200"]
+      opensearch.ssl.verificationMode: none
+      opensearch.requestHeadersWhitelist: ["securitytenant","Authorization"]
+      opensearch_security.multitenancy.enabled: false
+      opensearch_security.readonly_mode.roles: ["kibana_read_only"]
+      server.ssl.enabled: false
+  
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  
+  service:
+    type: ClusterIP
+    port: 5601
+  
+  ingress:
+    enabled: true
+    hostname: dashboards.codeflowx.local
+
+# ============================================================
+# REDIS (Cache + Kill-switch flags)
+# ============================================================
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: 7.2-alpine
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  
+  config:
+    maxMemory: 512mb
+    maxMemoryPolicy: allkeys-lru
+    appendonly: "yes"
+  
+  persistence:
+    enabled: false  # Cache no necesita persistencia (opcional)
+  
+  resources:
+    requests:
+      memory: 512Mi
+      cpu: 250m
+    limits:
+      memory: 1Gi
+      cpu: 500m
+  
+  service:
+    type: ClusterIP
+    port: 6379
+
+# ============================================================
+# OLLAMA (Modelos LLM locales - Llama, Mistral)
+# ============================================================
+ollama:
+  enabled: true
+  image:
+    repository: ollama/ollama
+    tag: latest
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1
+  
+  persistence:
+    enabled: true
+    size: 50Gi  # Para almacenar modelos (Llama 4.7GB, Mistral 4.1GB)
+    storageClass: standard
+  
+  resources:
+    requests:
+      memory: 8Gi
+      cpu: 4
+    limits:
+      memory: 16Gi
+      cpu: 8
+      nvidia.com/gpu: 1  # Si tienes GPU, sino quitar
+  
+  service:
+    type: ClusterIP
+    port: 11434
+  
+  # Models to pull on startup
+  models:
+    - llama3:8b
+    - mistral:7b
+
+# ============================================================
+# INGRESS (Opcional - para exponer servicios)
+# ============================================================
+ingress:
+  enabled: true
+  className: nginx  # O traefik, istio, etc.
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  tls:
+    enabled: true
+    secretName: codeflowx-tls
+  
+  hosts:
+    - host: codeflowx.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: backend-java
+          port: 8080
+    - host: dashboards.codeflowx.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: opensearch-dashboards
+          port: 5601
+    - host: minio-console.codeflowx.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: minio
+          port: 9001
+
+# ============================================================
+# MONITORING (Prometheus + Grafana)
+# ============================================================
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+  grafana:
+    enabled: true
+
