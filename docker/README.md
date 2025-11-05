@@ -50,6 +50,7 @@ Ver: `../k8s/README.md`
 | **OpenSearch Dashboards** | 5601 | http://localhost:5601 | Kibana-like UI (dashboards compliance) |
 | **Ollama** | 11434 | - | Modelos LLM locales (Llama, Mistral) |
 | **Redis** | 6379 | - | Cache + kill-switch flags |
+| **RabbitMQ** | 5672 (AMQP), 15672 (UI) | http://localhost:15672 | Message broker (eventos, workflows asíncronos) |
 
 ---
 
@@ -61,6 +62,7 @@ Ver: `../k8s/README.md`
 # .env
 POSTGRES_PASSWORD=secure_password_here_min_12_chars
 MINIO_ROOT_PASSWORD=minio_password_min_8_chars
+RABBITMQ_PASSWORD=rabbitmq_password_here
 ```
 
 **Producción:**

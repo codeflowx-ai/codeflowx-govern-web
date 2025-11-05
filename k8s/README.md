@@ -11,6 +11,7 @@ codeflowx-govern-systems  (Infraestructura)
 ├─ MinIO (object storage)
 ├─ OpenSearch + Dashboards
 ├─ Redis
+├─ RabbitMQ (message broker)
 └─ Ollama (LLMs locales)
 
 codeflowx-govern  (Aplicaciones)
@@ -50,6 +51,7 @@ kubectl apply -f 03-qdrant-statefulset.yaml
 kubectl apply -f 04-minio-statefulset.yaml
 kubectl apply -f 05-opensearch-statefulset.yaml
 kubectl apply -f 06-redis-deployment.yaml
+kubectl apply -f 07-rabbitmq-statefulset.yaml
 
 # 3. Esperar que todo esté running
 kubectl get pods -n codeflowx-govern-systems --watch
@@ -125,8 +127,12 @@ spec:
           value: http://opensearch.codeflowx-govern-systems.svc.cluster.local:9200
         
         # Redis (cross-namespace)
-        - name: REDIS_HOST
-          value: redis.codeflowx-govern-systems.svc.cluster.local
+- name: REDIS_HOST
+  value: redis.codeflowx-govern-systems.svc.cluster.local
+- name: RABBITMQ_HOST
+  value: rabbitmq.codeflowx-govern-systems.svc.cluster.local
+- name: RABBITMQ_PORT
+  value: "5672"
 ```
 
 **DNS Format:** `<service-name>.<namespace>.svc.cluster.local`
@@ -204,7 +210,17 @@ opensearch:
     size: 50Gi
 ```
 
-**Total:** ~8 GB RAM, 4 CPU, 150 GB storage
+redis:
+  resources:
+    requests: {memory: 512Mi, cpu: 250m}
+
+rabbitmq:
+  persistence:
+    size: 5Gi
+  resources:
+    requests: {memory: 512Mi, cpu: 250m}
+
+**Total:** ~9 GB RAM, 5 CPU, 160 GB storage
 
 ---
 
@@ -242,7 +258,18 @@ opensearch:
   replicaCount: 3  # Cluster 3 nodos
 ```
 
-**Total:** ~50 GB RAM, 25 CPU, 2 TB storage
+redis:
+  resources:
+    requests: {memory: 1Gi, cpu: 500m}
+
+rabbitmq:
+  persistence:
+    size: 20Gi
+  resources:
+    requests: {memory: 2Gi, cpu: 1}
+  replicaCount: 3  # Cluster HA
+
+**Total:** ~55 GB RAM, 27 CPU, 2.1 TB storage
 
 ---
 
@@ -286,6 +313,10 @@ kubectl port-forward -n codeflowx-govern-systems svc/minio 9001:9001
 # OpenSearch Dashboards
 kubectl port-forward -n codeflowx-govern-systems svc/opensearch-dashboards 5601:5601
 # Access: http://localhost:5601
+
+# RabbitMQ Management UI
+kubectl port-forward -n codeflowx-govern-systems svc/rabbitmq 15672:15672
+# Access: http://localhost:15672 (user: codeflowx_admin)
 ```
 
 ---

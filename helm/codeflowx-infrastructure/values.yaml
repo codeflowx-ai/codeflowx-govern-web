@@ -309,6 +309,46 @@ ingress:
           port: 9001
 
 # ============================================================
+# RABBITMQ (Message Broker)
+# ============================================================
+rabbitmq:
+  enabled: true
+  image:
+    repository: rabbitmq
+    tag: 3.12-management-alpine
+    pullPolicy: IfNotPresent
+  
+  replicaCount: 1  # Para HA: 3 (cluster)
+  
+  auth:
+    username: codeflowx_admin
+    password: "CHANGEME_RABBITMQ_PASSWORD"
+    vhost: codeflowx
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    storageClass: standard
+  
+  resources:
+    requests:
+      memory: 1Gi
+      cpu: 500m
+    limits:
+      memory: 2Gi
+      cpu: 1
+  
+  service:
+    type: ClusterIP
+    amqpPort: 5672
+    managementPort: 15672
+  
+  config:
+    # RabbitMQ config
+    diskFreeLimit: 2147483648  # 2 GB
+    logLevels: "{connection,error},{default,warning}"
+
+# ============================================================
 # MONITORING (Prometheus + Grafana)
 # ============================================================
 monitoring:

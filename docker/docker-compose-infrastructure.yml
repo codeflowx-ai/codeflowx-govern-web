@@ -204,4 +204,29 @@ services:
       retries: 5
     networks:
       - codeflowx-network
+  
+  # ============================================================
+  # RABBITMQ (Message broker para eventos, workflows asíncronos)
+  # ============================================================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: codeflowx-rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=codeflowx_admin
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-changeme_rabbitmq_password}
+      - RABBITMQ_DEFAULT_VHOST=codeflowx
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,warning}] disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - codeflowx-network
 
