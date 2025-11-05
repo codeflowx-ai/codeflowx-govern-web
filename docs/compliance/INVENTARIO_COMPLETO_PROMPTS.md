@@ -2,10 +2,10 @@
 ## Vista Consolidada Todos los Documentos PROMPTS
 
 **Fecha:** 5 Noviembre 2025  
-**Total documentos:** 11  
-**Total prompts:** 165  
-**Implementados:** 28 (17%)  
-**Pendientes:** 137 (83%)
+**Total documentos:** 12  
+**Total prompts:** 177  
+**Implementados:** 28 (16%)  
+**Pendientes:** 149 (84%)
 
 ---
 
@@ -24,7 +24,8 @@
 | **09** | PROMPTS_09_BPMN_MULTI_FRAMEWORK | Workflows BPMN multi-framework (12 workflows) | 12 | 0 | 12 | 0% | 🟡 ALTA |
 | **10** | PROMPTS_10_PYTHON_MULTI_FRAMEWORK_CONSOLIDADO | Python microservicios consolidado | 13 | 0 | 13 | 0% | 🟡 ALTA |
 | **11** | PROMPTS_11_INTEGRACION_QDRANT_MINIO_OPENSEARCH | Infraestructura enterprise (Qdrant, MinIO, OpenSearch) | 15 | 0 | 15 | 0% | 🟡 ALTA |
-| | **TOTAL** | | **165** | **28** | **137** | **17%** | |
+| **12** | PROMPTS_12_CONECTORES_PLATAFORMAS_ENTERPRISE | Conectores Databricks, Snowflake, Azure ML, SageMaker (governance overlay) | 12 | 0 | 12 | 0% | 🔴 CRÍTICA |
+| | **TOTAL** | | **177** | **28** | **149** | **16%** | |
 
 ---
 
