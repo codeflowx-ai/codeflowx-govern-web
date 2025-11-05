@@ -14,11 +14,9 @@ spec:
       labels:
         app: opensearch
     spec:
-      # Run as opensearch user (UID 1000)
+      # Set fsGroup at pod level to ensure volume ownership
       securityContext:
         fsGroup: 1000
-        runAsUser: 1000
-        runAsNonRoot: true
       initContainers:
       # Increase vm.max_map_count (required by OpenSearch)
       - name: increase-vm-max-map-count
@@ -26,6 +24,7 @@ spec:
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         securityContext:
           privileged: true
+          runAsUser: 0
       # Fix volume permissions
       - name: fix-permissions
         image: busybox
@@ -71,6 +70,8 @@ spec:
             memory: "4Gi"
             cpu: "2"
         securityContext:
+          runAsUser: 1000
+          runAsNonRoot: true
           capabilities:
             add:
             - IPC_LOCK  # Para memory lock
