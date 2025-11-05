@@ -95,12 +95,19 @@ Cliente Self-Hosted → API Externa LLM → Respuesta → Cliente Self-Hosted
 
 **Respuesta:** ✅ **SÍ, implementado**
 
-**Entidad:** `DataProtectionImpactAssessment` (tabla `DPIADATAPROTECTIONIMPACTASSESSMENTS`)
+**Implementación:** DPIA integrada en proceso FRIA según Art. 27.4 AI Act
 
-**Integración DPIA + FRIA:**
-- Art. 27.4 AI Act requiere: "FRIA puede integrarse en DPIA según GDPR Art. 35"
-- ✅ CodeflowX permite ejecutar FRIA + DPIA conjuntamente
-- ✅ Workflow BPMN: `dpia_assessment_process`
+**Art. 27.4 AI Act:** *"La evaluación de impacto podrá integrarse en una evaluación de impacto relativa a la protección de datos contemplada en el artículo 35 del RGPD"*
+
+**Entidad:** `FriaAssessment` (tabla `FRIAFUNDAMENTALRIGHTSASSESSMENTS`)  
+**Campos DPIA incluidos:**
+- Descripción tratamiento datos (Art. 35.7.a GDPR)
+- Evaluación necesidad y proporcionalidad (Art. 35.7.b)
+- Riesgos derechos y libertades (Art. 35.7.c)
+- Medidas mitigación (Art. 35.7.d)
+- Aprobación DPO si aplica (Art. 35.2)
+
+**Workflow:** `fria_assessment_process` (cubre FRIA + DPIA integrado)
 
 **Campos DPIA:**
 - Descripción tratamiento datos
@@ -388,7 +395,7 @@ Cliente Self-Hosted → API Externa LLM → Respuesta → Cliente Self-Hosted
 - Screenshots arquitectura
 - Logs auditoría anexos
 
-**Tiempo generación:** 30-60 segundos (automatizado)
+**Generación:** Automatizada desde metadatos sistema. Exportación PDF disponible.
 
 ---
 
@@ -442,12 +449,12 @@ Cliente Self-Hosted → API Externa LLM → Respuesta → Cliente Self-Hosted
 - Kill procesos Python background
 - **Componente:** `notebook-editor.tsx`
 
-**C. Agent Monitoring (API Python):**
-- Endpoint: `POST /api/agent/emergency-stop`
-- Para automáticamente agente en producción
-- Flags: `agent.status = "EMERGENCY_STOPPED"`
+**C. Agent Monitoring (Microservicio Python):**
+- **Capacidad:** Detención agentes en producción mediante API
+- **Implementación:** Workflows HITL + flags status agent
+- Estados: `RUNNING` → `PAUSED` → `STOPPED` → `EMERGENCY_STOPPED`
 - Notificación inmediata equipo
-- Logs inmutables razón parada
+- Logs inmutables razón parada (Art. 19)
 - **Microservicio:** `leka-agent-monitoring`
 
 **D. Model Inference (API):**
