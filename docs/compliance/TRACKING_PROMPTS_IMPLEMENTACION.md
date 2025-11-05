@@ -714,161 +714,169 @@ Deja como está y si pregunta:
 
 **Tu prestigio está en juego. Dime qué enfoque prefieres.** 🎯
 
+
 ---
 
-# PROMPTS_11 - INTEGRACIÓN QDRANT + MINIO + OPENSEARCH
+# PROMPTS_12 - CONECTORES PLATAFORMAS ENTERPRISE
 
-**Documento:** `PROMPTS_11_INTEGRACION_QDRANT_MINIO_OPENSEARCH.md`  
-**Objetivo:** Integrar componentes especializados enterprise (Qdrant, MinIO, OpenSearch)  
-**Estado:** ⏳ 0% (0/15)  
-**Prioridad:** 🟡 ALTA (infraestructura RAG + compliance)
+**Documento:** `PROMPTS_12_CONECTORES_PLATAFORMAS_ENTERPRISE.md`  
+**Objetivo:** Integrar CodeflowX como governance overlay sobre Databricks, Snowflake, Azure ML, SageMaker  
+**Estado:** ⏳ 0% (0/12)  
+**Prioridad:** 🔴 **CRÍTICA COMERCIAL** (80% clientes enterprise usan estas plataformas)  
+**Impacto:** 4x TAM accesible (€3B → €12B)
 
 ## Checklist Prompts:
 
-### GRUPO A: QDRANT (Embeddings + RAG) - 0/5
+### GRUPO A: DATABRICKS + MLFLOW - 0/3
 
-- [ ] **PROMPT 1:** Setup Qdrant + Collections (Docker + 4 collections)
-  - Docker Compose Qdrant
-  - Collections: prompts, knowledge_base_docs, compliance_regulations, evaluations
-  - Script Python init_qdrant_collections.py
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 0.5-1 día
+- [ ] **PROMPT 1:** Conector Databricks + MLflow Registry
+  - Dependency: com.databricks:databricks-sdk-java
+  - DatabricksConfig + DatabricksConnectorService
+  - Entities: ExternalPlatformIntegration, ExternalModel
+  - Sync models FROM Databricks (API REST)
+  - Notify approval TO Databricks (tags + stage transition)
+  - Scheduled sync cada 1 hora
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 3-4 días
 
-- [ ] **PROMPT 2:** Cliente Java Qdrant + QdrantService
-  - Dependency: io.qdrant:client:1.7.0
-  - QdrantConfig (bean)
-  - QdrantService (insert, search, searchWithFilters, delete)
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 1-1.5 días
-
-- [ ] **PROMPT 3:** Microservicio Python RAG con Qdrant
-  - FastAPI service: leka-rag-service
-  - RAGService (chunk, embed_batch, query_rag)
-  - Endpoints: /api/rag/process-document, /api/rag/query
-  - **Prioridad:** 🔴 CRÍTICA (RAG potente necesario)
-  - **Estimación:** 2-3 días
-
-- [ ] **PROMPT 4:** Integración Qdrant Backend Java (Prompts)
-  - PromptEmbeddingService (auto-generación embeddings)
-  - Entity Prompt: campo PRMQDRANT_POINT_ID
-  - Migration SQL: V1.XX__add_qdrant_point_id_prompts.sql
-  - Search similar prompts
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 1.5-2 días
-
-- [ ] **PROMPT 5:** Reranking Avanzado RAG
-  - RerankerService (cross-encoder: ms-marco-MiniLM-L-6-v2)
-  - Integración RAGService._rerank()
-  - Mejora relevancia: 30-50%
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 1-1.5 días
-
-**Total GRUPO A:** 6-9 días (con 2-3 chats paralelos = 3-4 días reales)
-
----
-
-### GRUPO B: MINIO (Object Storage) - 0/5
-
-- [ ] **PROMPT 6:** Setup MinIO + Buckets
-  - Docker Compose MinIO
-  - 7 buckets: technical-docs, datasets, models, knowledge-base, evaluation-results, backups, client-documents
-  - Script Python init_minio_buckets.py
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 0.5-1 día
-
-- [ ] **PROMPT 7:** Cliente Java MinIO + MinIOService
-  - Dependency: io.minio:minio:8.5.7
-  - MinIOConfig (bean)
-  - MinIOService (upload, download, presignedUrl, delete)
-  - **Prioridad:** 🟡 ALTA
-  - **Estimación:** 1-1.5 días
-
-- [ ] **PROMPT 8:** Integración MinIO Docs Técnicos (Anexo IV)
-  - Entity TechnicalDocumentation: TECMINIO_BUCKET, TECMINIO_OBJECT_NAME
-  - TechnicalDocumentationService (generate PDF + upload MinIO)
-  - Migration SQL
-  - **Prioridad:** 🔴 CRÍTICA (Art. 11)
+- [ ] **PROMPT 2:** Webhooks Databricks → CodeflowX
+  - Microservicio FastAPI: leka-webhooks-service
+  - Webhook receiver (MODEL_VERSION_CREATED, MODEL_VERSION_TRANSITIONED)
+  - Signature verification (security)
+  - Auto-registro modelos nuevos
+  - Bloqueo deployment si no aprobado
+  - **Prioridad:** 🔴 CRÍTICA
   - **Estimación:** 2-2.5 días
 
-- [ ] **PROMPT 9:** Pipeline RAG MinIO → Qdrant
-  - DocumentProcessingService (Python FastAPI)
-  - Upload PDF MinIO → Extract → Chunk → Embed → Qdrant
-  - Endpoint: /api/documents/process-pdf
-  - **Prioridad:** 🔴 CRÍTICA (RAG pipeline)
-  - **Estimación:** 2-3 días
-
-- [ ] **PROMPT 10:** Lifecycle Policies MinIO
-  - Script configure_minio_lifecycle.py
-  - Delete evaluation-results >12 meses
-  - Delete backups >2 años
-  - **Prioridad:** 🟢 MEDIA
-  - **Estimación:** 0.5-1 día
-
-**Total GRUPO B:** 6-9 días (con 2-3 chats paralelos = 3-4 días reales)
-
----
-
-### GRUPO C: OPENSEARCH (Logs + Auditoría) - 0/5
-
-- [ ] **PROMPT 11:** Setup OpenSearch + Índices
-  - Docker Compose OpenSearch + Dashboards
-  - 3 índices: audit-logs, inference-logs, application-logs
-  - Script Python init_opensearch_indices.py
-  - **Prioridad:** 🔴 CRÍTICA (Art. 19 logs inmutables)
-  - **Estimación:** 0.5-1 día
-
-- [ ] **PROMPT 12:** Cliente Java OpenSearch + LogService
-  - Dependency: opensearch-rest-high-level-client:2.11.0
-  - OpenSearchConfig (bean)
-  - OpenSearchLogService (logAuditEvent Art. 19, logInference)
-  - Integración BPMN delegates
-  - **Prioridad:** 🔴 CRÍTICA (Art. 19)
-  - **Estimación:** 1.5-2 días
-
-- [ ] **PROMPT 13:** Microservicio Analytics Python
-  - FastAPI service: leka-analytics-service
-  - AnalyticsService (compliance metrics, inference analytics)
-  - Endpoints: /api/analytics/*
+- [ ] **PROMPT 3:** UI Gestión Plataformas Externas
+  - ViewModel: ExternalPlatformsViewModel
+  - Pantalla ZUL: external-platforms.zul
+  - Add platform, sync now, test connection, edit, delete
+  - Lista external models synced
   - **Prioridad:** 🟡 ALTA
   - **Estimación:** 2-2.5 días
 
-- [ ] **PROMPT 14:** ILM OpenSearch
-  - Script configure_opensearch_ilm.py
-  - Policy audit-logs (retention 10 años)
-  - Policy inference-logs (retention 12 meses)
-  - **Prioridad:** 🔴 CRÍTICA (GDPR Art. 17)
-  - **Estimación:** 0.5-1 día
-
-- [ ] **PROMPT 15:** OpenSearch Dashboards Compliance
-  - JSON export dashboards (6 visualizaciones)
-  - Script import_opensearch_dashboards.py
-  - Visualizaciones: events, approvals, risk, timeline, latency, cost
-  - **Prioridad:** 🟢 MEDIA
-  - **Estimación:** 1-1.5 días
-
-**Total GRUPO C:** 6-8 días (con 2-3 chats paralelos = 3-4 días reales)
+**Total GRUPO A:** 7-9 días (con 2 chats = 4-5 días reales)
 
 ---
 
-## 📊 RESUMEN PROMPTS_11
+### GRUPO B: SNOWFLAKE (DATA CATALOG) - 0/2
 
-**Total prompts:** 15
+- [ ] **PROMPT 4:** Conector Snowflake Catalogación Datasets
+  - SnowflakeConnectorService (Java JDBC)
+  - Query INFORMATION_SCHEMA (metadata only - NO copia datos)
+  - Entity: ExternalDataset
+  - Catalog datasets (name, rows, size, created)
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 2-2.5 días
+
+- [ ] **PROMPT 5:** Microservicio Python Data Quality Snowflake
+  - FastAPI: leka-data-quality-service
+  - Evaluate quality usando SAMPLE (1K filas, NO full scan)
+  - PII detection Presidio sobre sample
+  - Metrics: completeness, nulls, duplicates
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 2-2.5 días
+
+**Total GRUPO B:** 4-5 días (con 2 chats = 2-3 días reales)
+
+---
+
+### GRUPO C: AZURE ML / SAGEMAKER (DEPLOYMENT) - 0/2
+
+- [ ] **PROMPT 6:** Conector Azure ML Deployment Monitoring
+  - Python: azure.ai.ml SDK
+  - List deployed models
+  - Get Azure Monitor metrics (latency, throughput)
+  - Drift detection (métricas vs baseline)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 2-3 días
+
+- [ ] **PROMPT 7:** Conector SageMaker (AWS)
+  - Python: boto3 SDK
+  - List endpoints SageMaker
+  - Get CloudWatch metrics
+  - Similar Azure ML pero para AWS
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 2-2.5 días
+
+**Total GRUPO C:** 4-5.5 días (con 2 chats = 2-3 días reales)
+
+---
+
+### GRUPO D: DATA LAKES - 0/1
+
+- [ ] **PROMPT 8:** Conector S3 / Azure Blob / GCS Catalogación
+  - Python: boto3 (S3), azure.storage.blob, google.cloud.storage
+  - Catalog datasets data lakes (metadata only - NO download files)
+  - Soporta: .parquet, .csv, .json
+  - Register en ExternalDataset
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 2-2.5 días
+
+**Total GRUPO D:** 2-2.5 días (1 chat)
+
+---
+
+### GRUPO E: SPARK (EVALUATION JOBS) - 0/1
+
+- [ ] **PROMPT 9:** Conector Spark Submit Evaluation Jobs
+  - Python: pylivy (Livy API)
+  - Submit bias evaluation jobs a Spark cluster cliente
+  - Jobs ejecutan donde están datos (NO mover datos)
+  - PySpark script bias detection (demographic parity, equalized odds)
+  - Results collection (solo métricas, no datos)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 3-3.5 días
+
+**Total GRUPO E:** 3-3.5 días (1 chat)
+
+---
+
+### GRUPO F: FRAMEWORK ORQUESTACIÓN - 0/3
+
+- [ ] **PROMPT 10:** Service Orquestación Sync Multi-Plataforma
+  - ExternalPlatformOrchestrationService (Java)
+  - Scheduler sync all platforms cada 1 hora
+  - Sync single platform on-demand
+  - Error handling + status tracking
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 2-2.5 días
+
+- [ ] **PROMPT 11:** BPMN External Model Approval Workflow
+  - Workflow: external-model-approval-workflow.bpmn
+  - Service Task: Classify risk external model
+  - ExclusiveGateway: HIGH_RISK → FRIA, else → Auto-approve
+  - User Task: Approve model (Compliance Officer)
+  - Service Task: Notify external platform (Databricks/Azure ML)
+  - Delegates: NotifyExternalPlatformDelegate
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 2-2.5 días
+
+- [ ] **PROMPT 12:** Dashboard External Platforms Monitoring
+  - ViewModel: ExternalPlatformsDashboardViewModel
+  - Pantalla ZUL: external-platforms-dashboard.zul
+  - KPIs: total platforms, pending approval, HIGH_RISK, sync status
+  - Recent sync activity list
+  - **Prioridad:** 🟢 MEDIA
+  - **Estimación:** 1.5-2 días
+
+**Total GRUPO F:** 5.5-7 días (con 2 chats = 3-4 días reales)
+
+---
+
+## 📊 RESUMEN PROMPTS_12
+
+**Total prompts:** 12
 **Implementados:** 0
-**Pendientes:** 15
+**Pendientes:** 12
 **% Completo:** 0% ⏳
 
-**Estimación total:** 18-26 días secuencial | 9-12 días con 3 chats paralelos
+**Estimación total:** 26-32 días secuencial | 12-16 días con 4 chats paralelos
 
-**Críticos (🔴):** 6 prompts
-- PROMPT 3 (RAG Python)
-- PROMPT 8 (Anexo IV MinIO)
-- PROMPT 9 (Pipeline RAG)
-- PROMPT 11 (OpenSearch setup)
-- PROMPT 12 (OpenSearch Java Art. 19)
-- PROMPT 14 (ILM retention)
+**Críticos (🔴):** 6 prompts (Databricks conector, webhooks, Snowflake, orchestration, BPMN, OpenSearch)
+**Altos (🟡):** 5 prompts
+**Medios (🟢):** 1 prompt
 
-**Altos (🟡):** 7 prompts
-**Medios (🟢):** 2 prompts
-
----
+**Impacto comercial:** 🔴 **MÁXIMO** (sin esto, solo 20% mercado accesible)
 
