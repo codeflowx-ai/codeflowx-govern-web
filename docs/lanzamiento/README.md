@@ -289,6 +289,65 @@
 - Responder expertos gobierno datos
 - RFPs con requisitos GDPR específicos
 
+---
+
+### **15. RESPUESTA EXPERTA GOBIERNO DATOS #2** (62 KB) ⭐🔥
+📄 [`RESPUESTA_EXPERTA_GOBIERNO_DATOS_2.md`](RESPUESTA_EXPERTA_GOBIERNO_DATOS_2.md)  
+📄 [`RESPUESTA_LINKEDIN_EXPERTA_GOBIERNO_DATOS_2.txt`](RESPUESTA_LINKEDIN_EXPERTA_GOBIERNO_DATOS_2.txt)
+
+**Audiencia:** Experta gobierno datos, arquitectos datos, responsables data governance  
+**Formato:** Documento técnico detallado (30 páginas) + versión corta LinkedIn
+
+**Contenido - 3 Preguntas Técnicas Avanzadas:**
+
+**1. Trazabilidad y linaje datos multi-dominio**
+- ✅ TRNEXPERIMENTLINEAGE con provenance graph JSONB
+- ✅ Tracking granular origen: CRM, APIs externas, Data Lakes, Kafka
+- ✅ Vista SQL recursiva `model_lineage_tree` (detección ciclos)
+- ✅ Compliance tracking por dataset (GDPR, calidad, PII)
+- ✅ Bloqueo automático si fuente no compliant
+- ✅ Ejemplo real: modelo credit scoring 4 dominios
+
+**2. Vinculación metadatos calidad ↔ clasificación riesgo AI Act**
+- ✅ Tabla DATASETQUALITY: completeness, consistency, accuracy, PII, sesgo
+- ✅ Función SQL `fn_get_risk_level_classification`
+- ✅ Escalado automático riesgo: calidad <80% → HIGH_RISK
+- ✅ Vista dashboard `v_models_risk_quality` (matriz Risk-Quality)
+- ✅ Workflow BPMN bloquea si HIGH_RISK + baja calidad
+- ✅ Ejemplo: Emotion Recognition 78.3% calidad → CRITICAL
+
+**3. Gobernanza continua post-despliegue (drift + ethical monitoring)**
+- ✅ `DriftDetectionService` (Python FastAPI)
+- ✅ 3 tipos drift: input (KL divergence), output, performance
+- ✅ BPMN workflow ejecución cada 1 hora automática
+- ✅ Alertas + HITL si severity HIGH
+- ✅ `EthicalReviews` POST_DEPLOYMENT cada 3 meses
+- ✅ 6 dimensiones éticas monitoreadas
+- ✅ Dashboard `v_production_models_governance`
+- ✅ Status: HEALTHY, ACTION_REQUIRED, ETHICAL_REVIEW_NEEDED
+
+**Código real incluido:**
+- SQL tables: TRNEXPERIMENTLINEAGE, DATASETQUALITY, DRIFTDETECTION, ETHICALREVIEWS
+- Python: DriftDetectionService (leka-model-wrapper)
+- SQL functions: fn_get_risk_level_classification
+- SQL views: v_model_lineage_tree, v_models_risk_quality, v_production_models_governance
+- BPMN: drift-detection-process (ejecución cada 1 hora)
+
+**Casos reales:**
+- Credit scoring con datos 4 dominios (CRM, Bureau crédito, Data Lake, Kafka)
+- Emotion recognition modelo rechazado por calidad 78.3%
+- Drift detection en producción con escalado automático
+
+**Usar Para:** 
+- Responder preguntas técnicas sobre data lineage y governance continua
+- Demostrar capacidades técnicas reales implementadas (con código SQL/Python)
+- LinkedIn: usar versión corta `.txt` (3000 caracteres) para responder en comentarios
+- Ventas enterprise: demostrar arquitectura data governance profunda
+
+**Versión LinkedIn:** `RESPUESTA_LINKEDIN_EXPERTA_GOBIERNO_DATOS_2.txt` — Respuesta compacta para comentarios LinkedIn (3000 caracteres)
+
+---
+
 **Contenido:**
 - 🎯 **Diapositiva 1:** Portada - Programa Partners Tecnológicos
 - 🚨 **Diapositiva 2:** Problema y contexto (Deadlines AI Act, multas 35M€, TAM 15B€ Europa)
