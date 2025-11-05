@@ -1,0 +1,58 @@
+Muchas gracias por tus preguntas técnicas. Son exactamente el tipo de cuestiones que distinguen una plataforma de gobierno real.
+
+Respondo con transparencia:
+
+## 1. TRAZABILIDAD MULTI-DOMINIO
+
+✅ **SÍ implementado** mediante:
+- Tabla TRNEXPERIMENTLINEAGE con provenance graph (JSONB)
+- Tracking granular origen: CRM, APIs externas, Data Lakes, Streams (Kafka)
+- Vista SQL recursiva para árbol completo linaje
+- Compliance tracking por dataset (GDPR, calidad, PII)
+- Bloqueo automático si alguna fuente no cumple governance
+
+Ejemplo real: Modelo credit scoring con datos de 4 dominios (CRM Salesforce, API Bureau crédito, S3 Data Lake, Kafka streams) — el sistema detecta automáticamente dataset no compliant y bloquea aprobación.
+
+## 2. METADATOS CALIDAD ↔ CLASIFICACIÓN RIESGO
+
+✅ **Vinculación automática implementada:**
+- Tabla DATASETQUALITY captura: completeness, consistency, accuracy, PII, sesgo
+- Función SQL fn_get_risk_level_classification que escala riesgo automáticamente si:
+  • Calidad <80% → Escalado a HIGH_RISK
+  • PII no anonimizado → HIGH_RISK
+  • Sesgo detectado → HIGH_RISK
+- Vista dashboard v_models_risk_quality: matriz Risk-Quality para cada modelo
+- Workflow BPMN bloquea aprobación si HIGH_RISK + calidad insuficiente
+
+Decisión automática: Calidad <80% + HIGH_RISK → REJECTED hasta mejora calidad.
+
+## 3. GOBERNANZA CONTINUA POST-DESPLIEGUE
+
+✅ **Monitoring 24/7 implementado:**
+
+**Drift Detection:**
+- Microservicio Python (DriftDetectionService)
+- 3 tipos drift: input (KL divergence), output, performance
+- BPMN workflow ejecuta cada 1 hora automáticamente
+- Alerta + escalado HITL si severity HIGH
+
+**Ethical Monitoring:**
+- Revisiones éticas POST_DEPLOYMENT cada 3 meses
+- 6 dimensiones: transparency, fairness, accountability, privacy, safety, societal impact
+- Comparación vs baseline pre-deployment
+- Escalado automático Ethics Committee si degradación >10%
+
+**Dashboard unificado:**
+- Vista v_production_models_governance
+- Status agregado: HEALTHY, ACTION_REQUIRED, ETHICAL_REVIEW_NEEDED
+
+---
+
+Estas capacidades están **implementadas en producción**, no roadmap.
+
+CodeflowX no es solo "compliance AI Act" — es **gobierno integral datos + modelos + decisiones**.
+
+Si deseas profundizar técnicamente, encantado de compartir arquitectura detallada.
+
+Manuel González
+Co-founder & CTO, CodeflowX
