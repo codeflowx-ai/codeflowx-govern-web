@@ -14,6 +14,11 @@ spec:
       labels:
         app: opensearch
     spec:
+      # Run as opensearch user (UID 1000)
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+        runAsNonRoot: true
       initContainers:
       # Increase vm.max_map_count (required by OpenSearch)
       - name: increase-vm-max-map-count
@@ -21,6 +26,15 @@ spec:
         command: ["sysctl", "-w", "vm.max_map_count=262144"]
         securityContext:
           privileged: true
+      # Fix volume permissions
+      - name: fix-permissions
+        image: busybox
+        command: ["sh", "-c", "chown -R 1000:1000 /usr/share/opensearch/data"]
+        volumeMounts:
+        - name: opensearch-storage
+          mountPath: /usr/share/opensearch/data
+        securityContext:
+          runAsUser: 0
       containers:
       - name: opensearch
         image: opensearchproject/opensearch:2.11.1
@@ -41,7 +55,7 @@ spec:
         - name: bootstrap.memory_lock
           value: "true"
         - name: OPENSEARCH_JAVA_OPTS
-          value: "-Xms4g -Xmx4g"
+          value: "-Xms2g -Xmx2g"
         - name: DISABLE_SECURITY_PLUGIN
           value: "true"  # En producción: configurar security plugin
         - name: DISABLE_INSTALL_DEMO_CONFIG
@@ -51,15 +65,16 @@ spec:
           mountPath: /usr/share/opensearch/data
         resources:
           requests:
-            memory: "6Gi"
-            cpu: "2"
+            memory: "3Gi"
+            cpu: "1"
           limits:
-            memory: "8Gi"
-            cpu: "4"
+            memory: "4Gi"
+            cpu: "2"
         securityContext:
           capabilities:
             add:
             - IPC_LOCK  # Para memory lock
+          allowPrivilegeEscalation: false
         livenessProbe:
           httpGet:
             path: /_cluster/health
