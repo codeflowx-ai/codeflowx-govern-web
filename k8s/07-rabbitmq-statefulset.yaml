@@ -59,9 +59,11 @@ spec:
           exec:
             command:
             - rabbitmq-diagnostics
-            - check_port_connectivity
-          initialDelaySeconds: 20
+            - status
+          initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
   volumeClaimTemplates:
   - metadata:
       name: rabbitmq-storage
