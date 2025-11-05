@@ -399,3 +399,56 @@ PostgreSQL/TimescaleDB  (50-100 GB metadata)
 - PROMPT 12 (OpenSearch LogService Art. 19)
 - PROMPT 14 (ILM retention GDPR)
 
+
+---
+
+### 📄 PROMPTS_12_CONECTORES_PLATAFORMAS_ENTERPRISE.md ⭐🔥🔥
+
+**Objetivo:** Integrar CodeflowX como governance overlay sobre Databricks, Snowflake, Azure ML, SageMaker  
+**Total Prompts:** 12 prompts  
+**Implementados:** 0  
+**Pendientes:** 12  
+**% Completo:** 0% ⏳  
+**Prioridad:** 🔴 **CRÍTICA COMERCIAL**
+
+**Prompts:**
+- **Databricks (3):** Conector + sync bidireccional, webhooks receiver, UI gestión
+- **Snowflake (2):** Catalogación datasets (metadata only), data quality (sample)
+- **Azure ML / SageMaker (2):** Deployment monitoring Art. 72
+- **Data Lakes (1):** S3/Azure Blob/GCS catalogación
+- **Spark (1):** Submit evaluation jobs big data
+- **Framework (3):** Orquestación sync, BPMN approval, dashboard
+
+**Arquitectura governance overlay:**
+```
+Cliente mantiene: Databricks + Snowflake + Azure ML + Spark
+CodeflowX añade: Governance + Compliance + Aprobaciones
+Datos: NO se mueven (solo metadata/métricas)
+```
+
+**Impacto comercial:** 🔴 **MÁXIMO**
+- Sin esto: Solo clientes greenfield (20% mercado, €3B TAM)
+- Con esto: Clientes greenfield + enterprise (80% mercado, **€12B TAM**)
+- **4x más mercado accesible**
+
+**Mensaje venta:**
+> "CodeflowX se integra con su Databricks existente, añadiendo compliance AI Act sin migración."
+
+**Beneficios cliente:**
+- ✅ Mantienen inversión existente ($300K/año Databricks+Snowflake)
+- ✅ Datos NO se mueven (permanecen en Snowflake)
+- ✅ Workflow ML Engineers NO cambia
+- ✅ Compliance AI Act automático
+- ✅ ROI: $500K ahorro vs desarrollo interno
+
+**Prioridad:** 🔴 **MÁS CRÍTICA QUE GPAI** (comercial urgente)
+
+**Estimación:** 26-32 días secuencial | 12-16 días paralelo (4 chats)
+
+**Prompts críticos (🔴):** 6 de 12
+- PROMPT 1 (Databricks conector)
+- PROMPT 2 (Webhooks)
+- PROMPT 4 (Snowflake catalog)
+- PROMPT 10 (Orquestación)
+- PROMPT 11 (BPMN approval workflow)
+

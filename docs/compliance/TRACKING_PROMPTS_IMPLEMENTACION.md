@@ -26,10 +26,11 @@
 | **PROMPTS_09** | 12 workflows | 0 | 12 | 0% ⏳ |
 | **PROMPTS_10** | 13 microservicios | 0 | 13 | 0% ⏳ |
 | **PROMPTS_11** | 15 prompts | 0 | 15 | 0% ⏳ |
+| **PROMPTS_12** | 12 prompts | 0 | 12 | 0% ⏳ |
 
-**TOTAL ACTUALIZADO:** ~165 prompts  
-**Implementados:** ~28 prompts (17%)  
-**Pendientes:** ~137 prompts (83%)
+**TOTAL ACTUALIZADO:** ~177 prompts  
+**Implementados:** ~28 prompts (16%)  
+**Pendientes:** ~149 prompts (84%)
 
 ---
 
