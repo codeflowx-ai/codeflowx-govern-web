@@ -25,6 +25,11 @@
 | **PROMPTS_08** | 22 entities | 1 | 21 | 5% ⏳ |
 | **PROMPTS_09** | 12 workflows | 0 | 12 | 0% ⏳ |
 | **PROMPTS_10** | 13 microservicios | 0 | 13 | 0% ⏳ |
+| **PROMPTS_11** | 15 prompts | 0 | 15 | 0% ⏳ |
+
+**TOTAL ACTUALIZADO:** ~165 prompts  
+**Implementados:** ~28 prompts (17%)  
+**Pendientes:** ~137 prompts (83%)
 
 ---
 
@@ -708,3 +713,162 @@ Deja como está y si pregunta:
 3. 📋 **Priorizo implementación** prompts críticos (leka-server-documents, workflows)?
 
 **Tu prestigio está en juego. Dime qué enfoque prefieres.** 🎯
+
+---
+
+# PROMPTS_11 - INTEGRACIÓN QDRANT + MINIO + OPENSEARCH
+
+**Documento:** `PROMPTS_11_INTEGRACION_QDRANT_MINIO_OPENSEARCH.md`  
+**Objetivo:** Integrar componentes especializados enterprise (Qdrant, MinIO, OpenSearch)  
+**Estado:** ⏳ 0% (0/15)  
+**Prioridad:** 🟡 ALTA (infraestructura RAG + compliance)
+
+## Checklist Prompts:
+
+### GRUPO A: QDRANT (Embeddings + RAG) - 0/5
+
+- [ ] **PROMPT 1:** Setup Qdrant + Collections (Docker + 4 collections)
+  - Docker Compose Qdrant
+  - Collections: prompts, knowledge_base_docs, compliance_regulations, evaluations
+  - Script Python init_qdrant_collections.py
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 0.5-1 día
+
+- [ ] **PROMPT 2:** Cliente Java Qdrant + QdrantService
+  - Dependency: io.qdrant:client:1.7.0
+  - QdrantConfig (bean)
+  - QdrantService (insert, search, searchWithFilters, delete)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 1-1.5 días
+
+- [ ] **PROMPT 3:** Microservicio Python RAG con Qdrant
+  - FastAPI service: leka-rag-service
+  - RAGService (chunk, embed_batch, query_rag)
+  - Endpoints: /api/rag/process-document, /api/rag/query
+  - **Prioridad:** 🔴 CRÍTICA (RAG potente necesario)
+  - **Estimación:** 2-3 días
+
+- [ ] **PROMPT 4:** Integración Qdrant Backend Java (Prompts)
+  - PromptEmbeddingService (auto-generación embeddings)
+  - Entity Prompt: campo PRMQDRANT_POINT_ID
+  - Migration SQL: V1.XX__add_qdrant_point_id_prompts.sql
+  - Search similar prompts
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 1.5-2 días
+
+- [ ] **PROMPT 5:** Reranking Avanzado RAG
+  - RerankerService (cross-encoder: ms-marco-MiniLM-L-6-v2)
+  - Integración RAGService._rerank()
+  - Mejora relevancia: 30-50%
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 1-1.5 días
+
+**Total GRUPO A:** 6-9 días (con 2-3 chats paralelos = 3-4 días reales)
+
+---
+
+### GRUPO B: MINIO (Object Storage) - 0/5
+
+- [ ] **PROMPT 6:** Setup MinIO + Buckets
+  - Docker Compose MinIO
+  - 7 buckets: technical-docs, datasets, models, knowledge-base, evaluation-results, backups, client-documents
+  - Script Python init_minio_buckets.py
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 0.5-1 día
+
+- [ ] **PROMPT 7:** Cliente Java MinIO + MinIOService
+  - Dependency: io.minio:minio:8.5.7
+  - MinIOConfig (bean)
+  - MinIOService (upload, download, presignedUrl, delete)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 1-1.5 días
+
+- [ ] **PROMPT 8:** Integración MinIO Docs Técnicos (Anexo IV)
+  - Entity TechnicalDocumentation: TECMINIO_BUCKET, TECMINIO_OBJECT_NAME
+  - TechnicalDocumentationService (generate PDF + upload MinIO)
+  - Migration SQL
+  - **Prioridad:** 🔴 CRÍTICA (Art. 11)
+  - **Estimación:** 2-2.5 días
+
+- [ ] **PROMPT 9:** Pipeline RAG MinIO → Qdrant
+  - DocumentProcessingService (Python FastAPI)
+  - Upload PDF MinIO → Extract → Chunk → Embed → Qdrant
+  - Endpoint: /api/documents/process-pdf
+  - **Prioridad:** 🔴 CRÍTICA (RAG pipeline)
+  - **Estimación:** 2-3 días
+
+- [ ] **PROMPT 10:** Lifecycle Policies MinIO
+  - Script configure_minio_lifecycle.py
+  - Delete evaluation-results >12 meses
+  - Delete backups >2 años
+  - **Prioridad:** 🟢 MEDIA
+  - **Estimación:** 0.5-1 día
+
+**Total GRUPO B:** 6-9 días (con 2-3 chats paralelos = 3-4 días reales)
+
+---
+
+### GRUPO C: OPENSEARCH (Logs + Auditoría) - 0/5
+
+- [ ] **PROMPT 11:** Setup OpenSearch + Índices
+  - Docker Compose OpenSearch + Dashboards
+  - 3 índices: audit-logs, inference-logs, application-logs
+  - Script Python init_opensearch_indices.py
+  - **Prioridad:** 🔴 CRÍTICA (Art. 19 logs inmutables)
+  - **Estimación:** 0.5-1 día
+
+- [ ] **PROMPT 12:** Cliente Java OpenSearch + LogService
+  - Dependency: opensearch-rest-high-level-client:2.11.0
+  - OpenSearchConfig (bean)
+  - OpenSearchLogService (logAuditEvent Art. 19, logInference)
+  - Integración BPMN delegates
+  - **Prioridad:** 🔴 CRÍTICA (Art. 19)
+  - **Estimación:** 1.5-2 días
+
+- [ ] **PROMPT 13:** Microservicio Analytics Python
+  - FastAPI service: leka-analytics-service
+  - AnalyticsService (compliance metrics, inference analytics)
+  - Endpoints: /api/analytics/*
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 2-2.5 días
+
+- [ ] **PROMPT 14:** ILM OpenSearch
+  - Script configure_opensearch_ilm.py
+  - Policy audit-logs (retention 10 años)
+  - Policy inference-logs (retention 12 meses)
+  - **Prioridad:** 🔴 CRÍTICA (GDPR Art. 17)
+  - **Estimación:** 0.5-1 día
+
+- [ ] **PROMPT 15:** OpenSearch Dashboards Compliance
+  - JSON export dashboards (6 visualizaciones)
+  - Script import_opensearch_dashboards.py
+  - Visualizaciones: events, approvals, risk, timeline, latency, cost
+  - **Prioridad:** 🟢 MEDIA
+  - **Estimación:** 1-1.5 días
+
+**Total GRUPO C:** 6-8 días (con 2-3 chats paralelos = 3-4 días reales)
+
+---
+
+## 📊 RESUMEN PROMPTS_11
+
+**Total prompts:** 15
+**Implementados:** 0
+**Pendientes:** 15
+**% Completo:** 0% ⏳
+
+**Estimación total:** 18-26 días secuencial | 9-12 días con 3 chats paralelos
+
+**Críticos (🔴):** 6 prompts
+- PROMPT 3 (RAG Python)
+- PROMPT 8 (Anexo IV MinIO)
+- PROMPT 9 (Pipeline RAG)
+- PROMPT 11 (OpenSearch setup)
+- PROMPT 12 (OpenSearch Java Art. 19)
+- PROMPT 14 (ILM retention)
+
+**Altos (🟡):** 7 prompts
+**Medios (🟢):** 2 prompts
+
+---
+

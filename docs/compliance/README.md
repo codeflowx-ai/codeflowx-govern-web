@@ -307,13 +307,14 @@ PROMPTS_07 (Multi-Framework Master):     ░░░░░░░░░░░░░
 PROMPTS_08 (Java Multi-Framework):       █░░░░░░░░░░░░░░░░░░░   5% ⏳ (1/22)
 PROMPTS_09 (BPMN Multi-Framework):       ░░░░░░░░░░░░░░░░░░░░   0% ⏳
 PROMPTS_10 (Python Consolidado):         ░░░░░░░░░░░░░░░░░░░░   0% ⏳
+PROMPTS_11 (Qdrant+MinIO+OpenSearch):    ░░░░░░░░░░░░░░░░░░░░   0% ⏳
 
-TOTAL GENERAL:                           ████░░░░░░░░░░░░░░░░  23% ⏳
+TOTAL GENERAL:                           ███░░░░░░░░░░░░░░░░░  17% ⏳
 ```
 
-**Total Prompts:** ~120 prompts  
+**Total Prompts:** ~165 prompts  
 **Implementados:** ~28 prompts  
-**Pendientes:** ~92 prompts
+**Pendientes:** ~137 prompts
 
 ---
 
@@ -354,4 +355,47 @@ TOTAL GENERAL:                           ████░░░░░░░░░
 
 
 
+
+
+---
+
+### 📄 PROMPTS_11_INTEGRACION_QDRANT_MINIO_OPENSEARCH.md ⭐🔥
+
+**Objetivo:** Integrar componentes especializados enterprise (Qdrant, MinIO, OpenSearch)  
+**Total Prompts:** 15 prompts  
+**Implementados:** 0  
+**Pendientes:** 15  
+**% Completo:** 0% ⏳
+
+**Prompts:**
+- **GRUPO A - Qdrant (5):** Setup + collections, cliente Java, RAG Python, integración prompts, reranking
+- **GRUPO B - MinIO (5):** Setup + buckets, cliente Java, docs Anexo IV, pipeline RAG, lifecycle
+- **GRUPO C - OpenSearch (5):** Setup + índices, cliente Java logs Art. 19, analytics Python, ILM, dashboards
+
+**Arquitectura resultante:**
+```
+PostgreSQL/TimescaleDB  (50-100 GB metadata)
++ Qdrant                (18-35 GB embeddings, 5.75M vectors)
++ MinIO                 (4 TB docs/datasets/modelos)
++ OpenSearch            (650 GB logs inmutables Art. 19)
+```
+
+**Beneficios clave:**
+- ✅ RAG potente (hybrid search vector+keyword + reranking +30-50% accuracy)
+- ✅ Compliance robusto (logs inmutables OpenSearch Art. 19)
+- ✅ Escalabilidad (componentes especializados optimizados)
+- ✅ Multi-tenant (collections/buckets/índices por cliente)
+- ✅ Lifecycle automático (archivado MinIO, retention ILM OpenSearch)
+
+**Prioridad:** 🟡 ALTA (RAG enterprise + infraestructura compliance)
+
+**Estimación:** 18-26 días secuencial | 9-12 días paralelo (3 chats)
+
+**Prompts críticos (🔴):** 6 de 15
+- PROMPT 3 (RAG Python FastAPI)
+- PROMPT 8 (Anexo IV MinIO Art. 11)
+- PROMPT 9 (Pipeline RAG MinIO → Qdrant)
+- PROMPT 11 (OpenSearch setup)
+- PROMPT 12 (OpenSearch LogService Art. 19)
+- PROMPT 14 (ILM retention GDPR)
 
