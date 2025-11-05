@@ -881,3 +881,126 @@ Deja como está y si pregunta:
 
 **Impacto comercial:** 🔴 **MÁXIMO** (sin esto, solo 20% mercado accesible)
 
+
+
+---
+
+# PROMPTS_13 - DATOS PRUEBA MASIVOS + MOCK DATA
+
+**Documento:** `PROMPTS_13_DATOS_PRUEBA_MASIVOS_MOCK.md`  
+**Objetivo:** Generar 6.5M registros sintéticos + modelos locales para demos SIN gastar en APIs  
+**Estado:** ⏳ 0% (0/8)  
+**Prioridad:** 🔴 **CRÍTICA DEMO** (dashboards vacíos no impresionan + ahorro $6K/año)
+
+## Checklist Prompts:
+
+### GENERADORES DATOS SINTÉTICOS - 0/5
+
+- [ ] **PROMPT 1:** Generador Base (Projects, Models, Datasets)
+  - Python Faker + custom generators
+  - 10K projects + 50K models + 20K datasets
+  - Batch insert (1000x más rápido)
+  - Datos coherentes (FKs válidos, nombres realistas)
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 0.5 día
+
+- [ ] **PROMPT 2:** Generador Evaluations + Logs Masivos
+  - 500K evaluations (métricas realistas: accuracy, bias, hallucination)
+  - 5M inference logs (time-series distribuido 12 meses)
+  - 1M audit logs (hash chain inmutable Art. 19)
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 1 día
+
+- [ ] **PROMPT 6:** Generador Compliance/GDPR
+  - 5K FRIA assessments
+  - 10K GDPR data subject requests (deadlines 30 días)
+  - 500 serious incidents (Art. 73)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 0.5 día
+
+- [ ] **PROMPT 7:** Seed Qdrant Embeddings (100K)
+  - 100K document chunks knowledge_base_docs
+  - 10K prompts embeddings
+  - 5K compliance regulations
+  - Textos realistas compliance (AI Act, GDPR, ISO templates)
+  - **Prioridad:** 🟡 ALTA
+  - **Estimación:** 0.5 día
+
+- [ ] **PROMPT 8:** Seed MinIO Sample Files
+  - 100 PDFs Anexo IV (generados reportlab)
+  - 200 Parquet datasets sample
+  - 100 model files mock (.safetensors simulados)
+  - **Prioridad:** 🟢 MEDIA
+  - **Estimación:** 0.5 día
+
+**Total generadores:** 3 días
+
+---
+
+### MODELOS LOCALES (SIN APIS) - 0/2
+
+- [ ] **PROMPT 3:** Setup Llama + Mistral Local (Ollama)
+  - Docker Compose Ollama
+  - Pull llama3:8b (4.7 GB)
+  - Pull mistral:7b (4.1 GB)
+  - LocalLLMService (chat_completion, generate_embedding)
+  - **Prioridad:** 🔴 CRÍTICA (demos sin OpenAI $50-500)
+  - **Estimación:** 0.5 día
+
+- [ ] **PROMPT 4:** Mock LLM Responses Cached
+  - MockLLMService con responses pre-generated
+  - Instantáneo (<1ms vs 1-2seg OpenAI)
+  - Determinista (demos repetibles)
+  - Responses: hallucination_check, bias_analysis, compliance_summary, executive_summary
+  - Config flag: USE_MOCK_LLM=true
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 0.5 día
+
+**Total modelos locales:** 1 día
+
+---
+
+### MASTER SEED SCRIPT - 0/1
+
+- [ ] **PROMPT 5:** Master Seed Script (1-comando TODO)
+  - Script Bash: seed_everything_demo.sh
+  - Docker up (Qdrant, MinIO, OpenSearch)
+  - Truncate existing data (solo test DB)
+  - Execute todos los generadores
+  - Configure TimescaleDB hypertables
+  - Update statistics
+  - **Output:** 6.5M PostgreSQL + 100K Qdrant + 1K MinIO files
+  - **Tiempo ejecución:** <90 min
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Estimación:** 0.5 día
+
+**Total master script:** 0.5 día
+
+---
+
+## 📊 RESUMEN PROMPTS_13
+
+**Total prompts:** 8
+**Implementados:** 0
+**Pendientes:** 8
+**% Completo:** 0% ⏳
+
+**Estimación total:** 5 días secuencial | 2-3 días con 1-2 chats paralelos
+
+**Datos generados:**
+- 6,580,000 registros PostgreSQL
+- 100,000 embeddings Qdrant
+- 1,000 archivos MinIO
+- ~10 GB total (2-3 GB comprimido)
+
+**Ahorro:**
+- $500/mes testing APIs = $6,000/año
+- Demos ilimitadas gratis
+- Testing performance real
+
+**Crítico para:**
+- 🔴 DEMO próxima semana (dashboards vacíos no impresionan)
+- 🔴 Testing performance (necesitas 5M logs)
+- 🔴 Screenshots marketing (datos realistas)
+- 🔴 Ahorro costes (demos sin APIs)
+
