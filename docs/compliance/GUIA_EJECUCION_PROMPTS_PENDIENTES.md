@@ -1,10 +1,10 @@
 # GUÍA EJECUCIÓN PROMPTS PENDIENTES
-## Plan Priorizado Implementación ~122 Prompts
+## Plan Priorizado Implementación ~137 Prompts
 
 **Fecha:** 5 Noviembre 2025  
-**Estado Actual:** 28/150 prompts (19%)  
-**Objetivo:** Roadmap ejecutar 122 prompts pendientes  
-**Timeline:** Q4 2024 - Q2 2025
+**Estado Actual:** 28/165 prompts (17%)  
+**Objetivo:** Roadmap ejecutar 137 prompts pendientes  
+**Timeline:** Q4 2025 - Q2 2026
 
 ---
 
@@ -181,7 +181,49 @@
 
 ---
 
-## 📅 FASE 2: VALOR COMERCIAL (Semanas 5-8)
+### **SPRINT 4-bis (Semana 4-bis) - Infraestructura RAG Enterprise 🟡**
+
+**Objetivo:** Setup Qdrant + MinIO + OpenSearch (infraestructura RAG potente)
+
+**PROMPTS_11 - Integración componentes especializados:**
+
+- [ ] **PROMPT 1** - Setup Qdrant + 4 collections (0.5 día)
+  - Docker Compose Qdrant
+  - Collections: prompts, kb_docs, compliance, evaluations
+  - **Esfuerzo:** 0.5 día (1 chat)
+  - **Valor:** 🟡 ALTA - RAG enterprise
+
+- [ ] **PROMPT 6** - Setup MinIO + 7 buckets (0.5 día)
+  - Docker Compose MinIO
+  - Buckets: technical-docs, datasets, models, kb, etc.
+  - **Esfuerzo:** 0.5 día (1 chat)
+
+- [ ] **PROMPT 11** - Setup OpenSearch + 3 índices (0.5 día)
+  - Docker Compose OpenSearch + Dashboards
+  - Índices: audit-logs, inference-logs, application-logs
+  - **Esfuerzo:** 0.5 día (1 chat)
+  - **Valor:** 🔴 CRÍTICA - Logs inmutables Art. 19
+
+- [ ] **PROMPT 2** - Cliente Java Qdrant (1.5 día)
+  - QdrantConfig + QdrantService
+  - **Esfuerzo:** 1.5 día
+
+- [ ] **PROMPT 7** - Cliente Java MinIO (1.5 día)
+  - MinIOConfig + MinIOService
+  - **Esfuerzo:** 1.5 día
+
+- [ ] **PROMPT 12** - Cliente Java OpenSearch (2 días)
+  - OpenSearchConfig + LogService Art. 19
+  - **Esfuerzo:** 2 días
+  - **Valor:** 🔴 CRÍTICA - Art. 19
+
+**Total Sprint 4-bis:** 6 prompts, 6.5-7 días esfuerzo (con 3 chats paralelos = 2-3 días reales)
+
+**Resultado:** Infraestructura RAG enterprise + Logs inmutables Art. 19 ✅
+
+---
+
+## 📅 FASE 2: VALOR COMERCIAL (Semanas 5-9)
 
 ### **SPRINT 5 (Semana 5) - Workflows Automáticos 🟡**
 
