@@ -307,6 +307,9 @@
 ### **Plataforma Ejecutivo:**
 > "Gobierno + Evaluación + Monitorización = seguro contra desastres. Una crisis evitada (150k€) paga años licencia."
 
+### **Oportunidad España:**
+> "TAM 720M€, 60k-80k empresas target. 50% ya usan IA pero 95% sin gobierno. Ventana first-mover: 4-6 meses. Confluencia perfecta: urgencia + madurez + gap + timing. AHORA o NUNCA."
+
 ---
 
 ## 📧 DISTRIBUCIÓN DOCUMENTOS
