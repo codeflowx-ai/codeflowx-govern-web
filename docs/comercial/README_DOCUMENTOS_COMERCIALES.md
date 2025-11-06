@@ -378,6 +378,8 @@ docs/comercial/
 ├── CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.docx ✅
 ├── CODEFLOWX_PLATAFORMA_EJECUTIVO.md
 ├── CODEFLOWX_PLATAFORMA_EJECUTIVO.docx ✅
+├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md
+├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx ✅
 └── README_DOCUMENTOS_COMERCIALES.md (este archivo)
 ```
 
@@ -423,6 +425,7 @@ docs/comercial/
 ✅ Sectores (banca, salud, RR.HH., público, seguros)
 ✅ Agencias/consultores (15 casos uso)
 ✅ Valor plataforma (gobierno + evaluación + monitorización)
+✅ Oportunidad mercado España (TAM 720M€, timing perfecto)
 ```
 
 ### **ROI Cuantificado:**
