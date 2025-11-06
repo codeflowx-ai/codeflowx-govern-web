@@ -6,13 +6,14 @@
 
 ---
 
-## 📚 DOCUMENTOS DISPONIBLES (6 + Formatos Word)
+## 📚 DOCUMENTOS DISPONIBLES (6 Documentos x 3 Formatos)
 
 ### **1. EU AI ACT TIMELINE Y FASES CODEFLOWX**
 
 **Archivos:**
-- `EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.md` (28 KB)
-- `EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.docx` (24 KB) ← **Word**
+- `EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.md` (28 KB) - Editable
+- `EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.docx` (24 KB) - **Word**
+- `EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.pdf` (131 KB) - **PDF**
 
 **Contenido:**
 - Timeline oficial EU AI Act con fechas críticas
@@ -36,8 +37,9 @@
 ### **2. GPAI EXCLUSIONES EU AI ACT**
 
 **Archivos:**
-- `GPAI_EXCLUSIONES_EU_AI_ACT.md` (26 KB)
-- `GPAI_EXCLUSIONES_EU_AI_ACT.docx` (21 KB) ← **Word**
+- `GPAI_EXCLUSIONES_EU_AI_ACT.md` (26 KB) - Editable
+- `GPAI_EXCLUSIONES_EU_AI_ACT.docx` (21 KB) - **Word**
+- `GPAI_EXCLUSIONES_EU_AI_ACT.pdf` (119 KB) - **PDF**
 
 **Contenido:**
 - Definición oficial GPAI (Art. 3.44-3.45)
@@ -59,8 +61,9 @@
 ### **3. PROVEEDOR VS DEPLOYER - CASOS DE USO**
 
 **Archivos:**
-- `PROVEEDOR_VS_DEPLOYER_CASOS_USO.md` (34 KB)
-- `PROVEEDOR_VS_DEPLOYER_CASOS_USO.docx` (25 KB) ← **Word**
+- `PROVEEDOR_VS_DEPLOYER_CASOS_USO.md` (34 KB) - Editable
+- `PROVEEDOR_VS_DEPLOYER_CASOS_USO.docx` (25 KB) - **Word**
+- `PROVEEDOR_VS_DEPLOYER_CASOS_USO.pdf` (127 KB) - **PDF**
 
 **Contenido:**
 - Definiciones proveedor vs deployer (Art. 3.3-3.4)
@@ -87,8 +90,9 @@
 ### **4. CASOS DE USO DESARROLLO, AGENCIAS Y CONSULTORES**
 
 **Archivos:**
-- `CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.md` (52 KB)
-- `CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.docx` (34 KB) ← **Word**
+- `CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.md` (52 KB) - Editable
+- `CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.docx` (34 KB) - **Word**
+- `CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.pdf` (173 KB) - **PDF**
 
 **Contenido:**
 - Perfil target (agencias marketing, consultores, software houses)
@@ -125,8 +129,9 @@
 ### **5. CODEFLOWX PLATAFORMA EJECUTIVO**
 
 **Archivos:**
-- `CODEFLOWX_PLATAFORMA_EJECUTIVO.md` (55 KB)
-- `CODEFLOWX_PLATAFORMA_EJECUTIVO.docx` (35 KB) ← **Word**
+- `CODEFLOWX_PLATAFORMA_EJECUTIVO.md` (55 KB) - Editable
+- `CODEFLOWX_PLATAFORMA_EJECUTIVO.docx` (35 KB) - **Word**
+- `CODEFLOWX_PLATAFORMA_EJECUTIVO.pdf` (181 KB) - **PDF**
 
 **Contenido:**
 - Qué es CodeflowX (problema que resuelve)
@@ -182,8 +187,9 @@
 ### **6. OPORTUNIDAD DE NEGOCIO ESPAÑA NOVIEMBRE 2025**
 
 **Archivos:**
-- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md` (42 KB)
-- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx` (28 KB) ← **Word**
+- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md` (42 KB) - Editable
+- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx` (28 KB) - **Word**
+- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.pdf` (119 KB) - **PDF**
 
 **Contenido:**
 - **Por qué es AHORA el momento** (5 factores críticos confluyen)
@@ -277,16 +283,16 @@
 
 ## 📊 TABLA RESUMEN DOCUMENTOS
 
-| Documento | Páginas | Word | Target | Fase Venta | Objetivo |
-|-----------|---------|------|--------|------------|----------|
-| **Timeline + Fases** | 723 líneas | 24 KB | Todos | Awareness | Urgencia regulatoria |
-| **GPAI Exclusiones** | 596 líneas | 21 KB | Con modelos propios | Consideration | Clarificar GPAI |
-| **Proveedor vs Deployer** | 866 líneas | 25 KB | Enterprise | Consideration | Identificar rol |
-| **Casos Uso Agencias** | 1602 líneas | 34 KB | Agencias/Consultores | Consideration | Casos específicos |
-| **Plataforma Ejecutivo** | 1748 líneas | 35 KB | Todos | Evaluation | Valor completo |
-| **Oportunidad España** | 1097 líneas | 28 KB | Dirección/C-level | Estratégico | Justificar mercado |
+| Documento | Páginas | Word | PDF | Target | Fase Venta | Objetivo |
+|-----------|---------|------|-----|--------|------------|----------|
+| **Timeline + Fases** | 723 líneas | 24 KB | 131 KB | Todos | Awareness | Urgencia regulatoria |
+| **GPAI Exclusiones** | 596 líneas | 21 KB | 119 KB | Con modelos propios | Consideration | Clarificar GPAI |
+| **Proveedor vs Deployer** | 866 líneas | 25 KB | 127 KB | Enterprise | Consideration | Identificar rol |
+| **Casos Uso Agencias** | 1602 líneas | 34 KB | 173 KB | Agencias/Consultores | Consideration | Casos específicos |
+| **Plataforma Ejecutivo** | 1748 líneas | 35 KB | 181 KB | Todos | Evaluation | Valor completo |
+| **Oportunidad España** | 1097 líneas | 28 KB | 119 KB | Dirección/C-level | Estratégico | Justificar mercado |
 
-**TOTAL:** 6 documentos en Markdown + Word
+**TOTAL:** 6 documentos x 3 formatos (Markdown + Word + PDF) = **18 archivos**
 
 ---
 
@@ -373,16 +379,22 @@ CTA: Revisión propuesta esta semana
 docs/comercial/
 ├── EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.md
 ├── EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.docx ✅
+├── EU_AI_ACT_TIMELINE_FASES_CODEFLOWX.pdf ✅
 ├── GPAI_EXCLUSIONES_EU_AI_ACT.md
 ├── GPAI_EXCLUSIONES_EU_AI_ACT.docx ✅
+├── GPAI_EXCLUSIONES_EU_AI_ACT.pdf ✅
 ├── PROVEEDOR_VS_DEPLOYER_CASOS_USO.md
 ├── PROVEEDOR_VS_DEPLOYER_CASOS_USO.docx ✅
+├── PROVEEDOR_VS_DEPLOYER_CASOS_USO.pdf ✅
 ├── CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.md
 ├── CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.docx ✅
+├── CASOS_USO_DESARROLLO_AGENCIAS_CONSULTORES.pdf ✅
 ├── CODEFLOWX_PLATAFORMA_EJECUTIVO.md
 ├── CODEFLOWX_PLATAFORMA_EJECUTIVO.docx ✅
+├── CODEFLOWX_PLATAFORMA_EJECUTIVO.pdf ✅
 ├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md
 ├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx ✅
+├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.pdf ✅
 └── README_DOCUMENTOS_COMERCIALES.md (este archivo)
 ```
 
@@ -415,8 +427,9 @@ docs/comercial/
 ### **Material Disponible:**
 ```
 ✅ 6 documentos técnico-comerciales completos
-✅ Formatos Markdown (editable) + Word (distribución)
-✅ Total: ~6.600 líneas documentación
+✅ 3 formatos por documento: Markdown + Word + PDF
+✅ Total: 18 archivos (6 .md + 6 .docx + 6 .pdf)
+✅ ~6.600 líneas documentación
 ✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado
 ```
 
