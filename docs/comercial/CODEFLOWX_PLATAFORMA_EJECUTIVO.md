@@ -10,34 +10,66 @@
 
 ## 🎯 QUÉ ES CODEFLOWX
 
-**CodeflowX** es la **plataforma de gobierno, evaluación y monitorización de sistemas IA** que garantiza compliance EU AI Act automático para empresas que desarrollan soluciones IA.
+**CodeflowX** es la **plataforma de gobierno, evaluación y monitorización de sistemas IA** que transforma cómo desarrollas, despliegas y operas soluciones IA de forma confiable, segura y rentable.
 
 ### **En Una Frase:**
 
-> **"CodeflowX transforma 16 meses de compliance manual en 3 meses automatizados, garantizando que tus chatbots, agentes y RAG cumplan EU AI Act antes del deadline Agosto 2026."**
+> **"CodeflowX te permite desarrollar sistemas IA con confianza: sabes que funcionan bien, no discriminan, son explicables y mejoran continuamente. Además, cumples EU AI Act automáticamente."**
 
 ### **Problema que Resuelve:**
 
 ```
-❌ ANTES (Sin CodeflowX):
-- 16 meses compliance manual (consultores 150.000€)
-- Documentación Anexo IV: 6-8 semanas manual
-- Bias detection: análisis ad-hoc no sistemático
-- Explicabilidad: inexistente o manual
-- Supervisión humana: sin evidencia documentada
-- Monitorización: sin drift detection automatizado
-- Audit trail: inexistente
-→ Resultado: IMPOSIBLE cumplir Agosto 2026
+❌ SIN GOBIERNO IA (Situación Actual):
 
-✅ DESPUÉS (Con CodeflowX):
-- 3 meses compliance automatizado (24.000€/año)
-- Documentación Anexo IV: 3-5 días automatizada
-- Bias detection: 20+ métricas fairness automáticas
-- Explicabilidad: SHAP/LIME integrado
-- Supervisión humana: HITL workflows documentados
-- Monitorización: drift detection 24/7
-- Audit trail: logging inmutable completo
-→ Resultado: COMPLIANCE GARANTIZADO Agosto 2026
+PROBLEMA 1: NO SABES SI TU IA FUNCIONA BIEN
+- Chatbot responde incorrectamente → cliente frustrado se va
+- Modelo scoring degrada performance → pérdidas financieras
+- RAG retrieval irrelevante → usuarios no confían
+→ Resultado: Pérdida clientes, reputación, dinero
+
+PROBLEMA 2: NO DETECTAS PROBLEMAS HASTA QUE ES TARDE
+- Descubres sesgo cuando cliente demanda
+- Notas degradación cuando clientes se quejan
+- Detectas drift cuando modelo ya inservible
+→ Resultado: Crisis reputacional, demandas, rehacer trabajo
+
+PROBLEMA 3: NO PUEDES MEJORAR SISTEMÁTICAMENTE
+- No sabes qué funciona y qué no
+- No tienes métricas objetivas
+- Mejoras son prueba-error
+→ Resultado: Desarrollo lento, costes altos, calidad variable
+
+PROBLEMA 4: NO PUEDES ESCALAR CONFIABLEMENTE
+- Cada sistema IA es "artesanal"
+- No tienes procesos repetibles
+- Calidad depende de desarrollador
+→ Resultado: No escalas, pierdes oportunidades
+
+✅ CON GOBIERNO IA (CodeflowX):
+
+BENEFICIO 1: SABES QUE TU IA FUNCIONA BIEN
+- Evaluación continua performance → detectas problemas antes que clientes
+- Métricas objetivas calidad → garantizas SLA
+- Testing automático exhaustivo → confianza release
+→ Resultado: Clientes satisfechos, retención alta, SLA cumplido
+
+BENEFICIO 2: DETECTAS Y CORRIGES PROACTIVAMENTE
+- Alertas drift ANTES que impacte usuarios
+- Detección sesgo ANTES de demanda
+- Monitorización 24/7 → actúas preventivamente
+→ Resultado: Evitas crisis, proteges reputación, ahorras costes
+
+BENEFICIO 3: MEJORAS CONTINUAMENTE CON DATOS
+- Métricas objetivas qué funciona
+- A/B testing sistemático prompts/modelos
+- Optimización basada en evidencia
+→ Resultado: Desarrollo rápido, costes bajos, calidad alta
+
+BENEFICIO 4: ESCALAS CONFIABLEMENTE
+- Procesos gobierno repetibles
+- Calidad garantizada independiente de desarrollador
+- Aprobación rápida (minutos vs semanas)
+→ Resultado: Escalas 5x, capturas oportunidades, creces negocio
 ```
 
 ---
@@ -93,109 +125,377 @@
 
 ## 🚀 FUNCIONALIDADES CLAVE
 
-### **1. GOBIERNO DE DATOS (Art. 10)**
+---
 
-#### **1.1. Detección Sesgos Avanzada**
+## 🏛️ PILAR 1: GOBIERNO IA
 
-**Microservicio:** `leka-bias-detection-service`
+> **"Gobierno = Control + Confianza + Escalabilidad"**
 
-```
-✅ 20+ métricas fairness:
-   • Disparate Impact Ratio
-   • Statistical Parity Difference
-   • Equal Opportunity Difference
-   • Predictive Equality
-   • Calibration by group
-
-✅ Análisis interseccionalidad:
-   • Género x Edad
-   • Etnia x Código postal
-   • Combinaciones múltiples
-
-✅ Detección data poisoning:
-   • Tests estadísticos (Kolmogorov-Smirnov, Chi-Squared)
-   • Outliers extremos
-   • Anomalías distribuciones
-```
-
-**Valor Agencias/Consultores:**
-> *"Tu chatbot RR.HH. screening candidatos puede tener sesgo género sin saberlo. CodeflowX detecta automáticamente con 20+ métricas y genera informe compliance Art. 10."*
+El gobierno IA no es burocracia, es **asegurar que tu IA funciona como esperas, es confiable y puedes escalarla sin miedo.**
 
 ---
 
-#### **1.2. Validación Calidad Datos**
+### **1. GOBIERNO DE DATOS: Fundamento de IA Confiable**
 
-**Microservicio:** `leka-bias-detection-service`
-
-```
-✅ Integridad dataset:
-   • Missing values analysis
-   • Duplicados detection
-   • Outliers extremos
-   • Schema validation
-
-✅ Data quality score:
-   • Completeness (% valores completos)
-   • Uniqueness (% duplicados)
-   • Validity (tipos datos correctos)
-   • Consistency (coherencia cross-tables)
-```
-
-**Valor Agencias/Consultores:**
-> *"Antes de entrenar modelo scoring crediticio, valida calidad datos automáticamente. Art. 10.2 exige datasets representativos y sin errores."*
+> **¿Por qué gobernar datos?** *"Basura entra, basura sale" (GIGO). Datos de mala calidad = modelos que fallan. Gobierno datos = garantía calidad IA.*
 
 ---
 
-### **2. EVALUACIÓN MODELOS/LLMs (Art. 15)**
+#### **1.1. Detección Sesgos: Protege Reputación + Evita Demandas**
 
-#### **2.1. Evaluación LLMs Comprehensive**
+**Microservicio:** `leka-bias-detection-service`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Tu chatbot RR.HH. screening candidatos rechaza sistemáticamente 
+mujeres mayores 50 años SIN saberlo.
+
+→ Cliente demandado por discriminación
+→ Cliente te demanda a ti como proveedor
+→ Pérdida: 200.000€ demanda + reputación destrozada
+→ Trabajo perdido: 3 meses desarrollo chatbot
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Detección automática ANTES de producción:
+   • 20+ métricas fairness (Disparate Impact, Statistical Parity, etc.)
+   • Análisis interseccionalidad (género x edad, etnia x código postal)
+   • Alertas cuando DI ratio < 0.8 (umbral discriminación)
+
+→ Detectas sesgo en testing
+→ Corriges modelo antes de release
+→ Evitas demanda 200.000€
+→ Proteges reputación
+→ Cliente satisfecho
+
+ROI: Una demanda evitada paga 8 años de licencia CodeflowX
+```
+
+**Métricas Disponibles:**
+- Disparate Impact Ratio (80% rule)
+- Statistical Parity Difference
+- Equal Opportunity Difference
+- Predictive Equality
+- Calibration by group
+- Interseccionalidad (combinaciones múltiples)
+
+---
+
+#### **1.2. Validación Calidad Datos: Evita "Basura Entra, Basura Sale"**
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Cliente pide chatbot scoring crediticio urgente.
+Entrenas modelo con datos cliente (CSV 50k rows).
+Modelo en producción da resultados inconsistentes.
+Investigas: 30% datos duplicados, 15% outliers extremos, 
+10% missing values críticos.
+
+→ Modelo inservible
+→ Rehacer entrenamiento: 2 semanas perdidas
+→ Cliente enfadado (deadline incumplido)
+→ Pérdida contrato: 25.000€
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Validación automática ANTES de entrenar:
+   • Missing values analysis (% por columna)
+   • Duplicados detection (exactos + fuzzy)
+   • Outliers extremos (IQR, Z-score > 3)
+   • Schema validation (tipos correctos)
+   • Data quality score (0-1)
+
+→ Detectas problemas calidad día 1
+→ Pides cliente limpiar datos ANTES de entrenar
+→ Modelo funciona bien primera vez
+→ Cliente feliz (deadline cumplido)
+→ Cobras 25.000€ + reputación intacta
+
+ROI: Un proyecto salvado paga licencia año completo
+```
+
+**Validaciones Disponibles:**
+- Completeness (% valores completos)
+- Uniqueness (% duplicados)
+- Validity (tipos datos correctos)
+- Consistency (coherencia cross-tables)
+- Accuracy (valores plausibles)
+- Timeliness (datos actualizados)
+
+---
+
+---
+
+## 📊 PILAR 2: EVALUACIÓN IA COMPREHENSIVE
+
+> **"No puedes mejorar lo que no mides. Evaluación = conocimiento = mejora continua = ventaja competitiva."**
+
+La evaluación IA no es solo "medir accuracy". Es **entender profundamente qué funciona, qué no, por qué, y cómo mejorarlo.**
+
+---
+
+### **2. EVALUACIÓN MODELOS ML: ¿Tu Modelo Realmente Funciona?**
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Desarrollas modelo predicción churn clientes para ecommerce.
+Testing local: 92% accuracy (excelente).
+Producción: Cliente dice "no funciona, predice mal".
+Investigas: Accuracy 92% pero Precision 45% (mayoría falsos positivos).
+
+→ Cliente descarta modelo
+→ 6 semanas desarrollo perdidas
+→ Proyecto cancelado: 30.000€
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Evaluación comprehensive ANTES de release:
+   • Accuracy, Precision, Recall, F1 (no solo accuracy)
+   • Confusion matrix detallada
+   • ROC-AUC, PR-AUC curves
+   • Class imbalance analysis
+   • Performance por segmento (país, producto, etc.)
+
+→ Detectas Precision baja en testing
+→ Ajustas threshold modelo para mejorar Precision
+→ Modelo funciona bien en producción
+→ Cliente satisfecho
+→ Cobras 30.000€ + renovación contrato
+
+ROI: Un proyecto exitoso vs fallido = diferencia enorme
+```
+
+---
+
+### **3. EVALUACIÓN LLMs: Más Allá de "Parece que Funciona"**
 
 **Microservicio:** `leka-llm-evaluation`
 
+**CASO DE NEGOCIO:**
 ```
-✅ Métricas rendimiento:
-   • Accuracy, Precision, Recall, F1
-   • Perplexity (calidad generación)
-   • BLEU, ROUGE (traducción, resumen)
-   • Coherence, Relevance (respuestas)
+PROBLEMA:
+Chatbot atención cliente ecommerce con GPT-4.
+Funciona "bien" en demos.
+Producción: 15% respuestas tóxicas ("idiota", "estúpido").
+Cliente ve redes sociales llenas de screenshots respuestas ofensivas.
 
-✅ Frameworks integrados:
-   • DeepEval (testing LLMs)
-   • RAGAS (evaluación RAG)
-   • MLflow (tracking experimentos)
+→ Crisis reputacional
+→ Chatbot desactivado urgentemente
+→ Cliente enfadado
+→ Multa contrato: 50.000€
+```
 
-✅ Evaluación compliance:
+**SOLUCIÓN CodeflowX:**
+```
+✅ Evaluación LLM ANTES de producción:
    • Toxicity detection (respuestas ofensivas)
    • PII leakage (filtra datos personales)
-   • Hallucination detection (inventa info)
+   • Hallucination detection (inventa información)
    • Bias in responses (respuestas sesgadas)
+   • Coherence + Relevance scoring
+   • Safety testing (100 adversarial prompts)
+
+→ Detectas 15% toxicity en testing
+→ Añades guardrails (content filtering)
+→ Re-testing: 0.5% toxicity residual (acceptable)
+→ Producción sin incidentes
+→ Cliente feliz
+→ Renuevas contrato
+
+ROI: Crisis reputacional evitada = invaluable
 ```
 
-**Valor Agencias/Consultores:**
-> *"Tu chatbot atención cliente puede generar respuestas tóxicas. CodeflowX evalúa automáticamente toxicity, PII leakage, hallucinations antes de producción."*
+**Frameworks Integrados:**
+- DeepEval (testing LLMs comprehensive)
+- RAGAS (evaluación RAG)
+- MLflow (tracking experimentos)
+- LangSmith (tracing LLM calls)
 
 ---
 
-#### **2.2. Adversarial Robustness Testing**
+### **4. EVALUACIÓN RAG: ¿Tu RAG Responde Bien?**
+
+**Microservicio:** `leka-rag-evaluation`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+RAG documentación interna empresa (10.000 docs).
+Empleados preguntan política vacaciones.
+RAG responde con info obsoleta (política 2020, actual es 2025).
+RR.HH. detecta: empleados confundidos, peticiones incorrectas.
+
+→ RAG no confiable
+→ Empleados dejan de usarlo
+→ Inversión RAG perdida: 40.000€
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Evaluación RAG con RAGAS framework:
+   • Context Precision: ¿chunks recuperados son relevantes?
+   • Context Recall: ¿respuesta cubre toda la info necesaria?
+   • Faithfulness: ¿respuesta fiel a documentos (no inventa)?
+   • Answer Relevance: ¿respuesta útil para pregunta?
+   • Document freshness: ¿docs actualizados?
+
+→ Detectas Context Precision 60% (bajo, retrieval malo)
+→ Detectas Faithfulness 70% (LLM inventa info)
+→ Ajustas chunk size, embeddings, reranking
+→ Re-evaluación: Context Precision 92%, Faithfulness 95%
+→ RAG funciona bien
+→ Empleados confían y usan
+→ Inversión recuperada
+
+ROI: RAG funcional vs fallido = 40.000€ diferencia
+```
+
+**Métricas RAGAS:**
+- Context Precision (calidad retrieval)
+- Context Recall (cobertura respuesta)
+- Faithfulness (fidelidad documentos)
+- Answer Relevance (utilidad respuesta)
+- Chunk quality scoring
+- Embedding quality analysis
+
+---
+
+### **5. EVALUACIÓN PROMPTS: Optimización Sistemática**
+
+**Microservicio:** `leka-prompt-governance`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Chatbot ventas ecommerce.
+Prompt inicial: "Eres asistente ventas amable".
+Conversion rate: 5% (bajo).
+Pruebas ad-hoc mejoran poco.
+No sabes qué prompts funcionan mejor.
+
+→ Conversion rate bajo
+→ Cliente insatisfecho con ROI
+→ Riesgo cancelación contrato: 60.000€/año
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ A/B testing prompts sistemático:
+   • Versionado prompts (Git-like)
+   • A/B testing automático (2+ prompts paralelos)
+   • Métricas comparativas:
+     * Conversion rate por prompt
+     * Engagement (mensajes por sesión)
+     * Satisfaction score (user feedback)
+     * Response quality (coherence, relevance)
+
+→ Pruebas 10 variantes prompt
+→ Prompt óptimo: "Eres experto compras online que ayuda 
+   a encontrar producto perfecto haciendo preguntas clave"
+→ Conversion rate: 5% → 12% (+140%)
+→ Cliente feliz (ROI triplicado)
+→ Renuevas contrato + upsell
+
+ROI: Optimización prompts = ROI cliente mejorado = renovación
+```
+
+**Capacidades Prompts:**
+- Versionado Git-like (diff, rollback)
+- A/B testing automático
+- Template library (best practices)
+- Variables parametrizables
+- Performance tracking por prompt
+
+---
+
+### **6. EVALUACIÓN ÍNDICES VECTOR: ¿Tu Vector DB es Óptima?**
+
+**Microservicio:** `leka-rag-evaluation`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+RAG knowledge base 100k documentos.
+Embeddings con text-embedding-3-large (3072 dim).
+Storage: 1.2 TB vectores.
+Coste Cloud: 500€/mes.
+Latency retrieval: 800ms (lento).
+
+→ Coste alto
+→ Latency mala (UX pobre)
+→ Cliente se queja
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Análisis optimización índices:
+   • Embedding model comparison (quality vs size vs speed)
+   • Quantization analysis (8-bit, 4-bit)
+   • Dimension reduction (PCA, UMAP)
+   • Index type optimization (HNSW params)
+   • Trade-off quality vs performance
+
+→ Testing quantization 8-bit:
+   * Storage reduction: 75% (1.2 TB → 300 GB)
+   * Coste Cloud: 500€/mes → 125€/mes (ahorro 375€/mes)
+   * Latency: 800ms → 200ms (4x faster)
+   * Quality loss: 2% (acceptable)
+
+→ Cliente feliz (coste bajo + latency buena)
+→ Ahorro anual: 4.500€
+
+ROI: Optimización índices = ahorro coste + mejor UX
+```
+
+**Análisis Disponibles:**
+- Embedding quality comparison
+- Quantization impact analysis
+- Dimension reduction trade-offs
+- Index parameter tuning
+- Storage + cost optimization
+
+---
+
+### **7. ADVERSARIAL ROBUSTNESS: ¿Tu IA Resiste Ataques?**
 
 **Microservicio:** `leka-adversarial-robustness`
 
+**CASO DE NEGOCIO:**
 ```
-✅ Tests adversariales:
+PROBLEMA:
+Sistema detección fraude tarjetas crédito.
+Funciona bien en testing (99% accuracy).
+Producción: defraudadores descubren cómo evadirlo 
+(pequeños cambios transacción → fraude no detectado).
+
+→ Fraudes no detectados: 200.000€ pérdidas/mes
+→ Cliente furioso
+→ Modelo inservible
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Adversarial testing ANTES de producción:
    • Evasion attacks (engañar modelo)
    • Poisoning attacks (envenenar datos)
    • Model inversion (extraer datos entrenamiento)
    • Backdoor attacks (puertas traseras)
+   • Jailbreak testing (LLMs)
 
-✅ Jailbreak detection (LLMs):
-   • Prompt injection attempts
-   • System prompt leaks
-   • Adversarial prompts
-   • Security testing
+→ Detectas vulnerabilidad evasion
+→ Entrenas modelo con ejemplos adversariales
+→ Re-testing: modelo robusto
+→ Producción: fraudes detectados correctamente
+→ Cliente ahorra 200.000€/mes
+
+ROI: Fraudes evitados vs pérdidas = enorme
 ```
-
-**Valor Agencias/Consultores:**
-> *"Art. 15.5 exige adversarial robustness testing. CodeflowX automatiza tests adversariales (evasion, poisoning, jailbreak) y genera informe compliance."*
 
 ---
 
@@ -286,62 +586,253 @@
 
 ---
 
-### **5. MONITORIZACIÓN POST-DESPLIEGUE (Art. 72)**
+---
 
-#### **5.1. Drift Detection**
+## 📡 PILAR 3: MONITORIZACIÓN Y AUDITORÍA EN TIEMPO REAL
 
-**Microservicio:** `leka-agent-monitoring`
+> **"Producción no es el final, es el principio. Monitorización = tranquilidad + mejora continua + protección reputación."**
 
-```
-✅ Data drift:
-   • Statistical tests (KS, Chi-Squared)
-   • Feature distribution changes
-   • Covariate shift detection
-   • Alertas automáticas
-
-✅ Concept drift:
-   • Performance degradation
-   • Accuracy drop detection
-   • Prediction distribution changes
-   • Retraining triggers
-
-✅ Model drift:
-   • Model behavior changes
-   • Output distribution shift
-   • Calibration degradation
-```
-
-**Valor Agencias/Consultores:**
-> *"Tu chatbot scoring crediticio puede degradarse con tiempo. CodeflowX detecta automáticamente drift (datos, concepto, modelo) y alerta para reentrenamiento."*
+La monitorización en tiempo real no es "nice to have". Es **tu sistema de alerta temprana que evita desastres antes que ocurran.**
 
 ---
 
-#### **5.2. Incident Management**
+### **8. DRIFT DETECTION: Detecta Degradación ANTES que Clientes se Quejen**
 
 **Microservicio:** `leka-agent-monitoring`
 
+**CASO DE NEGOCIO:**
 ```
-✅ Detección incidentes automática:
-   • Performance drops >10%
-   • Bias spikes detected
-   • Error rate increases
-   • Timeout/latency issues
+PROBLEMA:
+Chatbot scoring crediticio bancario en producción.
+Performance inicial: 95% accuracy.
+6 meses después: clientes se quejan scoring incorrecto.
+Investigas: accuracy degradó a 75% (patterns cambió, modelo obsoleto).
 
-✅ Root cause analysis:
-   • LLM-powered RCA
-   • Análisis logs automático
-   • Correlación eventos
+→ 6 meses decisiones incorrectas
+→ Clientes enfadados (préstamos rechazados incorrectamente)
+→ Pérdidas: 500.000€ (préstamos buenos rechazados)
+→ Reputación dañada
+→ Demandas clientes
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Drift detection automático 24/7:
+   • Data drift: distribución datos entrada cambia
+   • Concept drift: relación input-output cambia
+   • Model drift: comportamiento modelo cambia
+   • Alertas automáticas cuando accuracy < 90%
+
+→ Semana 2 post-deployment: alerta data drift detectado
+→ Reentrenar modelo con datos nuevos
+→ Accuracy recupera a 94%
+→ Cero impacto clientes
+→ Cero pérdidas
+→ Reputación intacta
+
+ROI: Pérdidas evitadas 500.000€ >> licencia CodeflowX
+```
+
+**Detección Disponible:**
+- Data drift (KS, Chi-Squared tests)
+- Concept drift (performance degradation)
+- Model drift (output distribution shift)
+- Feature distribution changes
+- Covariate shift detection
+- Alertas automáticas configurables
+
+---
+
+### **9. INCIDENT MANAGEMENT: De Crisis Reactiva a Gestión Proactiva**
+
+**Microservicio:** `leka-agent-monitoring`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Sistema IA detección fraude ecommerce.
+Viernes noche: spike error rate 30% (sistema caído parcialmente).
+Equipo técnico no trabaja fin de semana.
+Lunes detectan: 300 transacciones fraudulentas pasaron (20.000€ pérdidas).
+Root cause desconocido (logs confusos, sin correlación).
+
+→ 20.000€ fraudes no detectados
+→ 48h sistema degradado sin saber
+→ Cliente furioso
+→ 2 días debugging (root cause manual)
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Incident management automático:
+   • Detección automática anomalías (error rate > threshold)
+   • Alerta inmediata equipo (email, SMS, Slack)
+   • Root cause analysis LLM-powered (analiza logs automáticamente)
    • Recomendaciones mitigación
-
-✅ Reporting Art. 73:
-   • Formato compliance Art. 73 (incidentes graves)
-   • Notificación autoridad automatizada
    • Timeline incidente documentado
-   • Corrective actions tracking
+
+→ Viernes 10pm: alerta automática error rate spike
+→ RCA automática: API externa timeout (dependency issue)
+→ Recomendación: activar fallback API
+→ On-call activa fallback en 10 minutos
+→ Sistema recuperado
+→ Cero fraudes pasaron
+→ Cliente feliz
+
+ROI: Fraudes evitados 20.000€ + debugging time saved 2 días
 ```
 
-**Valor Agencias/Consultores:**
-> *"Art. 73 exige reportar incidentes graves. CodeflowX detecta automáticamente, analiza root cause con LLM y genera reporte formato compliance."*
+**Capacidades:**
+- Detección anomalías automática
+- Root cause analysis LLM
+- Alerting multi-canal (email, Slack, PagerDuty)
+- Incident timeline tracking
+- Corrective actions suggestions
+- Post-mortem automation
+
+---
+
+### **10. AUDITORÍA TIEMPO REAL: Tu Seguro contra Crisis Reputacionales**
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Chatbot RR.HH. screening candidatos.
+Candidato rechazado demanda por discriminación género.
+Abogado pide evidencias: ¿por qué rechazado?
+No tienes logs decisión (hace 8 meses, logs no guardados).
+Sin evidencia = pérdida demanda.
+
+→ Demanda perdida: 150.000€
+→ Reputación dañada (prensa: "IA discrimina")
+→ Cliente cancela contrato
+→ Otros clientes preocupados
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Auditoría completa tiempo real:
+   • Logging inmutable TODAS las decisiones
+   • Timestamp, input, output, modelo versión, usuario
+   • Hash chain (tamper-proof, no modificable)
+   • Retención 10 años
+   • Búsqueda instantánea cualquier decisión histórica
+
+→ Candidato demanda
+→ Búsqueda logs: decisión 15/03/2024 10:23am
+→ Evidencia completa:
+   * Input: CV candidato (pseudonimizado)
+   * Modelo: v2.3
+   * Scoring: 65/100 (threshold 70)
+   * Razones: experiencia insuficiente (2 años vs requerido 5)
+   * Bias metrics: DI ratio 0.92 (OK, no discriminación)
+   * Supervisor humano aprobó (María López)
+→ Abogado presenta evidencia
+→ Demanda desestimada
+→ Reputación protegida
+
+ROI: Demanda ganada vs perdida = 150.000€ diferencia
+```
+
+**Auditoría Disponible:**
+- Logging inmutable (hash chain)
+- Retención configurable (10 años default)
+- Búsqueda instantánea decisiones
+- OpenSearch analytics
+- Compliance GDPR Art. 17 (derecho olvido)
+- Export auditoría formato estándar
+
+---
+
+### **11. CONTINUOUS IMPROVEMENT: De Reactivo a Proactivo**
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+RAG documentación técnica producto.
+Métricas promedio: 
+- Time to answer: 12 segundos
+- User satisfaction: 3.2/5
+- Query resolution: 68%
+
+No sabes qué queries funcionan mal, qué docs faltan, cómo mejorar.
+Mejoras son prueba-error.
+
+→ Usuarios insatisfechos
+→ Improvement lento
+→ ROI bajo
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Analytics continuous improvement:
+   • Dashboard métricas tiempo real
+   • Query success rate por categoría
+   • Failed queries analysis (qué no responde bien)
+   • Document coverage gaps (docs que faltan)
+   • A/B testing prompts/modelos
+   • Performance trends (mejorando/empeorando)
+
+→ Detectas: queries producto "instalación" tienen 45% success (bajo)
+→ Razón: docs instalación desactualizados
+→ Actualizas docs instalación
+→ Re-testing: success rate 85%
+→ User satisfaction: 3.2 → 4.1/5
+→ Cliente feliz (ROI mejorado)
+
+ROI: Mejora continua = user satisfaction up = ROI cliente up = renovación
+```
+
+**Analytics Disponible:**
+- Dashboard tiempo real métricas
+- Success rate por categoría
+- Failed queries analysis
+- Performance trends (weekly, monthly)
+- A/B testing results
+- Cost optimization recommendations
+
+---
+
+### **12. AUDITORÍA COMPLIANCE AUTOMÁTICA: Tranquilidad Regulatoria**
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Cliente enterprise usando tu chatbot RR.HH.
+Auditor regulador pide evidencia compliance EU AI Act:
+- Art. 10: ¿datos sin sesgo?
+- Art. 12: ¿logs decisiones?
+- Art. 13: ¿transparencia candidatos?
+- Art. 14: ¿supervisión humana?
+
+Manual: 2 semanas recopilar evidencias (si existen).
+
+→ Auditoría costosa
+→ Estrés enorme
+→ Riesgo finding compliance gaps
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Audit pack exportable 1-click:
+   • Documentación Anexo IV completa
+   • Bias metrics reports (Art. 10)
+   • Logging inmutable (Art. 12)
+   • Transparencia evidencia (Art. 13)
+   • HITL workflows documentados (Art. 14)
+   • Declaración UE conformidad (Anexo V)
+   • Export Art. 71 DB
+   • Todo formato PDF + JSON
+
+→ Auditor pide evidencias
+→ Export audit pack: 10 minutos
+→ Auditor satisfecho (evidencia completa)
+→ Auditoría exitosa: cero findings
+→ Cliente tranquilo
+→ Reputación protegida
+
+ROI: Auditoría exitosa vs fallida = crítico
+```
 
 ---
 
@@ -732,95 +1223,6 @@ CON CodeflowX:
 
 ---
 
-## 💰 MODELOS PRICING AGENCIAS/CONSULTORES
-
-### **Tier 1: BÁSICA - 1.200€/año**
-
-**Target:** Chatbots riesgo limitado (FAQ, soporte, reservas)
-
-**Incluye:**
-- Templates transparencia Art. 50
-- Checklist compliance riesgo limitado
-- Documentación básica
-- 1 proyecto
-
-**Ideal para:**
-- Chatbot ecommerce FAQ
-- Bot WhatsApp soporte
-- Chatbot reservas citas
-- Agente ventas conversacional (no scoring)
-
----
-
-### **Tier 2: PROFESIONAL - 12.000€/año**
-
-**Target:** 1-2 sistemas alto riesgo pequeños
-
-**Incluye:**
-- Documentación Anexo IV automatizada (1 sistema)
-- Bias detection básico (10 métricas)
-- Logging inmutable
-- Evaluación conformidad asistida
-- Soporte email
-
-**Ideal para:**
-- Consultor freelance con 1-2 clientes alto riesgo
-- Startup con MVP alto riesgo
-
----
-
-### **Tier 3: ENTERPRISE - 24.000€/año** ⭐ **MÁS POPULAR**
-
-**Target:** Agencias/software houses con múltiples clientes
-
-**Incluye:**
-- Documentación Anexo IV automatizada (hasta 5 sistemas)
-- Bias detection avanzado (20+ métricas)
-- Explicabilidad (SHAP/LIME)
-- HITL workflows
-- Drift detection 24/7
-- Evaluación conformidad + Declaración UE
-- Export Art. 71 DB
-- Incident management
-- Soporte técnico prioritario
-- Onboarding 1 semana incluido
-
-**Ideal para:**
-- Agencias con 3-10 clientes alto riesgo/año
-- Software houses con portafolio sistemas IA
-- Integradores con práctica IA
-
-**ROI:**
-```
-Inversión: 24.000€/año
-Por cliente:
-- Precio adicional compliance: +3.000€
-- 8 clientes/año x 3.000€ = 24.000€
-→ Break-even 8 clientes
-→ Cliente 9+ = profit puro
-```
-
----
-
-### **Tier 4: SECTORES CRÍTICOS - 36.000€/año**
-
-**Target:** HealthTech, LegalTech, FinTech
-
-**Incluye:**
-- Todo Tier 3 +
-- Accuracy tracking crítico (life-critical/money-critical)
-- Compliance sectorial (GDPR salud, regulación financiera)
-- Consultoría legal incluida (4h/mes)
-- Auditoría compliance incluida (1x año)
-- Soporte 24/7
-
-**Ideal para:**
-- Startups HealthTech (triaje salud, diagnóstico)
-- LegalTech (RAG legal con decisiones automáticas)
-- FinTech (scoring crediticio, detección fraude)
-
----
-
 ## 📊 COMPARATIVA COMPETENCIA
 
 | Característica | CodeflowX | Weights & Biases | MLflow | Azure ML Governance | AWS SageMaker Governance |
@@ -835,18 +1237,19 @@ Por cliente:
 | **Logging inmutable** | ✅ Hash chain | ❌ No | ⚠️ Básico | ⚠️ Básico | ⚠️ Básico |
 | **Self-hosted** | ✅ Sí | ❌ No (solo cloud) | ✅ Sí | ❌ No | ❌ No |
 | **EU AI Act focus** | ✅ 100% diseñado | ❌ No | ❌ No | ⚠️ Parcial | ⚠️ Parcial |
-| **Pricing agencias** | ✅ 1.2k€ - 36k€ | 💰 >100k€/año | ✅ Open source (self-manage) | 💰 >50k€/año | 💰 >50k€/año |
 
 ### **Posicionamiento Único CodeflowX:**
 
 ```
+✅ ÚNICO con gobierno comprehensive (datos + modelos + prompts + RAG + índices)
+✅ ÚNICO con evaluación end-to-end (ML + LLMs + RAG + adversarial)
+✅ ÚNICO con monitorización tiempo real + auditoría inmutable
 ✅ ÚNICO con documentación Anexo IV automatizada
 ✅ ÚNICO con Declaración UE Anexo V automatizada
 ✅ ÚNICO con export Art. 71 DB UE 1-click
 ✅ ÚNICO con HITL workflows BPMN integrados
-✅ ÚNICO con logging inmutable hash chain
-✅ ÚNICO diseñado 100% para EU AI Act
-✅ ÚNICO con pricing accesible agencias/consultores (1.2k€ vs 100k€)
+✅ ÚNICO con logging inmutable hash chain tamper-proof
+✅ ÚNICO diseñado 100% para EU AI Act desde día uno
 ```
 
 ---
@@ -906,43 +1309,20 @@ Por cliente:
 
 ---
 
-## 📞 CONTACTO Y PRÓXIMOS PASOS
+## 📞 CONTACTO COMERCIAL
 
-### **Opción 1: Demo 30 Minutos**
-
-**Contenido demo:**
-- Walkthrough plataforma CodeflowX
-- Demo en vivo: generar documentación Anexo IV
-- Demo en vivo: bias detection 20+ métricas
-- Demo en vivo: explicabilidad SHAP
-- Q&A
-
-**Agenda:** [LINK CALENDLY]
-
----
-
-### **Opción 2: Free Trial 14 Días**
-
-**Incluye:**
-- Acceso completo plataforma (Docker Compose local)
-- Catalogar 1 sistema IA gratis
-- Generar documentación Anexo IV
-- Testing bias detection
-- Soporte técnico trial
-
-**Registro:** [LINK TRIAL]
-
----
-
-### **Opción 3: Propuesta Comercial Personalizada**
+### **Propuesta Personalizada**
 
 **Proceso:**
-1. Reunión discovery 30 min (conocer tus sistemas IA)
-2. Análisis compliance gaps
-3. Calculadora ROI personalizada
-4. Propuesta comercial escrita (precio, timeline, deliverables)
+1. **Reunión discovery** (30-45 min): Conocer tus sistemas IA y necesidades específicas
+2. **Análisis compliance gaps**: Identificar dónde estás y qué necesitas
+3. **Calculadora ROI personalizada**: Cuantificar ahorro y beneficios específicos
+4. **Propuesta comercial escrita**: Precio, timeline, deliverables, soporte
 
-**Contacto:** sales@codeflowx.ai
+**Contacto:**
+- Email: sales@codeflowx.ai
+- Web: www.codeflowx.ai
+- Teléfono: +34 XXX XXX XXX
 
 ---
 
@@ -971,11 +1351,29 @@ Por cliente:
 
 ### **Para Agencias/Consultores:**
 
-> **"CodeflowX no es un gasto, es una inversión que se paga sola. Con 8 clientes/año (+3.000€ cada uno por compliance), recuperas los 24.000€ de licencia. A partir del cliente 9, es profit puro. Además, evitas demandas (50.000€+), ganas deals vs competencia y escalas tu negocio 5x. ¿Empezamos con una demo 30 min?"**
+> **"CodeflowX te permite desarrollar IA con confianza: sabes que funciona bien, detectas problemas antes que clientes, mejoras continuamente con datos objetivos, y escalas tu negocio sin miedo. Además, cumples EU AI Act automáticamente."**
 
 ### **Diferenciador Clave:**
 
-> **"Aunque uses GPT-4 API, si desarrollas y entregas chatbot/agente/RAG a cliente, TÚ eres PROVEEDOR. Tienes obligaciones AI Act Art. 16-21. Deadline Agosto 2026 (9 meses). Sin compliance = prohibición vender + multas 35M€. CodeflowX te hace compliance-ready en 3 meses vs 16 meses manual. First-mover wins."**
+> **"Gobierno + Evaluación + Monitorización no es burocracia. Es tu seguro contra desastres: evitas proyectos fallidos, detectas problemas antes que clientes, proteges tu reputación, y demuestras profesionalidad. Una sola demanda evitada (150.000€) o proyecto salvado (30.000€) paga años de licencia."**
+
+### **Valor de Negocio:**
+
+```
+SIN CodeflowX:
+→ Proyectos fallidos (modelo no funciona)
+→ Clientes insatisfechos (performance degrada)
+→ Demandas (sesgo no detectado)
+→ Reputación dañada (incidentes públicos)
+→ No escalas (cada proyecto es único, calidad variable)
+
+CON CodeflowX:
+→ Proyectos exitosos (evalúas exhaustivamente antes release)
+→ Clientes felices (monitorización proactiva)
+→ Cero demandas (evidencia auditoría completa)
+→ Reputación protegida (detectas problemas antes)
+→ Escalas 5x (procesos repetibles, calidad garantizada)
+```
 
 ---
 
