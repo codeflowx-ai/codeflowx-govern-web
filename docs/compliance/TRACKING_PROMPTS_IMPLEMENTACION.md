@@ -24,15 +24,15 @@
 | **PROMPTS_07** | 47 prompts | 0 | 47 | 0% ⏳ |
 | **PROMPTS_08** | 22 entities | 1 | 21 | 5% ⏳ |
 | **PROMPTS_09** | 12 workflows | 0 | 12 | 0% ⏳ |
-| **PROMPTS_10** | 13 microservicios | 0 | 13 | 0% ⏳ |
+| **PROMPTS_10** | 10 prompts | 5 | 5 | 50% ⚠️ |
 | **PROMPTS_11** | 15 prompts | 0 | 15 | 0% ⏳ |
 | **PROMPTS_12** | 12 prompts | 0 | 12 | 0% ⏳ |
 | **PROMPTS_13** | 8 prompts | 0 | 8 | 0% ⏳ |
 | **PROMPTS_14** | 12 prompts | 0 | 12 | 0% ⏳ |
 
-**TOTAL ACTUALIZADO:** ~194 prompts  
-**Implementados:** ~36 prompts (19%)  
-**Pendientes:** ~158 prompts (81%)
+**TOTAL ACTUALIZADO:** ~191 prompts  
+**Implementados:** ~41 prompts (21%)  
+**Pendientes:** ~150 prompts (79%)
 
 ---
 
@@ -601,7 +601,7 @@ Los microservicios que estaban listados anteriormente en el tracking (leka-adver
 | **Java Services (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java ViewModels (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java Entities Nuevas (05, 08)** | 34 | 2 | 32 | 6% ⏳ |
-| **Python Microservicios (01, 02, 10)** | 28 | 16 | 12 | 57% ⚠️ |
+| **Python Microservicios (01, 02, 10)** | 25 | 21 | 4 | 84% ⚠️ |
 | **BPMN Workflows (04, 09)** | 27 | 3 | 24 | 11% ⏳ |
 | **GPAI Specific (06)** | 6 | 0 | 6 | 0% ⏳ |
 
@@ -621,11 +621,11 @@ Los microservicios que estaban listados anteriormente en el tracking (leka-adver
 ## TOTAL ABSOLUTO:
 
 ```
-████░░░░░░░░░░░░░░░░ 19% COMPLETADO
+█████░░░░░░░░░░░░░░░ 21% COMPLETADO
 
-✅ Implementado:  ~36 prompts
-⏳ Pendiente:     ~158 prompts
-📊 Total:         ~194 prompts
+✅ Implementado:  ~41 prompts
+⏳ Pendiente:     ~150 prompts
+📊 Total:         ~191 prompts
 ```
 
 ---
