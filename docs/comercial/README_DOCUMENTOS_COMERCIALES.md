@@ -6,7 +6,7 @@
 
 ---
 
-## 📚 DOCUMENTOS DISPONIBLES (5 + Formatos Word)
+## 📚 DOCUMENTOS DISPONIBLES (6 + Formatos Word)
 
 ### **1. EU AI ACT TIMELINE Y FASES CODEFLOWX**
 
@@ -179,6 +179,43 @@
 
 ---
 
+### **6. OPORTUNIDAD DE NEGOCIO ESPAÑA NOVIEMBRE 2025**
+
+**Archivos:**
+- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md` (42 KB)
+- `OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx` (28 KB) ← **Word**
+
+**Contenido:**
+- **Por qué es AHORA el momento** (5 factores críticos confluyen)
+- **Estadísticas mercado España con fuentes oficiales:**
+  * 2.000M€ inversión IA 2020-2025 (Invest in Spain)
+  * 50% empresas usan IA = 1,5M empresas (ONTSI, NotimericA)
+  * 81% prioridad estratégica 2025 (BCG)
+  * 44% grandes empresas usan IA (ONTSI)
+  * Madrid líder 30,1% adopción (Comunidad Madrid)
+  * PYMEs 99,8% tejido empresarial (INDESIA)
+- **Tamaño mercado cuantificado:**
+  * TAM: 720M€ (60k-80k empresas)
+  * SAM 3 años: 108M€ (15% penetración)
+  * SOM Año 1: 7,2M€ (600 clientes)
+- **Segmentación target detallada:**
+  * Software houses + Consultoras: 5.450 empresas (87,2M€ TAM)
+  * Agencias marketing: 5.450 empresas (43,6M€ TAM)
+  * Startups tech/IA: 3.110 empresas (62,2M€ TAM)
+  * Integradores: 1.120 empresas (20,2M€ TAM)
+- **Proyección financiera 3 años** (conservador vs optimista)
+- **Estrategia go-to-market por fases** (Early Adopters → Early Majority → Late Majority)
+- **Breakdown por comunidad autónoma** (Madrid 30%, Cataluña 25%, Resto 45%)
+- **Comparativa España vs Europa** (5º país pero top 3 adopción)
+- **Ventana first-mover:** 4-6 meses (Nov 2025 - Abr 2026)
+- **Fuentes oficiales:** 7 fuentes citadas (INE, ONTSI, Dealroom, BCG, etc.)
+
+**Uso:** Justificar oportunidad mercado + timing perfecto + urgencia actuación
+
+**Audiencia:** Dirección/C-level (decisión estratégica lanzamiento)
+
+---
+
 ## 🎯 GUÍA DE USO POR FASE VENTA
 
 ### **FASE 1: AWARENESS (Prospecto frío)**
@@ -247,8 +284,9 @@
 | **Proveedor vs Deployer** | 866 líneas | 25 KB | Enterprise | Consideration | Identificar rol |
 | **Casos Uso Agencias** | 1602 líneas | 34 KB | Agencias/Consultores | Consideration | Casos específicos |
 | **Plataforma Ejecutivo** | 1748 líneas | 35 KB | Todos | Evaluation | Valor completo |
+| **Oportunidad España** | 1097 líneas | 28 KB | Dirección/C-level | Estratégico | Justificar mercado |
 
-**TOTAL:** 5 documentos en Markdown + Word
+**TOTAL:** 6 documentos en Markdown + Word
 
 ---
 
@@ -371,10 +409,10 @@ docs/comercial/
 
 ### **Material Disponible:**
 ```
-✅ 5 documentos técnico-comerciales completos
+✅ 6 documentos técnico-comerciales completos
 ✅ Formatos Markdown (editable) + Word (distribución)
-✅ Total: ~5.600 líneas documentación
-✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma
+✅ Total: ~6.600 líneas documentación
+✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado
 ```
 
 ### **Argumentación Preparada Para:**
