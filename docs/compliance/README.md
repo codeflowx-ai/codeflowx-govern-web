@@ -452,3 +452,115 @@ Datos: NO se mueven (solo metadata/métricas)
 - PROMPT 10 (Orquestación)
 - PROMPT 11 (BPMN approval workflow)
 
+
+---
+
+### 📄 PROMPTS_14_INTEGRACION_EXTENSIONES_POSTGRESQL.md 🌟💾
+
+**Objetivo:** Integrar las 17 extensiones PostgreSQL instaladas en tablas, vistas y queries existentes  
+**Total Prompts:** 12 prompts  
+**Implementados:** 0  
+**Pendientes:** 12  
+**% Completo:** 0% ⏳  
+**Prioridad:** 🟡 **ALTA (Compliance + Performance)**
+
+**Extensiones críticas:**
+- **uuid-ossp** → UUIDs automáticos (TODAS las tablas)
+- **pgcrypto** → Hash chains logs inmutables (Art. 19 AI Act)
+- **timescaledb** → Series temporales (compresión 10x)
+- **vector** → Embeddings RAG (búsqueda semántica)
+- **ltree** → Linaje modelos GPAI (Art. 53)
+- **pg_trgm** → Búsqueda difusa (tolerante typos)
+- **hstore** → Metadatos flexibles
+- **btree_gin/gist** → Índices optimizados
+
+**Prompts grupos:**
+- **Grupo 1 (3):** uuid-ossp + pgcrypto → Audit logs inmutables
+- **Grupo 2 (2):** ltree → Linaje modelos GPAI Art. 53
+- **Grupo 3 (2):** timescaledb → Hypertables + continuous aggregates
+- **Grupo 4 (1):** pgvector → Embeddings RAG
+- **Grupo 5 (1):** pg_trgm → Búsqueda fuzzy
+- **Grupo 6 (1):** hstore → Metadatos dinámicos
+- **Grupo 7 (1):** btree_gin/gist → Índices compuestos
+- **Grupo 8 (1):** Funciones utilidad
+
+**Compliance AI Act:**
+- ✅ **Art. 19:** Hash chains criptográficos (pgcrypto) → logs inmutables
+- ✅ **Art. 53:** Linaje GPAI (ltree) → documentar modificaciones sustanciales
+- ✅ **Art. 15:** Retención logs 10 años comprimido (timescaledb)
+- ✅ **Art. 13:** RAG instrucciones de uso (pgvector)
+
+**Rendimiento:**
+- 📈 **10x compresión** datos > 90 días (timescaledb)
+- 📈 **100x queries** más rápidas (continuous aggregates)
+- 📈 **Búsqueda semántica** sub-segundo (pgvector HNSW índices)
+- 📈 **Búsqueda fuzzy** tolerante typos (pg_trgm)
+
+**Documentación arquitectura:**
+- 📖 `/docs/arquitectura/POSTGRESQL_EXTENSIONES_COMPLETAS.md` (80 KB) → Explicación extensiones
+- 📖 `/docs/arquitectura/POSTGRESQL_QUERIES_VISTAS_OPTIMIZADAS.md` (65 KB) → Queries y vistas
+
+**Tablas críticas afectadas:**
+```sql
+cor_auditlog           → Hash chain + hypertable (Art. 19)
+cor_model_lineage      → ltree path (Art. 53 GPAI)
+eval_modelmetrics      → Hypertable (series temporales)
+rag_chunks             → vector(1536) embeddings
+gov_prompt             → pg_trgm índice búsqueda
+cor_model              → hstore hyperparameters
+```
+
+**Validación incluida:**
+- ✅ Script verificación integridad hash chain
+- ✅ Función `verify_audit_chain()` → detectar manipulación
+- ✅ Queries linaje completo (ancestros + descendientes)
+- ✅ Continuous aggregates (métricas diarias auto-refresh)
+- ✅ Test RAG búsqueda semántica
+
+**Estimación:** 4-6 horas  
+**Impacto:** 🟢 **Compliance** (Art. 19, 53) + 🟢 **Performance** (10-100x mejora)
+
+**Prompts críticos (🔴):**
+- PROMPT 14.2: Audit logs hash chain (Art. 19 - **CRÍTICO LEGAL**)
+- PROMPT 14.4: Linaje modelos ltree (Art. 53 GPAI - **CRÍTICO LEGAL**)
+- PROMPT 14.6: Hypertables (performance - **CRÍTICO PROD**)
+
+**Referencias:**
+- Documentación completa: `docs/arquitectura/POSTGRESQL_*`
+- Ejemplos SQL: Todas las vistas, funciones y triggers incluidos
+- ViewModel Java: Ejemplos integración ZKoss
+
+---
+
+## 📊 RESUMEN INVENTARIO PROMPTS
+
+**Total documentos:** 14  
+**Total prompts:** 185  
+**Implementados:** 17 (PROMPTS_01 base + PROMPTS_03 completo)  
+**Pendientes:** 168  
+**% Progreso global:** ~9%
+
+**Distribución por tecnología:**
+- **Python:** 45 prompts (PROMPTS_01, 02, 10)
+- **Java:** 34 prompts (PROMPTS_03 ✅, 05, 08)
+- **BPMN:** 12 prompts (PROMPTS_09)
+- **MLOps:** 6 prompts (PROMPTS_06)
+- **Infraestructura:** 27 prompts (PROMPTS_11, 12)
+- **Data/Mock:** 8 prompts (PROMPTS_13)
+- **Database:** 12 prompts (PROMPTS_14) 🌟 **NUEVO**
+- **Deprecated:** 47 prompts (PROMPTS_07 → reemplazado)
+
+**Prioridades críticas:**
+1. 🔴 **PROMPTS_14** (Database) → Compliance Art. 19/53 + Performance
+2. 🔴 **PROMPTS_12** (Conectores) → 4x mercado accesible
+3. 🔴 **PROMPTS_11** (Infraestructura) → Stack completo operativo
+4. 🟡 **PROMPTS_08** (Java Multi-Framework) → ISO/OECD compliance
+5. 🟡 **PROMPTS_10** (Python Multi-Framework) → Extensión microservicios
+
+**Roadmap Q1 2025:**
+- Semana 1-2: PROMPTS_14 + PROMPTS_11 (Database + Infra)
+- Semana 3-4: PROMPTS_12 (Conectores enterprise)
+- Semana 5-8: PROMPTS_08 + PROMPTS_09 + PROMPTS_10 (Multi-Framework)
+- Semana 9-10: PROMPTS_13 (Mock data + Ollama)
+- Semana 11-12: PROMPTS_05 + PROMPTS_06 (Nuevas entidades + GPAI)
+
