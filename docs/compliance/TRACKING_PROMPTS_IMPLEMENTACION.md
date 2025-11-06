@@ -28,10 +28,11 @@
 | **PROMPTS_11** | 15 prompts | 0 | 15 | 0% ⏳ |
 | **PROMPTS_12** | 12 prompts | 0 | 12 | 0% ⏳ |
 | **PROMPTS_13** | 8 prompts | 0 | 8 | 0% ⏳ |
+| **PROMPTS_14** | 12 prompts | 0 | 12 | 0% ⏳ |
 
-**TOTAL ACTUALIZADO:** ~182 prompts  
-**Implementados:** ~33 prompts (18%)  
-**Pendientes:** ~149 prompts (82%)
+**TOTAL ACTUALIZADO:** ~194 prompts  
+**Implementados:** ~33 prompts (17%)  
+**Pendientes:** ~161 prompts (83%)
 
 ---
 
@@ -623,11 +624,11 @@
 ## TOTAL ABSOLUTO:
 
 ```
-████░░░░░░░░░░░░░░░░ 22% COMPLETADO
+████░░░░░░░░░░░░░░░░ 17% COMPLETADO
 
 ✅ Implementado:  ~33 prompts
-⏳ Pendiente:     ~114 prompts
-📊 Total:         ~147 prompts
+⏳ Pendiente:     ~161 prompts
+📊 Total:         ~194 prompts
 ```
 
 ---
