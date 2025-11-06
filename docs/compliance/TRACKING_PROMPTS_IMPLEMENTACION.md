@@ -564,30 +564,85 @@ Los microservicios que estaban listados anteriormente en el tracking (leka-adver
 # PROMPTS_10 - PYTHON MULTI-FRAMEWORK CONSOLIDADO (13 microservicios)
 
 **Documento:** `PROMPTS_10_PYTHON_MULTI_FRAMEWORK_CONSOLIDADO.md`  
-**Objetivo:** Extensiones Python multi-framework  
-**Estado:** ⏳ 0% (0/13)
+**Objetivo:** Extensiones Python multi-framework + Nuevos microservicios necesarios  
+**Estado:** ⚠️ 50% (5/10)
 
-## Checklist Extensiones Python:
+**NOTA:** Documento CONSOLIDADO que evita duplicados con PROMPTS_01/02
 
-- [ ] **1. leka-llm-evaluation** - GDPR compliance features
-- [ ] **2. leka-bias-detection** - Fairness ISO metrics
-- [ ] **3. leka-prompt-governance** - GDPR PII enhancements
-- [ ] **4. leka-rag-evaluation** - Transparency metrics
-- [ ] **5. leka-agent-monitoring** - ISO 42001 monitoring
-- [ ] **6. leka-model-wrapper** - Multi-framework support
-- [ ] **7. leka-orchestrator** - Governance routing
-- [ ] **8. leka-data-lineage-tracker** (NUEVO)
-  - Data lineage Art. 10
-- [ ] **9. leka-adversarial-testing** (NUEVO)
-  - Art. 15.5 adversarial
-- [ ] **10. leka-explainability-service** (NUEVO)
-  - SHAP/LIME Art. 22
-- [ ] **11. leka-gdpr-compliance** (NUEVO)
-  - GDPR automation
-- [ ] **12. leka-iso-reporter** (NUEVO)
-  - ISO compliance reporting
-- [ ] **13. leka-multi-framework-dashboard** (NUEVO)
-  - Dashboard multi-framework
+## GRUPO PC1: Extensiones a Microservicios Existentes (5/5) ✅
+
+Estas extensiones se añaden sobre microservicios ya implementados en PROMPTS_01/02:
+
+- [x] **PC1.1** - Extender leka-prompt-governance (8003)
+  - GDPR PII Database Scan
+  - Añadido sobre PROMPTS_01 A.3
+  - **Estado:** ✅ Implementado (base en PROMPTS_01)
+  - **Esfuerzo adicional:** +1 día
+
+- [x] **PC1.2** - Extender leka-technical-documentation-generator (8008)
+  - GDPR Privacy Notice, ISO 42001 Audit Report, ROPA
+  - Añadido sobre PROMPTS_02 Prompt 1
+  - **Estado:** ✅ Implementado (base en PROMPTS_02)
+  - **Esfuerzo adicional:** +2 días
+
+- [x] **PC1.3** - Extender leka-llm-evaluation (8002)
+  - OECD Trustworthiness Score (5 principios)
+  - Añadido sobre PROMPTS_01 A.2
+  - **Estado:** ✅ Implementado (base en PROMPTS_01)
+  - **Esfuerzo adicional:** +0.5 día
+
+- [x] **PC1.4** - Extender leka-rag-evaluation (8004)
+  - KB Sustainability metrics (CO2, storage)
+  - Añadido sobre PROMPTS_01 B.1
+  - **Estado:** ✅ Implementado (base en PROMPTS_01)
+  - **Esfuerzo adicional:** +0.5 día
+
+- [x] **PC1.5** - Extender leka-model-wrapper (8006)
+  - ISO 42001 Model Compliance Score (Annex A controls)
+  - Añadido sobre PROMPTS_01 C.2
+  - **Estado:** ✅ Implementado (base en PROMPTS_01)
+  - **Esfuerzo adicional:** +0.5 día
+
+## GRUPO PC2: Nuevos Microservicios Necesarios (0/5) ⏳
+
+- [ ] **PC2.1** - leka-multi-framework-compliance-aggregator (Puerto 8060)
+  - Agregador compliance scores todos frameworks
+  - Weighted scoring, gaps identification
+  - **Estado:** ⏳ Pendiente
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Esfuerzo:** 2 días
+
+- [ ] **PC2.2** - leka-iso42001-annex-a-assessor (Puerto 8030)
+  - Evaluador 39 controles Anexo A ISO 42001
+  - Assessment automático + gap analysis
+  - **Estado:** ⏳ Pendiente
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Esfuerzo:** 2 días
+
+- [ ] **PC2.3** - leka-board-governance-calculator (Puerto 8061)
+  - Métricas board-level ISO 38507 EDM
+  - Executive dashboard metrics
+  - **Estado:** ⏳ Pendiente
+  - **Prioridad:** 🟡 MEDIA
+  - **Esfuerzo:** 1.5 días
+
+- [ ] **PC2.4** - leka-sustainability-metrics (Puerto 8062)
+  - CO2, energy, water footprint IA (OECD)
+  - Optimization recommendations
+  - **Estado:** ⏳ Pendiente
+  - **Prioridad:** 🟢 BAJA (ESG nice-to-have)
+  - **Esfuerzo:** 2 días
+
+- [ ] **PC2.5** - leka-ethics-risk-assessor (Puerto 8063)
+  - Ethics + fundamental rights assessment
+  - ISO 38507, OECD Principle 2, Art. 27 FRIA support
+  - **Estado:** ⏳ Pendiente
+  - **Prioridad:** 🟡 MEDIA
+  - **Esfuerzo:** 2 días
+
+**COMPLETADO:** 5/10 (50%) - Extensiones completadas, nuevos pendientes
+
+**ESFUERZO RESTANTE:** 9.5 días (nuevos) | 3-4 días con 3 chats paralelos
 
 ---
 
