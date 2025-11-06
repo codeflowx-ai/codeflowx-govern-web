@@ -16,7 +16,7 @@
 | Documento | Total Prompts | Implementados | Pendientes | % Completo |
 |-----------|---------------|---------------|------------|------------|
 | **PROMPTS_01** | ~10 extensiones | ~10 | 0 | **100%** ✅ |
-| **PROMPTS_02** | 5 microservicios | 2 | 3 | 40% ⚠️ |
+| **PROMPTS_02** | 5 microservicios | 5 | 0 | **100%** ✅ |
 | **PROMPTS_03** | 7 prompts | 7 | 0 | **100%** ✅ |
 | **PROMPTS_04** | ~15 workflows | ~3 | ~12 | 20% ⏳ |
 | **PROMPTS_05** | ~12 entities | 0 | ~12 | 0% ⏳ |
@@ -31,8 +31,8 @@
 | **PROMPTS_14** | 12 prompts | 0 | 12 | 0% ⏳ |
 
 **TOTAL ACTUALIZADO:** ~194 prompts  
-**Implementados:** ~33 prompts (17%)  
-**Pendientes:** ~161 prompts (83%)
+**Implementados:** ~36 prompts (19%)  
+**Pendientes:** ~158 prompts (81%)
 
 ---
 
@@ -94,15 +94,15 @@
 
 **Documento:** `PROMPTS_02_PYTHON_MICROSERVICIOS_NUEVOS.md`  
 **Objetivo:** Crear nuevos microservicios Python  
-**Estado:** ⏳ 40% (2/5)
+**Estado:** ✅ **100% COMPLETADO** (5/5)
 
 ## Checklist Microservicios Nuevos:
 
-- [ ] **1. leka-technical-documentation-generator** (Puerto 8008)
+- [x] **1. leka-technical-documentation-generator** (Puerto 8008)
   - Generación Anexo IV completo (9 secciones)
   - Validación completitud obligatoria
   - Formatos: Markdown, HTML, PDF
-  - **Estado:** ⏳ Diseñado, no implementado
+  - **Estado:** ✅ Implementado
   - **Prioridad:** 🔴 CRÍTICA (necesario para Anexo IV)
   - **Esfuerzo:** 3-4 días
 
@@ -114,11 +114,11 @@
   - **Prioridad:** 🟡 Media-Alta
   - **Esfuerzo:** 2-3 días
 
-- [ ] **3. leka-eu-declaration-generator** (Puerto 8010)
+- [x] **3. leka-eu-declaration-generator** (Puerto 8010)
   - Declaración UE Conformidad Anexo V (8 elementos)
   - Multi-idioma (ES, EN, FR, DE)
   - PDF formato oficial UE
-  - **Estado:** ⏳ Diseñado, no implementado
+  - **Estado:** ✅ Implementado
   - **Prioridad:** 🔴 CRÍTICA
   - **Esfuerzo:** 2 días
 
@@ -130,21 +130,18 @@
   - **Prioridad:** 🔴 CRÍTICA
   - **Esfuerzo:** 3 días
 
-- [ ] **5. leka-copyright-compliance** (Puerto 8013)
+- [x] **5. leka-copyright-compliance** (Puerto 8013)
   - Verificación copyright datos entrenamiento GPAI
   - TDM opt-out detection (Directiva 2019/790)
   - License tracking y expiry warnings
-  - **Estado:** ⏳ Diseñado, no implementado
+  - **Estado:** ✅ Implementado
   - **Prioridad:** 🟡 Media (Fase II GPAI)
   - **Esfuerzo:** 2-3 días
 
-**COMPLETADO:** 2/5 microservicios (40%)
+**COMPLETADO:** ✅ 5/5 microservicios (100%)
 
-**CRÍTICO PENDIENTE:**
-- leka-technical-documentation-generator (Anexo IV) - 🔴 CRÍTICA
-- leka-eu-declaration-generator (Anexo V) - 🔴 CRÍTICA
-
-**TOTAL ESFUERZO RESTANTE:** 7-9 días secuencial | 3-4 días con 3 chats paralelos
+**NOTA IMPORTANTE:**
+Los microservicios que estaban listados anteriormente en el tracking (leka-adversarial-robustness, leka-data-lineage, leka-explainability, leka-server-documents, leka-compliance-reporter) están documentados en **PROMPTS_01** (extensiones microservicios existentes) o en otros documentos específicos.
 
 ---
 
@@ -604,7 +601,7 @@
 | **Java Services (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java ViewModels (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java Entities Nuevas (05, 08)** | 34 | 2 | 32 | 6% ⏳ |
-| **Python Microservicios (01, 02, 10)** | 28 | 13 | 15 | 46% ⚠️ |
+| **Python Microservicios (01, 02, 10)** | 28 | 16 | 12 | 57% ⚠️ |
 | **BPMN Workflows (04, 09)** | 27 | 3 | 24 | 11% ⏳ |
 | **GPAI Specific (06)** | 6 | 0 | 6 | 0% ⏳ |
 
@@ -624,10 +621,10 @@
 ## TOTAL ABSOLUTO:
 
 ```
-████░░░░░░░░░░░░░░░░ 17% COMPLETADO
+████░░░░░░░░░░░░░░░░ 19% COMPLETADO
 
-✅ Implementado:  ~33 prompts
-⏳ Pendiente:     ~161 prompts
+✅ Implementado:  ~36 prompts
+⏳ Pendiente:     ~158 prompts
 📊 Total:         ~194 prompts
 ```
 
