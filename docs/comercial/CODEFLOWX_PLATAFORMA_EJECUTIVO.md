@@ -112,6 +112,9 @@ BENEFICIO 4: ESCALAS CONFIABLEMENTE
 | **Workflows** | Camunda BPMN 2.0 | Procesos governance |
 | **Reglas** | Drools | Políticas as code |
 | **Microservicios** | FastAPI (Python) | Análisis IA especializado |
+| **Servidores Inferencia** | leka-llm-interpreter | LLMs locales + wrappers comerciales |
+| **Servidor RAG** | leka-rag-evaluation | RAG end-to-end propio |
+| **Model Wrapper** | leka-model-wrapper | Integración multi-framework |
 | **Base Datos** | PostgreSQL + TimescaleDB + pgvector | ACID + time-series + embeddings |
 | **Vector DB** | Qdrant | RAG + similarity search |
 | **Object Storage** | MinIO (S3-compatible) | Modelos, datasets, docs |
@@ -119,7 +122,109 @@ BENEFICIO 4: ESCALAS CONFIABLEMENTE
 | **Cache** | Redis | Performance |
 | **Message Broker** | RabbitMQ | Eventos asíncronos |
 | **LLMs Locales** | Ollama (LLaMA, Mistral) | Sin coste APIs |
+| **LLMs Comerciales** | Wrappers OpenAI, Anthropic, Google | Integración seamless |
 | **Orquestación** | Kubernetes + Helm | Producción enterprise |
+
+### **Servidores de Inferencia Propios:**
+
+**¿Por qué propios servidores inferencia?** → Control total, latency baja, coste optimizado, privacy garantizada
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ leka-llm-interpreter (Servidor Inferencia Universal)       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  LOCALES (Self-hosted):                                    │
+│  • Ollama: LLaMA 2/3, Mistral 7B/8x7B, Falcon             │
+│  • vLLM: Inferencia optimizada (2x faster)                 │
+│  • Sin coste API, privacy total, latency <50ms             │
+│                                                             │
+│  WRAPPERS COMERCIALES (Unified API):                       │
+│  • OpenAI (GPT-4, GPT-3.5)                                 │
+│  • Anthropic (Claude 3 Opus/Sonnet/Haiku)                 │
+│  • Google (Gemini Ultra/Pro)                               │
+│  • Azure OpenAI Service                                    │
+│  • Cohere, AI21, etc.                                      │
+│                                                             │
+│  VENTAJAS:                                                  │
+│  ✅ API única (cambias modelo sin cambiar código)         │
+│  ✅ Fallback automático (si API falla, switch a local)    │
+│  ✅ Cost optimization (routing inteligente)               │
+│  ✅ A/B testing transparente (compara modelos fácilmente) │
+│  ✅ Observability unificada (logs, métricas, traces)      │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Caso de Uso:**
+```
+PROBLEMA: Cliente usa GPT-4 API (caro, latency alta, sin privacy)
+→ Coste: 50€/día (1.500€/mes)
+→ Latency: 2-5 segundos
+→ Datos enviados a OpenAI (privacy concern)
+
+SOLUCIÓN CodeflowX:
+→ Routing inteligente:
+  * Queries simples → Mistral 7B local (latency 50ms, coste 0€)
+  * Queries complejas → GPT-4 API (solo cuando necesario)
+→ Resultado:
+  * Coste: 15€/mes (ahorro 1.485€/mes = 90% reducción)
+  * Latency promedio: 300ms (10x faster queries simples)
+  * Privacy: 80% queries procesadas localmente
+```
+
+---
+
+### **Servidor RAG Propio:**
+
+**¿Por qué propio servidor RAG?** → Optimización end-to-end, evaluación integrada, mejora continua automática
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ leka-rag-evaluation (RAG Server + Evaluation)              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  COMPONENTES:                                               │
+│  • Document Processing: Chunking inteligente, metadata     │
+│  • Embeddings: Multiple providers (OpenAI, local, custom)  │
+│  • Vector Store: Qdrant + pgvector (híbrido)              │
+│  • Retrieval: Semantic + keyword + hybrid + reranking     │
+│  • Generation: LLM local o wrapper comercial              │
+│  • Evaluation: RAGAS metrics integradas                    │
+│                                                             │
+│  EVALUACIÓN CONTINUA:                                       │
+│  ✅ Context Precision: ¿chunks relevantes?                │
+│  ✅ Context Recall: ¿cobertura completa?                  │
+│  ✅ Faithfulness: ¿respuesta fiel a docs?                 │
+│  ✅ Answer Relevance: ¿respuesta útil?                    │
+│  ✅ Chunk quality: ¿tamaño óptimo?                        │
+│  ✅ Embedding quality: ¿vectores buenos?                  │
+│                                                             │
+│  OPTIMIZACIÓN AUTOMÁTICA:                                   │
+│  • A/B testing chunk sizes                                 │
+│  • A/B testing retrieval strategies                        │
+│  • A/B testing rerankers                                   │
+│  • Auto-tuning threshold similarity                        │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Caso de Uso:**
+```
+PROBLEMA: RAG "artesanal" LangChain + Pinecone
+→ Context Precision: 60% (retrieval malo)
+→ Latency: 3 segundos (retrieval + generation)
+→ No métricas, mejoras prueba-error
+
+SOLUCIÓN CodeflowX RAG Server:
+→ Evaluación RAGAS automática detecta problemas
+→ A/B testing 5 configuraciones chunk size + retrieval
+→ Configuración óptima:
+  * Context Precision: 92% (+53% mejora)
+  * Latency: 800ms (3.75x faster con reranking optimizado)
+  * Métricas dashboardadas tiempo real
+→ Mejora continua automática
+```
 
 ---
 
@@ -225,6 +330,257 @@ ROI: Un proyecto salvado paga licencia año completo
 - Consistency (coherencia cross-tables)
 - Accuracy (valores plausibles)
 - Timeliness (datos actualizados)
+
+---
+
+### **13. SERVIDORES INFERENCIA: Optimización Coste + Latency + Privacy**
+
+**Microservicio:** `leka-llm-interpreter` + `leka-model-wrapper`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Chatbot atención cliente ecommerce.
+100.000 queries/mes con GPT-4 API.
+Coste OpenAI: 0.03€ por query (prompts largos).
+→ Coste total: 3.000€/mes (36.000€/año)
+
+Análisis queries:
+- 70% queries simples (FAQ básicas)
+- 20% queries medias (consultas producto)
+- 10% queries complejas (problemas técnicos)
+
+Cliente: "Coste APIs insostenible a largo plazo"
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Routing inteligente multi-modelo:
+   • Queries simples (70%) → Mistral 7B local
+     * Latency: 50ms (vs 2-5 seg GPT-4)
+     * Coste: 0€
+     * Privacy: datos no salen servidor
+   
+   • Queries medias (20%) → GPT-3.5 Turbo API
+     * Latency: 500ms
+     * Coste: 0.002€/query (15x cheaper que GPT-4)
+   
+   • Queries complejas (10%) → GPT-4 API
+     * Latency: 2 seg
+     * Coste: 0.03€/query (solo 10% queries)
+
+→ Cálculo nuevo coste:
+   * 70k queries x 0€ (local) = 0€
+   * 20k queries x 0.002€ (GPT-3.5) = 40€
+   * 10k queries x 0.03€ (GPT-4) = 300€
+   * TOTAL: 340€/mes (ahorro 2.660€/mes)
+
+→ Ahorro anual: 31.920€ (89% reducción coste)
+→ Latency promedio: 500ms (vs 2.5 seg antes)
+→ Privacy: 70% queries locales (datos no salen)
+
+ROI: Ahorro coste APIs paga licencia CodeflowX + sobra
+```
+
+**Wrappers Multi-Provider:**
+```
+✅ API unificada (cambias proveedor sin cambiar código):
+   
+   # Código único, múltiples providers
+   response = llm_interpreter.generate(
+       prompt="...",
+       model="gpt-4",  # O "claude-3-opus", "mistral-7b-local", etc.
+       fallback_models=["gpt-3.5", "mistral-local"]
+   )
+
+✅ Fallback automático:
+   • Si GPT-4 API falla (rate limit, downtime)
+   • Automáticamente intenta GPT-3.5
+   • Si falla, intenta Mistral local
+   • Cero downtime para usuario final
+
+✅ Cost optimization automático:
+   • Analiza queries históricos
+   • Detecta queries simples vs complejas
+   • Redirige automáticamente a modelo óptimo
+   • Dashboards ahorro coste tiempo real
+
+✅ A/B testing transparente:
+   • Compara GPT-4 vs Claude vs Mistral
+   • Misma interfaz, métricas comparables
+   • Decisión basada en datos (quality vs cost vs latency)
+```
+
+**Valor Agencias/Consultores:**
+> *"Coste APIs LLMs puede destruir margen proyecto. CodeflowX routing inteligente reduce 89% coste (queries simples → local, complejas → API). Ahorro 31.920€/año = margen recuperado + privacy mejorada."*
+
+---
+
+### **14. SERVIDOR RAG PROPIO: End-to-End Optimizado**
+
+**Microservicio:** `leka-rag-evaluation` + Qdrant + pgvector
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+RAG documentación técnica producto (50k docs).
+Stack: LangChain + Pinecone + GPT-4.
+User complaints: "A veces responde bien, a veces mal".
+No sabes por qué unas queries funcionan y otras no.
+
+Métricas desconocidas:
+- ¿Retrieval recupera chunks correctos?
+- ¿LLM responde fiel a docs o inventa?
+- ¿Qué chunk size es óptimo?
+
+→ Calidad inconsistente
+→ Usuario no confía
+→ Inversión RAG no rentabiliza
+```
+
+**SOLUCIÓN CodeflowX RAG Server:**
+```
+✅ RAG completo con evaluación integrada:
+   
+   COMPONENTES:
+   1. Document processing:
+      • Chunking strategies múltiples (fixed, semantic, recursive)
+      • Metadata extraction (título, fecha, autor, tags)
+      • Deduplication inteligente
+   
+   2. Embeddings multi-provider:
+      • OpenAI text-embedding-3-large
+      • Sentence transformers local (multilingual)
+      • Custom embeddings fine-tuned
+      • A/B testing automático
+   
+   3. Vector store híbrido:
+      • Qdrant (semantic search rápido)
+      • pgvector PostgreSQL (queries complejas SQL + vector)
+      • BM25 keyword search (fallback)
+   
+   4. Retrieval avanzado:
+      • Semantic search (cosine similarity)
+      • Keyword search (BM25)
+      • Hybrid search (semantic + keyword)
+      • Reranking (cross-encoder)
+      • MMR (diversity reranking)
+   
+   5. Generation:
+      • LLM local (Mistral 7B) o API (GPT-4)
+      • Prompts optimizados por tipo query
+      • Citation sources (trazabilidad respuestas)
+   
+   6. Evaluation RAGAS continua:
+      • Context Precision monitored 24/7
+      • Faithfulness tracked tiempo real
+      • Failed queries analyzed automáticamente
+
+→ Evaluación detecta:
+   * Context Precision: 65% (retrieval no óptimo)
+   * Chunk size promedio: 1500 tokens (muy grande)
+   * Reranking desactivado
+
+→ Optimización automática:
+   * A/B test chunk sizes: 300, 500, 800, 1000 tokens
+   * A/B test retrieval: semantic, hybrid, hybrid+reranking
+   * Resultado óptimo: 500 tokens + hybrid + reranking
+
+→ Resultados post-optimización:
+   * Context Precision: 65% → 91% (+40% mejora)
+   * Faithfulness: 72% → 94% (LLM inventa menos)
+   * User satisfaction: 3.4/5 → 4.5/5
+   * Latency: 3 seg → 1.2 seg (2.5x faster)
+
+→ Usuario confía, ROI rentabiliza
+
+ROI: RAG funcional vs fallido = diferencia éxito/fracaso proyecto
+```
+
+**Ventajas RAG Propio CodeflowX:**
+```
+✅ Evaluación integrada (no separada):
+   • RAGAS metrics cada query (no solo batch)
+   • Failed queries analysis automático
+   • Mejora continua basada en métricas reales
+
+✅ Optimización automática:
+   • A/B testing chunk strategies
+   • A/B testing retrieval algorithms
+   • Auto-tuning similarity thresholds
+   • Performance tracking tiempo real
+
+✅ Híbrido vector + keyword:
+   • Semantic search (conceptos)
+   • Keyword search (términos exactos)
+   • Mejor de ambos mundos
+
+✅ Multi-source:
+   • Qdrant (fast vector search)
+   • pgvector (SQL + vector queries complejas)
+   • BM25 (keyword fallback)
+   • Reranking final (calidad máxima)
+```
+
+**Valor Agencias/Consultores:**
+> *"RAG artesanal LangChain+Pinecone no tiene evaluación integrada. CodeflowX RAG Server evalúa RAGAS cada query, detecta problemas retrieval automáticamente, y optimiza configuración end-to-end (chunks, embeddings, reranking). Resultado: 91% Context Precision vs 65% artesanal."*
+
+---
+
+### **15. MODEL WRAPPER MULTI-FRAMEWORK: Flexibilidad Total**
+
+**Microservicio:** `leka-model-wrapper`
+
+**CASO DE NEGOCIO:**
+```
+PROBLEMA:
+Cliente 1 usa TensorFlow, cliente 2 usa PyTorch, cliente 3 usa scikit-learn.
+Desarrollas 3 integraciones diferentes (duplicas código).
+Mantenimiento: pesadilla (3 codebases).
+
+→ Coste desarrollo: 3x
+→ Coste mantenimiento: 3x
+→ Bugs: 3x probabilidad
+```
+
+**SOLUCIÓN CodeflowX:**
+```
+✅ Wrapper unificado multi-framework:
+   • TensorFlow, PyTorch, scikit-learn, XGBoost, LightGBM
+   • ONNX (formato universal)
+   • HuggingFace Transformers
+   • API única independiente framework
+
+→ Desarrollas integración UNA vez
+→ Funciona con TODOS los frameworks
+→ Reduces coste desarrollo 66%
+→ Reduces coste mantenimiento 66%
+→ Reduces bugs
+
+ROI: Desarrollo 1x vs 3x = ahorro 2/3 esfuerzo
+```
+
+**Capacidades:**
+```
+✅ Carga modelo cualquier framework:
+   • Auto-detect framework
+   • Deserialización automática
+   • Versioning integrado
+   
+✅ Inferencia unificada:
+   • API única predict()
+   • Batch prediction optimizado
+   • GPU/CPU auto-selection
+   
+✅ Métricas unificadas:
+   • Performance tracking
+   • Latency monitoring
+   • Resource usage (GPU/CPU/memoria)
+   • Cost tracking
+```
+
+**Valor Agencias/Consultores:**
+> *"Atiendes clientes con diferentes frameworks (TensorFlow, PyTorch, scikit-learn). Model wrapper unificado = desarrollas integración UNA vez, funciona TODOS. Ahorro 66% esfuerzo desarrollo + mantenimiento."*
 
 ---
 
