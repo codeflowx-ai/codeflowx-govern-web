@@ -16,7 +16,7 @@
 | Documento | Total Prompts | Implementados | Pendientes | % Completo |
 |-----------|---------------|---------------|------------|------------|
 | **PROMPTS_01** | ~10 extensiones | ~10 | 0 | **100%** ✅ |
-| **PROMPTS_02** | ~8 microservicios | ~1 | ~7 | 13% ⏳ |
+| **PROMPTS_02** | 5 microservicios | 2 | 3 | 40% ⚠️ |
 | **PROMPTS_03** | 7 prompts | 7 | 0 | **100%** ✅ |
 | **PROMPTS_04** | ~15 workflows | ~3 | ~12 | 20% ⏳ |
 | **PROMPTS_05** | ~12 entities | 0 | ~12 | 0% ⏳ |
@@ -29,9 +29,9 @@
 | **PROMPTS_12** | 12 prompts | 0 | 12 | 0% ⏳ |
 | **PROMPTS_13** | 8 prompts | 0 | 8 | 0% ⏳ |
 
-**TOTAL ACTUALIZADO:** ~185 prompts  
-**Implementados:** ~32 prompts (17%)  
-**Pendientes:** ~153 prompts (83%)
+**TOTAL ACTUALIZADO:** ~182 prompts  
+**Implementados:** ~33 prompts (18%)  
+**Pendientes:** ~149 prompts (82%)
 
 ---
 
@@ -93,55 +93,57 @@
 
 **Documento:** `PROMPTS_02_PYTHON_MICROSERVICIOS_NUEVOS.md`  
 **Objetivo:** Crear nuevos microservicios Python  
-**Estado:** ⏳ 13% (1/8)
+**Estado:** ⏳ 40% (2/5)
 
 ## Checklist Microservicios Nuevos:
 
-- [ ] **1. leka-server-documents** (Puerto 8010)
-  - Generación documentación técnica Anexo IV
-  - Instrucciones de uso Art. 13
-  - EU Declaration Art. 47
+- [ ] **1. leka-technical-documentation-generator** (Puerto 8008)
+  - Generación Anexo IV completo (9 secciones)
+  - Validación completitud obligatoria
+  - Formatos: Markdown, HTML, PDF
   - **Estado:** ⏳ Diseñado, no implementado
   - **Prioridad:** 🔴 CRÍTICA (necesario para Anexo IV)
+  - **Esfuerzo:** 3-4 días
 
-- [ ] **2. leka-fria-generator** (Puerto 8011)
-  - Generación automática FRIA Art. 27
-  - Análisis impacto derechos fundamentales
+- [x] **2. leka-conformity-assessment** (Puerto 8009)
+  - Evaluación conformidad Anexo VI (4 pasos)
+  - QMS check, Doc técnica, Consistencia
+  - Report generation
+  - **Estado:** ✅ Implementado
+  - **Prioridad:** 🟡 Media-Alta
+  - **Esfuerzo:** 2-3 días
+
+- [ ] **3. leka-eu-declaration-generator** (Puerto 8010)
+  - Declaración UE Conformidad Anexo V (8 elementos)
+  - Multi-idioma (ES, EN, FR, DE)
+  - PDF formato oficial UE
   - **Estado:** ⏳ Diseñado, no implementado
-  - **Nota:** Actual FriaWizard es manual UI
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Esfuerzo:** 2 días
 
-- [ ] **3. leka-conformity-assessment** (Puerto 8012)
-  - Conformity assessment Art. 43
-  - Anexo VII procedures
+- [x] **4. leka-fria-generator** (Puerto 8012)
+  - FRIA Art. 27 (6 elementos obligatorios)
+  - Análisis derechos fundamentales
+  - Integración FRIA+DPIA
+  - **Estado:** ✅ Implementado
+  - **Prioridad:** 🔴 CRÍTICA
+  - **Esfuerzo:** 3 días
+
+- [ ] **5. leka-copyright-compliance** (Puerto 8013)
+  - Verificación copyright datos entrenamiento GPAI
+  - TDM opt-out detection (Directiva 2019/790)
+  - License tracking y expiry warnings
   - **Estado:** ⏳ Diseñado, no implementado
+  - **Prioridad:** 🟡 Media (Fase II GPAI)
+  - **Esfuerzo:** 2-3 días
 
-- [ ] **4. leka-adversarial-robustness** (Puerto 8013)
-  - Adversarial testing Art. 15.5
-  - Attack simulation
-  - **Estado:** ⏳ Diseñado, no implementado
-  - **Prioridad:** 🟡 ALTA
+**COMPLETADO:** 2/5 microservicios (40%)
 
-- [ ] **5. leka-data-lineage** (Puerto 8014)
-  - Data lineage tracking
-  - Dataset provenance
-  - **Estado:** ⏳ Diseñado, no implementado
+**CRÍTICO PENDIENTE:**
+- leka-technical-documentation-generator (Anexo IV) - 🔴 CRÍTICA
+- leka-eu-declaration-generator (Anexo V) - 🔴 CRÍTICA
 
-- [ ] **6. leka-explainability** (Puerto 8015)
-  - SHAP/LIME integration
-  - Explanation generation Art. 22 GDPR
-  - **Estado:** ⏳ Diseñado, no implementado
-
-- [x] **7. leka-server-serving-wrapper** (Puerto 8003)
-  - Wrapper genérico models
-  - **Estado:** ✅ Parcialmente implementado
-
-- [ ] **8. leka-compliance-reporter** (Puerto 8016)
-  - Report generation compliance
-  - Dashboard metrics
-  - **Estado:** ⏳ Diseñado, no implementado
-
-**CRÍTICO MISSING:**
-- leka-server-documents (Anexo IV generation) - 🔴 ALTA PRIORIDAD
+**TOTAL ESFUERZO RESTANTE:** 7-9 días secuencial | 3-4 días con 3 chats paralelos
 
 ---
 
@@ -601,7 +603,7 @@
 | **Java Services (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java ViewModels (PROMPTS_03)** | 2 | 2 | 0 | 100% ✅ |
 | **Java Entities Nuevas (05, 08)** | 34 | 2 | 32 | 6% ⏳ |
-| **Python Microservicios (01, 02, 10)** | 31 | 11 | 20 | 35% ⚠️ |
+| **Python Microservicios (01, 02, 10)** | 28 | 13 | 15 | 46% ⚠️ |
 | **BPMN Workflows (04, 09)** | 27 | 3 | 24 | 11% ⏳ |
 | **GPAI Specific (06)** | 6 | 0 | 6 | 0% ⏳ |
 
@@ -621,11 +623,11 @@
 ## TOTAL ABSOLUTO:
 
 ```
-████░░░░░░░░░░░░░░░░ 21% COMPLETADO
+████░░░░░░░░░░░░░░░░ 22% COMPLETADO
 
-✅ Implementado:  ~32 prompts
-⏳ Pendiente:     ~118 prompts
-📊 Total:         ~150 prompts
+✅ Implementado:  ~33 prompts
+⏳ Pendiente:     ~114 prompts
+📊 Total:         ~147 prompts
 ```
 
 ---
