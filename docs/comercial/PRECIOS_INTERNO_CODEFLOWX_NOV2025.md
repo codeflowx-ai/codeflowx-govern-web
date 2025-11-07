@@ -25,7 +25,7 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 |------|------------------|-------------------|--------------|---------|-----------|
 | **Cloud Compliance (Basic)** | **149 €** | 35 € | 76% | Freelance, microagencias (≤10 personas) que necesitan **cumplimiento esencial** | Hasta **2 sistemas IA** (chatbots/agentes/RAG), checklists Art. 9-15, documentación Anexo IV básica, políticas Art. 50, FRIA templates, 2 usuarios, soporte email 48h |
 | **Cloud Governance (Professional)** | **399 €** | 70 € (2 instancias) | 82% | Agencias/consultoras 10-50 personas y software factories que necesitan **gobierno completo** | Hasta **7 sistemas IA**, workflows BPMN, evaluación métricas, monitorización 24/7, alertas desviaciones, reporting Art. 71, 12 usuarios, soporte prioritario 12h |
-| **Cloud Enterprise** | **799 €** | 105 € (3 instancias) | 87% | Partners SaaS y organizaciones con múltiples clientes internos. Incluye **solución completa** (cumplimiento + gobierno + evaluación + monitorización) multi-tenant | Multi-tenant, marca blanca opcional, API configurables, dashboards agregados, SLA 99,5 %, soporte 4h, formación comercial, controles centralizados |
+| **Cloud Enterprise** | **799 €** | 105 € (3 instancias) | 87% | Partners SaaS y organizaciones con múltiples clientes internos. Incluye **solución completa** (cumplimiento + gobierno + evaluación + monitorización) multi-tenant | Multi-tenant (hasta **5 clientes externos** incluidos), marca blanca opcional, API configurables, dashboards agregados, SLA 99,5 %, soporte 4h, formación comercial, controles centralizados |
 
 **Notas Cloud:**
 - Precios sin inferencia incluida. CodeflowX se integra con la infraestructura de modelos existente del cliente. Se ofrece un módulo opcional de servidores de inferencia (ver add-ons).
@@ -45,6 +45,7 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 | **Entorno regulado (datos UE dedicados)** | +90 € / mes | Professional / Enterprise | Workspace aislado multi-organización |
 | **Soporte 24/7** | +150 € / mes | Professional / Enterprise | Línea dedicada incidentes críticos |
 | **Módulo servidores de inferencia** | 120 € / mes por instancia | Professional / Enterprise | Despliegue gestionado de `leka-llm-interpreter`, incluye modelos open-source, wrappers comerciales opcionales, routing inteligente. Costes API externos se facturan al cliente. |
+| **Pack clientes adicionales (5 tenants)** | 150 € / mes | Enterprise | Amplía el número de organizaciones servidas (de 5 en 5) |
 
 ---
 
