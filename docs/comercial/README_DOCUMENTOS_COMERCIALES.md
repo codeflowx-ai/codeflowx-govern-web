@@ -6,7 +6,7 @@
 
 ---
 
-## 📚 DOCUMENTOS DISPONIBLES (7 Documentos x 3 Formatos)
+## 📚 DOCUMENTOS DISPONIBLES (8 Documentos x 3 Formatos)
 
 ### **1. EU AI ACT TIMELINE Y FASES CODEFLOWX**
 
@@ -244,6 +244,26 @@
 
 ---
 
+### **8. COMPARATIVA PRECIOS COMPETENCIA NOVIEMBRE 2025**
+
+**Archivos:**
+- `COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.md` (24 KB) - Editable
+- `COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.docx` (25 KB) - **Word**
+- `COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.pdf` (118 KB) - **PDF**
+
+**Contenido:**
+- Tabla precios proveedores IA (Cloudiax, AI Works, Vidiv, etc.)
+- Comparativa directa vs nuevas tarifas CodeflowX
+- ROI y mensaje comercial (“por lo que pagas solo por inferencia, obtienes gobierno completo”)
+- Recomendaciones posicionamiento pricing
+- Fuentes públicas con enlaces
+
+**Uso:** Justificar subida precios CodeflowX frente mercado
+
+**Audiencia:** Dirección comercial, ventas, partners
+
+---
+
 ## 🎯 GUÍA DE USO POR FASE VENTA
 
 ### **FASE 1: AWARENESS (Prospecto frío)**
@@ -314,8 +334,9 @@
 | **Plataforma Ejecutivo** | 1748 líneas | 35 KB | 181 KB | Todos | Evaluation | Valor completo |
 | **Oportunidad España** | 1097 líneas | 28 KB | 119 KB | Dirección/C-level | Estratégico | Justificar mercado |
 | **Tarifa Interna** | 742 líneas | 27 KB | 142 KB | Dirección comercial | Pricing interno | Definir precios |
+| **Comparativa competencia** | 512 líneas | 25 KB | 118 KB | Dirección comercial / ventas | Pricing | Justificar posicionamiento |
 
-**TOTAL:** 7 documentos x 3 formatos (Markdown + Word + PDF) = **21 archivos**
+**TOTAL:** 8 documentos x 3 formatos (Markdown + Word + PDF) = **24 archivos**
 
 ---
 
@@ -421,6 +442,9 @@ docs/comercial/
 ├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.md
 ├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.docx ✅
 ├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.pdf ✅
+├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.md
+├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.docx ✅
+├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.pdf ✅
 └── README_DOCUMENTOS_COMERCIALES.md (este archivo)
 ```
 
@@ -452,11 +476,11 @@ docs/comercial/
 
 ### **Material Disponible:**
 ```
-✅ 7 documentos técnico-comerciales completos
+✅ 8 documentos técnico-comerciales completos
 ✅ 3 formatos por documento: Markdown + Word + PDF
-✅ Total: 21 archivos (7 .md + 7 .docx + 7 .pdf)
-✅ ~7.300 líneas documentación
-✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado + Pricing
+✅ Total: 24 archivos (8 .md + 8 .docx + 8 .pdf)
+✅ ~7.800 líneas documentación
+✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado + Pricing + Competencia
 ```
 
 ### **Argumentación Preparada Para:**
