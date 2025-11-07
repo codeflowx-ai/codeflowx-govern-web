@@ -6,7 +6,7 @@
 
 ---
 
-## 📚 DOCUMENTOS DISPONIBLES (6 Documentos x 3 Formatos)
+## 📚 DOCUMENTOS DISPONIBLES (7 Documentos x 3 Formatos)
 
 ### **1. EU AI ACT TIMELINE Y FASES CODEFLOWX**
 
@@ -222,6 +222,28 @@
 
 ---
 
+### **7. TARIFA INTERNA CODEFLOWX NOVIEMBRE 2025**
+
+**Archivos:**
+- `PRECIOS_INTERNO_CODEFLOWX_NOV2025.md` (26 KB) - Editable
+- `PRECIOS_INTERNO_CODEFLOWX_NOV2025.docx` (27 KB) - **Word**
+- `PRECIOS_INTERNO_CODEFLOWX_NOV2025.pdf` (142 KB) - **PDF**
+
+**Contenido:**
+- Coste operativo cloud base 35 €/mes por cliente
+- Estructura precios SaaS cloud (Basic, Professional, OEM)
+- Add-ons cloud (onboarding, SSO, tokens, soporte 24/7)
+- Licenciamiento corporate self-hosting vía partners (Standard, Enterprise)
+- Planes administraciones públicas (Local, Regional, National)
+- Margenes objetivo, descuentos máximos, comisiones partner
+- Estrategia comercial por segmento (targets año 1)
+
+**Uso:** Referencia interna pricing (confidencial)
+
+**Audiencia:** Dirección comercial, estrategia, partners
+
+---
+
 ## 🎯 GUÍA DE USO POR FASE VENTA
 
 ### **FASE 1: AWARENESS (Prospecto frío)**
@@ -291,8 +313,9 @@
 | **Casos Uso Agencias** | 1602 líneas | 34 KB | 173 KB | Agencias/Consultores | Consideration | Casos específicos |
 | **Plataforma Ejecutivo** | 1748 líneas | 35 KB | 181 KB | Todos | Evaluation | Valor completo |
 | **Oportunidad España** | 1097 líneas | 28 KB | 119 KB | Dirección/C-level | Estratégico | Justificar mercado |
+| **Tarifa Interna** | 742 líneas | 27 KB | 142 KB | Dirección comercial | Pricing interno | Definir precios |
 
-**TOTAL:** 6 documentos x 3 formatos (Markdown + Word + PDF) = **18 archivos**
+**TOTAL:** 7 documentos x 3 formatos (Markdown + Word + PDF) = **21 archivos**
 
 ---
 
@@ -395,6 +418,9 @@ docs/comercial/
 ├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.md
 ├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.docx ✅
 ├── OPORTUNIDAD_NEGOCIO_ESPANA_NOVIEMBRE_2025.pdf ✅
+├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.md
+├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.docx ✅
+├── PRECIOS_INTERNO_CODEFLOWX_NOV2025.pdf ✅
 └── README_DOCUMENTOS_COMERCIALES.md (este archivo)
 ```
 
@@ -426,11 +452,11 @@ docs/comercial/
 
 ### **Material Disponible:**
 ```
-✅ 6 documentos técnico-comerciales completos
+✅ 7 documentos técnico-comerciales completos
 ✅ 3 formatos por documento: Markdown + Word + PDF
-✅ Total: 18 archivos (6 .md + 6 .docx + 6 .pdf)
-✅ ~6.600 líneas documentación
-✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado
+✅ Total: 21 archivos (7 .md + 7 .docx + 7 .pdf)
+✅ ~7.300 líneas documentación
+✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado + Pricing
 ```
 
 ### **Argumentación Preparada Para:**
