@@ -19,31 +19,32 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 
 ---
 
-## 🟢 CLOUD COMPLIANCE (SaaS gestionado CodeflowX)
+## 🟢 CLOUD (SaaS gestionado por CodeflowX)
 
-| Plan | Precio (EUR/mes) | Coste Infra (EUR) | Margen Bruto | Target | Características clave |
-|------|------------------|-------------------|--------------|--------|------------------------|
-| **Cloud Basic** | **149 €** | 35 € | 76% | Desarrolladores individuales, microagencias (≤10 personas) | 1 sistema IA alto riesgo o 3 riesgo limitado, 100k tokens/mes, 2 usuarios, soporte email 48h, reporting mensual compliance básico |
-| **Cloud Professional** | **399 €** | 70 € (2 instancias) | 82% | Agencias/consultoras 10-50 personas, software factories | Hasta 5 sistemas IA, 500k tokens/mes, 10 usuarios, workflows personalizados, alertas desviaciones, soporte prioritario (12h), documentación Anexo IV automatizada |
-| **Cloud OEM (White Label)** | **799 €** + 0,09 €/query IA | 105 € (3 instancias) | 87% | Partners que empaquetan CodeflowX en su oferta SaaS | Marca blanca completa, API multi-tenant, límites configurables, SLA 99,5%, soporte 4h, formación comercial, facturación uso (queries, almacenamiento) |
+| Plan | Precio (EUR/mes) | Coste Infra (EUR) | Margen Bruto | Enfoque | Cobertura |
+|------|------------------|-------------------|--------------|---------|-----------|
+| **Cloud Compliance (Basic)** | **149 €** | 35 € | 76% | Freelance, microagencias (≤10 personas) que necesitan **cumplimiento esencial** | Hasta **2 sistemas IA** (chatbots/agentes/RAG), checklists Art. 9-15, documentación Anexo IV básica, políticas Art. 50, FRIA templates, 2 usuarios, soporte email 48h |
+| **Cloud Governance (Professional)** | **399 €** | 70 € (2 instancias) | 82% | Agencias/consultoras 10-50 personas y software factories que necesitan **gobierno completo** | Hasta **7 sistemas IA**, workflows BPMN, evaluación métricas, monitorización 24/7, alertas desviaciones, reporting Art. 71, 12 usuarios, soporte prioritario 12h |
+| **Cloud Enterprise** | **799 €** | 105 € (3 instancias) | 87% | Partners SaaS y organizaciones con múltiples clientes internos. Incluye **solución completa** (cumplimiento + gobierno + evaluación + monitorización) multi-tenant | Multi-tenant, marca blanca opcional, API configurables, dashboards agregados, SLA 99,5 %, soporte 4h, formación comercial, controles centralizados |
 
 **Notas Cloud:**
-- Facturación mensual (pago anual anticipado: descuento 10%)
-- Onboarding opcional (ver tabla add-ons)
-- Exceso tokens/consultas: 0,015 € por 1.000 tokens o 0,05 € por consulta IA
-- Upgrade/downgrade: prorrateo mensual
+- Precios sin inferencia incluida. CodeflowX se integra con la infraestructura de modelos existente del cliente. Se ofrece un módulo opcional de servidores de inferencia (ver add-ons).
+- Facturación mensual; pago anual anticipado (‑10 %).
+- Número de sistemas IA = combinaciones de chatbots, agentes, RAG, scoring u otros flows gobernados. Packs adicionales disponibles.
+- Upgrade/downgrade prorrateado en el mes corriente.
 
 ---
 
 ## 🧩 ADD-ONS CLOUD
 
-| Add-on | Precio | Disponible en |
-|--------|--------|----------------|
-| **Onboarding guiado (2 semanas)** | 900 € único | Basic / Professional |
-| **Integración SSO (Azure AD/Okta)** | 600 € único | Professional / OEM |
-| **Token Pack adicional (1M tokens)** | 120 € / mes | Todos |
-| **Entorno regulado (datos UE dedicados)** | +90 € / mes | Professional / OEM |
-| **Soporte 24/7** | +150 € / mes | Professional / OEM |
+| Add-on | Precio | Disponible en | Descripción |
+|--------|--------|----------------|-------------|
+| **Onboarding guiado (2 semanas)** | 900 € único | Basic / Professional | Configuración inicial, mapeo procesos, primera auditoría |
+| **Integración SSO (Azure AD/Okta)** | 600 € único | Professional / Enterprise | Autenticación corporativa |
+| **Pack sistemas adicionales (3 sistemas)** | 90 € / mes | Todos | Amplía cobertura a más chatbots/agentes/RAG |
+| **Entorno regulado (datos UE dedicados)** | +90 € / mes | Professional / Enterprise | Workspace aislado multi-organización |
+| **Soporte 24/7** | +150 € / mes | Professional / Enterprise | Línea dedicada incidentes críticos |
+| **Módulo servidores de inferencia** | 120 € / mes por instancia | Professional / Enterprise | Despliegue gestionado de `leka-llm-interpreter`, incluye modelos open-source, wrappers comerciales opcionales, routing inteligente. Costes API externos se facturan al cliente. |
 
 ---
 
@@ -65,9 +66,9 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 
 | Plan | Precio Licencia Anual | Tipo Administración | Modelo Implantación | Observaciones |
 |------|-----------------------|---------------------|----------------------|---------------|
-| **Public Local** | **12.000 €/año** | Ayuntamientos <100.000 habitantes, organismos municipales | Cloud dedicado (SaaS región UE) o self-host básico | 2 sistemas IA, FRIA integrada, soporte 12h, formación 1 día |
-| **Public Regional** | **24.000 €/año** | Diputaciones, Comunidades Autónomas, hospitales regionales | Self-host híbrido o cloud dedicado | 5 sistemas IA, reporting Art. 71 automatizado, soporte 8h, formación 2 días |
-| **Public National** | **60.000 €/año** | Ministerios, agencias estatales, fuerzas seguridad | Self-host clusters + alta disponibilidad | 10 sistemas IA, cumplimiento ENS Alto, soporte 4h, formación 3 días, auditoría anual incluida |
+| **Public Local** | **12.000 €** | Ayuntamientos <100.000 habitantes, organismos municipales | Cloud dedicado (SaaS región UE) o self-host básico | 2 sistemas IA, FRIA integrada, soporte 12h, formación 1 día, **incluye cumplimiento + gobierno + evaluación + monitorización** |
+| **Public Regional** | **24.000 €** | Diputaciones, Comunidades Autónomas, hospitales regionales | Self-host híbrido o cloud dedicado | 5 sistemas IA, reporting Art. 71 automatizado, soporte 8h, formación 2 días, **solución integral (cumplimiento + gobierno + evaluación + monitorización)** |
+| **Public National** | **60.000 €** | Ministerios, agencias estatales, fuerzas seguridad | Self-host clusters + alta disponibilidad | 10 sistemas IA, cumplimiento ENS Alto, soporte 4h, formación 3 días, auditoría anual incluida, **solución completa CodeflowX** |
 
 **Partners sector público:**
 - Venta obligatoria vía partner homologado (20-25% margen)
