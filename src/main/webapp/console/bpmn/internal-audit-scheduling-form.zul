@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Programar auditoría interna ISO 42001"
+            width="70%"
+            height="65%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.InternalAuditSchedulingViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Datos de la auditoría"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Proyecto" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.projectId)"
+                                     width="220px"
+                                     readonly="true"
+                                     placeholder="Project ID"/>
+                        </row>
+                        <row>
+                            <label value="Fecha programada" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.auditDate)"
+                                     format="yyyy-MM-dd HH:mm"
+                                     cols="25"/>
+                        </row>
+                        <row>
+                            <label value="Alcance" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.auditScope)"
+                                     width="100%"
+                                     rows="4"
+                                     multiline="true"
+                                     placeholder="Cláusulas, procesos y sistemas a auditar"/>
+                        </row>
+                        <row>
+                            <label value="Auditor responsable" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.auditor)"
+                                     width="100%"
+                                     placeholder="Usuario o rol auditor"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Planificar auditoría"
+                        onClick="@command('doSubmit')"
+                        width="180px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

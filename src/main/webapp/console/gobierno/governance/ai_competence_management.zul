@@ -1,0 +1,276 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:h="xhtml">
+	<idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.AICompetenceViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div class="col-12">
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-duotone fa-people-roof me-2" />
+						Matriz Competencias IA (ISO 42001 · Clauses 7.2 - 7.3)
+					</h:h2>
+					<h:p class="text-muted">
+						Evaluación de competencias, gaps y formación de equipos IA conforme al AIMS corporativo.
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<label sclass="text-muted">Dashboard actualizado - Awareness y formación</label>
+							</div>
+							<div class="flex-shrink-0 hstack gap-2">
+								<a sclass="btn btn-soft-primary btn-sm"
+									iconSclass="fa-duotone fa-arrows-rotate"
+									onClick="@command('refreshData')">
+									Refrescar
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<h:div class="row g-3 mb-4">
+							<h:div class="col-md-3">
+								<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Profesionales IA</h:p>
+										<h:h3>
+											<label value="@load(vm.dashboard.totalPeople)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+								<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Sesiones Formación</h:p>
+										<h:h3>
+											<label value="@load(vm.dashboard.trainingSessions)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+								<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Roles Cubiertos</h:p>
+										<h:h3>
+											<label value="@load(vm.dashboard.byRole?.size())" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+								<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Competencias con Gaps</h:p>
+										<h:h3>
+											<label value="@load(vm.dashboard.openGaps?.size())" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+
+						<grid model="@load(vm.dashboard.byAwareness?.entrySet())" sclass="table table-sm table-borderless mb-3">
+							<columns>
+								<column label="Nivel Awareness" width="50%" />
+								<column label="Personas" width="50%" align="right" />
+							</columns>
+							<rows>
+								<row each="@load(each)">
+									<label value="@load(each.key)" />
+									<label value="@load(each.value)" style="text-align:right;" />
+								</row>
+							</rows>
+						</grid>
+
+						<grid model="@load(vm.competences)" sclass="table table-hover table-striped">
+							<columns sizable="true">
+								<column label="Nombre" width="18%" />
+								<column label="Email" width="18%" />
+								<column label="Rol" width="12%" />
+								<column label="Nivel Awareness" width="10%" align="center" />
+								<column label="Última Awareness" width="12%" align="center" />
+								<column label="Gaps detectados" width="12%" align="center" />
+								<column label="Acciones" width="18%" align="center" />
+							</columns>
+							<rows>
+								<row each="@load(each)" onClick="@command('selectCompetence', competence=each)">
+									<label value="@load(each.aicpersonname)" />
+									<label value="@load(each.aicpersonemail)" />
+									<label value="@load(each.aicrole)" />
+									<label value="@load(each.aicawarenesslevel)" />
+									<label value="@load(each.aiclastawarenesstrained)" />
+									<label value="@load(vm.fetchMissingFromJson(each.aicgapanalysis)?.size())" />
+									<div class="d-flex gap-1 justify-content-center">
+										<a sclass="btn btn-soft-primary btn-xs"
+											iconSclass="fa-duotone fa-magnifying-glass-chart"
+											onClick="@command('openGapAnalysis', competence=each)" tooltiptext="Gap Analysis" />
+										<a sclass="btn btn-soft-warning btn-xs"
+											iconSclass="fa-duotone fa-clipboard-list"
+											onClick="@command('openPlanModal', competence=each)" tooltiptext="Crear Plan Formación" />
+										<a sclass="btn btn-soft-success btn-xs"
+											iconSclass="fa-duotone fa-graduation-cap"
+											onClick="@command('openTrainingModal', competence=each)" tooltiptext="Registrar Formación" />
+									</div>
+								</row>
+							</rows>
+						</grid>
+
+						<div class="mt-3" visible="@load(vm.selectedCompetence != null)">
+							<h:h4>
+								<label value="@load(vm.selectedCompetence != null ? vm.selectedCompetence.aicpersonname : '')" />
+								- Historial de Formación
+							</h:h4>
+							<grid model="@load(vm.trainingRecords)" emptyMessage="Sin registros">
+								<columns>
+									<column label="Fecha" width="18%" />
+									<column label="Tipo" width="14%" />
+									<column label="Título" width="32%" />
+									<column label="Proveedor" width="18%" />
+									<column label="Horas" width="8%" align="center" />
+									<column label="Certificado" width="10%" align="center" />
+								</columns>
+								<rows>
+									<row each="@load(each)">
+										<label value="@load(each.aittrainingdate)" />
+										<label value="@load(each.aittrainingtype)" />
+										<label value="@load(each.aittrainingtitle)" />
+										<label value="@load(each.aitprovider)" />
+										<label value="@load(each.aitduration)" style="text-align:center;" />
+										<label value="@load(each.aitcertificateobtained ? 'Sí' : 'No')" style="text-align:center;" />
+									</row>
+								</rows>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal Gap Analysis -->
+		<window title="Gap Analysis" mode="modal"
+			width="600px" closable="true"
+			visible="@bind(vm.gapModalVisible)"
+			onClose="@command('closeGapModal')">
+			<vbox spacing="10px">
+				<label value="Competencias faltantes" sclass="fw-bold" />
+				<listbox model="@load(vm.missingCompetencies)" mold="select">
+					<listitem each="@load(each)">
+						<listcell label="@load(each)" />
+					</listitem>
+				</listbox>
+				<label value="Competencias adicionales detectadas" sclass="fw-bold mt-3" />
+				<listbox model="@load(vm.extraCompetencies)" mold="select">
+					<listitem each="@load(each)">
+						<listcell label="@load(each)" />
+					</listitem>
+				</listbox>
+				<label value="Detalle JSON" sclass="fw-bold mt-3" />
+				<textbox value="@bind(vm.gapAnalysisJson)" multiline="true" rows="6" readonly="true" class="form-control" />
+			</vbox>
+		</window>
+
+		<!-- Modal Plan Formación -->
+		<window title="Plan de Formación" mode="modal"
+			width="560px" closable="true"
+			visible="@bind(vm.planModalVisible)"
+			onClose="@command('cancelPlan')">
+			<grid width="100%">
+				<rows>
+					<row>
+						<label value="Responsable" />
+						<textbox value="@bind(vm.planOwner)" class="form-control" />
+					</row>
+					<row>
+						<label value="Fecha objetivo" />
+						<datebox value="@bind(vm.planTargetDate)" class="form-control" />
+					</row>
+					<row>
+						<label value="Competencias a cubrir" />
+						<textbox value="@bind(vm.planGapsInput)" multiline="true" rows="4"
+							placeholder="Separadas por coma" class="form-control" />
+					</row>
+				</rows>
+			</grid>
+			<div class="d-flex justify-content-end gap-2 mt-3">
+				<a sclass="btn btn-soft-secondary"
+					iconSclass="fa-duotone fa-xmark"
+					onClick="@command('cancelPlan')">
+					Cancelar
+				</a>
+				<a sclass="btn btn-warning"
+					iconSclass="fa-duotone fa-clipboard-list-check"
+					onClick="@command('generateTrainingPlan')">
+					Generar Plan
+				</a>
+			</div>
+		</window>
+
+		<!-- Modal Registrar Formación -->
+		<window title="Registrar Formación / Awareness" mode="modal"
+			width="560px" closable="true"
+			visible="@bind(vm.trainingModalVisible)"
+			onClose="@command('cancelTrainingRecord')">
+			<grid width="100%">
+				<rows>
+					<row>
+						<label value="Tipo" />
+						<combobox selectedItem="@bind(vm.trainingRecordForm.aittrainingtype)" class="form-control">
+							<comboitem label="AWARENESS" value="AWARENESS" />
+							<comboitem label="TECHNICAL" value="TECHNICAL" />
+							<comboitem label="COMPLIANCE" value="COMPLIANCE" />
+							<comboitem label="CERTIFICATION" value="CERTIFICATION" />
+						</combobox>
+					</row>
+					<row>
+						<label value="Título / Contenido" />
+						<textbox value="@bind(vm.trainingRecordForm.aittrainingtitle)" class="form-control"
+							placeholder="Ej. ISO 42001 Awareness" />
+					</row>
+					<row>
+						<label value="Fecha" />
+						<datebox value="@bind(vm.trainingRecordForm.aittrainingdate)" class="form-control" />
+					</row>
+					<row>
+						<label value="Proveedor" />
+						<textbox value="@bind(vm.trainingRecordForm.aitprovider)" class="form-control" />
+					</row>
+					<row>
+						<label value="Horas" />
+						<intbox value="@bind(vm.trainingRecordForm.aitduration)" class="form-control" />
+					</row>
+					<row>
+						<label value="Certificado obtenido" />
+						<checkbox checked="@bind(vm.trainingRecordForm.aitcertificateobtained)" />
+					</row>
+					<row>
+						<label value="URL Certificado" />
+						<textbox value="@bind(vm.trainingRecordForm.aitcertificateurl)" class="form-control" />
+					</row>
+				</rows>
+			</grid>
+			<div class="d-flex justify-content-end gap-2 mt-3">
+				<a sclass="btn btn-soft-secondary"
+					iconSclass="fa-duotone fa-xmark"
+					onClick="@command('cancelTrainingRecord')">
+					Cancelar
+				</a>
+				<a sclass="btn btn-success"
+					iconSclass="fa-duotone fa-floppy-disk"
+					onClick="@command('saveTrainingRecord')">
+					Guardar
+				</a>
+			</div>
+		</window>
+
+	</idspace>
+</zk>
+
+

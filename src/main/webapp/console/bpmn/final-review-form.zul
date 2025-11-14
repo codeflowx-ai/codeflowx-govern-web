@@ -1,0 +1,73 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.FinalReviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-list-check me-2"></h:i>
+						Final Conformity Review (Annex VI)
+					</h:h2>
+					<h:p class="text-muted">
+						Assessment did not pass all steps - final decision required
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Assessment Summary -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-danger text-white">
+						<h:h5 class="card-title mb-0">⚠️ Assessment Failed</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Project:</strong> <label value="@load(vm.projectName)" /></h:p>
+						<h:p class="mb-2"><strong>Overall Score:</strong> <label value="@load(vm.overallScore)" />%</h:p>
+						<h:p class="mb-0"><strong>Process Consistent:</strong> 
+							<label value="@load(vm.processConsistent ? 'Yes' : 'No')" 
+							       sclass="@load(vm.processConsistent ? 'text-success' : 'text-danger')" />
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Review Comments -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Review Comments *</h:h5>
+						<textbox rows="5" width="100%" value="@bind(vm.reviewComments)" 
+						         placeholder="Provide detailed comments about the assessment failure and recommended actions..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Decision Buttons -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Decision Required</h:h5>
+						<div class="d-flex gap-2">
+							<button label="Retry Assessment" 
+							        iconSclass="fa fa-rotate-right"
+							        zclass="btn btn-warning"
+							        onClick="@command('retryFromBeginning')" />
+							<button label="Cancel Assessment" 
+							        iconSclass="fa fa-ban"
+							        zclass="btn btn-danger"
+							        onClick="@command('cancelAssessment')" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

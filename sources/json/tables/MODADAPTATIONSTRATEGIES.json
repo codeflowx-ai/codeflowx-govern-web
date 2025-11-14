@@ -1,0 +1,191 @@
+{
+  "namespace": "models",
+  "name": "MODADAPTATIONSTRATEGIES",
+  "type": "TABLE",
+  "labelMonitor": "modusecase",
+  "description": "Historial estrategias adaptación modelos - Tracking recomendaciones EU AI Act GPAI",
+  "fields": [
+    {
+      "name": "idxadaptationstrategy",
+      "type": "LONG",
+      "pk": true,
+      "required": false,
+      "label": "ID Estrategia",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "iduuid",
+      "type": "VARCHAR",
+      "size": 36,
+      "required": true,
+      "label": "UUID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "idxproject",
+      "type": "LONG",
+      "required": false,
+      "label": "Proyecto",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "PRJPROJECTS",
+        "field": "IDXPROJECT"
+      }
+    },
+    {
+      "name": "modusecase",
+      "type": "CLOB",
+      "required": true,
+      "label": "Caso de Uso",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modtargettask",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "Tarea Objetivo",
+      "criteria": true,
+      "filter": true,
+      "values": ["QA", "SUMMARIZATION", "CODE_GENERATION", "TRANSLATION", "CLASSIFICATION", "CHAT", "RAG"]
+    },
+    {
+      "name": "modbudgetusd",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Presupuesto USD",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modtimedays",
+      "type": "INTEGER",
+      "required": false,
+      "label": "Tiempo Disponible (días)",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modtargetperformance",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Performance Objetivo (%)",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modhardwareavailable",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "Hardware Disponible",
+      "criteria": true,
+      "filter": true,
+      "comment": "CPU, GPU_T4, GPU_A100, etc."
+    },
+    {
+      "name": "modpriority",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": false,
+      "label": "Prioridad",
+      "criteria": true,
+      "filter": true,
+      "values": ["COST", "TIME", "CO2", "PERFORMANCE"]
+    },
+    {
+      "name": "modrecommendations",
+      "type": "JSONB",
+      "required": true,
+      "label": "Recomendaciones IA",
+      "criteria": false,
+      "filter": false,
+      "comment": "Array estrategias rankeadas: [{strategy, score, cost, time, co2, pros, cons}]"
+    },
+    {
+      "name": "modselectedstrategy",
+      "type": "VARCHAR",
+      "size": 50,
+      "required": false,
+      "label": "Estrategia Seleccionada",
+      "criteria": true,
+      "filter": true,
+      "values": ["ADAPTER_LORA", "ADAPTER_QLORA", "FINE_TUNING", "QUANTIZATION", "MERGE", "NONE"]
+    },
+    {
+      "name": "modselectedreason",
+      "type": "CLOB",
+      "required": false,
+      "label": "Razón Selección",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modresultingmodelid",
+      "type": "LONG",
+      "required": false,
+      "label": "Modelo Resultante",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "MODMODELS",
+        "field": "IDXMODEL"
+      }
+    },
+    {
+      "name": "modactualcost",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Costo Real USD",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modactualco2kg",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "CO2 Real (kg)",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modactualtimehours",
+      "type": "INTEGER",
+      "required": false,
+      "label": "Tiempo Real (horas)",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modactualperformance",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Performance Real (%)",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modcreatedby",
+      "type": "VARCHAR",
+      "size": 255,
+      "required": true,
+      "label": "Creado Por",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "modcreatedat",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Fecha Creación",
+      "criteria": true,
+      "filter": true
+    }
+  ]
+}
+
+

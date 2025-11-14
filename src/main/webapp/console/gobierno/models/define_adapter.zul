@@ -1,0 +1,64 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.DefineAdapterParametersViewModel')">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Definir parámetros Adapter (LoRA/QLoRA)</h3>
+            </div>
+            <div class="card-body">
+                <grid sclass="grid-form">
+                    <rows>
+                        <row>
+                            <label value="ID Modelo Base" />
+                            <longbox value="@bind(vm.baseModelId)" />
+                        </row>
+                        <row>
+                            <label value="Nombre Adapter" />
+                            <textbox value="@bind(vm.adapterName)" placeholder="mi-modelo-adapter" />
+                        </row>
+                        <row>
+                            <label value="Tipo" />
+                            <combobox selectedItem="@bind(vm.adapterType)">
+                                <comboitem label="ADAPTER_LORA" value="ADAPTER_LORA" />
+                                <comboitem label="ADAPTER_QLORA" value="ADAPTER_QLORA" />
+                            </combobox>
+                        </row>
+                        <row>
+                            <label value="Rank" />
+                            <intbox value="@bind(vm.rank)" />
+                        </row>
+                        <row>
+                            <label value="Alpha" />
+                            <intbox value="@bind(vm.alpha)" />
+                        </row>
+                        <row>
+                            <label value="Target Modules" />
+                            <textbox value="@bind(vm.targetModules)" placeholder="q_proj,v_proj" />
+                        </row>
+                        <row>
+                            <label value="Dropout" />
+                            <doublebox value="@bind(vm.dropout)" format="0.##" />
+                        </row>
+                        <row>
+                            <label value="Dataset Entrenamiento" />
+                            <textbox value="@bind(vm.trainingDataset)" />
+                        </row>
+                        <row>
+                            <label value="Creado por" />
+                            <textbox value="@bind(vm.createdBy)" />
+                        </row>
+                        <row>
+                            <label value="Doc Modificaciones (URL)" />
+                            <textbox value="@bind(vm.modificationsDocUrl)" />
+                        </row>
+                    </rows>
+                </grid>
+                <div class="mt-3 d-flex gap-2">
+                    <button label="Enviar" sclass="btn btn-success" onClick="@command('submit')" />
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>
+

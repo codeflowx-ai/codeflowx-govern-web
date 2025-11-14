@@ -1,0 +1,103 @@
+-- ==================================================
+-- TABLE: MODADAPTATIONSTRATEGIES
+-- ==================================================
+-- Fecha: Noviembre 2025
+-- Objetivo: Tracking de estrategias de adaptación de modelos con recomendaciones IA
+-- Artículos: Art. 51-55 EU AI Act - GPAI Downstream Providers
+
+CREATE SEQUENCE seq_modadaptationstrategies START WITH 1 INCREMENT BY 1;
+
+CREATE TABLE MODADAPTATIONSTRATEGIES (
+    -- PK
+    IDXADAPTATIONSTRATEGY BIGINT PRIMARY KEY DEFAULT nextval('seq_modadaptationstrategies'),
+    IDUUID VARCHAR(36) NOT NULL UNIQUE,
+    
+    -- FK Proyecto
+    IDXPROJECT BIGINT,
+    
+    -- Información Request
+    MODUSECASE TEXT NOT NULL,
+    MODTARGETTASK VARCHAR(100),
+    MODBUDGETUSD NUMERIC(10,2),
+    MODTIMEDAYS INTEGER,
+    MODTARGETPERFORMANCE NUMERIC(5,2),
+    MODHARDWAREAVAILABLE VARCHAR(100),
+    MODPRIORITY VARCHAR(20),
+    
+    -- Recomendaciones IA (JSONB array)
+    MODRECOMMENDATIONS JSONB NOT NULL,
+    
+    -- Selección Usuario
+    MODSELECTEDSTRATEGY VARCHAR(50),
+    MODSELECTEDREASON TEXT,
+    
+    -- Modelo Resultante
+    MODRESULTINGMODELID BIGINT,
+    
+    -- Resultados Reales (vs estimaciones)
+    MODACTUALCOST NUMERIC(10,2),
+    MODACTUALCO2KG NUMERIC(10,3),
+    MODACTUALTIMEHOURS INTEGER,
+    MODACTUALPERFORMANCE NUMERIC(5,2),
+    
+    -- Auditoría
+    MODCREATEDBY VARCHAR(255) NOT NULL,
+    MODCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Constraints
+    CONSTRAINT chk_mod_target_task CHECK (MODTARGETTASK IN ('QA', 'SUMMARIZATION', 'CODE_GENERATION', 'TRANSLATION', 'CLASSIFICATION', 'CHAT', 'RAG')),
+    CONSTRAINT chk_mod_priority CHECK (MODPRIORITY IN ('COST', 'TIME', 'CO2', 'PERFORMANCE')),
+    CONSTRAINT chk_mod_selected_strategy CHECK (MODSELECTEDSTRATEGY IN ('ADAPTER_LORA', 'ADAPTER_QLORA', 'FINE_TUNING', 'QUANTIZATION', 'MERGE', 'NONE')),
+    CONSTRAINT fk_mod_project FOREIGN KEY (IDXPROJECT) REFERENCES PRJPROJECTS(IDXPROJECT) ON DELETE CASCADE,
+    CONSTRAINT fk_mod_resulting_model FOREIGN KEY (MODRESULTINGMODELID) REFERENCES MODMODELS(IDXMODEL) ON DELETE SET NULL
+);
+
+-- Índices
+CREATE INDEX idx_modadapt_project ON MODADAPTATIONSTRATEGIES(IDXPROJECT);
+CREATE INDEX idx_modadapt_strategy ON MODADAPTATIONSTRATEGIES(MODSELECTEDSTRATEGY);
+CREATE INDEX idx_modadapt_task ON MODADAPTATIONSTRATEGIES(MODTARGETTASK);
+CREATE INDEX idx_modadapt_priority ON MODADAPTATIONSTRATEGIES(MODPRIORITY);
+CREATE INDEX idx_modadapt_resulting ON MODADAPTATIONSTRATEGIES(MODRESULTINGMODELID);
+CREATE INDEX idx_modadapt_created ON MODADAPTATIONSTRATEGIES(MODCREATEDAT DESC);
+
+-- Índice GIN para queries JSONB
+CREATE INDEX idx_modadapt_recommendations_gin ON MODADAPTATIONSTRATEGIES USING GIN(MODRECOMMENDATIONS);
+
+-- Comentarios
+COMMENT ON TABLE MODADAPTATIONSTRATEGIES IS 'Historial estrategias adaptación modelos - EU AI Act GPAI compliance';
+COMMENT ON COLUMN MODADAPTATIONSTRATEGIES.MODRECOMMENDATIONS IS 'Array JSON con estrategias rankeadas por IA con scores, costos, CO2, pros/cons';
+COMMENT ON COLUMN MODADAPTATIONSTRATEGIES.MODSELECTEDSTRATEGY IS 'Estrategia finalmente seleccionada por usuario';
+COMMENT ON COLUMN MODADAPTATIONSTRATEGIES.MODACTUALCOST IS 'Costo real ejecutado (para comparar vs estimación)';
+COMMENT ON COLUMN MODADAPTATIONSTRATEGIES.MODACTUALCO2KG IS 'CO2 real emitido (para compliance sostenibilidad)';
+
+-- ==================================================
+-- QUERIES EJEMPLO
+-- ==================================================
+
+-- Obtener estrategias de un proyecto
+-- SELECT * FROM MODADAPTATIONSTRATEGIES WHERE IDXPROJECT = 123 ORDER BY MODCREATEDAT DESC;
+
+-- Comparar estimaciones vs reales (Adapter)
+-- SELECT 
+--   MODSELECTEDSTRATEGY,
+--   AVG(MODBUDGETUSD) as estimated_cost,
+--   AVG(MODACTUALCOST) as actual_cost,
+--   AVG(MODACTUALCOST - MODBUDGETUSD) as cost_variance,
+--   AVG(MODACTUALCO2KG) as avg_co2
+-- FROM MODADAPTATIONSTRATEGIES
+-- WHERE MODSELECTEDSTRATEGY = 'ADAPTER_LORA'
+-- GROUP BY MODSELECTEDSTRATEGY;
+
+-- Savings Adapter vs Fine-Tuning (para dashboard)
+-- SELECT 
+--   AVG(CASE WHEN MODSELECTEDSTRATEGY LIKE 'ADAPTER%' THEN MODACTUALCOST END) as avg_adapter_cost,
+--   AVG(CASE WHEN MODSELECTEDSTRATEGY = 'FINE_TUNING' THEN MODACTUALCOST END) as avg_finetuning_cost,
+--   (1 - AVG(CASE WHEN MODSELECTEDSTRATEGY LIKE 'ADAPTER%' THEN MODACTUALCOST END) / 
+--        AVG(CASE WHEN MODSELECTEDSTRATEGY = 'FINE_TUNING' THEN MODACTUALCOST END)) * 100 as cost_savings_pct
+-- FROM MODADAPTATIONSTRATEGIES;
+
+-- ==================================================
+-- FIN SCRIPT
+-- ==================================================
+
+

@@ -1,0 +1,103 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.incident.RootCauseAnalysisViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-magnifying-glass-chart me-2"></h:i>
+						Root Cause Analysis (Art. 20)
+					</h:h2>
+					<h:p class="text-muted">
+						Identify root cause and contributing factors
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Incident Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:p class="mb-0"><strong>Incident:</strong> <label value="@load(vm.incidentTitle)" /></h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Automated RCA (if available) -->
+			<div class="col-lg-12 s-bot" visible="@load(not empty vm.automatedRcaReport)">
+				<div class="card border-info">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">🤖 Automated RCA Report</h:h5>
+					</div>
+					<div class="card-body">
+						<h:pre class="mb-0"><label value="@load(vm.automatedRcaReport)" /></h:pre>
+					</div>
+				</div>
+			</div>
+
+			<!-- What Happened? -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">1. What Happened? *</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.whatHappened)" 
+						         placeholder="Describe the sequence of events leading to the incident..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Why Happened (Root Cause) -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">2. Why Happened? (Root Cause) *</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.whyHappened)" 
+						         placeholder="Identify the underlying root cause (use 5 Whys technique if needed)..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Contributing Factors -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">3. Contributing Factors</h:h5>
+						<textbox rows="3" width="100%" value="@bind(vm.contributingFactors)" 
+						         placeholder="List any secondary factors that contributed to the incident..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Timeline -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">4. Timeline of Events</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.timeline)" 
+						         placeholder="Chronological timeline of events (e.g., T-60min: ..., T-30min: ..., T0: incident occurred...)..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Complete RCA" 
+						        iconSclass="fa fa-check"
+						        zclass="btn btn-primary btn-lg"
+						        onClick="@command('submitRCA')" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

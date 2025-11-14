@@ -1,0 +1,108 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.incident.DocumentIncidentDetailsViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-triangle-exclamation me-2"></h:i>
+						Document Serious Incident (Art. 73)
+					</h:h2>
+					<h:p class="text-muted">
+						Complete incident documentation - Authority notification sent
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Incident Classification -->
+			<div class="col-lg-12 s-bot">
+				<div class="card border-danger">
+					<div class="card-header bg-danger text-white">
+						<h:h5 class="card-title mb-0">🚨 SERIOUS INCIDENT DETECTED</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Severity:</strong> 
+							<h:span class="badge bg-danger"><label value="@load(vm.severity)" /></h:span>
+						</h:p>
+						<h:p class="mb-0"><strong>Affected Users:</strong> <label value="@load(vm.affectedUsersCount)" /></h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Incident Title -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Incident Title *</h:h5>
+						<textbox width="100%" value="@bind(vm.incidentTitle)" 
+						         placeholder="Brief descriptive title of the incident..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Detailed Description -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Detailed Description *</h:h5>
+						<textbox rows="5" width="100%" value="@bind(vm.detailedDescription)" 
+						         placeholder="What happened? When? How was it detected?..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Impact Assessment -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Impact Assessment</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.impactAssessment)" 
+						         placeholder="Describe the impact on users, fundamental rights, data, systems..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Initial Actions -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Initial Containment Actions</h:h5>
+						<textbox rows="3" width="100%" value="@bind(vm.initialActions)" 
+						         placeholder="What immediate actions have been taken to contain the incident?..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Potential Risks -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Potential Risks</h:h5>
+						<textbox rows="3" width="100%" value="@bind(vm.potentialRisks)" 
+						         placeholder="Identify potential risks and consequences if not addressed..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Submit Documentation" 
+						        iconSclass="fa fa-check"
+						        zclass="btn btn-primary btn-lg"
+						        onClick="@command('submitDocumentation')" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

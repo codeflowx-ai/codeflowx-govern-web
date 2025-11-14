@@ -6,7 +6,7 @@
 
 ---
 
-## 📚 DOCUMENTOS DISPONIBLES (8 Documentos x 3 Formatos)
+## 📚 DOCUMENTOS DISPONIBLES (10 Documentos x 3 Formatos)
 
 ### **1. EU AI ACT TIMELINE Y FASES CODEFLOWX**
 
@@ -264,6 +264,45 @@
 
 ---
 
+### **9. COMPARATIVA PLATAFORMAS GOBIERNO IA NOVIEMBRE 2025**
+
+**Archivos:**
+- `COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.md` (22 KB) - Editable
+- `COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.docx` (24 KB) - **Word**
+- `COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.pdf` (121 KB) - **PDF**
+
+**Contenido:**
+- Tabla CodeflowX vs Credo AI, Holistic AI, Fiddler, Arthur, Lakera, W&B
+- Tabla plataformas no-code (Botpress, Voiceflow, Landbot, Manychat, Stack AI, Flowise) con pricing
+- Tabla proveedores de inferencia/modelos (OpenAI, Anthropic, Gemini, Bedrock, Mistral, Together, Cohere)
+- Insights comerciales y estrategia de alianzas
+
+**Uso:** Soporte a pricing y posicionamiento competitivo
+
+**Audiencia:** Dirección comercial, partners, preventa técnica
+
+---
+
+### **10. GOBERNANZA SIN MIGRACIONES (OVERLAY INTEGRACIONES)**
+
+**Archivos:**
+- `CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.md` (20 KB)
+- `CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.docx` (23 KB)
+- `CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.pdf` (117 KB)
+
+**Contenido:**
+- Resumen ejecutivo “plug & play” n8n/ChatGPT/Claude/Databricks
+- Arquitectura API pública + RabbitMQ + evaluaciones Python
+- Tabla conectores (REST, SDK, MCP, webhooks)
+- Ventajas competitivas frente Credo/Holistic + casos de uso
+- Discursos comerciales y pricing recomendado
+
+**Uso:** Ventas, partners, avances PoC express
+
+**Audiencia:** C-level técnico, preventa, integradores
+
+---
+
 ## 🎯 GUÍA DE USO POR FASE VENTA
 
 ### **FASE 1: AWARENESS (Prospecto frío)**
@@ -335,8 +374,10 @@
 | **Oportunidad España** | 1097 líneas | 28 KB | 119 KB | Dirección/C-level | Estratégico | Justificar mercado |
 | **Tarifa Interna** | 742 líneas | 27 KB | 142 KB | Dirección comercial | Pricing interno | Definir precios |
 | **Comparativa competencia** | 512 líneas | 25 KB | 118 KB | Dirección comercial / ventas | Pricing | Justificar posicionamiento |
+| **Comparativa plataformas gobierno IA** | 462 líneas | 24 KB | 121 KB | Dirección comercial / partners | Competitive intel | Diferenciación CodeflowX |
+| **Gobernanza sin migraciones** | 390 líneas | 23 KB | 117 KB | Ventas / partners | Evaluation | Argumento integración plug & play |
 
-**TOTAL:** 8 documentos x 3 formatos (Markdown + Word + PDF) = **24 archivos**
+**TOTAL:** 10 documentos x 3 formatos (Markdown + Word + PDF) = **30 archivos**
 
 ---
 
@@ -445,6 +486,12 @@ docs/comercial/
 ├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.md
 ├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.docx ✅
 ├── COMPARATIVA_PRECIOS_COMPETENCIA_NOV2025.pdf ✅
+├── COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.md
+├── COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.docx ✅
+├── COMPARATIVA_PLATAFORMAS_GOBIERNO_IA_NOV2025.pdf ✅
+├── CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.md
+├── CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.docx ✅
+├── CODEFLOWX_GOBERNANZA_OVERLAY_NOSINTEGRACION.pdf ✅
 └── README_DOCUMENTOS_COMERCIALES.md (este archivo)
 ```
 
@@ -476,11 +523,11 @@ docs/comercial/
 
 ### **Material Disponible:**
 ```
-✅ 8 documentos técnico-comerciales completos
+✅ 10 documentos técnico-comerciales completos
 ✅ 3 formatos por documento: Markdown + Word + PDF
-✅ Total: 24 archivos (8 .md + 8 .docx + 8 .pdf)
-✅ ~7.800 líneas documentación
-✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado + Pricing + Competencia
+✅ Total: 30 archivos (10 .md + 10 .docx + 10 .pdf)
+✅ ~8.700 líneas documentación
+✅ Cobertura: Timeline + GPAI + Roles + Casos Uso + Plataforma + Mercado + Pricing + Competencia + Integración plug & play
 ```
 
 ### **Argumentación Preparada Para:**

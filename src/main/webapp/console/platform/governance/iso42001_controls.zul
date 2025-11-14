@@ -1,0 +1,133 @@
+<?page title="ISO 42001 Controls" contentType="text/html;charset=UTF-8"?>
+<window width="100%" height="100%" border="normal"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.ISO42001ControlsViewModel')">
+
+    <vlayout hflex="1" vflex="1" spacing="12px">
+        <hlayout spacing="10px">
+            <button label="Registrar control" iconSclass="z-icon-plus"
+                    onClick="@command('createControl')" />
+            <separator orient="vertical"/>
+            <label value="Estado"/>
+            <combobox value="@bind(vm.statusFilter)" width="160px" onSelect="@command('filterControls')">
+                <comboitem label="Todos" value=""/>
+                <comboitem label="PLANNED" value="PLANNED"/>
+                <comboitem label="IN_PROGRESS" value="IN_PROGRESS"/>
+                <comboitem label="IMPLEMENTED" value="IMPLEMENTED"/>
+                <comboitem label="PARTIAL" value="PARTIAL"/>
+            </combobox>
+            <label value="Categoría"/>
+            <combobox value="@bind(vm.categoryFilter)" width="160px" onSelect="@command('filterControls')">
+                <comboitem label="Todas" value=""/>
+                <comboitem label="GOVERNANCE" value="GOVERNANCE"/>
+                <comboitem label="LEADERSHIP" value="LEADERSHIP"/>
+                <comboitem label="RISK" value="RISK"/>
+                <comboitem label="PERFORMANCE" value="PERFORMANCE"/>
+                <comboitem label="RESOURCES" value="RESOURCES"/>
+                <comboitem label="OPERATIONS" value="OPERATIONS"/>
+                <comboitem label="DATA" value="DATA"/>
+                <comboitem label="SECURITY" value="SECURITY"/>
+                <comboitem label="SUPPLIER" value="SUPPLIER"/>
+                <comboitem label="MONITORING" value="MONITORING"/>
+                <comboitem label="RESPONSIBILITY" value="RESPONSIBILITY"/>
+                <comboitem label="COMPLIANCE" value="COMPLIANCE"/>
+                <comboitem label="IMPROVEMENT" value="IMPROVEMENT"/>
+                <comboitem label="INNOVATION" value="INNOVATION"/>
+            </combobox>
+            <separator orient="vertical"/>
+            <groupbox title="Implementados" width="200px">
+                <vlayout align="center">
+                    <label value="@load(vm.implementedCount)" style="font-size:24px;font-weight:bold"/>
+                    <label value="Controles implementados"/>
+                </vlayout>
+            </groupbox>
+        </hlayout>
+
+        <groupbox title="Nuevo control" width="100%">
+            <grid hflex="1">
+                <rows>
+                    <row>
+                        <label value="Código"/>
+                        <textbox value="@bind(vm.newControl.icocontrolcode)" width="200px" />
+                        <label value="Cláusula"/>
+                        <textbox value="@bind(vm.newControl.icocontrolclause)" width="120px" />
+                        <label value="Título"/>
+                        <textbox value="@bind(vm.newControl.icocontroltitle)" width="320px" />
+                    </row>
+                    <row>
+                        <label value="Descripción"/>
+                        <textbox value="@bind(vm.newControl.icocontroldescription)" multiline="true" rows="4" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Categoría"/>
+                        <combobox value="@bind(vm.newControl.icocontrolcategory)" width="200px">
+                            <comboitem label="GOVERNANCE" value="GOVERNANCE"/>
+                            <comboitem label="LEADERSHIP" value="LEADERSHIP"/>
+                            <comboitem label="RISK" value="RISK"/>
+                            <comboitem label="PERFORMANCE" value="PERFORMANCE"/>
+                            <comboitem label="RESOURCES" value="RESOURCES"/>
+                            <comboitem label="OPERATIONS" value="OPERATIONS"/>
+                            <comboitem label="DATA" value="DATA"/>
+                            <comboitem label="SECURITY" value="SECURITY"/>
+                            <comboitem label="SUPPLIER" value="SUPPLIER"/>
+                            <comboitem label="MONITORING" value="MONITORING"/>
+                            <comboitem label="RESPONSIBILITY" value="RESPONSIBILITY"/>
+                            <comboitem label="COMPLIANCE" value="COMPLIANCE"/>
+                            <comboitem label="IMPROVEMENT" value="IMPROVEMENT"/>
+                            <comboitem label="INNOVATION" value="INNOVATION"/>
+                        </combobox>
+                        <label value="Estado"/>
+                        <combobox value="@bind(vm.newControl.icocontrolstatus)" width="180px">
+                            <comboitem label="PLANNED" value="PLANNED"/>
+                            <comboitem label="IN_PROGRESS" value="IN_PROGRESS"/>
+                            <comboitem label="PARTIAL" value="PARTIAL"/>
+                            <comboitem label="IMPLEMENTED" value="IMPLEMENTED"/>
+                        </combobox>
+                        <label value="Owner"/>
+                        <textbox value="@bind(vm.newControl.icocontrolowner)" width="220px" />
+                    </row>
+                    <row>
+                        <label value="Impacto riesgo"/>
+                        <combobox value="@bind(vm.newControl.icocontrolriskimpact)" width="180px">
+                            <comboitem label="LOW" value="LOW"/>
+                            <comboitem label="MEDIUM" value="MEDIUM"/>
+                            <comboitem label="HIGH" value="HIGH"/>
+                        </combobox>
+                        <label value="Evidencia"/>
+                        <textbox value="@bind(vm.newControl.icocontrolevidence)" multiline="true" rows="2" hflex="1"/>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+
+        <listbox model="@load(vm.controls)" selectedItem="@bind(vm.selectedControl)" hflex="1" vflex="1"
+                 emptyMessage="No hay controles registrados" mold="paging">
+            <listhead>
+                <listheader label="Código" width="120px"/>
+                <listheader label="Título" width="260px"/>
+                <listheader label="Categoría" width="140px"/>
+                <listheader label="Estado" width="140px"/>
+                <listheader label="Owner" width="180px"/>
+                <listheader label="Cláusula" width="120px"/>
+                <listheader label="Acciones" width="220px"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell><label value="@load(each.icocontrolcode)"/></listcell>
+                    <listcell><label value="@load(each.icocontroltitle)"/></listcell>
+                    <listcell><label value="@load(each.icocontrolcategory)"/></listcell>
+                    <listcell><label value="@load(each.icocontrolstatus)"/></listcell>
+                    <listcell><label value="@load(each.icocontrolowner)"/></listcell>
+                    <listcell><label value="@load(each.icocontrolclause)"/></listcell>
+                    <listcell>
+                        <hlayout spacing="6px">
+                            <button label="Actualizar" sclass="btn-primary"
+                                    onClick="@command('updateControl', control=each)"/>
+                            <button label="Eliminar" sclass="btn-danger"
+                                    onClick="@command('deleteControl', control=each)"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </vlayout>
+</window>

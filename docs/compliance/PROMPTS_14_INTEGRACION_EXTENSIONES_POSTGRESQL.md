@@ -1040,6 +1040,194 @@ $$ LANGUAGE SQL IMMUTABLE;
 
 ---
 
+## GRUPO 5: Tablas Governance API (Eventos + Webhooks)
+
+### PROMPT 14.11: Crear tabla `GOVGOVERNANCEEVENTS` (TimescaleDB + pgcrypto + pg_trgm)
+
+**Objetivo:** Persistir todos los eventos ingeridos por la API pública (`codeflowx-governance-api`) garantizando trazabilidad, hash del prompt y consultas eficientes.
+
+**SQL propuesta:**
+
+```sql
+CREATE TABLE govgovernanceevents (
+    idxgovernanceevent BIGSERIAL PRIMARY KEY,
+    iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
+    idxproject BIGINT NOT NULL,
+    govtraceid VARCHAR(64) NOT NULL,
+    goveventtype VARCHAR(30) NOT NULL, -- CHAT_COMPLETION, AGENT_ACTION, RAG_QUERY...
+    govsource VARCHAR(30) NOT NULL,    -- N8N, CHATGPT_API, CLAUDE_API, MCP, OTHER
+    govprompt TEXT NOT NULL,
+    govprompthash VARCHAR(64) NOT NULL,
+    govinputmetadata JSONB,
+    govoutputtext TEXT,
+    govoutputmetadata JSONB,           -- tokens, confidence, latency
+    govmodelprovider VARCHAR(50),
+    govmodelname VARCHAR(80),
+    govtemperature NUMERIC(4,3),
+    govriskflags JSONB,                -- array de flags PII, BIAS, SENSITIVE_TOPIC
+    govstatus VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    govdecisionpayload JSONB,          -- resultados agregados (se rellena al cerrar)
+    createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+    updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_gov_idxproject FOREIGN KEY (idxproject)
+        REFERENCES prjprojects (idxproject)
+);
+
+-- Hash prompt automáticamente (pgcrypto) y actualizar updatedat
+CREATE OR REPLACE FUNCTION gov_set_prompthash()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.govprompthash := encode(digest(COALESCE(NEW.govprompt, '') || COALESCE(NEW.govtraceid, ''), 'sha256'), 'hex');
+    NEW.updatedat := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gov_set_prompthash
+    BEFORE INSERT OR UPDATE ON govgovernanceevents
+    FOR EACH ROW
+    EXECUTE FUNCTION gov_set_prompthash();
+
+-- Índices (pg_trgm + GIN/BTREE_GIN)
+CREATE INDEX idx_gov_events_traceid ON govgovernanceevents (govtraceid);
+CREATE INDEX idx_gov_events_status ON govgovernanceevents (govstatus);
+CREATE INDEX idx_gov_events_prompthash ON govgovernanceevents (govprompthash);
+CREATE INDEX idx_gov_events_source ON govgovernanceevents (govsource, goveventtype);
+CREATE INDEX idx_gov_events_prompt_trgm ON govgovernanceevents USING gin (govprompt gin_trgm_ops);
+CREATE INDEX idx_gov_events_inputmeta ON govgovernanceevents USING gin (govinputmetadata jsonb_path_ops);
+CREATE INDEX idx_gov_events_outputmeta ON govgovernanceevents USING gin (govoutputmetadata jsonb_path_ops);
+
+-- TimescaleDB para series temporales
+SELECT create_hypertable('govgovernanceevents', 'createdat', if_not_exists => TRUE);
+-- Compresión y retención (Art. 71 → 6 años mínimo)
+SELECT add_compression_policy('govgovernanceevents', INTERVAL '30 days', if_not_exists => TRUE);
+SELECT add_retention_policy('govgovernanceevents', INTERVAL '6 years', if_not_exists => TRUE);
+```
+
+**Validaciones:**
+- Insertar evento dummy y comprobar que `govprompthash` se genera.
+- Consultar por `traceId` y `status` (índices en uso).
+- Analizar `EXPLAIN` sobre búsqueda `govprompt ILIKE '%riesgo%'` → usa `pg_trgm`.
+
+---
+
+### PROMPT 14.12: Tabla `GOVWEBHOOKSUBSCRIPTIONS` (pgcrypto para secretos)
+
+```sql
+CREATE TABLE govwebhooksubscriptions (
+    idxwebhooksubscription BIGSERIAL PRIMARY KEY,
+    iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
+    idxproject BIGINT NOT NULL,
+    gwsname VARCHAR(150) NOT NULL,
+    gwsurl VARCHAR(500) NOT NULL,
+    gwsevents JSONB NOT NULL,              -- ej. ["EVALUATION_COMPLETED", "INCIDENT_RAISED"]
+    gwssecret BYTEA NOT NULL,              -- cifrado con pgp_sym_encrypt
+    gwsactive BOOLEAN NOT NULL DEFAULT TRUE,
+    gwscreatedby BIGINT,
+    gwscreatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+    gwsupdatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_gws_project FOREIGN KEY (idxproject)
+        REFERENCES prjprojects (idxproject)
+);
+
+CREATE OR REPLACE FUNCTION gws_encrypt_secret()
+RETURNS TRIGGER AS $$
+DECLARE
+    key TEXT := current_setting('codeflowx.pgcrypto.key', true);
+BEGIN
+    IF key IS NULL THEN
+        RAISE EXCEPTION 'Missing pgcrypto key (codeflowx.pgcrypto.key)';
+    END IF;
+    IF TG_OP = 'INSERT' OR NEW.gwssecret <> OLD.gwssecret THEN
+        NEW.gwssecret := pgp_sym_encrypt(convert_to(NEW.gwssecret::text, 'UTF8'), key, 'cipher-algo=aes256');
+    END IF;
+    NEW.gwsupdatedat := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_gws_encrypt_secret
+    BEFORE INSERT OR UPDATE ON govwebhooksubscriptions
+    FOR EACH ROW
+    EXECUTE FUNCTION gws_encrypt_secret();
+
+CREATE INDEX idx_gws_project ON govwebhooksubscriptions (idxproject, gwsactive);
+CREATE INDEX idx_gws_events ON govwebhooksubscriptions USING gin (gwsevents jsonb_path_ops);
+```
+
+**Nota:** Guardar la clave `codeflowx.pgcrypto.key` en `postgresql.conf` o `ALTER SYSTEM` (no en SQL plano).
+
+---
+
+### PROMPT 14.13: Tabla `GOVWEBHOOKDELIVERIES` (TimescaleDB + retries)
+
+```sql
+CREATE TABLE govwebhookdeliveries (
+    idxwebhookdelivery BIGSERIAL PRIMARY KEY,
+    iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
+    idxwebhooksubscription BIGINT NOT NULL,
+    gwdeventuuid UUID NOT NULL,
+    gwdpayload JSONB NOT NULL,
+    gwdstatus VARCHAR(20) NOT NULL DEFAULT 'PENDING',   -- PENDING, SENT, RETRYING, FAILED
+    gwdattempts SMALLINT NOT NULL DEFAULT 0,
+    gwdnextrtryat TIMESTAMP,
+    gwdlasterror TEXT,
+    createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_gwd_webhook FOREIGN KEY (idxwebhooksubscription)
+        REFERENCES govwebhooksubscriptions (idxwebhooksubscription)
+);
+
+CREATE INDEX idx_gwd_status ON govwebhookdeliveries (gwdstatus, gwdattempts);
+CREATE INDEX idx_gwd_nextretry ON govwebhookdeliveries (gwdnextrtryat) WHERE gwdstatus = 'RETRYING';
+
+SELECT create_hypertable('govwebhookdeliveries', 'createdat', if_not_exists => TRUE);
+SELECT add_retention_policy('govwebhookdeliveries', INTERVAL '18 months', if_not_exists => TRUE);
+```
+
+---
+
+### PROMPT 14.14: Tabla `GOVGOVERNANCERESULTS` (Resultados evaluaciones Python)
+
+```sql
+CREATE TABLE govgovernanceresults (
+    idxgovernanceresult BIGSERIAL PRIMARY KEY,
+    iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
+    idxgovernanceevent BIGINT NOT NULL,
+    gvrstage VARCHAR(30) NOT NULL,          -- LLM_EVAL, BIAS_CHECK, DPIA, RAG_QUALITY, etc.
+    gvrscore NUMERIC(5,2),
+    gvrseverity VARCHAR(20),                -- INFO, WARNING, CRITICAL
+    gvrmetrics JSONB,
+    gvrexplanations JSONB,                  -- razonamientos, evidencias, enlaces
+    gvrrecommendations JSONB,
+    gvrcreatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT fk_gvr_event FOREIGN KEY (idxgovernanceevent)
+        REFERENCES govgovernanceevents (idxgovernanceevent)
+);
+
+CREATE INDEX idx_gvr_event ON govgovernanceresults (idxgovernanceevent);
+CREATE INDEX idx_gvr_stage ON govgovernanceresults (gvrstage, gvrseverity);
+CREATE INDEX idx_gvr_metrics ON govgovernanceresults USING gin (gvrmetrics jsonb_path_ops);
+```
+
+**Integración con extensiones:**
+- `timescaledb` en eventos + deliveries → queries por rango temporal (monitorización Art. 15/71).
+- `pgcrypto` para hashing y cifrado de secretos.
+- `pg_trgm` + `jsonb_path_ops` para búsquedas rápidas por contenido (investigaciones auditoras).
+- `btree_gin` se recomienda si se añaden columnas compuestas.
+
+---
+
+**Acciones posteriores:**
+1. Documentar entidades EnArt correspondientes (prefijo `gov`) en PROMPTS_05 Grupo D.
+2. Actualizar migraciones Liquibase/Flyway.
+3. Generar vistas materializadas según necesidades (ej. conteo incidentes por proyecto usando Timescale continuous aggregates).
+
+---
+
 ## VALIDACIÓN COMPLETA
 
 ### Script de Verificación

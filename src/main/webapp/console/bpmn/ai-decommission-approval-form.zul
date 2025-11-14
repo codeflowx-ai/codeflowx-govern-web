@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Aprobación de decommission"
+            width="65%"
+            height="55%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.AIDecommissionApprovalViewModel')">
+
+        <vlayout sclass="p-4" spacing="12px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Resumen de sistema"/>
+                <textbox value="@bind(vm.systemSummary)"
+                         width="100%"
+                         rows="6"
+                         multiline="true"
+                         readonly="true"/>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Decisión"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Resultado" sclass="font-weight-bold"/>
+                            <combobox selectedItem="@bind(vm.decision)" width="180px">
+                                <comboitem label="APPROVED"/>
+                                <comboitem label="REJECTED"/>
+                                <comboitem label="ON_HOLD"/>
+                            </combobox>
+                        </row>
+                        <row>
+                            <label value="Comentarios" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.comments)"
+                                     width="100%"
+                                     rows="4"
+                                     multiline="true"
+                                     placeholder="Condiciones o acciones requeridas"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Registrar decisión"
+                        onClick="@command('doSubmit')"
+                        width="170px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

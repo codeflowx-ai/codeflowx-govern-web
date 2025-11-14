@@ -1,0 +1,181 @@
+{
+  "namespace": "compliance",
+  "name": "REGEUREGISTRATIONS",
+  "type": "TABLE",
+  "labelMonitor": "regregistrationtype",
+  "description": "Registro en Base de Datos UE según Art. 49 y Anexo VIII EU AI Act",
+  "fields": [
+    {
+      "name": "idxeuregistration",
+      "type": "LONG",
+      "pk": true,
+      "required": false,
+      "label": "ID Registration",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "iduuid",
+      "type": "VARCHAR",
+      "size": 36,
+      "required": true,
+      "label": "UUID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "idxproject",
+      "type": "LONG",
+      "required": true,
+      "label": "Proyecto",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "PRJPROJECTS",
+        "field": "IDXPROJECT"
+      }
+    },
+    {
+      "name": "regregistrationtype",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": true,
+      "label": "Registration Type",
+      "criteria": true,
+      "filter": true,
+      "values": ["SECTION_A", "SECTION_B", "SECTION_C"],
+      "comment": "Anexo VIII - A:13 campos, B:9 campos, C:5 campos"
+    },
+    {
+      "name": "regart49section",
+      "type": "VARCHAR",
+      "size": 10,
+      "required": false,
+      "label": "Art 49 Section",
+      "criteria": true,
+      "filter": true,
+      "comment": "49.1, 49.2, 49.3"
+    },
+    {
+      "name": "regeuregistrationid",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "EU Registration ID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regsubmissiondata",
+      "type": "JSONB",
+      "required": true,
+      "label": "Submission Data",
+      "criteria": false,
+      "filter": false,
+      "comment": "JSON con campos según sección Anexo VIII"
+    },
+    {
+      "name": "regstatus",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": false,
+      "label": "Status",
+      "criteria": true,
+      "filter": true,
+      "values": ["DRAFT", "PENDING", "SUBMITTED", "REGISTERED", "REJECTED", "ERROR"]
+    },
+    {
+      "name": "regsubmissiondate",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Submission Date",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regregistrationdate",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Registration Date",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regeuapiresponse",
+      "type": "JSONB",
+      "required": false,
+      "label": "EU API Response",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "regerrormessage",
+      "type": "CLOB",
+      "required": false,
+      "label": "Error Message",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "regattempts",
+      "type": "INTEGER",
+      "required": false,
+      "label": "Attempts",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "reglastattemptat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Last Attempt At",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regissensitive",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 49.4 - Is Sensitive",
+      "criteria": true,
+      "filter": true,
+      "comment": "TRUE para Anexo III.1, III.6, III.7 - registro no público"
+    },
+    {
+      "name": "regisnational",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 49.5 - Is National",
+      "criteria": true,
+      "filter": true,
+      "comment": "TRUE para infraestructuras críticas - registro nacional"
+    },
+    {
+      "name": "regnationalregistrationid",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "National Registration ID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regcreatedat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Created At",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "regupdatedat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Updated At",
+      "criteria": true,
+      "filter": true
+    }
+  ]
+}
+
+

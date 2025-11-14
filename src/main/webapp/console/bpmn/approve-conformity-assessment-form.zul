@@ -1,0 +1,81 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ApproveConformityAssessmentViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-badge-check me-2"></h:i>
+						Approve Conformity Assessment (Annex VI)
+					</h:h2>
+					<h:p class="text-muted">
+						Final approval required for conformity assessment
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Assessment Summary -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-success text-white">
+						<h:h5 class="card-title mb-0">✓ Assessment Passed All Steps</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Project:</strong> <label value="@load(vm.projectName)" /></h:p>
+						<h:p class="mb-2"><strong>Overall Conformity Score:</strong> 
+							<label value="@load(vm.overallScore)" sclass="text-success fw-bold" />%
+						</h:p>
+						<h:p class="mb-0"><strong>Conformity Report:</strong> 
+							<a href="@load(vm.reportUrl)" target="_blank" class="btn btn-sm btn-outline-primary">
+								<h:i class="fa fa-file-pdf me-1"></h:i> Download Report
+							</a>
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Approval Comments -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Approval Comments</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.approvalComments)" 
+						         placeholder="Optional: Add any comments or observations about this conformity assessment..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Decision Buttons -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Final Decision</h:h5>
+						<h:div class="alert alert-info">
+							<h:i class="fa fa-info-circle me-2"></h:i>
+							If approved, the project will be marked as <strong>Conformity Assessed</strong> 
+							and ready for EU Declaration generation.
+						</h:div>
+						<div class="d-flex gap-2 mt-3">
+							<button label="APPROVE Assessment" 
+							        iconSclass="fa fa-check-circle"
+							        zclass="btn btn-success btn-lg"
+							        onClick="@command('approve')" />
+							<button label="REJECT Assessment" 
+							        iconSclass="fa fa-times-circle"
+							        zclass="btn btn-danger"
+							        onClick="@command('reject')" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

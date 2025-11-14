@@ -1,0 +1,106 @@
+<?page title="AIMS Improvement" contentType="text/html;charset=UTF-8"?>
+<window width="100%" height="100%" border="normal"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.AIMSImprovementViewModel')">
+
+    <vlayout hflex="1" vflex="1" spacing="12px">
+        <hlayout spacing="10px">
+            <button label="Registrar plan de mejora" iconSclass="z-icon-plus"
+                    onClick="@command('createImprovement')" />
+            <separator orient="vertical"/>
+            <groupbox title="Completados" width="180px">
+                <vlayout align="center">
+                    <label value="@load(vm.completedCount)" style="font-size:22px;font-weight:bold"/>
+                    <label value="Planes completados"/>
+                </vlayout>
+            </groupbox>
+        </hlayout>
+
+        <groupbox title="Nuevo plan" width="100%">
+            <grid hflex="1">
+                <rows>
+                    <row>
+                        <label value="Título"/>
+                        <textbox value="@bind(vm.newImprovement.aimtitle)" width="320px" />
+                        <label value="Propietario"/>
+                        <textbox value="@bind(vm.newImprovement.aimowner)" width="220px" />
+                    </row>
+                    <row>
+                        <label value="Descripción"/>
+                        <textbox value="@bind(vm.newImprovement.aimdescription)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Categoría"/>
+                        <combobox value="@bind(vm.newImprovement.aimcategory)" width="200px">
+                            <comboitem label="PROCESS" value="PROCESS"/>
+                            <comboitem label="TECHNICAL" value="TECHNICAL"/>
+                            <comboitem label="RISK" value="RISK"/>
+                            <comboitem label="COMPLIANCE" value="COMPLIANCE"/>
+                            <comboitem label="TRAINING" value="TRAINING"/>
+                        </combobox>
+                        <label value="Prioridad"/>
+                        <combobox value="@bind(vm.newImprovement.aimpriority)" width="180px">
+                            <comboitem label="LOW" value="LOW"/>
+                            <comboitem label="MEDIUM" value="MEDIUM"/>
+                            <comboitem label="HIGH" value="HIGH"/>
+                        </combobox>
+                        <label value="Estado"/>
+                        <combobox value="@bind(vm.newImprovement.aimstatus)" width="200px">
+                            <comboitem label="PLANNED" value="PLANNED"/>
+                            <comboitem label="IN_PROGRESS" value="IN_PROGRESS"/>
+                            <comboitem label="COMPLETED" value="COMPLETED"/>
+                            <comboitem label="ON_HOLD" value="ON_HOLD"/>
+                        </combobox>
+                    </row>
+                    <row>
+                        <label value="Inicio"/>
+                        <datebox value="@bind(vm.newImprovement.aimstartdate)" format="dd/MM/yyyy" width="150px"/>
+                        <label value="Objetivo"/>
+                        <datebox value="@bind(vm.newImprovement.aimduedate)" format="dd/MM/yyyy" width="150px"/>
+                    </row>
+                    <row>
+                        <label value="Beneficio esperado"/>
+                        <textbox value="@bind(vm.newImprovement.aimexpectedbenefit)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+
+        <listbox model="@load(vm.improvements)" selectedItem="@bind(vm.selectedImprovement)" hflex="1" vflex="1"
+                 emptyMessage="No hay planes de mejora registrados" mold="paging">
+            <listhead>
+                <listheader label="Título" width="220px"/>
+                <listheader label="Categoría" width="120px"/>
+                <listheader label="Propietario" width="160px"/>
+                <listheader label="Estado" width="120px"/>
+                <listheader label="Prioridad" width="120px"/>
+                <listheader label="Fechas" width="220px"/>
+                <listheader label="Acciones" width="220px"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell><label value="@load(each.aimtitle)"/></listcell>
+                    <listcell><label value="@load(each.aimcategory)"/></listcell>
+                    <listcell><label value="@load(each.aimowner)"/></listcell>
+                    <listcell><label value="@load(each.aimstatus)"/></listcell>
+                    <listcell><label value="@load(each.aimpriority)"/></listcell>
+                    <listcell>
+                        <label value="@load(each.aimstartdate) @converter('formattedDate', format='dd/MM/yyyy')"/>
+                        <label value="@load(each.aimduedate) @converter('formattedDate', format='dd/MM/yyyy')"/>
+                        <label value="@load(each.aimcompletiondate) @converter('formattedDate', format='dd/MM/yyyy')"/>
+                    </listcell>
+                    <listcell>
+                        <hlayout spacing="6px">
+                            <button label="Actualizar" sclass="btn-primary"
+                                    onClick="@command('updateImprovement', improvement=each)"/>
+                            <button label="Completar" sclass="btn-success"
+                                    onClick="@command('markCompleted', improvement=each)"
+                                    disabled="@load(each.aimstatus eq 'COMPLETED')"/>
+                            <button label="Eliminar" sclass="btn-danger"
+                                    onClick="@command('deleteImprovement', improvement=each)"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </vlayout>
+</window>

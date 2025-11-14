@@ -1,0 +1,85 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.euregistration.EuRegistrationFormViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-database me-2"></h:i>
+						EU Database Registration Form (Art. 49)
+					</h:h2>
+					<h:p class="text-muted">
+						Complete registration form according to Annex VIII - <label value="@load(vm.registrationType)" />
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-primary text-white">
+						<h:h5 class="card-title mb-0">Provider Information</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label>Provider Name *</label>
+								<textbox width="100%" value="@bind(vm.providerName)" />
+							</div>
+							<div class="col-md-6 mb-3">
+								<label>Provider Address *</label>
+								<textbox width="100%" value="@bind(vm.providerAddress)" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-primary text-white">
+						<h:h5 class="card-title mb-0">System Information</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-12 mb-3">
+								<label>AI System Name *</label>
+								<textbox width="100%" value="@bind(vm.systemName)" />
+							</div>
+							<div class="col-md-12 mb-3">
+								<label>Intended Purpose *</label>
+								<textbox rows="3" width="100%" value="@bind(vm.intendedPurpose)" />
+							</div>
+							<div class="col-md-6 mb-3">
+								<label>High-Risk Category (Annex III)</label>
+								<textbox width="100%" value="@bind(vm.highriskCategory)" 
+								         placeholder="e.g., III.1, III.5.b..." />
+							</div>
+							<div class="col-md-6 mb-3">
+								<label>Notified Body (if applicable)</label>
+								<textbox width="100%" value="@bind(vm.conformityBody)" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Submit Registration Form" 
+						        iconSclass="fa fa-paper-plane"
+						        zclass="btn btn-primary btn-lg"
+						        onClick="@command('submitForm')" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

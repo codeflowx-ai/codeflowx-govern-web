@@ -1,0 +1,256 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:h="xhtml">
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.AIObjectivesViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div class="col-12">
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-duotone fa-bullseye me-2" />
+						Gestión de Objetivos IA (ISO 42001)
+					</h:h2>
+					<h:p class="text-muted">
+						Seguimiento y control de objetivos alineados con la política IA corporativa.
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<label sclass="text-muted">
+									ISO/IEC 42001 Clause 6.2 · Reporte actualizado
+								</label>
+							</div>
+							<div class="flex-shrink-0 hstack gap-2">
+								<a sclass="btn btn-soft-primary btn-sm"
+									iconSclass="fa-duotone fa-rotate"
+									onClick="@command('refreshData')">
+									Refrescar
+								</a>
+								<a sclass="btn btn-primary btn-sm"
+									iconSclass="fa-duotone fa-plus"
+									onClick="@command('openCreate')">
+									Nuevo Objetivo
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<h:div class="row g-3 mb-4">
+							<h:div class="col-md-3">
+						<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Total Objetivos</h:p>
+										<h:h3>
+											<label value="@load(vm.report.totalObjectives)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+						<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Objetivos Cumplidos</h:p>
+										<h:h3>
+											<label value="@load(vm.report.achievedObjectives)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+						<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Promedio Progreso (%)</h:p>
+										<h:h3>
+									<label value="@load(vm.report.averageProgress)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+						<h:div class="card kpi-card">
+									<h:div class="card-body">
+										<h:p class="text-muted mb-1">Objetivos en Riesgo (&lt;80%)</h:p>
+										<h:h3>
+									<label value="@load(vm.report.objectivesBelowThreshold != null ? vm.report.objectivesBelowThreshold.size() : 0)" />
+										</h:h3>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+
+						<grid model="@load(vm.objectives)" sclass="table table-hover table-striped">
+							<columns sizable="true">
+								<column label="Métrica" width="20%" />
+								<column label="Categoría" width="12%" />
+								<column label="Objetivo" width="8%" align="center" />
+								<column label="Actual" width="8%" align="center" />
+								<column label="Estado" width="10%" align="center" />
+								<column label="Responsable" width="18%" />
+								<column label="Próxima Revisión" width="12%" />
+								<column label="Acciones" width="12%" align="center" />
+							</columns>
+							<rows>
+								<row each="@load(each)">
+									<label value="@load(each.aiometric)" />
+									<label value="@load(each.aiocategory)" />
+									<label value="@load(each.aiotargetvalue)" />
+									<label value="@load(each.aiocurrentvalue)" />
+									<label value="@load(each.aiostatus)" />
+									<label value="@load(each.aioresponsible)" />
+									<label value="@load(each.aionextreview)" />
+									<div class="d-flex gap-1 justify-content-center">
+										<a sclass="btn btn-soft-secondary btn-xs"
+											iconSclass="fa-duotone fa-pen-to-square"
+											onClick="@command('openEdit', objective=each)" tooltiptext="Editar" />
+										<a sclass="btn btn-soft-success btn-xs"
+											iconSclass="fa-duotone fa-gauge-simple-high"
+											onClick="@command('openProgressModal', objective=each)" tooltiptext="Actualizar Progreso" />
+										<a sclass="btn btn-soft-warning btn-xs"
+											iconSclass="fa-duotone fa-clipboard-check"
+											onClick="@command('openReviewModal', objective=each)" tooltiptext="Registrar Revisión" />
+										<a sclass="btn btn-soft-danger btn-xs"
+											iconSclass="fa-duotone fa-trash"
+											onClick="@command('deleteObjective', objective=each)" tooltiptext="Eliminar" />
+									</div>
+								</row>
+							</rows>
+						</grid>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Formulario creación / edición -->
+		<window title="@load(vm.editMode ? 'Editar Objetivo IA' : 'Nuevo Objetivo IA')"
+			mode="modal" visible="@bind(vm.formVisible)"
+			width="720px" closable="true"
+			onClose="@command('cancelForm')">
+			<grid width="100%">
+				<rows>
+					<row>
+						<label value="Descripción" />
+						<textbox value="@bind(vm.formObjective.aiodescription)" multiline="true" rows="3"
+							class="form-control" placeholder="Descripción del objetivo" />
+					</row>
+					<row>
+						<label value="Categoría" />
+						<combobox selectedItem="@bind(vm.formObjective.aiocategory)"
+							class="form-control">
+							<comboitem forEach="@load(vm.categories)"
+								label="@load(each)" value="@load(each)" />
+						</combobox>
+					</row>
+					<row>
+						<label value="Métrica" />
+						<textbox value="@bind(vm.formObjective.aiometric)" class="form-control"
+							placeholder="Ej. Explainability coverage >95%" />
+					</row>
+					<row>
+						<label value="Valor Objetivo" />
+						<decimalbox value="@bind(vm.formObjective.aiotargetvalue)" class="form-control"
+							scale="2" />
+					</row>
+					<row>
+						<label value="Valor Actual" />
+						<decimalbox value="@bind(vm.formObjective.aiocurrentvalue)" class="form-control"
+							scale="2" />
+					</row>
+					<row>
+						<label value="Estado" />
+						<combobox selectedItem="@bind(vm.formObjective.aiostatus)" class="form-control">
+							<comboitem forEach="@load(vm.statuses)"
+								label="@load(each)" value="@load(each)" />
+						</combobox>
+					</row>
+					<row>
+						<label value="Responsable" />
+						<textbox value="@bind(vm.formObjective.aioresponsible)" class="form-control" />
+					</row>
+					<row>
+						<label value="Frecuencia Revisión" />
+						<combobox selectedItem="@bind(vm.formObjective.aioreviewfrequency)" class="form-control">
+							<comboitem forEach="@load(vm.frequencies)"
+								label="@load(each)" value="@load(each)" />
+						</combobox>
+					</row>
+					<row>
+						<label value="Política Relacionada" />
+						<textbox value="@bind(vm.formObjective.aiorelatedpolicy)" class="form-control"
+							multiline="true" rows="2" />
+					</row>
+				</rows>
+			</grid>
+			<separator />
+			<div class="d-flex justify-content-end gap-2">
+				<a sclass="btn btn-soft-secondary"
+					iconSclass="fa-duotone fa-xmark"
+					onClick="@command('cancelForm')">
+					Cancelar
+				</a>
+				<a sclass="btn btn-primary"
+					iconSclass="fa-duotone fa-floppy-disk"
+					onClick="@command('saveObjective')">
+					Guardar
+				</a>
+			</div>
+		</window>
+
+		<!-- Modal Actualizar Progreso -->
+		<window title="Actualizar Progreso" mode="modal"
+			width="480px" closable="true"
+			visible="@bind(vm.progressModalVisible)"
+			onClose="@command('cancelProgress')">
+			<vbox spacing="10px">
+				<label value="Nuevo valor para la métrica" />
+				<decimalbox value="@bind(vm.progressValue)" scale="2" class="form-control" />
+				<div class="d-flex justify-content-end gap-2 mt-3">
+					<a sclass="btn btn-soft-secondary" iconSclass="fa-duotone fa-xmark"
+						onClick="@command('cancelProgress')">
+						Cancelar
+					</a>
+					<a sclass="btn btn-success" iconSclass="fa-duotone fa-gauge-high"
+						onClick="@command('updateProgress')">
+						Actualizar
+					</a>
+				</div>
+			</vbox>
+		</window>
+
+		<!-- Modal Revisión -->
+		<window title="Registrar Revisión" mode="modal"
+			width="480px" closable="true"
+			visible="@bind(vm.reviewModalVisible)"
+			onClose="@command('cancelReview')">
+			<vbox spacing="10px">
+				<label value="Decisión" />
+				<combobox selectedItem="@bind(vm.reviewDecision)" class="form-control">
+					<comboitem forEach="@load(vm.statuses)" label="@load(each)" value="@load(each)" />
+				</combobox>
+
+				<label value="Próxima Revisión" />
+				<datebox value="@bind(vm.reviewNextDate)" class="form-control" />
+
+				<div class="d-flex justify-content-end gap-2 mt-3">
+					<a sclass="btn btn-soft-secondary" iconSclass="fa-duotone fa-xmark"
+						onClick="@command('cancelReview')">
+						Cancelar
+					</a>
+					<a sclass="btn btn-warning" iconSclass="fa-duotone fa-clipboard-check"
+						onClick="@command('submitReview')">
+						Guardar
+					</a>
+				</div>
+			</vbox>
+		</window>
+	</idspace>
+</zk>
+
+

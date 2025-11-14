@@ -1,0 +1,228 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	
+	<!-- ViewModel binding -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.AIActDocumentationGeneratorViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<!-- Título pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-file-certificate me-2"></h:i>
+						AI Act Technical Documentation Generator
+					</h:h2>
+					<h:p class="text-muted">
+						Generación automática de documentación técnica según EU AI Act Annex IV
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Formulario de generación -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">
+							<h:i class="fa-duotone fa-solid fa-file-plus me-2"></h:i>
+							Generate Technical Documentation
+						</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<!-- Entity Type -->
+							<div class="col-md-3">
+								<label class="form-label">Entity Type *</label>
+								<combobox
+									placeholder="Select entity type"
+									selectedItem="@bind(vm.selectedEntityType)"
+									class="form-control">
+									<comboitem label="MODEL" value="MODEL" />
+									<comboitem label="AGENT" value="AGENT" />
+									<comboitem label="PROMPT" value="PROMPT" />
+									<comboitem label="RAG_SYSTEM" value="RAG_SYSTEM" />
+									<comboitem label="SYSTEM" value="SYSTEM" />
+								</combobox>
+							</div>
+
+							<!-- Entity ID -->
+							<div class="col-md-3">
+								<label class="form-label">Entity ID *</label>
+								<longbox value="@bind(vm.entityId)"
+									placeholder="Enter entity ID"
+									class="form-control" />
+							</div>
+
+							<!-- System Name -->
+							<div class="col-md-3">
+								<label class="form-label">System Name (optional)</label>
+								<textbox value="@bind(vm.systemName)"
+									placeholder="e.g., Customer Support Agent"
+									class="form-control" />
+							</div>
+
+							<!-- Version -->
+							<div class="col-md-3">
+								<label class="form-label">Version (optional)</label>
+								<textbox value="@bind(vm.version)"
+									placeholder="e.g., 1.0"
+									class="form-control" />
+							</div>
+
+							<!-- Botones de acción -->
+							<div class="col-md-12">
+								<div class="hstack gap-2">
+									<button
+										iconSclass="fa-duotone fa-solid fa-file-certificate me-2"
+										label="Generate Documentation"
+										onClick="@command('generateDocumentation')"
+										class="btn btn-primary"
+										disabled="@load(vm.generating)" />
+									<button
+										iconSclass="fa-duotone fa-solid fa-broom me-2"
+										label="Clear"
+										onClick="@command('clearForm')"
+										class="btn btn-secondary" />
+								</div>
+							</div>
+
+							<!-- Estado de generación -->
+							<div class="col-md-12" visible="@load(not empty vm.generationStatus)">
+								<div class="alert alert-info mb-0">
+									<h:i class="fa-duotone fa-solid fa-circle-info me-2"></h:i>
+									<label value="@load(vm.generationStatus)" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lista de documentos generados -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<h:h5 class="card-title mb-0">
+									<h:i class="fa-duotone fa-solid fa-files me-2"></h:i>
+									Generated Documents
+								</h:h5>
+							</div>
+							<div class="flex-shrink-0">
+								<button
+									iconSclass="fa-duotone fa-solid fa-arrows-rotate me-2"
+									label="Refresh"
+									onClick="@command('refreshDocs')"
+									class="btn btn-sm btn-soft-primary" />
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<grid model="@load(vm.generatedDocs)" emptyMessage="No documentation generated yet">
+								<columns sizable="true">
+									<column label="ID" align="center" width="8%" />
+									<column label="System Name" align="left" width="30%" />
+									<column label="Entity Type" align="center" width="15%" />
+									<column label="Generated At" align="center" width="20%" />
+									<column label="Status" align="center" width="12%" />
+									<column label="Actions" align="center" width="15%" />
+								</columns>
+								<template name="model" var="doc">
+									<row>
+										<label value="@load(doc.id)" />
+										<label value="@load(doc.system_name)" />
+										<label value="@load(doc.entity_type)" />
+										<label value="@load(doc.generated_at)" />
+										<label value="@load(doc.status)" 
+											sclass="@load(doc.status eq 'APPROVED' ? 'badge bg-success' : 'badge bg-warning')" />
+										<hbox>
+											<button
+												iconSclass="fa-duotone fa-solid fa-file-pdf"
+												tooltiptext="Download PDF"
+												onClick="@command('downloadPDF', docId=doc.id)"
+												class="btn btn-sm btn-soft-danger" />
+										</hbox>
+									</row>
+								</template>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Información adicional -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">
+							<h:i class="fa-duotone fa-solid fa-circle-info me-2"></h:i>
+							About EU AI Act Technical Documentation (Annex IV)
+						</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2">
+							<strong>La documentación técnica debe incluir:</strong>
+						</h:p>
+						<h:ul class="mb-3">
+							<h:li>Descripción general del sistema IA y su propósito previsto</h:li>
+							<h:li>Diseño detallado y especificaciones técnicas</h:li>
+							<h:li>Descripción del proceso de desarrollo</h:li>
+							<h:li>Gobernanza y gestión de datos</h:li>
+							<h:li>Procedimientos de validación y testing</h:li>
+							<h:li>Medidas de monitoreo post-market</h:li>
+							<h:li>Información sobre supervisión humana</h:li>
+							<h:li>Sistema de gestión de riesgos</h:li>
+							<h:li>Métricas de precisión, robustez y ciberseguridad</h:li>
+						</h:ul>
+						<h:p class="text-muted mb-0">
+							<h:i class="fa-duotone fa-solid fa-shield-check me-1"></h:i>
+							La documentación generada cumple con los requisitos del EU AI Act Annex IV y está lista para auditorías de conformidad.
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

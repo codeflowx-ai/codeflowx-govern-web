@@ -1,0 +1,36 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.FixComplianceGapsViewModel')">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning">
+                <h3 class="mb-0">Resolver brechas de compliance (Art. 53)</h3>
+            </div>
+            <div class="card-body">
+                <grid sclass="grid-form">
+                    <rows>
+                        <row>
+                            <label value="Brechas detectadas" />
+                            <textarea value="@bind(vm.complianceGaps)" rows="4" placeholder="Detalle brechas..." />
+                        </row>
+                        <row>
+                            <label value="Plan de remediación" />
+                            <textarea value="@bind(vm.remediationPlan)" rows="4" placeholder="Pasos propuestos" />
+                        </row>
+                        <row>
+                            <label value="Decisión" />
+                            <radiogroup selectedItem="@bind(vm.decision)">
+                                <radio label="Reintentar" value="RETRY" />
+                                <radio label="Cancelar" value="CANCEL" />
+                            </radiogroup>
+                        </row>
+                    </rows>
+                </grid>
+                <div class="mt-3 d-flex gap-2">
+                    <button label="Enviar" sclass="btn btn-success" onClick="@command('submitDecision')" />
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>
+

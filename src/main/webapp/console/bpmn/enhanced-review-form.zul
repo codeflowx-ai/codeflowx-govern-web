@@ -1,0 +1,76 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.fria.EnhancedReviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-scale-balanced me-2"></h:i>
+						Enhanced FRIA Review (HIGH Impact)
+					</h:h2>
+					<h:p class="text-muted">
+						High fundamental rights impact detected - enhanced review required
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-danger">
+					<div class="card-header bg-danger text-white">
+						<h:h5 class="card-title mb-0">⚠️ HIGH IMPACT ON FUNDAMENTAL RIGHTS</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Impact Severity:</strong> 
+							<h:span class="badge bg-danger"><label value="@load(vm.impactSeverity)" /></h:span>
+						</h:p>
+						<h:p class="mb-2"><strong>Charter Articles Affected:</strong></h:p>
+						<listbox model="@load(vm.charterArticles)" height="150px">
+							<template name="model">
+								<listitem><listcell><label value="@load(each)" /></listcell></listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Ethics Committee Review Comments *</h:h5>
+						<textbox rows="6" width="100%" value="@bind(vm.reviewComments)" 
+						         placeholder="Detailed review of fundamental rights impact, mitigation measures, legal considerations..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Decision</h:h5>
+						<div class="d-flex gap-2">
+							<button label="APPROVE (Acceptable Risk)" 
+							        iconSclass="fa fa-check"
+							        zclass="btn btn-success"
+							        onClick="@command('approve')" />
+							<button label="MODIFY System Required" 
+							        iconSclass="fa fa-wrench"
+							        zclass="btn btn-warning"
+							        onClick="@command('modify')" />
+							<button label="REJECT (Block Deployment)" 
+							        iconSclass="fa fa-ban"
+							        zclass="btn btn-danger"
+							        onClick="@command('reject')" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

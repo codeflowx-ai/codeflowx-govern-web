@@ -1,0 +1,146 @@
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.SectorDashboardViewModel')">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card border-primary">
+                    <div class="card-header bg-soft-primary">
+                        <h3 class="mb-0">Metamodelo sectorial FaaS</h3>
+                        <small class="text-muted">
+                            Visualiza sectores, subsectores y frameworks configurados sin modificar el core de CodeflowX.
+                        </small>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <listbox model="@bind(vm.sectors)"
+                                    selectedItem="@bind(vm.selectedSector)" onSelect="@command('onSectorSelected')"
+                                    mold="paging" pageSize="10" sizedByContent="true" width="100%">
+                                    <listhead>
+                                        <listheader label="Sector" width="65%"/>
+                                        <listheader label="Riesgo" width="20%"/>
+                                        <listheader label="Ámbito" width="15%"/>
+                                    </listhead>
+                                    <template name="model">
+                                        <listitem value="@load(each)">
+                                            <listcell><label value="@load(each.label)"/></listcell>
+                                            <listcell><label value="@load(each.riskProfile)"/></listcell>
+                                            <listcell><label value="@load(each.geoScope)"/></listcell>
+                                        </listitem>
+                                    </template>
+                                </listbox>
+                            </div>
+                            <div class="col-lg-8">
+                                <vlayout sclass="gap-md">
+                                    <div class="card border-light mb-3">
+                                        <div class="card-body">
+                                            <h4 class="card-title mb-2">
+                                                <label value="@load(vm.selectedSector != null ? vm.selectedSector.label : 'Selecciona un sector')" />
+                                            </h4>
+                                            <separator />
+                                            <grid sclass="table table-sm mb-3" visible="@load(vm.selectedSector != null)">
+                                                <columns/>
+                                                <rows>
+                                                    <row>
+                                                        <label value="Código"/>
+                                                        <label value="@load(vm.selectedSector.code)"/>
+                                                    </row>
+                                                    <row>
+                                                        <label value="Riesgo"/>
+                                                        <label value="@load(vm.selectedSector.riskProfile)"/>
+                                                    </row>
+                                                    <row>
+                                                        <label value="Ámbito"/>
+                                                        <label value="@load(vm.selectedSector.geoScope)"/>
+                                                    </row>
+                                                    <row visible="@load(!empty vm.selectedSector.requirementsDoc)">
+                                                        <label value="Requisitos"/>
+                                                        <label value="@load(vm.selectedSector.requirementsDoc)"/>
+                                                    </row>
+                                                </rows>
+                                            </grid>
+
+                                            <div visible="@load(vm.selectedSector != null)">
+                                                <h5 class="mb-1">Normativa habilitadora</h5>
+                                                <vlayout>
+                                                    <label value="@load(reg)" forEach="@bind(vm.selectedSector.regulationRefs)"/>
+                                                </vlayout>
+                                                <separator />
+                                                <h5 class="mb-1">Estándares y frameworks de referencia</h5>
+                                                <vlayout>
+                                                    <label value="@load(std)" forEach="@bind(vm.selectedSector.standardRefs)"/>
+                                                </vlayout>
+                                                <separator/>
+                                                <h5 class="mb-1" visible="@load(vm.selectedSector.hasSubsectors())">Subsectores configurados</h5>
+                                                <vlayout visible="@load(vm.selectedSector.hasSubsectors())">
+                                                    <label value="@load(label)" forEach="@bind(vm.selectedSector.subsectorLabels)"/>
+                                                </vlayout>
+                                                <separator/>
+                                                <h5 class="mb-1" visible="@load(vm.selectedSector.hasPrompts())">Prompts sectoriales activos</h5>
+                                                <vlayout visible="@load(vm.selectedSector.hasPrompts())">
+                                                    <label value="@load(prompt)" forEach="@bind(vm.selectedSector.prompts)"/>
+                                                </vlayout>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-light mb-3" visible="@load(!empty vm.selectedFrameworks)">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Frameworks FaaS vinculados</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <listbox model="@bind(vm.selectedFrameworks)" sclass="table table-sm" sizedByContent="true">
+                                                <listhead>
+                                                    <listheader label="Framework"/>
+                                                    <listheader label="Versión"/>
+                                                    <listheader label="Ámbito"/>
+                                                    <listheader label="Prompts vinculados"/>
+                                                </listhead>
+                                                <template name="model">
+                                                    <listitem>
+                                                        <listcell><label value="@load(each.configKey)"/></listcell>
+                                                        <listcell><label value="@load(each.version)"/></listcell>
+                                                        <listcell><label value="@load(each.geoScope)"/></listcell>
+                                                        <listcell>
+                                                            <label value="@load(each.metadata != null ? each.metadata.prompts : null)"/>
+                                                        </listcell>
+                                                    </listitem>
+                                                </template>
+                                            </listbox>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-light" visible="@load(!empty vm.selectedPolicies)">
+                                        <div class="card-header">
+                                            <h5 class="mb-0">Políticas sectoriales (Drools)</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <listbox model="@bind(vm.selectedPolicies)" sclass="table table-sm" sizedByContent="true">
+                                                <listhead>
+                                                    <listheader label="Policy Code"/>
+                                                    <listheader label="Riesgo"/>
+                                                    <listheader label="Regulación cubierta"/>
+                                                </listhead>
+                                                <template name="model">
+                                                    <listitem>
+                                                        <listcell><label value="@load(each.policyCode)"/></listcell>
+                                                        <listcell><label value="@load(each.riskProfile)"/></listcell>
+                                                        <listcell><label value="@load(each.activationConditions != null ? each.activationConditions.regulationRefs : null)"/></listcell>
+                                                    </listitem>
+                                                </template>
+                                            </listbox>
+                                        </div>
+                                    </div>
+                                </vlayout>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </idspace>
+</zk>

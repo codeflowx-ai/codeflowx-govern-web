@@ -1,0 +1,256 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="complianceAssessmentPage"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.compliance.ComplianceAssessmentViewModel')"
+		validationMessages="@id('vmsgs')">
+		
+		<h:div class="row">
+			<!-- Header -->
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-check label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="Evaluaciones de Conformidad" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de evaluaciones según Anexo VI - Art. 43" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+			
+			<!-- KPIs Section -->
+			<h:div class="col-lg-12 col-xlg-12 col-md-12 mb-4">
+				<h:div class="row">
+					<!-- KPI 1: Total Assessments -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Total Evaluaciones
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.totalAssessments)" />
+										</h:h4>
+										<h:span class="badge bg-info me-1">Registradas</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-info-subtle rounded fs-3">
+											<h:i class="fa-solid fa-clipboard-list text-info"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<!-- KPI 2: Compliant -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Conformes Anexo VI
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.compliantAssessments)" />
+										</h:h4>
+										<h:span class="badge bg-success me-1">Compliant</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-success-subtle rounded fs-3">
+											<h:i class="fa-solid fa-circle-check text-success"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<!-- KPI 3: Ready for Certification -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Listas Certificación
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.readyForCertification)" />
+										</h:h4>
+										<h:span class="badge bg-warning me-1">Ready</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-warning-subtle rounded fs-3">
+											<h:i class="fa-solid fa-certificate text-warning"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<!-- KPI 4: Average Score -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Score Promedio
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.averageScore)" />
+										</h:h4>
+										<h:span class="badge bg-primary me-1">Overall</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-primary-subtle rounded fs-3">
+											<h:i class="fa-solid fa-chart-line text-primary"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Filters and Actions -->
+			<h:div class="col-lg-12 mb-3">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div class="row g-3">
+							<!-- Tipo Assessment -->
+							<h:div class="col-md-3">
+								<label value="Tipo de Evaluación" class="form-label" />
+								<combobox placeholder="Seleccione tipo..."
+									model="@load(vm.assessmentTypes)"
+									value="@bind(vm.filterAssessmentType)"
+									width="100%">
+									<template name="model">
+										<comboitem label="@load(each)" />
+									</template>
+								</combobox>
+							</h:div>
+							
+							<!-- Compliant -->
+							<h:div class="col-md-3">
+								<label value="Estado Conformidad" class="form-label" />
+								<combobox placeholder="Todos..."
+									value="@bind(vm.filterCompliant)"
+									width="100%">
+									<comboitem label="Conforme" value="true" />
+									<comboitem label="No Conforme" value="false" />
+								</combobox>
+							</h:div>
+							
+							<!-- Botones -->
+							<h:div class="col-md-6 d-flex align-items-end justify-content-end">
+								<button label="Buscar" iconSclass="fa fa-search"
+									onClick="@command('search')"
+									sclass="btn btn-primary me-2" />
+								<button label="Limpiar" iconSclass="fa fa-eraser"
+									onClick="@command('clearFilters')"
+									sclass="btn btn-secondary me-2" />
+								<button label="Nueva Evaluación" iconSclass="fa fa-plus"
+									onClick="@command('createNewAssessment')"
+									sclass="btn btn-success" />
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Table -->
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5 class="card-title mb-0">
+							<h:i class="fa fa-list me-2"></h:i>
+							Evaluaciones de Conformidad
+						</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<listbox model="@load(vm.assessments)"
+							selectedItem="@bind(vm.selectedAssessment)"
+							emptyMessage="No hay evaluaciones registradas"
+							mold="paging"
+							pageSize="20">
+							<listhead>
+								<listheader label="ID" width="80px" />
+								<listheader label="Proyecto" />
+								<listheader label="Tipo" width="150px" />
+								<listheader label="Fecha" width="150px" />
+								<listheader label="Score Overall" width="120px" />
+								<listheader label="Anexo VI" width="100px" />
+								<listheader label="Certificación" width="120px" />
+								<listheader label="Acciones" width="150px" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.idxcomplianceassessment)" />
+									<listcell label="@load(each.project.prjname)" />
+									<listcell>
+										<h:span class="badge bg-info">
+											<label value="@load(each.comassessmenttype)" />
+										</h:span>
+									</listcell>
+									<listcell>
+										<label value="@load(each.comassessmentdate) @converter('formatedDate',format='dd/MM/yyyy')" />
+									</listcell>
+									<listcell>
+										<label value="@load(each.comoverallscore)" />
+									</listcell>
+									<listcell>
+										<h:span class="@load(each.comannexvicompliant ? 'badge bg-success' : 'badge bg-danger')">
+											<label value="@load(each.comannexvicompliant ? 'SÍ' : 'NO')" />
+										</h:span>
+									</listcell>
+									<listcell>
+										<h:span class="@load(each.comreadyforcertification ? 'badge bg-success' : 'badge bg-secondary')">
+											<label value="@load(each.comreadyforcertification ? 'Ready' : 'Pending')" />
+										</h:span>
+									</listcell>
+									<listcell>
+										<button iconSclass="fa fa-eye" tooltiptext="Ver detalle"
+											sclass="btn btn-sm btn-info me-1"
+											onClick="@command('selectAssessment', assessment=each)" />
+										<button iconSclass="fa fa-trash" tooltiptext="Eliminar"
+											sclass="btn btn-sm btn-danger"
+											onClick="@command('deleteAssessment', assessment=each)" />
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>
+

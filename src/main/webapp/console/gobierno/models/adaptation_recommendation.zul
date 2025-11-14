@@ -1,0 +1,109 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:h="xhtml"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.ModelAdaptationRecommendationViewModel')">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h:h3 class="mb-0">Recomendador Adaptación GPAI</h:h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label">Modelo base</label>
+                                <combobox model="@load(vm.baseModels)" selectedItem="@bind(vm.selectedBaseModel)"
+                                    autodrop="true" width="100%">
+                                    <template name="model" var="model">
+                                        <comboitem label="@load(model.modname)" value="@load(model)" />
+                                    </template>
+                                </combobox>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Caso de uso</label>
+                                <textbox value="@bind(vm.form.useCase)" placeholder="customer_support_chatbot" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Tarea objetivo</label>
+                                <textbox value="@bind(vm.form.targetTask)" placeholder="QA" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Dataset size</label>
+                                <intbox value="@bind(vm.form.datasetSize)" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Budget (USD)</label>
+                                <decimalbox value="@bind(vm.form.budgetUsd)" format="#,##0.##" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Tiempo (días)</label>
+                                <intbox value="@bind(vm.form.timeDays)" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Performance objetivo</label>
+                                <decimalbox value="@bind(vm.form.targetPerformance)" format="0.##" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Prioridad</label>
+                                <combobox model="@load(vm.priorityOptions)" selectedItem="@bind(vm.form.priority)" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Proyecto</label>
+                                <longbox value="@bind(vm.form.projectId)" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Hardware disponible</label>
+                                <checkbox label="CPU" checked="@load(vm.selectedHardware.contains('cpu'))"
+                                    onCheck="@command('toggleHardware', value='cpu', checked=event.checked)" />
+                                <checkbox label="GPU T4" checked="@load(vm.selectedHardware.contains('gpu_t4'))"
+                                    onCheck="@command('toggleHardware', value='gpu_t4', checked=event.checked)" />
+                                <checkbox label="GPU A100" checked="@load(vm.selectedHardware.contains('gpu_a100'))"
+                                    onCheck="@command('toggleHardware', value='gpu_a100', checked=event.checked)" />
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button label="Recomendar" sclass="btn btn-primary"
+                                onClick="@command('generateRecommendation')" />
+                            <button label="Guardar Estrategia" sclass="btn btn-success"
+                                disabled="@load(!vm.recommendationVisible)"
+                                onClick="@command('saveStrategy')" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12" visible="@load(vm.recommendationVisible)">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h:h4 class="mb-0">Recomendación</h:h4>
+                    </div>
+                    <div class="card-body">
+                        <label value="@load(vm.recommendation.recommendation)" class="fw-bold" />
+                        <separator />
+                        <listbox model="@load(vm.recommendation.alternativesRanked)"
+                            selectedItem="@bind(vm.selectedAlternative)" mold="paging" pageSize="3">
+                            <listhead>
+                                <listheader label="Estrategia" />
+                                <listheader label="Modelo" />
+                                <listheader label="Score" />
+                                <listheader label="Costo (USD)" />
+                                <listheader label="Tiempo (h)" />
+                                <listheader label="CO2 (kg)" />
+                            </listhead>
+                            <template name="model" var="alt">
+                                <listitem value="@load(alt)" onClick="@command('selectAlternative', alternative=alt)">
+                                    <listcell label="@load(alt.strategy)" />
+                                    <listcell label="@load(alt.baseModel)" />
+                                    <listcell label="@load(alt.score)" />
+                                    <listcell label="@load(alt.estimatedCostUsd)" />
+                                    <listcell label="@load(alt.estimatedTimeHours)" />
+                                    <listcell label="@load(alt.estimatedCo2Kg)" />
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>

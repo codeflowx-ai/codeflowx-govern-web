@@ -33,6 +33,27 @@
 
 ## 📋 ÍNDICE PROMPTS JAVA
 
+---
+
+## 📌 Estado de ejecución (actualizado noviembre 2025)
+
+### ✅ Implementado
+- **J1.1 AI Objectives Management**: entidad `nocode/services/entitys/governance/AIMObjectives.java`, ViewModel `com/codeflowx/govern/viewmodel/governance/AIObjectivesViewModel.java`, pantalla ZUL `src/main/webapp/console/platform/governance/ai_objectives_management.zul`, migración `sql-scripts/extensions/03_iso42001_ai_objectives.sql`.
+- **J1.2 AI Competence Management**: entidad `nocode/services/entitys/governance/AICCompetence.java` y registros de entrenamiento `nocode/services/entitys/governance/AITrainingRecord.java`; ViewModel `com/codeflowx/govern/viewmodel/governance/AICompetenceViewModel.java`; pantalla `src/main/webapp/console/platform/governance/ai_competence_management.zul`; migraciones `04_iso42001_ai_competence.sql` y `05_iso42001_ai_training_records.sql`.
+- **J1.3 AI Training Records**: integrado en el mismo ViewModel y ZUL de competencias; se soportan altas, filtros por rol, registro de awareness y gestión de certificados.
+- **J1.4 AI System Inventory Extension**: entidad extendida `nocode/services/entitys/projects/PRJProject.java`, migración `06_iso42001_prjprojects_extension.sql`; ViewModel `com/codeflowx/govern/viewmodel/projects/ProjectAIInventoryViewModel.java`; vista `src/main/webapp/console/platform/projects/project-ai-inventory.zul` embebida en `project-detail.zul`.
+- **J1.5 AIMS Performance**: entidad `nocode/services/entitys/governance/APSAimsPerformance.java`; ViewModel `com/codeflowx/govern/viewmodel/governance/AIMSPerformanceViewModel.java`; pantalla `src/main/webapp/console/platform/governance/aims_performance.zul`; migración `07_iso42001_aims_performance.sql`.
+- **J1.6 AIMS Non-Conformity**: entidad `nocode/services/entitys/governance/ANCNonConformity.java`; ViewModel `com/codeflowx/govern/viewmodel/governance/AIMSNonConformityViewModel.java`; pantalla `src/main/webapp/console/platform/governance/aims_nonconformity.zul`; migración `08_iso42001_aims_nonconformity.sql`.
+- **J1.7 AIMS Improvement**: entidad `nocode/services/entitys/governance/AIMImprovement.java`; ViewModel `com/codeflowx/govern/viewmodel/governance/AIMSImprovementViewModel.java`; pantalla `src/main/webapp/console/platform/governance/aims_improvement.zul`; migración `09_iso42001_aims_improvement.sql`.
+- **J1.8 ISO 42001 Controls**: entidad `nocode/services/entitys/governance/ICOISO42001Control.java`; ViewModel `com/codeflowx/govern/viewmodel/governance/ISO42001ControlsViewModel.java`; pantalla `src/main/webapp/console/platform/governance/iso42001_controls.zul`; migración `10_iso42001_iso_controls.sql` con semilla inicial de 39 controles.
+
+### ⏳ Pendiente
+- **Grupo J2 (ISO 38507)**: generar entidades, migraciones, ViewModels y ZUL para J2.1–J2.8, manteniendo el patrón definido (EntityManager directo, sin BusinessServices/REST).
+- **Grupo J3 (OECD + GDPR)**: implementar las seis entidades, pantallas y scripts correspondientes.
+- **Automatización complementaria**: integrar pruebas de carga ZK y validar ejecución de migraciones en todos los entornos antes de pasar a los grupos J2/J3.
+
+---
+
 ### **GRUPO J1: ISO 42001 (8 prompts)**
 - J1.1: AI Objectives Entity + ViewModel + ZUL
 - J1.2: AI Competence Entity + ViewModel + ZUL

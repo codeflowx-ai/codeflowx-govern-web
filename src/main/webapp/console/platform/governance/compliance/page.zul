@@ -5,378 +5,313 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
 	xmlns:h="xhtml"
 	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
-	<idspace id="governance"
-		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.governance.ComplianceAssessmentDetailViewModel')"
+	<idspace id="complianceDashboard"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.governance.ComplianceAssessmentOverviewViewModel')"
 		validationMessages="@id('vmsgs')">
+		
 		<h:div class="row">
+			<!-- Header -->
 			<div>
 				<h:div class="left tittle-principal">
 					<h:h2 class="mb-1" style="font-weight: bold;">
 						<h:i class="fa-sharp-duotone fa-solid fa-shield-check label-icon align-middle fs-16 me-2"></h:i>
-						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+						<label class="mb-1" value="Compliance Dashboard" style="font-weight: bold;" />
 					</h:h2>
 					<h:p class="text-muted">
-						<label value="Gestión y configuración de Compliance Assessment" class="text-muted" />
+						<label value="Vista general de cumplimiento EU AI Act" class="text-muted" />
 					</h:p>
 				</h:div>
-			</h:div>
+			</div>
 			
-			<h:div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
-				<h:div class="card">
-					<h:div class="card-header">
-						<h:div class="d-flex align-items-center flex-wrap gap-2">
-							<h:div class="flex-grow-1">
-								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
-									onClick="@command('cancelEdit')"
-									sclass="waves-effect waves-light" 
-									tooltiptext="Volver">
-								</a>
-							</h:div>
-							<h:div class="flex-shrink-0">
-								<h:div class="hstack text-nowrap gap-2 d-flex">
-									<a class="waves-effect waves-light"
-										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
-										onClick="@command('saveItem')"
-										tooltiptext="Guardar">
-									</a>
-								</h:div>
-							</h:div>
-						</h:div>
-					</h:div><!--header-->
-					
-					<h:div class="card-body">
-						<h:div class="row">
-							<!-- Formulario Principal -->
-							<h:div class="col-lg-12 col-xlg-12 col-md-12">
-								<h:div class="card default shadow-xl">
-									<h:div class="card-body">
-
-										<h:div class="form-group row">
-											<!-- Assessment Name -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Assessment Name *" />
-														<textbox tabindex="2" id="assessmentname"
-															value="@bind(vm.currentComplianceAssessment.assessmentname) @save(vm.currentComplianceAssessment.assessmentname, before=('saveItem')) @validator(vm.unique, field='ASSESSMENTNAME', required=true, oldValue=vm.originalAssessmentname)"
-															maxlength="100"
-															constraint="no empty: max 100" />
-														<label sclass="text-danger" value="@load(vmsgs['assessmentname'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Description -->
-											<h:div class="default col-lg-12 col-xlg-12 col-md-12">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Description" />
-														<textbox tabindex="3" id="description"
-															value="@bind(vm.currentComplianceAssessment.description)"
-															rows="4" multiline="true"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['description'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Compliance Framework -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Compliance Framework *" />
-														<combobox tabindex="4" id="complianceframework"
-															selectedItem="@bind(vm.currentComplianceAssessment.complianceframework)"
-															readonly="true"
-															constraint="no empty">
-															<comboitem label="Opción 1" value="OPTION1"/>
-															<comboitem label="Opción 2" value="OPTION2"/>
-														</combobox>
-														<label sclass="text-danger" value="@load(vmsgs['complianceframework'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Status -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Status *" />
-														<combobox tabindex="5" id="status"
-															selectedItem="@bind(vm.currentComplianceAssessment.status)"
-															readonly="true"
-															constraint="no empty">
-															<comboitem label="Activo" value="ACTIVE"/>
-															<comboitem label="Inactivo" value="INACTIVE"/>
-															<comboitem label="Pendiente" value="PENDING"/>
-															<comboitem label="Rechazado" value="REJECTED"/>
-														</combobox>
-														<label sclass="text-danger" value="@load(vmsgs['status'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Overall Score -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Overall Score" />
-														<textbox tabindex="6" id="overallscore"
-															value="@bind(vm.currentComplianceAssessment.overallscore)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['overallscore'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Compliance Percentage -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Compliance Percentage" />
-														<textbox tabindex="7" id="compliancepercentage"
-															value="@bind(vm.currentComplianceAssessment.compliancepercentage)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['compliancepercentage'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Assessment Date -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Assessment Date *" />
-														<textbox tabindex="8" id="assessmentdate"
-															value="@bind(vm.currentComplianceAssessment.assessmentdate)"
-															maxlength="255"
-															constraint="no empty" />
-														<label sclass="text-danger" value="@load(vmsgs['assessmentdate'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Validuntil -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Validuntil" />
-														<textbox tabindex="9" id="validuntil"
-															value="@bind(vm.currentComplianceAssessment.validuntil)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['validuntil'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Assessorname -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Assessorname *" />
-														<textbox tabindex="10" id="assessorname"
-															value="@bind(vm.currentComplianceAssessment.assessorname) @save(vm.currentComplianceAssessment.assessorname, before=('saveItem')) @validator(vm.unique, field='ASSESSORNAME', required=true, oldValue=vm.originalAssessorname)"
-															maxlength="100"
-															constraint="no empty: max 100" />
-														<label sclass="text-danger" value="@load(vmsgs['assessorname'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Assessoremail -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Assessoremail *" />
-														<textbox tabindex="11" id="assessoremail"
-															value="@bind(vm.currentComplianceAssessment.assessoremail) @save(vm.currentComplianceAssessment.assessoremail, before=('saveItem')) @validator(vm.unique, field='ASSESSOREMAIL', required=true, oldValue=vm.originalAssessoremail)"
-															maxlength="100"
-															constraint="no empty: max 100" />
-														<label sclass="text-danger" value="@load(vmsgs['assessoremail'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Created At -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Created At *" />
-														<textbox tabindex="12" id="createdat"
-															value="@bind(vm.currentComplianceAssessment.createdat)"
-															maxlength="255"
-															constraint="no empty" />
-														<label sclass="text-danger" value="@load(vmsgs['createdat'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Updated At -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Updated At *" />
-														<textbox tabindex="13" id="updatedat"
-															value="@bind(vm.currentComplianceAssessment.updatedat)"
-															maxlength="255"
-															constraint="no empty" />
-														<label sclass="text-danger" value="@load(vmsgs['updatedat'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
-										<h:div class="form-group row">
-											<!-- Subgovcompliancefindings -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Subgovcompliancefindings" />
-														<textbox tabindex="14" id="subgovcompliancefindings"
-															value="@bind(vm.currentComplianceAssessment.subgovcompliancefindings)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['subgovcompliancefindings'])" />
-													</h:div>
-												</h:div>
-											</h:div>											<!-- Subgovcompliancerequirements -->
-											<h:div class="default col-lg-6 col-xlg-6 col-md-6">
-												<h:div class="row">
-													<h:div class="col-md-12 input-group">
-														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
-															value="Subgovcompliancerequirements" />
-														<textbox tabindex="15" id="subgovcompliancerequirements"
-															value="@bind(vm.currentComplianceAssessment.subgovcompliancerequirements)"
-															maxlength="255"
-															 />
-														<label sclass="text-danger" value="@load(vmsgs['subgovcompliancerequirements'])" />
-													</h:div>
-												</h:div>
-											</h:div>
-										</h:div>
+			<!-- KPIs Section -->
+			<h:div class="col-lg-12 col-xlg-12 col-md-12 mb-4">
+				<h:div class="row">
+					<!-- KPI 1: Total Modelos -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Total Modelos
+										</h:p>
 									</h:div>
 								</h:div>
-							</h:div>
-
-							<!-- Tabs de Información Descendente -->
-							<h:div class="col-lg-12 col-xlg-12 col-md-12" visible="@load(vm.editing)">
-								<h:div class="card default shadow-xl">
-									<h:div class="card-body">
-										<tabbox>
-											<tabs>
-												<tab label="Subgovcompliancefindings" onSelect="@command('onSelectComplianceFindingTab')" />
-												<tab label="Subgovcompliancerequirements" onSelect="@command('onSelectComplianceRequirementTab')" />
-											</tabs>
-											<tabpanels>
-												<!-- Panel: Subgovcompliancefindings -->
-												<tabpanel>
-													<h:div class="d-flex justify-content-between align-items-center mb-3">
-														<h:h5 class="mb-0">
-															<label value="Subgovcompliancefindings"/>
-														</h:h5>
-														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalComplianceFindings)"/> 
-															<label value="registros"/>
-														</h:span>
-													</h:div>
-													
-													<h:div class="table-responsive">
-														<h:table class="table table-hover table-sm">
-															<h:thead class="table-light">
-																<h:tr>
-																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
-																</h:tr>
-															</h:thead>
-															<h:tbody>
-																<forEach items="@load(vm.subgovcompliancefindings)" var="item">
-																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
-																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
-																			</h:span>
-																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
-																	</h:tr>
-																</forEach>
-															</h:tbody>
-														</h:table>
-													</h:div>
-													
-													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovcompliancefindings)">
-														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
-														<h:p class="mt-2">
-															<label value="No hay subgovcompliancefindings registrados"/>
-														</h:p>
-													</h:div>
-												</tabpanel>
-												<!-- Panel: Subgovcompliancerequirements -->
-												<tabpanel>
-													<h:div class="d-flex justify-content-between align-items-center mb-3">
-														<h:h5 class="mb-0">
-															<label value="Subgovcompliancerequirements"/>
-														</h:h5>
-														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalComplianceRequirements)"/> 
-															<label value="registros"/>
-														</h:span>
-													</h:div>
-													
-													<h:div class="table-responsive">
-														<h:table class="table table-hover table-sm">
-															<h:thead class="table-light">
-																<h:tr>
-																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
-																</h:tr>
-															</h:thead>
-															<h:tbody>
-																<forEach items="@load(vm.subgovcompliancerequirements)" var="item">
-																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
-																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
-																			</h:span>
-																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
-																	</h:tr>
-																</forEach>
-															</h:tbody>
-														</h:table>
-													</h:div>
-													
-													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subgovcompliancerequirements)">
-														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
-														<h:p class="mt-2">
-															<label value="No hay subgovcompliancerequirements registrados"/>
-														</h:p>
-													</h:div>
-												</tabpanel>
-											</tabpanels>
-										</tabbox>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.totalModels)" />
+										</h:h4>
+										<h:span class="badge bg-info me-1">Registrados</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-info-subtle rounded fs-3">
+											<h:i class="fa-solid fa-microchip text-info"></h:i>
+										</h:span>
 									</h:div>
 								</h:div>
 							</h:div>
 						</h:div>
 					</h:div>
-				</h:div><!--card-->
-			</h:div><!--lg-->
-		</h:div><!--row-->
+					
+					<!-- KPI 2: % Compliance -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Compliance Rate
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.compliancePercentage)" />
+										</h:h4>
+										<h:span class="badge bg-success me-1">Compliant</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-success-subtle rounded fs-3">
+											<h:i class="fa-solid fa-circle-check text-success"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<!-- KPI 3: Modelos Producción Sin Compliance -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Producción Non-Compliant
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.modelsInProductionNonCompliant)" />
+										</h:h4>
+										<h:span class="badge bg-danger me-1">⚠ Atención</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-danger-subtle rounded fs-3">
+											<h:i class="fa-solid fa-triangle-exclamation text-danger"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<!-- KPI 4: Análisis Sesgo Este Mes -->
+					<h:div class="col-xl-3 col-md-6">
+						<h:div class="card card-animate">
+							<h:div class="card-body">
+								<h:div class="d-flex align-items-center">
+									<h:div class="flex-grow-1 overflow-hidden">
+										<h:p class="text-uppercase fw-medium text-muted text-truncate mb-0">
+											Análisis Sesgo (Mes)
+										</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="d-flex align-items-end justify-content-between mt-4">
+									<h:div>
+										<h:h4 class="fs-22 fw-semibold ff-secondary mb-4">
+											<label value="@load(vm.biasAnalysisThisMonth)" />
+										</h:h4>
+										<h:span class="badge bg-warning me-1">Realizados</h:span>
+									</h:div>
+									<h:div class="avatar-sm flex-shrink-0">
+										<h:span class="avatar-title bg-warning-subtle rounded fs-3">
+											<h:i class="fa-solid fa-scale-balanced text-warning"></h:i>
+										</h:span>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Tabla Modelos Non-Compliant -->
+			<h:div class="col-lg-12 col-xlg-12 col-md-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center">
+							<h:h5 class="card-title mb-0 flex-grow-1">
+								<h:i class="fa-solid fa-list-check me-2"></h:i>
+								Modelos Non-Compliant
+							</h:h5>
+							<h:div class="flex-shrink-0">
+								<button label="Actualizar" 
+									iconSclass="fa-solid fa-refresh me-1"
+									sclass="btn btn-sm btn-primary"
+									onClick="@command('loadData')" />
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<h:div class="card-body">
+						<!-- Filtros -->
+						<h:div class="row mb-3">
+							<h:div class="col-md-4">
+								<h:div class="input-group">
+									<textbox placeholder="Buscar modelo..." 
+										value="@bind(vm.searchTerm)"
+										sclass="form-control" />
+									<button label="Buscar" 
+										iconSclass="fa-solid fa-search"
+										sclass="btn btn-primary"
+										onClick="@command('applyFilters')" />
+								</h:div>
+							</h:div>
+							<h:div class="col-md-3">
+								<combobox placeholder="Filtrar por risk level"
+									selectedItem="@bind(vm.riskLevelFilter)"
+									sclass="form-control">
+									<comboitem label="Todos" value="ALL"/>
+									<comboitem label="High" value="HIGH"/>
+									<comboitem label="Medium" value="MEDIUM"/>
+									<comboitem label="Low" value="LOW"/>
+								</combobox>
+							</h:div>
+							<h:div class="col-md-2">
+								<button label="Limpiar" 
+									iconSclass="fa-solid fa-eraser"
+									sclass="btn btn-secondary"
+									onClick="@command('clearFilters')" />
+							</h:div>
+						</h:div>
+						
+						<!-- Tabla -->
+						<h:div class="table-responsive">
+							<listbox model="@load(vm.nonCompliantModels)" 
+								emptyMessage="No hay modelos non-compliant"
+								sclass="table table-bordered table-hover">
+								<listhead>
+									<listheader label="Nombre Modelo" width="25%" />
+									<listheader label="Owner" width="15%" />
+									<listheader label="Risk Level" width="10%" align="center" />
+									<listheader label="Compliance Score" width="15%" align="center" />
+									<listheader label="Qué Falta" width="25%" />
+									<listheader label="Acciones" width="10%" align="center" />
+								</listhead>
+								<template name="model" var="item">
+									<listitem>
+										<listcell>
+											<label value="@load(item.modname)" 
+												sclass="fw-semibold" />
+										</listcell>
+										<listcell>
+											<label value="@load(item.modowner)" />
+										</listcell>
+										<listcell style="text-align: center;">
+											<h:span class="@load(item.modrisklevel eq 'HIGH' ? 'badge bg-danger' : (item.modrisklevel eq 'MEDIUM' ? 'badge bg-warning' : 'badge bg-info'))">
+												<label value="@load(item.modrisklevel)" />
+											</h:span>
+										</listcell>
+										<listcell style="text-align: center;">
+											<label value="@load(vm.getComplianceScoreForModel(item))" 
+												sclass="fw-bold" />
+										</listcell>
+										<listcell>
+											<label value="@load(vm.getMissingComplianceItems(item))" 
+												sclass="text-muted small" />
+										</listcell>
+										<listcell style="text-align: center;">
+											<button label="Ver Detalle" 
+												iconSclass="fa-solid fa-eye"
+												sclass="btn btn-sm btn-info"
+												onClick="@command('viewModelDetails', modelId=item.idxmodel)" />
+										</listcell>
+									</listitem>
+								</template>
+							</listbox>
+						</h:div>
+						
+						<!-- Mensaje vacío -->
+						<h:div class="text-center py-5" visible="@load(empty vm.nonCompliantModels)">
+							<h:i class="fa-solid fa-circle-check text-success" style="font-size: 64px;"></h:i>
+							<h:h4 class="mt-3 text-muted">¡Excelente!</h:h4>
+							<h:p class="text-muted">
+								Todos los modelos están en cumplimiento con EU AI Act
+							</h:p>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Compliance Distribution Chart (Opcional) -->
+			<h:div class="col-lg-6 col-xlg-6 col-md-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5 class="card-title mb-0">
+							<h:i class="fa-solid fa-chart-pie me-2"></h:i>
+							Distribución Compliance
+						</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<h:div class="text-center py-4">
+							<h:div class="row">
+								<h:div class="col-6">
+									<h:div class="p-3">
+										<h:h4 class="text-success">
+											<label value="@load(vm.compliantModelsCount)" />
+										</h:h4>
+										<h:p class="text-muted mb-0">✅ Compliant</h:p>
+									</h:div>
+								</h:div>
+								<h:div class="col-6">
+									<h:div class="p-3">
+										<h:h4 class="text-danger">
+											<label value="@load(vm.nonCompliantModelsCount)" />
+										</h:h4>
+										<h:p class="text-muted mb-0">❌ Non-Compliant</h:p>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:p class="text-muted small mt-3">
+								📊 Gráfico interactivo disponible en versión completa
+							</h:p>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Quick Actions -->
+			<h:div class="col-lg-6 col-xlg-6 col-md-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5 class="card-title mb-0">
+							<h:i class="fa-solid fa-bolt me-2"></h:i>
+							Acciones Rápidas
+						</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<h:div class="d-grid gap-2">
+							<button label="📋 Ver Todos los Modelos" 
+								sclass="btn btn-outline-primary"
+								onClick="@command('navigateToModels')" />
+							<button label="🔍 Analizar Sesgo de Modelo" 
+								sclass="btn btn-outline-warning"
+								onClick="@command('navigateToBiasAnalysis')" />
+							<button label="✅ Revisar Aprobaciones Pendientes" 
+								sclass="btn btn-outline-success"
+								onClick="@command('navigateToApprovals')" />
+							<button label="📊 Exportar Reporte Compliance" 
+								sclass="btn btn-outline-info"
+								onClick="@command('exportComplianceReport')" />
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
 	</idspace>
 </zk>

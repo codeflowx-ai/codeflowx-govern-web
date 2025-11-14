@@ -1,0 +1,90 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.euregistration.ReviewRegistrationPackageViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-file-circle-check me-2"></h:i>
+						Review Registration Package
+					</h:h2>
+					<h:p class="text-muted">
+						Final review before submission to EU Database
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-success">
+					<div class="card-header bg-success text-white">
+						<h:h5 class="card-title mb-0">✓ Registration Package Ready</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2">The registration package has been generated and is ready for submission.</h:p>
+						<h:p class="mb-0">
+							<strong>Download Package:</strong>
+							<a href="@load(vm.registrationPackageUrl)" class="btn btn-sm btn-outline-primary ms-2">
+								<h:i class="fa fa-download me-1"></h:i> Download Package
+							</a>
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-info">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">📦 Package Contents</h:h5>
+					</div>
+					<div class="card-body">
+						<h:ul>
+							<h:li>Registration JSON (Annex VIII format)</h:li>
+							<h:li>EU Declaration of Conformity (PDF)</h:li>
+							<h:li>Technical Documentation Summary</h:li>
+							<h:li>Conformity Certificates (if applicable)</h:li>
+						</h:ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Review Notes</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.reviewNotes)" 
+						         placeholder="Optional: Add review comments..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Decision</h:h5>
+						<div class="d-flex gap-2">
+							<button label="SUBMIT to EU Database" 
+							        iconSclass="fa fa-paper-plane"
+							        zclass="btn btn-success btn-lg"
+							        onClick="@command('submitToEU')" />
+							<button label="Modify Registration" 
+							        iconSclass="fa fa-edit"
+							        zclass="btn btn-warning"
+							        onClick="@command('modify')" />
+							<button label="Cancel Registration" 
+							        iconSclass="fa fa-times"
+							        zclass="btn btn-danger"
+							        onClick="@command('cancel')" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

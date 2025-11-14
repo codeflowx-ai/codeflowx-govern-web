@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Verificación de decommission"
+            width="70%"
+            height="60%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.AIDecommissionVerificationViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Checklist de verificación"/>
+                <textbox value="@bind(vm.verificationChecklist)"
+                         width="100%"
+                         rows="6"
+                         multiline="true"
+                         placeholder="Resultados de la verificación: endpoints cerrados, datos eliminados, logs resguardados"/>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Riesgos residuales y evidencia"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Riesgos residuales" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.residualRisks)"
+                                     width="100%"
+                                     rows="4"
+                                     multiline="true"
+                                     placeholder="Riesgos pendientes y medidas mitigantes"/>
+                        </row>
+                        <row>
+                            <label value="Evidencia" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.evidenceLink)"
+                                     width="100%"
+                                     placeholder="URL o identificador de evidencia de verificación"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Confirmar verificación"
+                        onClick="@command('doSubmit')"
+                        width="190px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

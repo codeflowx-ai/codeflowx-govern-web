@@ -1,0 +1,279 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	
+	<idspace id="modelDetail"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.models.ModelDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		
+		<h:div class="row">
+			<div>
+				<!-- Header Section -->
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-microchip label-icon align-middle fs-16 me-2"></h:i>
+						<label value="@load(vm.currentModel.modname)" style="font-weight: bold;" />
+						<h:span class="badge ms-2" 
+							sclass="@load(vm.currentModel.modstatus eq 'APPROVED' ? 'bg-success' : vm.currentModel.modstatus eq 'DRAFT' ? 'bg-warning' : vm.currentModel.modstatus eq 'IN_REVIEW' ? 'bg-info' : vm.currentModel.modstatus eq 'REJECTED' ? 'bg-danger' : 'bg-secondary')">
+							<label value="@load(vm.currentModel.modstatus)" />
+						</h:span>
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Detalle completo del modelo y compliance checklist" />
+					</h:p>
+				</h:div>
+			</div>
+			
+			<h:div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<h:div class="card">
+					<!-- Card Header con Acciones -->
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver a lista">
+								</a>
+							</h:div>
+							<h:div class="flex-shrink-0">
+								<h:div class="hstack text-nowrap gap-2 d-flex">
+									<!-- Editar -->
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-pen-to-square label-icon align-middle fs-16 me-2"
+										onClick="@command('editItem')"
+										tooltiptext="Editar Modelo">
+									</a>
+									<!-- Analizar Sesgo -->
+									<a class="waves-effect waves-light btn btn-sm btn-info"
+										onClick="@command('analyzeB
+
+ias')"
+										visible="@load(vm.currentModel.modstatus eq 'APPROVED' or vm.currentModel.modstatus eq 'DRAFT')">
+										<h:i class="fa-duotone fa-solid fa-chart-line me-1"></h:i>
+										<label value="Analizar Sesgo" />
+									</a>
+									<!-- Enviar a Aprobación -->
+									<a class="waves-effect waves-light btn btn-sm btn-primary"
+										onClick="@command('submitForApproval')"
+										visible="@load(vm.currentModel.modstatus eq 'DRAFT')">
+										<h:i class="fa-duotone fa-solid fa-paper-plane me-1"></h:i>
+										<label value="Enviar a Aprobación" />
+									</a>
+									<!-- Eliminar -->
+									<a class="waves-effect waves-light btn btn-sm btn-danger"
+										onClick="@command('deleteItem')"
+										tooltiptext="Eliminar Modelo">
+										<h:i class="fa-duotone fa-solid fa-trash me-1"></h:i>
+									</a>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<h:div class="card-body">
+						<h:div class="row">
+							<!-- Columna Izquierda: Información del Modelo -->
+							<h:div class="col-lg-8 col-xlg-8 col-md-12">
+								<!-- Información Básica -->
+								<h:div class="card default shadow-sm mb-3">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-info-circle me-2"></h:i>
+											<label value="Información Básica" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Nombre" /></h:p>
+												<h:h6><label value="@load(vm.currentModel.modname)" /></h:h6>
+											</h:div>
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Versión" /></h:p>
+												<h:h6><label value="@load(vm.currentModel.modversion)" /></h:h6>
+											</h:div>
+										</h:div>
+										
+										<h:div class="row mb-3">
+											<h:div class="col-md-12">
+												<h:p class="text-muted mb-1"><label value="Descripción" /></h:p>
+												<h:p><label value="@load(vm.currentModel.moddescription)" /></h:p>
+											</h:div>
+										</h:div>
+										
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Tipo de Modelo" /></h:p>
+												<h:h6><label value="@load(vm.currentModel.modtype)" /></h:h6>
+											</h:div>
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Framework" /></h:p>
+												<h:h6><label value="@load(vm.currentModel.modframework)" /></h:h6>
+											</h:div>
+										</h:div>
+										
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Nivel de Riesgo" /></h:p>
+												<h:span class="badge" 
+													sclass="@load(vm.currentModel.modrisklevel eq 'HIGH' ? 'bg-danger' : vm.currentModel.modrisklevel eq 'MEDIUM' ? 'bg-warning' : 'bg-success')">
+													<label value="@load(vm.currentModel.modrisklevel)" />
+												</h:span>
+											</h:div>
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Estado" /></h:p>
+												<h:span class="badge" 
+													sclass="@load(vm.currentModel.modstatus eq 'APPROVED' ? 'bg-success' : vm.currentModel.modstatus eq 'DRAFT' ? 'bg-warning' : vm.currentModel.modstatus eq 'IN_REVIEW' ? 'bg-info' : vm.currentModel.modstatus eq 'REJECTED' ? 'bg-danger' : 'bg-secondary')">
+													<label value="@load(vm.currentModel.modstatus)" />
+												</h:span>
+											</h:div>
+										</h:div>
+										
+										<h:div class="row">
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Creado por" /></h:p>
+												<h:p><label value="@load(vm.currentModel.modcreatedby)" /></h:p>
+											</h:div>
+											<h:div class="col-md-6">
+												<h:p class="text-muted mb-1"><label value="Fecha creación" /></h:p>
+												<h:p><label value="@load(vm.currentModel.modcreatedat)" /></h:p>
+											</h:div>
+										</h:div>
+									</h:div>
+								</h:div>
+								
+								<!-- Performance Metrics (si existen) -->
+								<h:div class="card default shadow-sm mb-3" visible="@load(not empty vm.currentModel.modperformancemetrics)">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-chart-bar me-2"></h:i>
+											<label value="Métricas de Performance" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:p><label value="@load(vm.currentModel.modperformancemetrics)" /></h:p>
+									</h:div>
+								</h:div>
+								
+								<!-- Análisis de Sesgo Recientes -->
+								<h:div class="card default shadow-sm mb-3" visible="@load(not empty vm.recentBiasAnalyses)">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-balance-scale me-2"></h:i>
+											<label value="Análisis de Sesgo Recientes" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="list-group">
+											<forEach items="@load(vm.recentBiasAnalyses)" var="analysis">
+												<h:div class="list-group-item">
+													<h:div class="d-flex w-100 justify-content-between">
+														<h:h6 class="mb-1">
+															<label value="@load(analysis.modbiastype)" />
+														</h:h6>
+														<h:span class="badge" 
+															sclass="@load(analysis.modseverity eq 'NO_BIAS' ? 'bg-success' : analysis.modseverity eq 'LOW' ? 'bg-info' : analysis.modseverity eq 'MODERATE' ? 'bg-warning' : 'bg-danger')">
+															<label value="@load(analysis.modseverity)" />
+														</h:span>
+													</h:div>
+													<h:p class="mb-1 text-muted small">
+														<label value="@load(analysis.modbiasdescription)" />
+													</h:p>
+													<h:small class="text-muted">
+														<label value="@load(analysis.modanalysisdate)" />
+													</h:small>
+												</h:div>
+											</forEach>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+							
+							<!-- Columna Derecha: Compliance Checklist -->
+							<h:div class="col-lg-4 col-xlg-4 col-md-12">
+								<h:div class="card default shadow-sm sticky-top" style="top: 20px;">
+									<h:div class="card-header" 
+										sclass="@load(vm.complianceStatus eq 'COMPLIANT' ? 'bg-success text-white' : vm.complianceStatus eq 'PARTIAL' ? 'bg-warning text-dark' : 'bg-danger text-white')">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-clipboard-check me-2"></h:i>
+											<label value="EU AI Act Compliance" />
+										</h:h5>
+										<h:p class="mb-0 mt-2">
+											<h:span class="fs-4 fw-bold">
+												<label value="@load(vm.complianceScore)" />
+											</h:span>
+											<h:span class="ms-2">
+												<h:span class="badge"
+													sclass="@load(vm.complianceStatus eq 'COMPLIANT' ? 'bg-white text-success' : vm.complianceStatus eq 'PARTIAL' ? 'bg-white text-warning' : 'bg-white text-danger')">
+													<label value="@load(vm.complianceStatusLabel)" />
+												</h:span>
+											</h:span>
+										</h:p>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="list-group list-group-flush">
+											<forEach items="@load(vm.complianceChecklist)" var="check">
+												<h:div class="list-group-item border-0 px-0">
+													<h:div class="d-flex align-items-start">
+														<h:div class="flex-shrink-0 me-3">
+															<h:i class="@load(check.passed ? 'fa-solid fa-circle-check text-success' : 'fa-solid fa-circle-xmark text-danger')" style="font-size: 1.2rem;"></h:i>
+														</h:div>
+														<h:div class="flex-grow-1">
+															<h:p class="mb-1 fw-semibold">
+																<label value="@load(check.name)" />
+															</h:p>
+															<h:p class="mb-1 text-muted small">
+																<label value="@load(check.description)" />
+															</h:p>
+															<h:small class="text-muted" visible="@load(check.passed)">
+																<h:i class="fa-solid fa-check-circle me-1"></h:i>
+																<label value="@load(check.completedDate)" />
+															</h:small>
+															<h:small class="text-warning" visible="@load(not check.passed)">
+																<h:i class="fa-solid fa-exclamation-circle me-1"></h:i>
+																<label value="Pendiente" />
+															</h:small>
+														</h:div>
+													</h:div>
+												</h:div>
+											</forEach>
+										</h:div>
+										
+										<!-- Progress Bar -->
+										<h:div class="mt-3">
+											<h:div class="progress" style="height: 8px;">
+												<h:div class="progress-bar" 
+													sclass="@load(vm.compliancePercentage >= 80 ? 'bg-success' : vm.compliancePercentage >= 60 ? 'bg-warning' : 'bg-danger')"
+													style="@load(concat('width: ', vm.compliancePercentage, '%'))">
+												</h:div>
+											</h:div>
+											<h:p class="text-muted text-center small mt-2">
+												<label value="@load(concat(vm.compliancePercentage, '% completo'))" />
+											</h:p>
+										</h:div>
+									</h:div>
+									<h:div class="card-footer bg-light">
+										<h:div class="d-grid">
+											<a class="btn btn-sm btn-outline-primary" onClick="@command('viewAuditTrail')">
+												<h:i class="fa-duotone fa-solid fa-file-lines me-1"></h:i>
+												<label value="Ver Audit Trail" />
+											</a>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>
+
+
+

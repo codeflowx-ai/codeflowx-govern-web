@@ -1,0 +1,57 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:h="xhtml"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.ModelLineageTreeViewModel')">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-secondary text-white">
+                        <h:h3 class="mb-0">Árbol de Linaje de Modelos</h:h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label class="form-label">ID Modelo</label>
+                                <longbox value="@bind(vm.modelId)" />
+                            </div>
+                            <div class="col-md-2">
+                                <button label="Cargar" sclass="btn btn-primary"
+                                    onClick="@command('loadTree')" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <empty visible="@load(!vm.hasData)">
+                            <div class="alert alert-info">No hay nodos disponibles para el modelo seleccionado.</div>
+                        </empty>
+                        <div visible="@load(vm.hasData)">
+                            <grid model="@load(vm.lineageRows)">
+                                <columns>
+                                    <column label="Modelo" />
+                                    <column label="Estrategia" />
+                                    <column label="Tipo" />
+                                    <column label="Profundidad" width="120px" />
+                                </columns>
+                                <rows>
+                                    <template name="model" var="row">
+                                        <row>
+                                            <label value="@load(row.displayName)" />
+                                            <label value="@load(row.node.strategy)" />
+                                            <label value="@load(row.node.lineageType)" />
+                                            <label value="@load(row.node.depth)" />
+                                        </row>
+                                    </template>
+                                </rows>
+                            </grid>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>

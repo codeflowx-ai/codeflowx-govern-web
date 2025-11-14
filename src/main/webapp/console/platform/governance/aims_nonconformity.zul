@@ -1,0 +1,109 @@
+<?page title="AIMS Non-Conformities" contentType="text/html;charset=UTF-8"?>
+<window width="100%" height="100%" border="normal"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.AIMSNonConformityViewModel')">
+
+    <vlayout hflex="1" vflex="1" spacing="12px">
+        <hlayout spacing="12px">
+            <button label="Registrar no conformidad" iconSclass="z-icon-plus"
+                    onClick="@command('createNonConformity')" />
+            <separator orient="vertical"/>
+            <groupbox title="Abiertas" width="160px">
+                <vlayout align="center">
+                    <label value="@load(vm.openCount)" style="font-size:24px;font-weight:bold"/>
+                    <label value="Registros abiertos"/>
+                </vlayout>
+            </groupbox>
+            <groupbox title="Críticas" width="160px">
+                <vlayout align="center">
+                    <label value="@load(vm.criticalCount)" style="font-size:24px;font-weight:bold;color:#d32f2f"/>
+                    <label value="Severidad crítica"/>
+                </vlayout>
+            </groupbox>
+        </hlayout>
+
+        <groupbox title="Nueva no conformidad" width="100%">
+            <grid hflex="1">
+                <rows>
+                    <row>
+                        <label value="Título"/>
+                        <textbox value="@bind(vm.newNonConformity.anctitle)" width="320px" />
+                        <label value="Responsable"/>
+                        <textbox value="@bind(vm.newNonConformity.ancresponsible)" width="220px" />
+                    </row>
+                    <row>
+                        <label value="Descripción"/>
+                        <textbox value="@bind(vm.newNonConformity.ancdescription)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Severidad"/>
+                        <combobox value="@bind(vm.newNonConformity.ancseverity)" width="200px">
+                            <comboitem label="LOW" value="LOW"/>
+                            <comboitem label="MEDIUM" value="MEDIUM"/>
+                            <comboitem label="HIGH" value="HIGH"/>
+                            <comboitem label="CRITICAL" value="CRITICAL"/>
+                        </combobox>
+                        <label value="Estado"/>
+                        <combobox value="@bind(vm.newNonConformity.ancstatus)" width="200px">
+                            <comboitem label="OPEN" value="OPEN"/>
+                            <comboitem label="IN_PROGRESS" value="IN_PROGRESS"/>
+                            <comboitem label="CLOSED" value="CLOSED"/>
+                        </combobox>
+                        <label value="Fecha detección"/>
+                        <datebox value="@bind(vm.newNonConformity.ancdetectiondate)" format="dd/MM/yyyy" width="160px"/>
+                    </row>
+                    <row>
+                        <label value="Acciones contención"/>
+                        <textbox value="@bind(vm.newNonConformity.anccontainmentactions)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Plan correctivo"/>
+                        <textbox value="@bind(vm.newNonConformity.anccorrectiveactions)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Fecha objetivo"/>
+                        <datebox value="@bind(vm.newNonConformity.ancduedate)" format="dd/MM/yyyy" width="160px"/>
+                        <label value="Evidencia"/>
+                        <textbox value="@bind(vm.newNonConformity.ancevidenceurl)" width="320px"/>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+
+        <listbox model="@load(vm.nonConformities)" selectedItem="@bind(vm.selectedNonConformity)" vflex="1"
+                 hflex="1" emptyMessage="No hay no conformidades registradas" mold="paging">
+            <listhead>
+                <listheader label="Título" width="220px"/>
+                <listheader label="Severidad" width="120px"/>
+                <listheader label="Estado" width="120px"/>
+                <listheader label="Responsable" width="180px"/>
+                <listheader label="Fecha detección" width="150px"/>
+                <listheader label="Fecha objetivo" width="150px"/>
+                <listheader label="Acciones" width="240px"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell><label value="@load(each.anctitle)"/></listcell>
+                    <listcell>
+                        <label value="@load(each.ancseverity)"
+                               style="@load(each.ancseverity eq 'CRITICAL' ? 'color:#d32f2f;font-weight:bold' : each.ancseverity eq 'HIGH' ? 'color:#f57c00;font-weight:bold' : 'color:#1976d2')"/>
+                    </listcell>
+                    <listcell><label value="@load(each.ancstatus)"/></listcell>
+                    <listcell><label value="@load(each.ancresponsible)"/></listcell>
+                    <listcell><label value="@load(each.ancdetectiondate) @converter('formattedDate', format='dd/MM/yyyy')"/></listcell>
+                    <listcell><label value="@load(each.ancduedate) @converter('formattedDate', format='dd/MM/yyyy')"/></listcell>
+                    <listcell>
+                        <hlayout spacing="6px">
+                            <button label="Actualizar" sclass="btn-primary"
+                                    onClick="@command('updateNonConformity', record=each)"/>
+                            <button label="Cerrar" sclass="btn-success"
+                                    onClick="@command('closeNonConformity', record=each)"
+                                    disabled="@load(each.ancstatus eq 'CLOSED')"/>
+                            <button label="Eliminar" sclass="btn-danger"
+                                    onClick="@command('deleteNonConformity', record=each)"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </vlayout>
+</window>

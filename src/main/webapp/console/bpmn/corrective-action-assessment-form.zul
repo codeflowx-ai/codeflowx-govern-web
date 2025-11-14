@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Evaluar no conformidad"
+            width="70%"
+            height="65%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CorrectiveActionAssessmentViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Detalles de la no conformidad"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="ID" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.nonConformityId)" width="200px" readonly="true"/>
+                        </row>
+                        <row>
+                            <label value="Cláusula ISO" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.nonConformityClause)"
+                                     width="200px"
+                                     placeholder="Ej. 10.2"/>
+                        </row>
+                        <row>
+                            <label value="Descripción" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.description)"
+                                     width="100%"
+                                     rows="4"
+                                     multiline="true"
+                                     placeholder="Describe la no conformidad detectada"/>
+                        </row>
+                        <row>
+                            <label value="Severidad" sclass="font-weight-bold"/>
+                            <combobox selectedItem="@bind(vm.severity)" width="200px">
+                                <comboitem each="@bind(item)"
+                                           model="@bind(vm.severityOptions)"
+                                           label="@bind(item)"/>
+                            </combobox>
+                        </row>
+                        <row>
+                            <label value="Fecha detección" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.detectionDate)"
+                                     format="yyyy-MM-dd"
+                                     width="200px"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Registrar evaluación"
+                        onClick="@command('doSubmit')"
+                        width="180px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

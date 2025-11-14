@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Plan de acciones correctivas - Revisión de dirección"
+            width="80%"
+            height="75%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.ManagementReviewActionsViewModel')">
+
+        <vlayout sclass="p-4" spacing="16px">
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Nueva acción correctiva"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Descripción" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.newActionDescription)"
+                                     width="100%"
+                                     multiline="true"
+                                     rows="3"
+                                     placeholder="Detalle de la acción correctiva a implementar"/>
+                        </row>
+                        <row>
+                            <label value="Responsable" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.newActionOwner)"
+                                     width="100%"
+                                     placeholder="Usuario o rol responsable"/>
+                        </row>
+                        <row>
+                            <label value="Fecha objetivo" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.newActionDueDate)"
+                                     format="yyyy-MM-dd"
+                                     width="200px"/>
+                        </row>
+                    </rows>
+                </grid>
+                <separator/>
+                <hlayout pack="end">
+                    <button label="Añadir acción"
+                            onClick="@command('addAction')"
+                            sclass="btn-primary"/>
+                </hlayout>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Plan de acciones"/>
+                <listbox model="@bind(vm.actions)" width="100%" height="250px" multiple="false">
+                    <listhead>
+                        <listheader label="Descripción" width="50%"/>
+                        <listheader label="Responsable" width="25%"/>
+                        <listheader label="Fecha objetivo" width="15%"/>
+                        <listheader label="" width="10%"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(each.description)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each.owner)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each.dueDate)"/>
+                            </listcell>
+                            <listcell>
+                                <button label="Eliminar"
+                                        onClick="@command('removeAction', item=each)"
+                                        width="90px"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Registrar plan"
+                        onClick="@command('doSubmit')"
+                        width="160px"
+                        sclass="btn-primary"
+                        disabled="@load(empty vm.actions)"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

@@ -1,0 +1,173 @@
+<?page title="Integración Plataformas Enterprise" contentType="text/html;charset=UTF-8"?>
+<zk>
+    <window title="Integraciones Enterprise" border="normal" width="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.integrations.ExternalPlatformsViewModel')">
+
+        <toolbar mold="flat" sclass="mb-3">
+            <toolbarbutton label="Registrar plataforma" iconSclass="z-icon-plus"
+                           onClick="@command('openAddModal')" />
+            <toolbarbutton label="Actualizar" iconSclass="z-icon-refresh"
+                           onClick="@command('refresh')" />
+        </toolbar>
+
+        <grid model="@load(vm.platforms)" sclass="table table-striped" emptyMessage="Sin plataformas configuradas">
+            <columns>
+                <column label="Tipo" width="130px" />
+                <column label="Nombre" width="200px" />
+                <column label="Host" />
+                <column label="Estado" width="130px" />
+                <column label="Último Sync" width="180px" />
+                <column label="Acciones" width="220px" />
+            </columns>
+            <template name="model" var="platform">
+                <row sclass="clickable-row" onClick="@command('selectPlatform', platform=platform)">
+                    <label value="@load(platform.eplplatformtype)" />
+                    <label value="@load(platform.eplplatformname)" />
+                    <label value="@load(platform.eplhosturl)" />
+                    <label value="@load(platform.eplsyncstatus)"
+                           style="@load(platform.eplsyncstatus eq 'SUCCESS' ? 'color:#0f766e;font-weight:bold;' : 'color:#f97316;font-weight:bold;')" />
+                    <label value="@load(platform.epllastsyncat)"
+                           onCreate="self.setValue(self.getValue() != null ? self.getValue().toString() : '-')" />
+                    <hbox spacing="6px">
+                        <button label="Sincronizar" iconSclass="z-icon-refresh"
+                                onClick="@command('syncNow', platform=platform)" />
+                        <button label="Probar" iconSclass="z-icon-check"
+                                onClick="@command('testConnection', platform=platform)" />
+                    </hbox>
+                </row>
+            </template>
+        </grid>
+
+        <separator height="20px" />
+        <label value="Modelos externos sincronizados" style="font-weight:bold;font-size:16px" />
+
+        <listbox model="@load(vm.externalModels)" mold="paging" pageSize="10"
+                 emptyMessage="Selecciona una plataforma para ver modelos">
+            <listhead>
+                <listheader label="Nombre" width="220px" />
+                <listheader label="Versión" width="120px" />
+                <listheader label="Stage" width="130px" />
+                <listheader label="Riesgo" width="150px" />
+                <listheader label="Aprobación" width="150px" />
+                <listheader label="Último sync" width="180px" />
+                <listheader label="Acciones" width="150px" />
+            </listhead>
+            <template name="model" var="model">
+                <listitem>
+                    <listcell label="@load(model.exmexternalname)" />
+                    <listcell label="@load(model.exmexternalversion)" />
+                    <listcell label="@load(model.exmsyncstatus)" />
+                    <listcell>
+                        <label value="@load(model.exmrisklevel)"
+                               style="@load(model.exmrisklevel != null && model.exmrisklevel.indexOf('HIGH_RISK') >= 0 ? 'color:#dc2626;font-weight:bold;' : 'color:#0f172a;')" />
+                    </listcell>
+                    <listcell>
+                        <label value="@load(model.exmapprovalstatus)"
+                               style="@load(model.exmapprovalstatus eq 'APPROVED' ? 'color:#15803d;font-weight:bold;' : (model.exmapprovalstatus eq 'REJECTED' ? 'color:#dc2626;font-weight:bold;' : 'color:#d97706;font-weight:bold;'))" />
+                    </listcell>
+                    <listcell label="@load(model.exmlastsyncedat)"
+                              onCreate="self.setValue(self.getValue() != null ? self.getValue().toString() : '-')" />
+                    <listcell>
+                        <button label="Monitor" iconSclass="z-icon-line-chart"
+                                onClick="@command('monitorModel', model=model)" />
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+
+        <separator height="20px" visible="@load(vm.datasetSectionVisible)" />
+        <div visible="@load(vm.datasetSectionVisible)">
+            <label value="Datasets externos catalogados" style="font-weight:bold;font-size:16px" />
+            <listbox model="@load(vm.externalDatasets)" mold="paging" pageSize="10"
+                     emptyMessage="Sin datasets catalogados">
+                <listhead>
+                    <listheader label="Dataset" width="240px" />
+                    <listheader label="Origen" width="200px" />
+                    <listheader label="Registros" width="120px" />
+                    <listheader label="Tamaño (bytes)" width="150px" />
+                    <listheader label="Calidad (%)" width="130px" />
+                    <listheader label="PII" width="100px" />
+                    <listheader label="Última calidad" width="180px" />
+                    <listheader label="Acciones" width="150px" />
+                </listhead>
+                <template name="model" var="dataset">
+                    <listitem>
+                        <listcell label="@load(dataset.exdexternalid)" />
+                        <listcell label="@load(dataset.exdsourcelocation)" />
+                        <listcell label="@load(dataset.exdrecordcount)" />
+                        <listcell label="@load(dataset.exdsizebytes)" />
+                        <listcell>
+                            <label value="@load(dataset.exdqualityscore != null ? dataset.exdqualityscore : 0)"
+                                   style="@load(dataset.exdqualityscore != null && dataset.exdqualityscore < 80 ? 'color:#dc2626;font-weight:bold;' : 'color:#15803d;font-weight:bold;')" />
+                        </listcell>
+                        <listcell>
+                            <label value="@load(dataset.exdpiidetected != null && dataset.exdpiidetected ? 'Sí' : 'No')"
+                                   style="@load(dataset.exdpiidetected != null && dataset.exdpiidetected ? 'color:#dc2626;font-weight:bold;' : 'color:#15803d;font-weight:bold;')" />
+                        </listcell>
+                        <listcell label="@load(dataset.exdlastqualitycheck)"
+                                  onCreate="self.setValue(self.getValue() != null ? self.getValue().toString() : '-')" />
+                        <listcell>
+                            <button label="Evaluar" iconSclass="z-icon-chart-line"
+                                    disabled="@load(!datasetSectionVisible || selectedPlatform.eplplatformtype eq 'PURVIEW' || selectedPlatform.eplplatformtype eq 'FABRIC' || selectedPlatform.eplplatformtype eq 'SERVICENOW' || selectedPlatform.eplplatformtype eq 'JIRA')"
+                                    tooltiptext="@load(selectedPlatform.eplplatformtype eq 'PURVIEW' || selectedPlatform.eplplatformtype eq 'FABRIC' || selectedPlatform.eplplatformtype eq 'SERVICENOW' || selectedPlatform.eplplatformtype eq 'JIRA' ? 'Evaluación automática no disponible; revisar metadatos sincronizados.' : '')"
+                                    onClick="@command('evaluateDataset', dataset=dataset)" />
+                        </listcell>
+                    </listitem>
+                </template>
+            </listbox>
+        </div>
+
+        <window title="Registrar plataforma" width="520px" closable="true" border="normal"
+                visible="@load(vm.addModalVisible)" sclass="modal" position="center"
+                onClose="@command('cancelAdd')">
+            <vlayout spacing="12px" style="padding:16px">
+                <hlayout spacing="12px">
+                    <label value="Tipo" width="130px" style="font-weight:bold" />
+                    <combobox readonly="true" model="@load(vm.platformTypes)"
+                              selectedItem="@bind(vm.platformForm.eplplatformtype)"
+                              placeholder="Selecciona" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Nombre" width="130px" style="font-weight:bold" />
+                    <textbox value="@bind(vm.platformForm.eplplatformname)" hflex="1" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Host" width="130px" style="font-weight:bold" />
+                    <textbox value="@bind(vm.platformForm.eplhosturl)" hflex="1"
+                             placeholder="https://adb-xxxxx.azuredatabricks.net" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Token API" width="130px" style="font-weight:bold" />
+                    <textbox type="password" value="@bind(vm.platformForm.eplapitoken)" hflex="1" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Client ID" width="130px" style="font-weight:bold" />
+                    <textbox value="@bind(vm.platformForm.eplclientid)" hflex="1" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Client Secret" width="130px" style="font-weight:bold" />
+                    <textbox type="password" value="@bind(vm.platformForm.eplclientsecret)" hflex="1" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Tenant / Account" width="130px" style="font-weight:bold" />
+                    <textbox value="@bind(vm.platformForm.epltenantid)" hflex="1" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Sync habilitado" width="130px" style="font-weight:bold" />
+                    <checkbox checked="@bind(vm.platformForm.eplsyncenabled)" />
+                </hlayout>
+                <hlayout spacing="12px">
+                    <label value="Frecuencia (horas)" width="130px" style="font-weight:bold" />
+                    <intbox value="@bind(vm.platformForm.eplsyncfrequencyhours)" hflex="1" min="1" />
+                </hlayout>
+                <hlayout spacing="12px" style="justify-content:flex-end">
+                    <button label="Cancelar" iconSclass="z-icon-times" sclass="btn btn-default"
+                            onClick="@command('cancelAdd')" />
+                    <button label="Guardar" iconSclass="z-icon-save" sclass="btn btn-primary"
+                            onClick="@command('savePlatform')" />
+                </hlayout>
+            </vlayout>
+        </window>
+    </window>
+</zk>

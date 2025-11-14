@@ -1,0 +1,32 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.ReviewAdapterApprovalViewModel')">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h3 class="mb-0">Revisión de Adapter vs Fine-Tuning</h3>
+            </div>
+            <div class="card-body">
+                <grid sclass="grid-form">
+                    <rows>
+                        <row>
+                            <label value="Reporte Comparativo" />
+                            <textarea value="@bind(vm.comparisonReport)" rows="6"
+                                placeholder="Resumen de costos, CO2 y performance" />
+                        </row>
+                        <row>
+                            <label value="Comentarios" />
+                            <textarea value="@bind(vm.reviewerComments)" rows="4" />
+                        </row>
+                    </rows>
+                </grid>
+                <div class="mt-3 d-flex gap-2">
+                    <button label="Aprobar" sclass="btn btn-success" onClick="@command('approve')" />
+                    <button label="Solicitar ajustes" sclass="btn btn-warning" onClick="@command('requestModification')" />
+                    <button label="Rechazar" sclass="btn btn-danger" onClick="@command('reject')" />
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>
+

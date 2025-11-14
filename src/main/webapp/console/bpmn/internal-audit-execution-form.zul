@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Ejecución de auditoría interna ISO 42001"
+            width="90%"
+            height="80%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.InternalAuditExecutionViewModel')">
+
+        <vlayout sclass="p-4" spacing="16px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Checklist de auditoría"/>
+                <listbox model="@bind(vm.items)" width="100%" height="360px" multiple="false" mold="paging">
+                    <listhead>
+                        <listheader label="Cláusula" width="10%"/>
+                        <listheader label="Control" width="20%"/>
+                        <listheader label="Descripción" width="30%"/>
+                        <listheader label="Cumple" width="8%"/>
+                        <listheader label="Severidad" width="10%"/>
+                        <listheader label="Evidencia" width="12%"/>
+                        <listheader label="Responsable" width="10%"/>
+                        <listheader label="Fecha objetivo" width="10%"/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(each.clause)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each.title)"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each.description)"/>
+                            </listcell>
+                            <listcell>
+                                <checkbox checked="@bind(each.compliant)"/>
+                            </listcell>
+                            <listcell>
+                                <combobox selectedItem="@bind(each.severity)">
+                                    <comboitem label="MINOR"/>
+                                    <comboitem label="MAJOR"/>
+                                    <comboitem label="CRITICAL"/>
+                                </combobox>
+                            </listcell>
+                            <listcell>
+                                <textbox value="@bind(each.evidence)" width="160px" placeholder="Evidencia recopilada"/>
+                            </listcell>
+                            <listcell>
+                                <textbox value="@bind(each.owner)" width="140px" placeholder="Responsable acción"/>
+                            </listcell>
+                            <listcell>
+                                <datebox value="@bind(each.dueDate)" width="120px" format="yyyy-MM-dd"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Registrar auditoría"
+                        onClick="@command('doSubmit')"
+                        width="200px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

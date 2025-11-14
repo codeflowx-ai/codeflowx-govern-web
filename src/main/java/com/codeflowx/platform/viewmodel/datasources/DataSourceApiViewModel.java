@@ -15,14 +15,11 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSource;
 import com.codeflowx.govern.entity.datasources.DataSourceApi;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
 
+import codeflowx.nocode.persist.Criterias;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

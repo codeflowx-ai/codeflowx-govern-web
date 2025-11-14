@@ -1,0 +1,87 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.fria.DeployerApprovalViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-user-check me-2"></h:i>
+						Deployer Final Approval (Art. 27)
+					</h:h2>
+					<h:p class="text-muted">
+						FRIA completed - deployer final decision required
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-success">
+					<div class="card-header bg-success text-white">
+						<h:h5 class="card-title mb-0">✓ FRIA Process Completed</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2">The Fundamental Rights Impact Assessment has been completed successfully.</h:p>
+						<h:p class="mb-0">
+							<strong>FRIA Document:</strong>
+							<a href="@load(vm.friaDocumentUrl)" target="_blank" class="btn btn-sm btn-outline-primary ms-2">
+								<h:i class="fa fa-file-pdf me-1"></h:i> View FRIA Report
+							</a>
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-info">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">ℹ️ Next Steps</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2">If you proceed with deployment:</h:p>
+						<h:ul>
+							<h:li>Market Surveillance Authority will be notified (Art. 27.3)</h:li>
+							<h:li>FRIA will be registered in the database</h:li>
+							<h:li>Project will be marked as ready for deployment</h:li>
+							<h:li>EU Database registration process can begin</h:li>
+						</h:ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Decision Notes</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.deploymentDecisionNotes)" 
+						         placeholder="Optional: Add any notes about this deployment decision..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Final Decision</h:h5>
+						<div class="d-flex gap-2">
+							<button label="PROCEED with Deployment" 
+							        iconSclass="fa fa-check-circle"
+							        zclass="btn btn-success btn-lg"
+							        onClick="@command('proceedWithDeployment')" />
+							<button label="CANCEL Deployment" 
+							        iconSclass="fa fa-times-circle"
+							        zclass="btn btn-danger"
+							        onClick="@command('cancelDeployment')" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

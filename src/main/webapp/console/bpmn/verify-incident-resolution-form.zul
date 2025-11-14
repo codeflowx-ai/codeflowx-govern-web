@@ -1,0 +1,102 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.incident.VerifyIncidentResolutionViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-check me-2"></h:i>
+						Verify Incident Resolution
+					</h:h2>
+					<h:p class="text-muted">
+						Verify that all corrective actions have been completed and incident is resolved
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Incident Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Incident:</strong> <label value="@load(vm.incidentTitle)" /></h:p>
+						<h:p class="mb-0"><strong>Corrective Actions Completed:</strong> 
+							<label value="@load(vm.correctiveActionsCount)" />
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Verification Checklist -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">Verification Checklist</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="form-check mb-3">
+							<checkbox id="issueResolved" checked="@bind(vm.issueResolved)" />
+							<label for="issueResolved" class="form-check-label ms-2">
+								<strong>✓ Issue is RESOLVED</strong> - The incident has been fully addressed
+							</label>
+						</div>
+						<div class="form-check">
+							<checkbox id="noRecurrence" checked="@bind(vm.noRecurrence)" />
+							<label for="noRecurrence" class="form-check-label ms-2">
+								<strong>✓ NO RECURRENCE</strong> - Measures in place to prevent future occurrences
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Resolution Evidence -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Resolution Evidence</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.resolutionEvidence)" 
+						         placeholder="Provide evidence of resolution (tests performed, metrics improved, user reports, etc.)..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Verification Notes -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Verification Notes</h:h5>
+						<textbox rows="3" width="100%" value="@bind(vm.verificationNotes)" 
+						         placeholder="Additional notes about the verification process..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Decision Buttons -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Decision</h:h5>
+						<div class="d-flex gap-2">
+							<button label="Confirm Resolution & Close Incident" 
+							        iconSclass="fa fa-check-circle"
+							        zclass="btn btn-success btn-lg"
+							        onClick="@command('confirmResolution')" />
+							<button label="Escalate - Not Resolved" 
+							        iconSclass="fa fa-arrow-up"
+							        zclass="btn btn-warning"
+							        onClick="@command('escalateIncident')" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

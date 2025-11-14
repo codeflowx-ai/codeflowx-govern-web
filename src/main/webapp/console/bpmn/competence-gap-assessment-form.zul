@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Evaluación de gap de competencias"
+            width="75%"
+            height="70%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CompetenceGapAssessmentViewModel')">
+
+        <vlayout sclass="p-4" spacing="16px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Información general"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="ID gap" sclass="font-weight-bold"/>
+                            <intbox value="@bind(vm.competenceGapId)" width="200px"/>
+                        </row>
+                        <row>
+                            <label value="Rol/Equipo" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.role)" width="100%" placeholder="Equipo o rol afectado"/>
+                        </row>
+                        <row>
+                            <label value="Fecha detección" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.detectionDate)" format="yyyy-MM-dd" width="200px"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Competencias necesarias"/>
+                <listbox model="@bind(vm.competenceAreas)" checkmark="true" multiple="true"
+                         selectedItems="@bind(vm.selectedAreas)" width="100%" height="180px">
+                    <template name="model">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(each)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Niveles actuales VS objetivo"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Nivel actual" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.currentCompetenceLevel)" width="100%" placeholder="Ej. Básico, Intermedio"/>
+                        </row>
+                        <row>
+                            <label value="Nivel deseado" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.desiredCompetenceLevel)" width="100%" placeholder="Ej. Avanzado"/>
+                        </row>
+                        <row>
+                            <label value="Notas" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.notes)" width="100%" rows="4" multiline="true" placeholder="Riesgos asociados, auditoría que detectó el gap"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+        </vlayout>
+
+        <hlayout hflex="1" pack="end" spacing="12px" style="padding: 16px;">
+            <button label="Cancelar" width="120px" onClick="@command('doCancel')"/>
+            <button label="Registrar evaluación" width="180px" sclass="btn-primary"
+                    onClick="@command('doSubmit')"
+                    disabled="@load(vm.role == null || vm.role.isEmpty() || empty vm.selectedAreas)"/>
+        </hlayout>
+    </window>
+</zk>
+
+

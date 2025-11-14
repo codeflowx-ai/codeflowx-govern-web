@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Ejecución del plan de capacitación"
+            width="75%"
+            height="70%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CompetenceGapImplementationViewModel')">
+
+        <vlayout sclass="p-4" spacing="16px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Detalles de ejecución"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Inicio" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.startDate)" format="yyyy-MM-dd" width="200px"/>
+                        </row>
+                        <row>
+                            <label value="Finalización" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.completionDate)" format="yyyy-MM-dd" width="200px"/>
+                        </row>
+                        <row>
+                            <label value="Proveedor" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.trainingProvider)" width="100%" placeholder="Proveedor/coach interno"/>
+                        </row>
+                        <row>
+                            <label value="Participantes" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.participants)" width="100%" placeholder="Lista de participantes"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Evaluaciones"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Pre training score" sclass="font-weight-bold"/>
+                            <doublebox value="@bind(vm.preAssessmentScore)" width="120px" />
+                        </row>
+                        <row>
+                            <label value="Post training score" sclass="font-weight-bold"/>
+                            <doublebox value="@bind(vm.postAssessmentScore)" width="120px" />
+                        </row>
+                        <row>
+                            <label value="Notas de ejecución" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.executionNotes)"
+                                     width="100%"
+                                     rows="4"
+                                     multiline="true"
+                                     placeholder="Observaciones, incidencias, participación"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+        </vlayout>
+
+        <hlayout hflex="1" pack="end" spacing="12px" style="padding: 16px;">
+            <button label="Cancelar" width="120px" onClick="@command('doCancel')"/>
+            <button label="Registrar ejecución"
+                    width="180px"
+                    sclass="btn-primary"
+                    onClick="@command('doSubmit')"
+                    disabled="@load(vm.completionDate == null || vm.trainingProvider == null || vm.trainingProvider.isEmpty())"/>
+        </hlayout>
+    </window>
+</zk>
+
+

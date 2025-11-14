@@ -1,0 +1,187 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ConformityReviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-user-check me-2"></h:i>
+						Conformity Assessment Review
+					</h:h2>
+					<h:p class="text-muted">
+						Human review required for borderline compliance assessment
+					</h:p>
+				</div>
+			</div>
+
+			<!-- System Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:p class="mb-2"><strong>System:</strong> <label value="@load(vm.systemName)" /></h:p>
+						<h:p class="mb-2"><strong>Assessment ID:</strong> <label value="@load(vm.assessmentId)" /></h:p>
+						<h:p class="mb-0"><strong>Overall Score:</strong> <label value="@load(vm.overallScore)" />%</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Compliance Scores -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Compliance Scores by Article</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<h:table class="table table-sm">
+								<h:thead>
+									<h:tr>
+										<h:th>Article</h:th>
+										<h:th>Description</h:th>
+										<h:th class="text-center">Score</h:th>
+										<h:th class="text-center">Status</h:th>
+									</h:tr>
+								</h:thead>
+								<h:tbody>
+									<h:tr>
+										<h:td>Art. 9</h:td>
+										<h:td>Risk Management</h:td>
+										<h:td class="text-center"><label value="@load(vm.art9Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art9Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 10</h:td>
+										<h:td>Data Governance</h:td>
+										<h:td class="text-center"><label value="@load(vm.art10Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art10Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 11</h:td>
+										<h:td>Technical Documentation</h:td>
+										<h:td class="text-center"><label value="@load(vm.art11Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art11Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 12</h:td>
+										<h:td>Record-Keeping</h:td>
+										<h:td class="text-center"><label value="@load(vm.art12Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art12Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 13</h:td>
+										<h:td>Transparency</h:td>
+										<h:td class="text-center"><label value="@load(vm.art13Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art13Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 14</h:td>
+										<h:td>Human Oversight</h:td>
+										<h:td class="text-center"><label value="@load(vm.art14Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art14Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+									<h:tr>
+										<h:td>Art. 15</h:td>
+										<h:td>Accuracy & Robustness</h:td>
+										<h:td class="text-center"><label value="@load(vm.art15Score)" />%</h:td>
+										<h:td class="text-center">
+											<label value="@load(vm.art15Compliant ? '✅' : '⚠️')" />
+										</h:td>
+									</h:tr>
+								</h:tbody>
+							</h:table>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Review Decision -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Review Decision</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="mb-3">
+							<label class="form-label">Reviewer Name *</label>
+							<textbox value="@bind(vm.reviewerName)"
+								placeholder="Enter your name"
+								class="form-control" />
+						</div>
+						<div class="mb-3">
+							<label class="form-label">Review Notes *</label>
+							<textbox value="@bind(vm.reviewNotes)"
+								placeholder="Enter review notes and justification..."
+								rows="5"
+								multiline="true"
+								class="form-control" />
+						</div>
+						<div class="hstack gap-2">
+							<button
+								iconSclass="fa-duotone fa-solid fa-check me-2"
+								label="Approve"
+								onClick="@command('approveReview')"
+								class="btn btn-success" />
+							<button
+								iconSclass="fa-duotone fa-solid fa-times me-2"
+								label="Reject"
+								onClick="@command('rejectReview')"
+								class="btn btn-danger" />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Verificar efectividad de acción correctiva"
+            width="70%"
+            height="55%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CorrectiveActionEffectivenessViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Evaluación"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Resultado" sclass="font-weight-bold"/>
+                            <radiogroup selectedItem="@bind(vm.effective)">
+                                <radio label="Efectiva" value="true"/>
+                                <radio label="No efectiva" value="false"/>
+                            </radiogroup>
+                        </row>
+                        <row>
+                            <label value="Observaciones" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.verificationNotes)"
+                                     width="100%"
+                                     rows="5"
+                                     multiline="true"
+                                     placeholder="Describe evidencias y controles post-implementación"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Registrar verificación"
+                        onClick="@command('doSubmit')"
+                        width="190px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

@@ -1,0 +1,81 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ReviewQmsGapsViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-check me-2"></h:i>
+						Review QMS Gaps (Art. 17)
+					</h:h2>
+					<h:p class="text-muted">
+						Quality Management System compliance gaps detected
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Project Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Project:</strong> <label value="@load(vm.projectName)" /></h:p>
+						<h:p class="mb-0"><strong>QMS Score:</strong> <label value="@load(vm.qmsScore)" />%</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- QMS Gaps -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-warning">
+						<h:h5 class="card-title mb-0">⚠️ QMS Gaps Detected</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.qmsGaps)" emptyMessage="No gaps detected">
+							<listhead>
+								<listheader label="Gap Description" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell>
+										<h:div class="d-flex align-items-center">
+											<h:i class="fa fa-exclamation-triangle text-warning me-2"></h:i>
+											<label value="@load(each)" />
+										</h:div>
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Decision Buttons -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-3">Decision Required</h:h5>
+						<div class="d-flex gap-2">
+							<button label="Fix and Retry" 
+							        iconSclass="fa fa-rotate-right"
+							        zclass="btn btn-primary"
+							        onClick="@command('fixAndRetry')" />
+							<button label="Cancel Assessment" 
+							        iconSclass="fa fa-times"
+							        zclass="btn btn-danger"
+							        onClick="@command('cancelAssessment')" />
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

@@ -34,6 +34,7 @@ import com.codeflowx.framework.validators.UniqueValidator;
 import com.codeflowx.govern.entity.evaluation.ModelBiasAnalysis;
 import com.codeflowx.govern.entity.evaluation.ModelPerformance;
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.entity.models.ModelApproval;
 import com.codeflowx.govern.entity.models.ModelArtifact;
 import com.codeflowx.govern.entity.models.ModelDependency;
 import com.codeflowx.govern.entity.models.ModelProvider;
@@ -341,6 +342,108 @@ public class ModelDetailViewModel extends MasterPage {
         params.put("dataParam", idxmodel);
         params.put("action", Action.LOAD);
         appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
+    }
+    
+    /**
+     * Envía el modelo a aprobación
+     * Cambia el estado del modelo a IN_REVIEW y crea un registro de aprobación
+     */
+    @Command
+    @NotifyChange("*")
+    public void submitForApproval() {
+        try {
+            if (currentModel == null || currentModel.getIdxmodel() == null) {
+                Messagebox.show("No hay modelo para enviar a aprobación",
+                    "Error", Messagebox.OK, Messagebox.ERROR);
+                return;
+            }
+            
+            // Validar que el modelo esté en estado DRAFT
+            if (!"DRAFT".equals(currentModel.getModstatus())) {
+                Messagebox.show("Solo los modelos en estado DRAFT pueden enviarse a aprobación",
+                    "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+                return;
+            }
+            
+            // Validar que el usuario actual sea el owner
+            if (!getUser().getUsername().equals(currentModel.getModcreatedby())) {
+                Messagebox.show("Solo el owner del modelo puede enviarlo a aprobación",
+                    "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+                return;
+            }
+            
+            log.info("Enviando modelo a aprobación: ID={}, Name={}", 
+                currentModel.getIdxmodel(), currentModel.getModname());
+            
+            // Confirmar acción
+            Messagebox.show("¿Está seguro de enviar este modelo a aprobación?",
+                "Confirmar",
+                Messagebox.YES | Messagebox.NO,
+                Messagebox.QUESTION,
+                event -> {
+                    if (Messagebox.ON_YES.equals(event.getName())) {
+                        try {
+                            // Cambiar estado del modelo
+                            currentModel.setModstatus("IN_REVIEW");
+                            currentModel.setModapprovalstatus("PENDING");
+                            currentModel.setModupdatedby(getUser().getUsername());
+                            currentModel.setModupdatedat(new Timestamp(System.currentTimeMillis()));
+                            
+                            businessService.update(currentModel);
+                            
+                            // Crear registro de aprobación
+                            com.codeflowx.govern.entity.models.ModelApproval approval = 
+                                new com.codeflowx.govern.entity.models.ModelApproval();
+                            approval.setModel(currentModel);
+                            approval.setModapprovaltype("NEW_MODEL");
+                            approval.setModapprovalstatus("UNDER_REVIEW");
+                            approval.setModtargetenvironment("PRODUCTION");
+                            approval.setModrequestreason("Solicitud de aprobación para nuevo modelo: " + currentModel.getModname());
+                            approval.setModcreatedby(getUser().getUsername());
+                            approval.setModcreatedat(new Timestamp(System.currentTimeMillis()));
+                            
+                            businessService.save(approval);
+                            
+                            log.info("Modelo enviado a aprobación exitosamente");
+                            
+                            // Auditar acción
+                            logActivity("ENVIO_APROBACION", "MODMODELS", currentModel.getIdxmodel(),
+                                "Modelo enviado a aprobación: " + currentModel.getModname());
+                            
+                            Messagebox.show("Modelo enviado a aprobación exitosamente",
+                                "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+                            
+                            // Recargar datos
+                            loadItem(currentModel.getIdxmodel());
+                            
+                        } catch (Exception e) {
+                            log.error("Error al enviar a aprobación", e);
+                            Messagebox.show("Error al enviar a aprobación: " + e.getMessage(),
+                                "Error", Messagebox.OK, Messagebox.ERROR);
+                        }
+                    }
+                });
+            
+        } catch (Exception e) {
+            log.error("Error al preparar envío a aprobación", e);
+            Messagebox.show("Error: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        }
+    }
+    
+    /**
+     * Verifica si el botón "Enviar a Aprobación" debe estar visible
+     * @return true si el modelo está en DRAFT y el usuario actual es el owner
+     */
+    public boolean isSubmitForApprovalVisible() {
+        if (currentModel == null) return false;
+        
+        boolean isDraft = "DRAFT".equals(currentModel.getModstatus());
+        boolean isOwner = getUser() != null && 
+                         getUser().getUsername() != null && 
+                         getUser().getUsername().equals(currentModel.getModcreatedby());
+        
+        return isDraft && isOwner;
     }
     
     private void loadModelProviders() {
@@ -943,5 +1046,219 @@ public class ModelDetailViewModel extends MasterPage {
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
         }
+    }
+    
+    // ========== COMPLIANCE CHECKLIST ==========
+    
+    /**
+     * Obtiene el checklist de compliance EU AI Act
+     */
+    public List<com.codeflowx.platform.dto.ComplianceCheck> getComplianceChecklist() {
+        List<com.codeflowx.platform.dto.ComplianceCheck> checklist = new ArrayList<>();
+        
+        if (currentModel == null) {
+            return checklist;
+        }
+        
+        // 1. Risk Classification documentada
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("risk_classification")
+            .name("Risk Classification")
+            .description("Clasificación de riesgo del modelo documentada")
+            .passed(currentModel.getModrisklevel() != null && !currentModel.getModrisklevel().isEmpty())
+            .completedDate(currentModel.getModcreatedat() != null ? currentModel.getModcreatedat().toString() : "")
+            .priority("REQUIRED")
+            .build());
+        
+        // 2. Dataset Quality validado
+        boolean hasDataset = false; // TODO: Check if dataset is associated
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("dataset_quality")
+            .name("Dataset Quality")
+            .description("Calidad del dataset validada")
+            .passed(hasDataset)
+            .priority("REQUIRED")
+            .build());
+        
+        // 3. Bias Analysis realizado
+        boolean hasBiasAnalysis = currentModel.getSubmodmodelbiasanalyses() != null && 
+                                  !currentModel.getSubmodmodelbiasanalyses().isEmpty();
+        String biasAnalysisDate = "";
+        if (hasBiasAnalysis && !currentModel.getSubmodmodelbiasanalyses().isEmpty()) {
+            ModelBiasAnalysis lastAnalysis = currentModel.getSubmodmodelbiasanalyses().get(0);
+            biasAnalysisDate = lastAnalysis.getModanalysisdate() != null ? 
+                             lastAnalysis.getModanalysisdate().toString() : "";
+        }
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("bias_analysis")
+            .name("Bias Analysis")
+            .description("Análisis de sesgo realizado")
+            .passed(hasBiasAnalysis)
+            .completedDate(biasAnalysisDate)
+            .priority("REQUIRED")
+            .build());
+        
+        // 4. Performance Metrics documentadas
+        boolean hasPerformance = currentModel.getModperformancemetrics() != null && 
+                                !currentModel.getModperformancemetrics().isEmpty();
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("performance_metrics")
+            .name("Performance Metrics")
+            .description("Métricas de rendimiento documentadas")
+            .passed(hasPerformance)
+            .completedDate(hasPerformance ? currentModel.getModcreatedat().toString() : "")
+            .priority("REQUIRED")
+            .build());
+        
+        // 5. Modelo aprobado
+        boolean isApproved = "APPROVED".equals(currentModel.getModstatus());
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("model_approved")
+            .name("Model Approved")
+            .description("Modelo aprobado por Governance")
+            .passed(isApproved)
+            .completedDate(currentModel.getModapprovedat() != null ? currentModel.getModapprovedat().toString() : "")
+            .priority("REQUIRED")
+            .build());
+        
+        // 6. Audit Trail disponible
+        boolean hasAuditTrail = true; // Always true if model exists
+        checklist.add(com.codeflowx.platform.dto.ComplianceCheck.builder()
+            .id("audit_trail")
+            .name("Audit Trail")
+            .description("Trazabilidad de cambios disponible")
+            .passed(hasAuditTrail)
+            .completedDate(currentModel.getModcreatedat() != null ? currentModel.getModcreatedat().toString() : "")
+            .priority("REQUIRED")
+            .build());
+        
+        return checklist;
+    }
+    
+    /**
+     * Obtiene el score de compliance (X/6)
+     */
+    public String getComplianceScore() {
+        List<com.codeflowx.platform.dto.ComplianceCheck> checklist = getComplianceChecklist();
+        long passed = checklist.stream().filter(com.codeflowx.platform.dto.ComplianceCheck::isPassed).count();
+        return passed + "/" + checklist.size();
+    }
+    
+    /**
+     * Obtiene el porcentaje de compliance
+     */
+    public int getCompliancePercentage() {
+        List<com.codeflowx.platform.dto.ComplianceCheck> checklist = getComplianceChecklist();
+        if (checklist.isEmpty()) return 0;
+        long passed = checklist.stream().filter(com.codeflowx.platform.dto.ComplianceCheck::isPassed).count();
+        return (int) ((passed * 100) / checklist.size());
+    }
+    
+    /**
+     * Obtiene el estado de compliance
+     */
+    public String getComplianceStatus() {
+        List<com.codeflowx.platform.dto.ComplianceCheck> checklist = getComplianceChecklist();
+        long passed = checklist.stream().filter(com.codeflowx.platform.dto.ComplianceCheck::isPassed).count();
+        
+        if (passed == checklist.size()) {
+            return "COMPLIANT";
+        } else if (passed >= 4) {
+            return "PARTIAL";
+        } else {
+            return "NON_COMPLIANT";
+        }
+    }
+    
+    /**
+     * Obtiene el label del estado de compliance
+     */
+    public String getComplianceStatusLabel() {
+        String status = getComplianceStatus();
+        switch (status) {
+            case "COMPLIANT":
+                return "✓ COMPLIANT";
+            case "PARTIAL":
+                return "⚠ PARTIAL COMPLIANCE";
+            default:
+                return "✗ NON-COMPLIANT";
+        }
+    }
+    
+    /**
+     * Obtiene los análisis de sesgo recientes (últimos 3)
+     */
+    public List<ModelBiasAnalysis> getRecentBiasAnalyses() {
+        if (currentModel == null || currentModel.getSubmodmodelbiasanalyses() == null) {
+            return new ArrayList<>();
+        }
+        
+        List<ModelBiasAnalysis> analyses = currentModel.getSubmodmodelbiasanalyses();
+        return analyses.size() > 3 ? analyses.subList(0, 3) : analyses;
+    }
+    
+    // ========== COMANDOS ADICIONALES ==========
+    
+    /**
+     * Comando para editar el modelo
+     */
+    @Command
+    public void editItem() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("action", Action.LOAD);
+        params.put("dataParam", currentModel.getIdxmodel());
+        appendPage("plataforma/models/create/page.zul", page.getFellow(IDDESKTOP), params);
+    }
+    
+    /**
+     * Comando para analizar sesgo
+     */
+    @Command
+    public void analyzeBias() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("modelId", currentModel.getIdxmodel());
+        appendPage("plataforma/models/bias-analysis/overview.zul", page.getFellow(IDDESKTOP), params);
+    }
+    
+    /**
+     * Comando para enviar a aprobación
+     */
+    @Command
+    @NotifyChange("currentModel")
+    public void submitForApproval() {
+        try {
+            if (currentModel == null || !"DRAFT".equals(currentModel.getModstatus())) {
+                Messagebox.show("Solo los modelos en estado DRAFT pueden enviarse a aprobación", "Error", 
+                              Messagebox.OK, Messagebox.ERROR);
+                return;
+            }
+            
+            // TODO: Crear registro en ModelApproval
+            
+            // Cambiar estado a IN_REVIEW
+            currentModel.setModstatus("IN_REVIEW");
+            businessService.save(currentModel);
+            
+            Messagebox.show("Modelo enviado a aprobación correctamente", "Éxito", 
+                          Messagebox.OK, Messagebox.INFORMATION);
+            
+            logActivity("SUBMIT_APPROVAL", "Modelo enviado a aprobación");
+            
+        } catch (Exception e) {
+            log.error("Error al enviar modelo a aprobación: {}", e.getMessage(), e);
+            Messagebox.show("Error al enviar a aprobación: " + e.getMessage(), "Error", 
+                          Messagebox.OK, Messagebox.ERROR);
+        }
+    }
+    
+    /**
+     * Comando para ver audit trail
+     */
+    @Command
+    public void viewAuditTrail() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("modelId", currentModel.getIdxmodel());
+        params.put("entity", "Model");
+        appendPage("plataforma/governance/audit/trail.zul", page.getFellow(IDDESKTOP), params);
     }
 }

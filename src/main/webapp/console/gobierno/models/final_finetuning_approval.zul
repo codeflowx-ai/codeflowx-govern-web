@@ -1,0 +1,43 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd">
+    <idspace viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.models.FinalFineTuningApprovalViewModel')">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h3 class="mb-0">Aprobación Senior Fine-Tuning</h3>
+            </div>
+            <div class="card-body">
+                <grid sclass="grid-form">
+                    <rows>
+                        <row>
+                            <label value="Resumen Justificación" />
+                            <textarea value="@bind(vm.justificationSummary)" rows="4" readonly="true" />
+                        </row>
+                        <row>
+                            <label value="Comparación" />
+                            <textarea value="@bind(vm.comparisonSummary)" rows="4" readonly="true" />
+                        </row>
+                        <row>
+                            <label value="Confirmaciones" />
+                            <vlayout spacing="8px">
+                                <checkbox label="Evalué adapters y NO son suficientes" checked="@bind(vm.adapterEvaluated)" />
+                                <checkbox label="Entiendo el costo adicional (10-20x)" checked="@bind(vm.costAcknowledged)" />
+                                <checkbox label="Entiendo el impacto CO2 (20-50x)" checked="@bind(vm.co2Acknowledged)" />
+                            </vlayout>
+                        </row>
+                        <row>
+                            <label value="Notas" />
+                            <textarea value="@bind(vm.reviewerNotes)" rows="3" />
+                        </row>
+                    </rows>
+                </grid>
+                <div class="mt-3 d-flex gap-2">
+                    <button label="Aprobar Fine-Tuning" sclass="btn btn-success" onClick="@command('approveFineTuning')" />
+                    <button label="Cambiar a Adapter" sclass="btn btn-warning" onClick="@command('switchToAdapter')" />
+                    <button label="Rechazar" sclass="btn btn-danger" onClick="@command('rejectFineTuning')" />
+                </div>
+            </div>
+        </div>
+    </idspace>
+</zk>
+

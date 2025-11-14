@@ -7,31 +7,31 @@
 
 ---
 
-## 🎯 Objetivo
+## 📦 Definición clave: Proyecto gobernado
 
-Definir una estructura de precios interna que cubra:
-- **Cloud Compliance** para empresas pequeñas/medianas (desarrolladores, agencias, consultoras)
-- **Planes OEM** para partners que quieren reempaquetar CodeflowX como parte de su oferta
-- **Licenciamiento self-hosting (Corporate)** vendido a través de partners
-- **Planes Administraciones Públicas** diferenciando pequeños ayuntamientos y organismos grandes
-
-Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y establecen coherencia entre valor entregado y complejidad de soporte.
+- Un **proyecto** representa un caso de uso gobernado end-to-end (ej. "chatbot soporte RR.HH.", "agente scoring crédito", "RAG documentación legal").
+- Cada proyecto puede incluir, como máximo, los siguientes activos:
+  - **2 chatbots** (interfaces conversacionales)
+  - **2 agentes** autónomos/flows de decisión
+  - **2 RAG** (vector store + orquestación)
+- El cliente puede activar solo los activos que necesite dentro de cada proyecto, pero no exceder el límite. Esto evita usos fraudulentos (p.ej. un plan básico gobernando decenas de bots bajo un único proyecto).
+- Para aumentar la capacidad se pueden contratar **proyectos adicionales** (ver add-ons).
 
 ---
 
 ## 🟢 CLOUD (SaaS gestionado por CodeflowX)
 
-| Plan | Precio (EUR/mes) | Coste Infra (EUR) | Margen Bruto | Enfoque | Cobertura |
-|------|------------------|-------------------|--------------|---------|-----------|
-| **Cloud Compliance (Basic)** | **149 €** | 35 € | 76% | Freelance, microagencias (≤10 personas) que necesitan **cumplimiento esencial** | Hasta **2 sistemas IA** (chatbots/agentes/RAG), checklists Art. 9-15, documentación Anexo IV básica, políticas Art. 50, FRIA templates, 2 usuarios, soporte email 48h |
-| **Cloud Governance (Professional)** | **399 €** | 70 € (2 instancias) | 82% | Agencias/consultoras 10-50 personas y software factories que necesitan **gobierno completo** | Hasta **7 sistemas IA**, workflows BPMN, evaluación métricas, monitorización 24/7, alertas desviaciones, reporting Art. 71, 12 usuarios, soporte prioritario 12h |
-| **Cloud Enterprise** | **799 €** | 105 € (3 instancias) | 87% | Partners SaaS y organizaciones con múltiples clientes internos. Incluye **solución completa** (cumplimiento + gobierno + evaluación + monitorización) multi-tenant | Multi-tenant (hasta **5 clientes externos** incluidos), marca blanca opcional, API configurables, dashboards agregados, SLA 99,5 %, soporte 4h, formación comercial, controles centralizados |
+| Plan | Precio (EUR/mes) | Proyectos incluidos | Coste Infra (EUR) | Margen Bruto | Enfoque | Cobertura |
+|------|------------------|---------------------|-------------------|--------------|---------|-----------|
+| **CodeflowX Compliance Cloud – Plug & Protect** | **149 €** | **1 proyecto** (cumplimiento esencial) | 35 € | 76% | Freelance, microagencias (≤10 personas) que necesitan **cumplimiento** para un caso de uso puntual | 1 proyecto con hasta 2 chatbots + 2 agentes + 2 RAG, checklists Art. 9-15, documentación Anexo IV básica, políticas Art. 50, FRIA templates, 2 usuarios, soporte email 48h |
+| **Cloud Governance (Professional)** | **699 €** | **3 proyectos** (gobierno completo) | 70 € (2 instancias) | 90% | Agencias/consultoras 10-50 personas y software factories que gestionan varios casos de uso | 3 proyectos (cada uno hasta 2 chatbots + 2 agentes + 2 RAG), workflows BPMN, evaluación métricas, monitorización 24/7, alertas desviaciones, reporting Art. 71, 12 usuarios, soporte prioritario 12h |
+| **Cloud Enterprise** | **1.199 €** | **5 proyectos** compartidos por hasta 5 clientes externos (multi-tenant) | 105 € (3 instancias) | 91% | Partners SaaS y organizaciones multi-cliente, incluye **solución completa** | Multi-tenant (5 clientes x 1 proyecto cada uno; proyectos adicionales vía add-on), marca blanca, API configurables, dashboards agregados, SLA 99,5 %, soporte 4h, formación comercial, controles centralizados |
 
 **Notas Cloud:**
-- Precios sin inferencia incluida. CodeflowX se integra con la infraestructura de modelos existente del cliente. Se ofrece un módulo opcional de servidores de inferencia (ver add-ons).
 - Facturación mensual; pago anual anticipado (‑10 %).
-- Número de sistemas IA = combinaciones de chatbots, agentes, RAG, scoring u otros flows gobernados. Packs adicionales disponibles.
-- Upgrade/downgrade prorrateado en el mes corriente.
+- Proyectos adicionales se contratan vía add-on (ver abajo). 
+- Los proyectos pueden reasignarse (p.ej. cerrar uno y abrir nuevo) previa baja documentada.
+- CodeflowX se integra con la infraestructura de modelos del cliente. El módulo de servidores de inferencia es opcional.
 
 ---
 
@@ -41,11 +41,13 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 |--------|--------|----------------|-------------|
 | **Onboarding guiado (2 semanas)** | 900 € único | Basic / Professional | Configuración inicial, mapeo procesos, primera auditoría |
 | **Integración SSO (Azure AD/Okta)** | 600 € único | Professional / Enterprise | Autenticación corporativa |
-| **Pack sistemas adicionales (3 sistemas)** | 90 € / mes | Todos | Amplía cobertura a más chatbots/agentes/RAG |
+| **Pack proyectos adicionales (1 proyecto)** | 120 € / mes | Todos | Añade 1 proyecto (con sus límites de activos) |
+| **Pack clientes adicionales (5 tenants)** | 150 € / mes | Enterprise | Amplía el número de organizaciones servidas (de 5 en 5) |
 | **Entorno regulado (datos UE dedicados)** | +90 € / mes | Professional / Enterprise | Workspace aislado multi-organización |
 | **Soporte 24/7** | +150 € / mes | Professional / Enterprise | Línea dedicada incidentes críticos |
-| **Módulo servidores de inferencia** | 120 € / mes por instancia | Professional / Enterprise | Despliegue gestionado de `leka-llm-interpreter`, incluye modelos open-source, wrappers comerciales opcionales, routing inteligente. Costes API externos se facturan al cliente. |
-| **Pack clientes adicionales (5 tenants)** | 150 € / mes | Enterprise | Amplía el número de organizaciones servidas (de 5 en 5) |
+| **Activación módulo inferencia (gestión)** | 90 € / mes | Professional / Enterprise | Despliegue y gestión de `leka-llm-interpreter` (routing, wrappers, monitorización). Requiere elegir modalidad compute. |
+| **Compute GPU dedicada** | Coste repercutido (desde 250 € / mes por nodo) | Professional / Enterprise | Facturación 1:1 del coste de GPU (cloud o on-prem). Se puede ajustar según proveedor (AWS, Azure, OVH, etc.). |
+| **Compute serverless (tokens/consulta)** | Pago por uso | Professional / Enterprise | Uso de APIs comerciales (OpenAI, Anthropic, etc.). Se factura directamente al cliente según proveedor; CodeflowX no intermedia. |
 
 ---
 
@@ -82,14 +84,14 @@ Los precios aseguran margen >70% sobre el coste operativo cloud (35 €/mes) y e
 
 | Segmento | Plan | Precio | Márgenes | Canal | Comentarios |
 |----------|------|--------|----------|-------|-------------|
-| Freelance/microagencia | Cloud Basic | 149 €/mes | 76% | Directo | 1 sistema IA alto riesgo, compliance rápido |
-| Agencia/consultora mediana | Cloud Professional | 399 €/mes | 82% | Directo/Partner | Hasta 5 sistemas, workflows avanzados |
-| Partner SaaS (white-label) | Cloud OEM | 799 €/mes + variable | 87% | Directo/Partner | Marca blanca, multi-tenant |
-| Enterprise | Corporate Standard | 24k €/año | 80% | Partner | Self-host, soporte L3 |
-| Enterprise avanzadas | Corporate Enterprise | 48k €/año | 80% | Partner Elite | Roadmap dedicado, HA |
-| Ayuntamiento pequeño | Public Local | 12k €/año | 72% | Partner público | Cloud dedicado, FRIA |
-| Organismo regional | Public Regional | 24k €/año | 80% | Partner | Self-host híbrido |
-| Organismo nacional | Public National | 60k €/año | 82% | Partner Elite | ENS Alto, auditoría incluida |
+| Freelance/microagencia | Cloud Compliance | 149 €/mes | 76% | Directo | 1 proyecto gobernado (compliance rápido) |
+| Agencia/consultora mediana | Cloud Governance | 699 €/mes | 90% | Directo/Partner | 3 proyectos simultáneos, workflows avanzados |
+| Partner SaaS (white-label) | Cloud Enterprise | 1.199 €/mes | 91% | Directo/Partner | Multi-tenant, marca blanca, 5 clientes incluidos |
+| Enterprise (self-host) | Corporate Standard | 24k €/año | 80% | Partner | 5 sistemas IA, soporte L3, despliegue rápido |
+| Enterprise regulado | Corporate Enterprise | 48k €/año | 80% | Partner Elite | HA + SIEM + roadmap dedicado |
+| Ayuntamiento pequeño | Public Local | 12k €/año | 72% | Partner público | Cloud dedicado UE, FRIA incluida |
+| Organismo regional | Public Regional | 24k €/año | 80% | Partner | 5 sistemas, reporting Art. 71 |
+| Organismo nacional | Public National | 60k €/año | 82% | Partner Elite | ENS Alto + auditoría anual |
 
 ---
 

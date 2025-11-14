@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Acciones adicionales de capacitación"
+            width="70%"
+            height="65%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CompetenceGapAdditionalActionsViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Acciones propuestas"/>
+                <listbox model="@bind(vm.actions)" width="100%" height="220px">
+                    <listhead>
+                        <listheader label="Descripción"/>
+                        <listheader label="Responsable"/>
+                        <listheader label="Horas"/>
+                        <listheader label=""/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell>
+                                <label value="@load(each[description])"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each[owner])"/>
+                            </listcell>
+                            <listcell>
+                                <label value="@load(each[hours])"/>
+                            </listcell>
+                            <listcell>
+                                <button label="Eliminar" width="90px" onClick="@command('removeAction', action=each)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Acción nueva"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Descripción" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.newActionDescription)" width="100%" rows="3" multiline="true"/>
+                        </row>
+                        <row>
+                            <label value="Responsable" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.newActionOwner)" width="100%"/>
+                        </row>
+                        <row>
+                            <label value="Horas estimadas" sclass="font-weight-bold"/>
+                            <intbox value="@bind(vm.newActionHours)" width="120px"/>
+                        </row>
+                    </rows>
+                </grid>
+                <separator/>
+                <button label="Agregar acción" width="160px" onClick="@command('addAction')" sclass="btn-primary"/>
+            </groupbox>
+        </vlayout>
+
+        <hlayout hflex="1" pack="end" spacing="12px" style="padding: 16px;">
+            <button label="Cancelar" width="120px" onClick="@command('doCancel')"/>
+            <button label="Registrar acciones"
+                    width="170px"
+                    sclass="btn-primary"
+                    onClick="@command('doSubmit')"
+                    disabled="@load(empty vm.actions)"/>
+        </hlayout>
+    </window>
+</zk>
+
+

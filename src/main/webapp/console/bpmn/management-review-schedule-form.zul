@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Planificar reunión de revisión de dirección"
+            width="70%"
+            height="60%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.ManagementReviewScheduleViewModel')">
+
+        <vlayout sclass="p-4">
+            <groupbox mold="3d" width="100%">
+                <caption label="Datos de la reunión"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Fecha y hora" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.meetingDate)"
+                                     format="yyyy-MM-dd HH:mm"
+                                     cols="25"
+                                     hflex="1"/>
+                        </row>
+                        <row>
+                            <label value="Asistentes" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.attendees)"
+                                     width="100%"
+                                     placeholder="Lista de asistentes (separados por coma)"
+                                     rows="3"
+                                     multiline="true"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Guardar y continuar"
+                        onClick="@command('doSubmit')"
+                        width="180px"
+                        sclass="btn-primary"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

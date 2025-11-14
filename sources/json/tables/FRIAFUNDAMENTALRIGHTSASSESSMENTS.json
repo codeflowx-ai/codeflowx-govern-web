@@ -1,0 +1,269 @@
+{
+  "namespace": "compliance",
+  "name": "FRIAFUNDAMENTALRIGHTSASSESSMENTS",
+  "type": "TABLE",
+  "labelMonitor": "friaprocessdescription",
+  "description": "Fundamental Rights Impact Assessment según Art. 27 EU AI Act",
+  "fields": [
+    {
+      "name": "idxfriaassessment",
+      "type": "LONG",
+      "pk": true,
+      "required": false,
+      "label": "ID FRIA",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "iduuid",
+      "type": "VARCHAR",
+      "size": 36,
+      "required": true,
+      "label": "UUID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "idxproject",
+      "type": "LONG",
+      "required": true,
+      "label": "Proyecto",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "PRJPROJECTS",
+        "field": "IDXPROJECT"
+      }
+    },
+    {
+      "name": "idxuser",
+      "type": "LONG",
+      "required": false,
+      "label": "Usuario Deployer",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "CORUSERS",
+        "field": "IDXUSER"
+      }
+    },
+    {
+      "name": "friaprocessdescription",
+      "type": "CLOB",
+      "required": true,
+      "label": "Art 27.1.a - Process Description",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friausageperiod",
+      "type": "VARCHAR",
+      "size": 200,
+      "required": false,
+      "label": "Art 27.1.b - Usage Period",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friausagefrequency",
+      "type": "VARCHAR",
+      "size": 200,
+      "required": false,
+      "label": "Art 27.1.b - Usage Frequency",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaaffectedcategories",
+      "type": "JSONB",
+      "required": false,
+      "label": "Art 27.1.c - Affected Categories",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friavulnerablegroupsincluded",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 27.1.c - Vulnerable Groups",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friarisks",
+      "type": "JSONB",
+      "required": true,
+      "label": "Art 27.1.d - Risks",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friahumanoversight",
+      "type": "CLOB",
+      "required": true,
+      "label": "Art 27.1.e - Human Oversight",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friahitlenabled",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 27.1.e - HITL Enabled",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friamiti gationmeasures",
+      "type": "JSONB",
+      "required": true,
+      "label": "Art 27.1.f - Mitigation Measures",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friaart27compliant",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 27 Compliant",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friacompletenesscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Completeness Score",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaqualscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Quality Score",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friacharterarticles",
+      "type": "JSONB",
+      "required": false,
+      "label": "Charter Articles Affected",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friaimpactseverity",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": false,
+      "label": "Impact Severity",
+      "criteria": true,
+      "filter": true,
+      "values": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+    },
+    {
+      "name": "frianotified",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 27.3 - Authority Notified",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "frianotificationid",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "Notification ID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "frianotificationdate",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Notification Date",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friadocumenturl",
+      "type": "VARCHAR",
+      "size": 500,
+      "required": false,
+      "label": "Document URL",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "friadocumentversion",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": false,
+      "label": "Document Version",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friadpiaintegrated",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Art 27.4 - DPIA Integrated",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friadpiaid",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "DPIA ID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaapproved",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Approved",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaapprovedby",
+      "type": "LONG",
+      "required": false,
+      "label": "Approved By User ID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaapprovaldate",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Approval Date",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friacreatedat",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Created At",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "friaupdatedat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Updated At",
+      "criteria": true,
+      "filter": true
+    }
+  ]
+}
+
+

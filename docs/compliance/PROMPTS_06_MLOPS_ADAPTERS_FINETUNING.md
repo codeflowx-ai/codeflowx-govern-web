@@ -924,6 +924,21 @@ REQUISITOS TÉCNICOS:
 
 ---
 
+## ✅ IMPLEMENTACIÓN 2025-11
+
+- Extensión completa de `ModelAdaptationBusinessService` y entidades (`ModelAdaptationStrategy`, vista `ModelLineageTree`) con metadatos GPAI y genealogía recursiva.
+- Script `model_adaptation.sql` con alteraciones `MODMODELS`, creación de `MODADAPTATIONSTRATEGIES` e introducción de `V_MODEL_LINEAGE_TREE` + `V_MODEL_LINEAGE_SUMMARY`.
+- Vistas y ViewModels ZK (`ModelAdaptationRecommendation`, `ModelLineageTree`, formularios BPMN adapter/fine-tuning) siguiendo patrón EnArt.
+- Delegados Flowable actualizados para reutilizar lógica de negocio y registrar compliance (adapter y fine-tuning).
+- Nuevos endpoints FastAPI en `leka-model-wrapper` (`recommend-adaptation`, `validate-adapter-config`, `estimate-adaptation-cost`) con esquemas Pydantic dedicados.
+
+### 🔧 Acciones Manuales Pendientes
+- Ejecutar `nocode.service.entitys/src/main/resources/sql/model_adaptation.sql` en la base de datos corporativa o integrar el script en la pipeline de migraciones.
+- Desplegar/Reiniciar `leka-model-wrapper` (puerto 8006) y, opcionalmente, correr `pytest` + smoke test para validar los nuevos endpoints.
+- Validar en entorno ZK las nuevas pantallas (`adaptation_recommendation.zul`, `model_lineage_tree.zul`, formularios BPMN) y ejecutar los flujos `adapter-creation-approval-v1` y `finetuning-approval-v1` en Flowable.
+
+---
+
 ## 🎯 DISTRIBUCIÓN TRABAJO PARALELO
 
 ### **CHAT MLOPS-1 - Entities & Data:**

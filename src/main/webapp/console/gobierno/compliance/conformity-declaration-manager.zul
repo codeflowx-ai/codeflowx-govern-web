@@ -1,0 +1,159 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ConformityDeclarationManagerViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-certificate me-2"></h:i>
+						EU Declaration of Conformity Manager
+					</h:h2>
+					<h:p class="text-muted">
+						Gestión de declaraciones de conformidad según EU AI Act Annex V
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Selección de Assessment y Generación -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Generate New Declaration</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="mb-3">
+							<label class="form-label">Select Assessment *</label>
+							<combobox
+								placeholder="Select compliant assessment..."
+								selectedItem="@bind(vm.selectedAssessmentId)"
+								onChange="@command('selectAssessment')"
+								class="form-control"
+								model="@load(vm.assessments)">
+								<template name="model" var="assessment">
+									<comboitem 
+										label="@load(assessment.assessmentname)" 
+										value="@load(assessment.idxcomplianceassessment)" />
+								</template>
+							</combobox>
+						</div>
+						<button
+							iconSclass="fa-duotone fa-solid fa-certificate me-2"
+							label="Generate Declaration"
+							onClick="@command('generateDeclaration')"
+							class="btn btn-primary w-100"
+							disabled="@load(vm.generating or empty vm.selectedAssessmentId)" />
+					</div>
+				</div>
+			</div>
+
+			<!-- Preview de Declaración -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Declaration Preview</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Provider:</strong> <label value="@load(vm.previewProviderName)" /></h:p>
+						<h:p class="mb-2"><strong>AI System:</strong> <label value="@load(vm.previewSystemName)" /></h:p>
+						<h:p class="mb-2"><strong>Compliance Score:</strong> <label value="@load(vm.previewComplianceScore)" />%</h:p>
+						<h:p class="mb-0"><strong>Articles:</strong> <label value="@load(vm.previewArticlesCompliance)" /></h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lista de Declaraciones -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center gap-2">
+							<div class="flex-grow-1">
+								<h:h5 class="card-title mb-0">Existing Declarations</h:h5>
+							</div>
+							<button
+								iconSclass="fa-duotone fa-solid fa-arrows-rotate"
+								onClick="@command('refreshData')"
+								class="btn btn-sm btn-soft-primary" />
+						</div>
+					</div>
+					<div class="card-body">
+						<grid model="@load(vm.declarations)" emptyMessage="No declarations yet">
+							<columns sizable="true">
+								<column label="ID" width="8%" />
+								<column label="System Name" width="30%" />
+								<column label="Provider" width="20%" />
+								<column label="Date" width="15%" />
+								<column label="Status" width="12%" />
+								<column label="Actions" width="15%" />
+							</columns>
+							<template name="model" var="decl">
+								<row>
+									<label value="@load(decl.id)" />
+									<label value="@load(decl.system_name)" />
+									<label value="@load(decl.provider_name)" />
+									<label value="@load(decl.declaration_date)" />
+									<label value="@load(decl.status)" 
+										sclass="@load(decl.status eq 'SIGNED' ? 'badge bg-success' : 'badge bg-warning')" />
+									<hbox>
+										<button
+											iconSclass="fa-duotone fa-solid fa-signature"
+											tooltiptext="Sign"
+											onClick="@command('signDeclaration', declId=decl.id)"
+											class="btn btn-sm btn-soft-primary"
+											visible="@load(decl.status eq 'DRAFT')" />
+										<button
+											iconSclass="fa-duotone fa-solid fa-file-pdf"
+											tooltiptext="Download PDF"
+											onClick="@command('downloadDeclaration', declId=decl.id)"
+											class="btn btn-sm btn-soft-danger" />
+									</hbox>
+								</row>
+							</template>
+						</grid>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

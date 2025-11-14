@@ -1,0 +1,171 @@
+{
+  "namespace": "compliance",
+  "name": "COMCOMPLIANCEASSESSMENTS",
+  "type": "TABLE",
+  "labelMonitor": "comassessmenttype",
+  "description": "Evaluaciones de conformidad según Anexo VI - Art. 43 EU AI Act",
+  "fields": [
+    {
+      "name": "idxcomplianceassessment",
+      "type": "LONG",
+      "pk": true,
+      "required": false,
+      "label": "ID Assessment",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "iduuid",
+      "type": "VARCHAR",
+      "size": 36,
+      "required": true,
+      "label": "UUID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "idxproject",
+      "type": "LONG",
+      "required": true,
+      "label": "Proyecto",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "PRJPROJECTS",
+        "field": "IDXPROJECT"
+      }
+    },
+    {
+      "name": "idxuser",
+      "type": "LONG",
+      "required": false,
+      "label": "Usuario Iniciador",
+      "criteria": true,
+      "filter": true,
+      "fk": {
+        "table": "CORUSERS",
+        "field": "IDXUSER"
+      }
+    },
+    {
+      "name": "comassessmenttype",
+      "type": "VARCHAR",
+      "size": 30,
+      "required": true,
+      "label": "Tipo Assessment",
+      "criteria": true,
+      "filter": true,
+      "values": ["SELF_ASSESSMENT", "NOTIFIED_BODY"]
+    },
+    {
+      "name": "comassessmentdate",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Fecha Assessment",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comannexvicompliant",
+      "type": "BOOLEAN",
+      "required": true,
+      "label": "Anexo VI Compliant",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comstep2qmsscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Score QMS Step 2",
+      "criteria": true,
+      "filter": true,
+      "comment": "Score 0.00-1.00"
+    },
+    {
+      "name": "comstep3docscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Score Doc Step 3",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comstep4consistencyscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Score Consistency Step 4",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comoverallscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Score Overall",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comgaps",
+      "type": "JSONB",
+      "required": false,
+      "label": "Gaps Detectados",
+      "criteria": false,
+      "filter": false,
+      "comment": "Array de gaps: ['gap1', 'gap2']"
+    },
+    {
+      "name": "comresults",
+      "type": "JSONB",
+      "required": false,
+      "label": "Resultados Detallados",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "comreadyforcertification",
+      "type": "BOOLEAN",
+      "required": false,
+      "label": "Listo para Certificación",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comcertificateid",
+      "type": "VARCHAR",
+      "size": 100,
+      "required": false,
+      "label": "ID Certificado",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comreporturl",
+      "type": "VARCHAR",
+      "size": 500,
+      "required": false,
+      "label": "URL Reporte",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "comcreatedat",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Fecha Creación",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "comupdatedat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Fecha Actualización",
+      "criteria": true,
+      "filter": true
+    }
+  ]
+}
+
+

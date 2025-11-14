@@ -1,0 +1,342 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - MODEL APPROVAL OVERVIEW -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.models.ModelApprovalOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<h:div class="row" style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-check me-2"></h:i>
+						<label value="Aprobaciones de Modelos" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de solicitudes de aprobación pendientes" />
+					</h:p>
+				</h:div>
+			</div>
+			
+			<!-- Métricas de Aprobaciones -->
+			<h:div class="col-lg-12 s-bot">
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Pendientes de Aprobación</h:p>
+								<fragment exps="@load(vm.totalPending)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Modelos Aprobados</h:p>
+								<fragment exps="@load(vm.totalApproved)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+					
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Modelos Rechazados</h:p>
+								<fragment exps="@load(vm.totalRejected)">
+					<![CDATA[ <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h:h2> ]]>
+				</fragment>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Filtros -->
+			<h:div class="col-lg-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1">
+								<h:h5 class="mb-0">Filtros</h:h5>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="card-body">
+						<h:div class="row g-3">
+							<h:div class="col-md-4">
+								<label value="Nivel de Riesgo:" class="form-label" />
+								<combobox mold="rounded" autodrop="true"
+									selectedItem="@bind(vm.riskLevelFilter)"
+									class="form-control">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="Alto" value="HIGH" />
+									<comboitem label="Medio" value="MEDIUM" />
+									<comboitem label="Bajo" value="LOW" />
+								</combobox>
+							</h:div>
+							
+							<h:div class="col-md-4">
+								<label value="Owner:" class="form-label" />
+								<textbox value="@bind(vm.ownerFilter)"
+									placeholder="Filtrar por owner"
+									class="form-control" />
+							</h:div>
+							
+							<h:div class="col-md-4 d-flex align-items-end">
+								<h:div class="btn-group">
+									<a label="Aplicar Filtros"
+										onClick="@command('applyFilters')"
+										iconSclass="fa-duotone fa-magnifying-glass me-2"
+										class="btn btn-primary waves-effect waves-light" />
+									<a label="Limpiar"
+										onClick="@command('clearFilters')"
+										iconSclass="fa-duotone fa-broom me-2"
+										class="btn btn-secondary waves-effect waves-light" />
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			
+			<!-- Tabla de Modelos Pendientes -->
+			<h:div class="col-xxl-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5 class="mb-0">
+							<h:i class="fa-duotone fa-list me-2"></h:i>
+							Modelos Pendientes de Aprobación
+						</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<h:div id="divTemplate" sclass="col-lg-12">
+							<grid model="@load(vm.pendingModels)" style="overflow:auto;">
+								<columns sizable="true" columnsgroup="false" columnshide="false">
+									<column label="Nombre Modelo" align="left" width="20%" />
+									<column label="Tipo" align="center" width="12%" />
+									<column label="Owner" align="center" width="15%" />
+									<column label="Risk Level" align="center" width="12%" />
+									<column label="Fecha Solicitud" align="center" width="15%" />
+									<column label="Estado" align="center" width="12%" />
+									<column label="Acciones" align="center" width="14%" />
+								</columns>
+
+								<template name="model" var="model">
+									<row style="text-align:center;cursor:pointer;">
+										<!-- Nombre del modelo -->
+										<cell align="left">
+											<a onClick="@command('viewModelDetails', modelId=model.idxmodel)"
+												label="@load(model.modname)"
+												class="text-primary fw-medium"
+												style="text-decoration: underline; cursor: pointer;" />
+										</cell>
+										
+										<!-- Tipo -->
+										<label value="@load(model.modtype)" class="text-muted" />
+										
+										<!-- Owner -->
+										<label value="@load(model.modcreatedby)" class="text-muted" />
+										
+										<!-- Risk Level con badge -->
+										<cell>
+											<h:span class="badge bg-danger" visible="@load(model.modrisklevel eq 'HIGH')">
+												HIGH
+											</h:span>
+											<h:span class="badge bg-warning" visible="@load(model.modrisklevel eq 'MEDIUM')">
+												MEDIUM
+											</h:span>
+											<h:span class="badge bg-success" visible="@load(model.modrisklevel eq 'LOW')">
+												LOW
+											</h:span>
+										</cell>
+										
+										<!-- Fecha Solicitud -->
+										<label value="@load(model.modcreatedat) @converter('formatedDate', format='dd/MM/yyyy HH:mm')" 
+											class="text-muted" />
+										
+										<!-- Estado -->
+										<cell>
+											<h:span class="badge bg-info">
+												EN REVISIÓN
+											</h:span>
+										</cell>
+										
+										<!-- Acciones -->
+										<cell align="center">
+											<h:div class="btn-group">
+												<!-- Botón Ver Detalle -->
+												<a onClick="@command('viewModelDetails', modelId=model.idxmodel)"
+													iconSclass="fa-duotone fa-eye"
+													class="btn btn-sm btn-secondary"
+													tooltiptext="Ver Detalle" />
+												
+												<!-- Botón Aprobar -->
+												<a onClick="@command('openApprovalModal', model=model)"
+													iconSclass="fa-duotone fa-check"
+													class="btn btn-sm btn-success"
+													tooltiptext="Aprobar" />
+												
+												<!-- Botón Rechazar -->
+												<a onClick="@command('openRejectionModal', model=model)"
+													iconSclass="fa-duotone fa-times"
+													class="btn btn-sm btn-danger"
+													tooltiptext="Rechazar" />
+											</h:div>
+										</cell>
+									</row>
+								</template>
+								
+								<!-- Mensaje cuando no hay datos -->
+								<footer if="@load(vm.pendingModels.empty)">
+									<h:div class="text-center p-4">
+										<h:i class="fa-duotone fa-clipboard-check fa-3x text-muted mb-3"></h:i>
+										<h:p class="text-muted">No hay modelos pendientes de aprobación</h:p>
+									</h:div>
+								</footer>
+							</grid>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+		
+		<!-- Modal de Aprobación -->
+		<window id="approvalModal" 
+			title="Aprobar Modelo" 
+			border="normal" 
+			width="600px" 
+			mode="modal" 
+			closable="true"
+			visible="@load(vm.showApprovalModal)"
+			onClose="@command('closeApprovalModal')">
+			<vbox spacing="15px" width="100%" padding="20px">
+				<h:div class="alert alert-success" role="alert">
+					<h:i class="fa-duotone fa-check-circle me-2"></h:i>
+					<h:strong>¿Confirmar aprobación del modelo?</h:strong>
+				</h:div>
+				
+				<separator />
+				
+				<vbox>
+					<label value="Nombre del Modelo:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modname)" class="text-muted" />
+				</vbox>
+				
+				<vbox>
+					<label value="Tipo:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modtype)" class="text-muted" />
+				</vbox>
+				
+				<vbox>
+					<label value="Owner:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modcreatedby)" class="text-muted" />
+				</vbox>
+				
+				<separator />
+				
+				<vbox>
+					<label value="Comentarios (opcional):" class="form-label fw-bold" />
+					<textbox value="@bind(vm.approvalComments)" 
+						multiline="true" 
+						rows="4" 
+						width="100%"
+						placeholder="Agregue comentarios sobre la aprobación..."
+						class="form-control" />
+				</vbox>
+				
+				<separator />
+				
+				<hbox spacing="10px" pack="end" width="100%">
+					<button label="Cancelar" 
+						onClick="@command('closeApprovalModal')"
+						iconSclass="fa-duotone fa-times me-2"
+						class="btn btn-secondary" />
+					<button label="Confirmar Aprobación" 
+						onClick="@command('approveModel')"
+						iconSclass="fa-duotone fa-check me-2"
+						class="btn btn-success" />
+				</hbox>
+			</vbox>
+		</window>
+		
+		<!-- Modal de Rechazo -->
+		<window id="rejectionModal" 
+			title="Rechazar Modelo" 
+			border="normal" 
+			width="600px" 
+			mode="modal" 
+			closable="true"
+			visible="@load(vm.showRejectionModal)"
+			onClose="@command('closeRejectionModal')">
+			<vbox spacing="15px" width="100%" padding="20px">
+				<h:div class="alert alert-danger" role="alert">
+					<h:i class="fa-duotone fa-exclamation-triangle me-2"></h:i>
+					<h:strong>¿Confirmar rechazo del modelo?</h:strong>
+				</h:div>
+				
+				<separator />
+				
+				<vbox>
+					<label value="Nombre del Modelo:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modname)" class="text-muted" />
+				</vbox>
+				
+				<vbox>
+					<label value="Tipo:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modtype)" class="text-muted" />
+				</vbox>
+				
+				<vbox>
+					<label value="Owner:" class="fw-bold" />
+					<label value="@load(vm.selectedModel.modcreatedby)" class="text-muted" />
+				</vbox>
+				
+				<separator />
+				
+				<vbox>
+					<label value="Razón del Rechazo (OBLIGATORIO) *:" class="form-label fw-bold text-danger" />
+					<textbox value="@bind(vm.rejectionReason)" 
+						multiline="true" 
+						rows="4" 
+						width="100%"
+						placeholder="Debe especificar la razón del rechazo..."
+						class="form-control"
+						constraint="no empty: La razón del rechazo es obligatoria" />
+					<h:small class="text-muted mt-1">
+						<h:i class="fa-duotone fa-info-circle me-1"></h:i>
+						Esta información será enviada al owner del modelo
+					</h:small>
+				</vbox>
+				
+				<separator />
+				
+				<hbox spacing="10px" pack="end" width="100%">
+					<button label="Cancelar" 
+						onClick="@command('closeRejectionModal')"
+						iconSclass="fa-duotone fa-times me-2"
+						class="btn btn-secondary" />
+					<button label="Confirmar Rechazo" 
+						onClick="@command('rejectModel')"
+						iconSclass="fa-duotone fa-ban me-2"
+						class="btn btn-danger" />
+				</hbox>
+			</vbox>
+		</window>
+	</idspace>
+</zk>
+
+
+
+

@@ -1,0 +1,507 @@
+-- ============================================================================
+-- GDPR / ISO 27001 / ISO 27701 / ISO 42001 / SOX COMPLIANCE TABLES
+-- ============================================================================
+-- Fecha: 2025-11-02
+-- Propósito: Tablas para soporte multi-framework compliance (GDPR, ISO, SOX)
+-- Frameworks:
+--   - GDPR (Art. 13-14, 15-22, 30)
+--   - ISO 27001:2022 (Security)
+--   - ISO 27701:2019 (Privacy)
+--   - ISO 42001:2023 (AI Management)
+--   - SOX Section 802
+-- ============================================================================
+
+-- ============================================================================
+-- TABLA: CMP_PRIVACY_NOTICES
+-- Privacy Notices según GDPR Art. 13-14 e ISO 27701 Control 6.3.1
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_PRIVACY_NOTICES (
+    -- Primary Key
+    IDXPRIVACYNOTICE BIGSERIAL PRIMARY KEY,
+    
+    -- Información del Responsable del Tratamiento (GDPR Art. 13.1.a)
+    CMPCONTROLLERNAME VARCHAR(200) NOT NULL,
+    CMPCONTROLLERCONTACT TEXT,
+    CMPDPOCONTACT TEXT,
+    
+    -- Propósitos del Tratamiento (GDPR Art. 13.1.c)
+    CMPPROCESSINGPURPOSES TEXT NOT NULL,  -- JSON array
+    
+    -- Base Jurídica (GDPR Art. 13.1.c)
+    CMPLEGALBASIS VARCHAR(100) NOT NULL,  -- CONSENT, CONTRACT, LEGAL_OBLIGATION, LEGITIMATE_INTEREST, VITAL_INTEREST, PUBLIC_INTEREST
+    
+    -- Categorías de Datos Personales (GDPR Art. 13.1.c)
+    CMPDATACATEGORIES TEXT,  -- JSON array
+    
+    -- Destinatarios (GDPR Art. 13.1.e)
+    CMPRECIPIENTS TEXT,  -- JSON array
+    
+    -- Transferencias Internacionales (GDPR Art. 13.1.f)
+    CMPINTERNATIONALTRANSFERS TEXT,  -- JSON
+    
+    -- Período de Conservación (GDPR Art. 13.2.a)
+    CMPRETENTIONPERIOD VARCHAR(200),
+    
+    -- Derechos del Interesado (GDPR Art. 13.2.b)
+    CMPDATASUBJECTRIGHTS TEXT,  -- JSON array
+    
+    -- Derecho a Retirar Consentimiento (GDPR Art. 13.2.c)
+    CMPRIGHTTOWITHDRAW TEXT,
+    
+    -- Derecho a Reclamar (GDPR Art. 13.2.d)
+    CMPRIGHTTOCOMPLAIN TEXT,
+    
+    -- Decisiones Automatizadas (GDPR Art. 13.2.f, 22)
+    CMPAUTOMATEDDECISIONMAKING TEXT,
+    
+    -- Idioma y Contenido Generado
+    CMPLANGUAGE VARCHAR(10) NOT NULL,
+    CMPGENERATEDHTML TEXT,
+    CMPGENERATEDPDFPATH VARCHAR(500),
+    
+    -- Metadata
+    CMPAPPLICABLETOSYSTEM VARCHAR(100),  -- MODEL, AGENT, PROMPT, RAG, ALL
+    CMPVERSION VARCHAR(50),
+    CMPSTATUS VARCHAR(50),  -- DRAFT, PUBLISHED, ARCHIVED
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_PRIVACY_NOTICES
+CREATE INDEX idx_privacy_notices_system ON CMP_PRIVACY_NOTICES(CMPAPPLICABLETOSYSTEM);
+CREATE INDEX idx_privacy_notices_status ON CMP_PRIVACY_NOTICES(CMPSTATUS);
+CREATE INDEX idx_privacy_notices_language ON CMP_PRIVACY_NOTICES(CMPLANGUAGE);
+CREATE INDEX idx_privacy_notices_created_at ON CMP_PRIVACY_NOTICES(CMPCREATEDAT DESC);
+
+-- Comentarios
+COMMENT ON TABLE CMP_PRIVACY_NOTICES IS 'Privacy Notices GDPR Art. 13-14 e ISO 27701 Control 6.3.1';
+COMMENT ON COLUMN CMP_PRIVACY_NOTICES.CMPLEGALBASIS IS 'Base jurídica: CONSENT, CONTRACT, LEGAL_OBLIGATION, LEGITIMATE_INTEREST, VITAL_INTEREST, PUBLIC_INTEREST';
+COMMENT ON COLUMN CMP_PRIVACY_NOTICES.CMPSTATUS IS 'Estado: DRAFT, PUBLISHED, ARCHIVED';
+COMMENT ON COLUMN CMP_PRIVACY_NOTICES.CMPAPPLICABLETOSYSTEM IS 'Sistema aplicable: MODEL, AGENT, PROMPT, RAG, ALL';
+
+-- ============================================================================
+-- TABLA: CMP_DATA_SUBJECT_REQUESTS
+-- Solicitudes de Derechos del Interesado (GDPR Art. 15-22)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_DATA_SUBJECT_REQUESTS (
+    -- Primary Key
+    IDXDSR BIGSERIAL PRIMARY KEY,
+    
+    -- Información del Solicitante
+    CMPREQUESTEREMAIL VARCHAR(200) NOT NULL,
+    CMPREQUESTERNAME VARCHAR(200),
+    
+    -- Tipo de Solicitud (GDPR Art. 15-22)
+    CMPREQUESTTYPE VARCHAR(50) NOT NULL,  -- ACCESS, RECTIFICATION, ERASURE, RESTRICTION, PORTABILITY, OBJECTION, EXPLANATION
+    
+    -- Descripción de la Solicitud
+    CMPREQUESTDESCRIPTION TEXT,
+    
+    -- Estado de la Solicitud
+    CMPSTATUS VARCHAR(50) NOT NULL,  -- RECEIVED, IN_REVIEW, IDENTITY_VERIFICATION, APPROVED, REJECTED, COMPLETED, EXPIRED
+    
+    -- Datos Afectados
+    CMPAFFECTEDDATACATEGORIES TEXT,  -- JSON
+    CMPAFFECTEDSYSTEMS TEXT,  -- JSON array
+    
+    -- Respuesta
+    CMPRESPONSE TEXT,
+    CMPRESPONSEDATAPATH VARCHAR(500),  -- Para portabilidad de datos
+    
+    -- SLA Tracking (GDPR: 30 días)
+    CMPRECEIVEDAT TIMESTAMP NOT NULL,
+    CMPDEADLINE TIMESTAMP,  -- 30 días desde recepción
+    CMPCOMPLETEDAT TIMESTAMP,
+    
+    -- Asignación y Verificación
+    CMPASSIGNEDTO VARCHAR(200),
+    CMPIDENTITYVERIFIED BOOLEAN DEFAULT FALSE,
+    CMPIDENTITYVERIFIEDAT TIMESTAMP,
+    
+    -- BPMN Process Tracking
+    CMPPROCESSINSTANCEID VARCHAR(100),
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_DATA_SUBJECT_REQUESTS
+CREATE INDEX idx_dsr_email ON CMP_DATA_SUBJECT_REQUESTS(CMPREQUESTEREMAIL);
+CREATE INDEX idx_dsr_type ON CMP_DATA_SUBJECT_REQUESTS(CMPREQUESTTYPE);
+CREATE INDEX idx_dsr_status ON CMP_DATA_SUBJECT_REQUESTS(CMPSTATUS);
+CREATE INDEX idx_dsr_deadline ON CMP_DATA_SUBJECT_REQUESTS(CMPDEADLINE);
+CREATE INDEX idx_dsr_received_at ON CMP_DATA_SUBJECT_REQUESTS(CMPRECEIVEDAT DESC);
+CREATE INDEX idx_dsr_assigned_to ON CMP_DATA_SUBJECT_REQUESTS(CMPASSIGNEDTO);
+CREATE INDEX idx_dsr_process_instance ON CMP_DATA_SUBJECT_REQUESTS(CMPPROCESSINSTANCEID);
+
+-- Comentarios
+COMMENT ON TABLE CMP_DATA_SUBJECT_REQUESTS IS 'Solicitudes de Derechos del Interesado GDPR Art. 15-22';
+COMMENT ON COLUMN CMP_DATA_SUBJECT_REQUESTS.CMPREQUESTTYPE IS 'Tipo: ACCESS, RECTIFICATION, ERASURE, RESTRICTION, PORTABILITY, OBJECTION, EXPLANATION';
+COMMENT ON COLUMN CMP_DATA_SUBJECT_REQUESTS.CMPSTATUS IS 'Estado: RECEIVED, IN_REVIEW, IDENTITY_VERIFICATION, APPROVED, REJECTED, COMPLETED, EXPIRED';
+COMMENT ON COLUMN CMP_DATA_SUBJECT_REQUESTS.CMPDEADLINE IS 'Deadline GDPR: 30 días desde recepción';
+
+-- ============================================================================
+-- TABLA: CMP_DATA_EXPORT_REQUESTS
+-- Solicitudes de Exportación de Datos (GDPR Art. 20 - Portabilidad)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_DATA_EXPORT_REQUESTS (
+    -- Primary Key
+    IDXEXPORTREQUEST BIGSERIAL PRIMARY KEY,
+    
+    -- Solicitante
+    CMPDATASUBJECTEMAIL VARCHAR(200) NOT NULL,
+    CMPDATASUBJECTID VARCHAR(100),
+    
+    -- Scope del Export
+    CMPEXPORTSCOPE TEXT,  -- JSON: {tables: [...], date_range: {...}}
+    
+    -- Formato de Export
+    CMPEXPORTFORMAT VARCHAR(50) NOT NULL,  -- JSON, XML, CSV
+    
+    -- Estado
+    CMPSTATUS VARCHAR(50) NOT NULL,  -- REQUESTED, PROCESSING, COMPLETED, FAILED
+    
+    -- Resultado
+    CMPEXPORTFILEPATH VARCHAR(500),
+    CMPEXPORTFILESIZEKB BIGINT,
+    CMPRECORDSEXPORTED INTEGER,
+    
+    -- Timestamps
+    CMPREQUESTEDAT TIMESTAMP NOT NULL,
+    CMPCOMPLETEDAT TIMESTAMP,
+    CMPEXPIRESAT TIMESTAMP,  -- Link descarga expira en 48h
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_DATA_EXPORT_REQUESTS
+CREATE INDEX idx_export_email ON CMP_DATA_EXPORT_REQUESTS(CMPDATASUBJECTEMAIL);
+CREATE INDEX idx_export_status ON CMP_DATA_EXPORT_REQUESTS(CMPSTATUS);
+CREATE INDEX idx_export_requested_at ON CMP_DATA_EXPORT_REQUESTS(CMPREQUESTEDAT DESC);
+CREATE INDEX idx_export_expires_at ON CMP_DATA_EXPORT_REQUESTS(CMPEXPIRESAT);
+
+-- Comentarios
+COMMENT ON TABLE CMP_DATA_EXPORT_REQUESTS IS 'Solicitudes de exportación de datos GDPR Art. 20 (Portabilidad)';
+COMMENT ON COLUMN CMP_DATA_EXPORT_REQUESTS.CMPEXPORTFORMAT IS 'Formato: JSON, XML, CSV';
+COMMENT ON COLUMN CMP_DATA_EXPORT_REQUESTS.CMPSTATUS IS 'Estado: REQUESTED, PROCESSING, COMPLETED, FAILED';
+COMMENT ON COLUMN CMP_DATA_EXPORT_REQUESTS.CMPEXPIRESAT IS 'Expiración del link de descarga (48 horas)';
+
+-- ============================================================================
+-- TABLA: CMP_CONSENT_RECORDS
+-- Registros de Consentimiento (GDPR Art. 7, ISO 27701 Control 6.2.1)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_CONSENT_RECORDS (
+    -- Primary Key
+    IDXCONSENT BIGSERIAL PRIMARY KEY,
+    
+    -- Data Subject
+    CMPDATASUBJECTEMAIL VARCHAR(200) NOT NULL,
+    CMPDATASUBJECTID VARCHAR(100),
+    
+    -- Purpose of Consent
+    CMPPROCESSINGPURPOSE VARCHAR(200) NOT NULL,
+    CMPPURPOSEDESCRIPTION TEXT,
+    
+    -- Consent Status
+    CMPCONSENTSTATUS VARCHAR(50) NOT NULL,  -- GIVEN, WITHDRAWN, EXPIRED
+    CMPCONSENTMETHOD VARCHAR(100),  -- WEB_FORM, EMAIL, API, EXPLICIT_ACTION
+    
+    -- Granularidad
+    CMPGRANULARCONSENTS TEXT,  -- JSON: {marketing: true, analytics: false, ...}
+    
+    -- Timestamps
+    CMPCONSENTGIVENAT TIMESTAMP NOT NULL,
+    CMPCONSENTWITHDRAWNAT TIMESTAMP,
+    CMPCONSENTEXPIRESAT TIMESTAMP,
+    
+    -- Evidencia (GDPR Art. 7.1 - demostrar consentimiento)
+    CMPCONSENTEVIDENCE TEXT,  -- JSON: IP, timestamp, form data, etc.
+    CMPCONSENTTEXTSHOWN TEXT,  -- Texto exacto que se mostró al usuario
+    
+    -- Versión de Privacy Notice
+    CMPPRIVACYNOTICEVERSION VARCHAR(50),
+    
+    -- Sistema Aplicable
+    CMPAPPLICABLESYSTEM VARCHAR(100),
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_CONSENT_RECORDS
+CREATE INDEX idx_consent_email ON CMP_CONSENT_RECORDS(CMPDATASUBJECTEMAIL);
+CREATE INDEX idx_consent_purpose ON CMP_CONSENT_RECORDS(CMPPROCESSINGPURPOSE);
+CREATE INDEX idx_consent_status ON CMP_CONSENT_RECORDS(CMPCONSENTSTATUS);
+CREATE INDEX idx_consent_given_at ON CMP_CONSENT_RECORDS(CMPCONSENTGIVENAT DESC);
+CREATE INDEX idx_consent_system ON CMP_CONSENT_RECORDS(CMPAPPLICABLESYSTEM);
+
+-- Comentarios
+COMMENT ON TABLE CMP_CONSENT_RECORDS IS 'Registros de consentimiento GDPR Art. 7 e ISO 27701 Control 6.2.1';
+COMMENT ON COLUMN CMP_CONSENT_RECORDS.CMPCONSENTSTATUS IS 'Estado: GIVEN, WITHDRAWN, EXPIRED';
+COMMENT ON COLUMN CMP_CONSENT_RECORDS.CMPCONSENTMETHOD IS 'Método: WEB_FORM, EMAIL, API, EXPLICIT_ACTION';
+COMMENT ON COLUMN CMP_CONSENT_RECORDS.CMPCONSENTEVIDENCE IS 'Evidencia para demostrar consentimiento (GDPR Art. 7.1)';
+
+-- ============================================================================
+-- TABLA: CMP_ISO_DOCUMENTATION
+-- Documentación ISO 27001 / 27701 / 42001
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_ISO_DOCUMENTATION (
+    -- Primary Key
+    IDXISODOC BIGSERIAL PRIMARY KEY,
+    
+    -- ISO Standard
+    CMPISOSTANDARD VARCHAR(50) NOT NULL,  -- ISO_27001, ISO_27701, ISO_42001
+    CMPISOVERSION VARCHAR(50) NOT NULL,  -- 2022, 2019, 2023
+    
+    -- Document Type
+    CMPDOCUMENTTYPE VARCHAR(100) NOT NULL,  -- ISMS_MANUAL, RISK_ASSESSMENT, CONTROL_IMPLEMENTATION, etc.
+    
+    -- Organization Info
+    CMPORGANIZATIONNAME VARCHAR(200),
+    CMPSCOPEDEFINITION TEXT,
+    
+    -- Content Sections (ISO clauses 4-10)
+    CMPSECTION1CONTEXT TEXT,
+    CMPSECTION4CONTEXTORG TEXT,
+    CMPSECTION5LEADERSHIP TEXT,
+    CMPSECTION6PLANNING TEXT,
+    CMPSECTION7SUPPORT TEXT,
+    CMPSECTION8OPERATION TEXT,
+    CMPSECTION9PERFORMANCE TEXT,
+    CMPSECTION10IMPROVEMENT TEXT,
+    
+    -- Controles Aplicables (ISO 27001 Annex A)
+    CMPAPPLICABLECONTROLS TEXT,  -- JSON
+    CMPCONTROLIMPLEMENTATIONSTATUS TEXT,  -- JSON
+    
+    -- AI-specific (ISO 42001)
+    CMPAISYSTEMINVENTORY TEXT,  -- JSON
+    CMPAILIFECYCLEPROCESSES TEXT,  -- JSON
+    
+    -- Privacy-specific (ISO 27701)
+    CMPPRIVACYCONTROLS TEXT,  -- JSON
+    CMPPIIINVENTORY TEXT,  -- JSON
+    
+    -- Generation Metadata
+    CMPGENERATEDAT TIMESTAMP,
+    CMPGENERATEDBY VARCHAR(100),
+    CMPPDFPATH VARCHAR(500),
+    CMPSTATUS VARCHAR(50),  -- DRAFT, APPROVED, PUBLISHED
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_ISO_DOCUMENTATION
+CREATE INDEX idx_iso_doc_standard ON CMP_ISO_DOCUMENTATION(CMPISOSTANDARD);
+CREATE INDEX idx_iso_doc_type ON CMP_ISO_DOCUMENTATION(CMPDOCUMENTTYPE);
+CREATE INDEX idx_iso_doc_status ON CMP_ISO_DOCUMENTATION(CMPSTATUS);
+CREATE INDEX idx_iso_doc_generated_at ON CMP_ISO_DOCUMENTATION(CMPGENERATEDAT DESC);
+
+-- Comentarios
+COMMENT ON TABLE CMP_ISO_DOCUMENTATION IS 'Documentación ISO 27001/27701/42001';
+COMMENT ON COLUMN CMP_ISO_DOCUMENTATION.CMPISOSTANDARD IS 'Estándar: ISO_27001, ISO_27701, ISO_42001';
+COMMENT ON COLUMN CMP_ISO_DOCUMENTATION.CMPSTATUS IS 'Estado: DRAFT, APPROVED, PUBLISHED';
+
+-- ============================================================================
+-- TABLA: CMP_DATA_CATALOG
+-- Catálogo de Datos y Clasificación (GDPR Art. 30, ISO 27701 PII Inventory)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_DATA_CATALOG (
+    -- Primary Key
+    IDXCATALOGENTRY BIGSERIAL PRIMARY KEY,
+    
+    -- Data Asset Identification
+    CMPTABLENAME VARCHAR(200) NOT NULL,
+    CMPCOLUMNNAME VARCHAR(200),
+    CMPSCHEMANAME VARCHAR(100),
+    
+    -- Classification
+    CMPDATACLASSIFICATION VARCHAR(50) NOT NULL,  -- PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED
+    CMPSENSITIVITYLEVEL VARCHAR(50),  -- LOW, MEDIUM, HIGH, CRITICAL
+    
+    -- PII Classification (GDPR + ISO 27701)
+    CMPCONTAINSPII BOOLEAN DEFAULT FALSE,
+    CMPPICATEGORY VARCHAR(100),  -- DIRECT, INDIRECT, SPECIAL_CATEGORY, NONE
+    CMPPIITYPES TEXT,  -- JSON: [EMAIL, PHONE, NAME, etc.]
+    
+    -- Processing Information (GDPR Art. 30)
+    CMPPROCESSINGPURPOSE VARCHAR(200),
+    CMPLEGALBASIS VARCHAR(100),
+    CMPRECIPIENTS TEXT,  -- JSON
+    CMPRETENTIONPERIOD VARCHAR(200),
+    
+    -- Security Measures
+    CMPENCRYPTIONENABLED BOOLEAN DEFAULT FALSE,
+    CMPACCESSCONTROLS TEXT,  -- JSON
+    
+    -- Metadata
+    CMPDATAOWNER VARCHAR(200),
+    CMPBUSINESSGLOSSARYTERM VARCHAR(200),
+    CMPSAMPLEDATA TEXT,  -- Masked sample
+    
+    -- Audit
+    CMPLASTSCANNEDAT TIMESTAMP,
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_DATA_CATALOG
+CREATE INDEX idx_catalog_table ON CMP_DATA_CATALOG(CMPTABLENAME);
+CREATE INDEX idx_catalog_classification ON CMP_DATA_CATALOG(CMPDATACLASSIFICATION);
+CREATE INDEX idx_catalog_pii ON CMP_DATA_CATALOG(CMPCONTAINSPII);
+CREATE INDEX idx_catalog_sensitivity ON CMP_DATA_CATALOG(CMPSENSITIVITYLEVEL);
+CREATE INDEX idx_catalog_last_scanned ON CMP_DATA_CATALOG(CMPLASTSCANNEDAT DESC);
+
+-- Comentarios
+COMMENT ON TABLE CMP_DATA_CATALOG IS 'Catálogo de datos y clasificación GDPR Art. 30 e ISO 27701';
+COMMENT ON COLUMN CMP_DATA_CATALOG.CMPDATACLASSIFICATION IS 'Clasificación: PUBLIC, INTERNAL, CONFIDENTIAL, RESTRICTED';
+COMMENT ON COLUMN CMP_DATA_CATALOG.CMPPICATEGORY IS 'Categoría PII: DIRECT, INDIRECT, SPECIAL_CATEGORY, NONE';
+
+-- ============================================================================
+-- TABLA: CMP_RETENTION_POLICIES
+-- Políticas de Retención (GDPR Art. 5.1.e, SOX 802, ISO 27001 A.8.10)
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_RETENTION_POLICIES (
+    -- Primary Key
+    IDXRETENTIONPOLICY BIGSERIAL PRIMARY KEY,
+    
+    -- Scope
+    CMPENTITYTYPE VARCHAR(100) NOT NULL,  -- MODEL, AGENT, AUDIT_LOG, CONSENT, etc.
+    CMPTABLENAME VARCHAR(200),
+    
+    -- Retention Rules
+    CMPRETENTIONPERIODDAYS INTEGER NOT NULL,
+    CMPRETENTIONBASIS VARCHAR(200),  -- LEGAL_REQUIREMENT, BUSINESS_NEED, CONSENT_DURATION
+    
+    -- Framework Compliance
+    CMPCOMPLIANTFRAMEWORKS TEXT,  -- JSON: [GDPR, SOX, ISO27001]
+    
+    -- Archival
+    CMPARCHIVEENABLED BOOLEAN DEFAULT FALSE,
+    CMPARCHIVELOCATION VARCHAR(500),
+    
+    -- Deletion Rules
+    CMPAUTODELETE BOOLEAN DEFAULT FALSE,
+    CMPDELETIONMETHOD VARCHAR(100),  -- SOFT_DELETE, HARD_DELETE, ANONYMIZE
+    
+    -- Exceptions
+    CMPLEGALHOLDEXCEPTIONS TEXT,  -- JSON
+    
+    -- Status
+    CMPSTATUS VARCHAR(50),  -- ACTIVE, SUSPENDED, ARCHIVED
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CMPUPDATEDAT TIMESTAMP
+);
+
+-- Índices para CMP_RETENTION_POLICIES
+CREATE INDEX idx_retention_entity_type ON CMP_RETENTION_POLICIES(CMPENTITYTYPE);
+CREATE INDEX idx_retention_table ON CMP_RETENTION_POLICIES(CMPTABLENAME);
+CREATE INDEX idx_retention_status ON CMP_RETENTION_POLICIES(CMPSTATUS);
+
+-- Comentarios
+COMMENT ON TABLE CMP_RETENTION_POLICIES IS 'Políticas de retención GDPR Art. 5.1.e, SOX 802, ISO 27001 A.8.10';
+COMMENT ON COLUMN CMP_RETENTION_POLICIES.CMPDELETIONMETHOD IS 'Método: SOFT_DELETE, HARD_DELETE, ANONYMIZE';
+COMMENT ON COLUMN CMP_RETENTION_POLICIES.CMPSTATUS IS 'Estado: ACTIVE, SUSPENDED, ARCHIVED';
+
+-- ============================================================================
+-- TABLA: CMP_RETENTION_EXECUTIONS
+-- Ejecuciones de Políticas de Retención
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS CMP_RETENTION_EXECUTIONS (
+    -- Primary Key
+    IDXEXECUTION BIGSERIAL PRIMARY KEY,
+    
+    -- Policy Reference
+    CMPPOLICYID BIGINT NOT NULL,
+    
+    -- Execution Info
+    CMPEXECUTIONDATE TIMESTAMP NOT NULL,
+    CMPRECORDSPROCESSED INTEGER DEFAULT 0,
+    CMPRECORDSDELETED INTEGER DEFAULT 0,
+    CMPRECORDSARCHIVED INTEGER DEFAULT 0,
+    
+    -- Status
+    CMPSTATUS VARCHAR(50),  -- SUCCESS, FAILED, PARTIAL
+    CMPEXECUTIONLOG TEXT,
+    
+    -- Audit Fields
+    CMPCREATEDAT TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Foreign Key
+    CONSTRAINT fk_retention_execution_policy
+        FOREIGN KEY (CMPPOLICYID)
+        REFERENCES CMP_RETENTION_POLICIES(IDXRETENTIONPOLICY)
+        ON DELETE CASCADE
+);
+
+-- Índices para CMP_RETENTION_EXECUTIONS
+CREATE INDEX idx_retention_exec_policy ON CMP_RETENTION_EXECUTIONS(CMPPOLICYID);
+CREATE INDEX idx_retention_exec_date ON CMP_RETENTION_EXECUTIONS(CMPEXECUTIONDATE DESC);
+CREATE INDEX idx_retention_exec_status ON CMP_RETENTION_EXECUTIONS(CMPSTATUS);
+
+-- Comentarios
+COMMENT ON TABLE CMP_RETENTION_EXECUTIONS IS 'Ejecuciones de políticas de retención';
+COMMENT ON COLUMN CMP_RETENTION_EXECUTIONS.CMPSTATUS IS 'Estado: SUCCESS, FAILED, PARTIAL';
+
+-- ============================================================================
+-- GRANTS (opcional, ajustar según necesidades)
+-- ============================================================================
+
+-- GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO codeflowx_user;
+-- GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO codeflowx_user;
+
+-- ============================================================================
+-- FIN DEL SCRIPT
+-- ============================================================================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

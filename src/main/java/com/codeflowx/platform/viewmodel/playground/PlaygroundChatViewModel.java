@@ -16,16 +16,15 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.agents.Agent;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundChat;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
 
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -72,7 +71,8 @@ public class PlaygroundChatViewModel extends BaseFront {
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
-            criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            criterias.addCriteria(  "modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
+            
             availableModels = businessService.find(Model.class, criterias);
         } catch (Exception e) {
             log.error("Error loading models", e);

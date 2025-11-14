@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Solicitud de decommission de sistema IA"
+            width="70%"
+            height="65%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.AIDecommissionRequestViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Datos del sistema"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="ID sistema" sclass="font-weight-bold"/>
+                            <intbox value="@bind(vm.systemId)" width="200px"/>
+                        </row>
+                        <row>
+                            <label value="Nombre sistema" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.systemName)" width="100%" placeholder="Nombre descriptivo del sistema IA"/>
+                        </row>
+                        <row>
+                            <label value="Crítico" sclass="font-weight-bold"/>
+                            <checkbox checked="@bind(vm.criticalSystem)"/>
+                        </row>
+                        <row>
+                            <label value="Fecha prevista" sclass="font-weight-bold"/>
+                            <datebox value="@bind(vm.plannedDecommissionDate)"
+                                     format="yyyy-MM-dd"
+                                     width="200px"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Justificación"/>
+                <textbox value="@bind(vm.justification)"
+                         width="100%"
+                         rows="6"
+                         multiline="true"
+                         placeholder="Motivos de negocio, cumplimiento o técnicos para el decommission"/>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Enviar solicitud"
+                        onClick="@command('doSubmit')"
+                        width="160px"
+                        sclass="btn-primary"
+                        disabled="@load(vm.systemName == null || vm.systemName.isEmpty())"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

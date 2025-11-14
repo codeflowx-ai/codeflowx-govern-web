@@ -16,6 +16,29 @@
 
 **Approach:** NO MVP - Implementación completa, agresiva, best-in-class
 
+---
+
+## 🔄 Avance Implementación (Noviembre 2025)
+
+### 📌 Entregables Completados
+- **AI Policy Framework** (`docs/governance/AI_POLICY_FRAMEWORK_ISO42001.md`) formalizado según Clause 5.2, con principios, roles, gestión de riesgos y compromisos EU AI Act / ISO.
+- **Módulo AI Objectives (Clause 6.2)**
+  - Entidad `AIMOBJECTIVES` + script `sql-scripts/ai_objectives.sql`.
+  - Business Service `AIObjectivesBusinessService`, ViewModel `AIObjectivesViewModel` y pantalla `ai_objectives_management.zul`.
+- **Módulo Competence & Awareness (Clauses 7.2 / 7.3)**
+  - Entidades `AICCOMPETENCE`, `AITTRAININGRECORD` + script `sql-scripts/ai_competence.sql`.
+  - Business Service `AICompetenceBusinessService`, ViewModel `AICompetenceViewModel` y pantalla `ai_competence_management.zul`.
+  - Documento `AI_AWARENESS_PROGRAM_ISO42001.md` con plan de formación 3.5h anual.
+
+### ⏳ Pendiente por Ejecutar
+- **Prompt A.1.4 Inventario**: extender `PRJPROJECTS`, servicios de reporte y pestaña ISO 42001 Inventory.
+- **Prompt A.1.5 AIMS Performance**: entidad `APSAIMSPERFORMANCE`, KPIs Clause 9, checklist auditoría y workflow BPMN `iso42001_management_review`.
+- **Prompt A.1.6 Continual Improvement**: entidades `ANCNONCONFORMITY` y `AIMPROVEMENT`, workflow de acciones correctivas y dashboard.
+- **Prompt A.1.7 Annex A Controls**: matriz `ICOISO42001CONTROL` con seed de 39 controles y UI de cobertura.
+- **Prompt A.1.8 Readiness Assessment**: entidad `IRDISO42001READINESS`, lógica de auto-evaluación y reporte ejecutivo PDF.
+- **Grupos A.2, A.3, B.1, B.2, C.1**: módulos pendientes (board-level governance, OECD/GDPR, ISO 27001/27701, UK guidance) incluyendo servicios, ZUL, documentación y BPMN.
+- Integrar scripts en pipeline de migraciones, generar DTOs/SDK clientes y añadir pruebas automatizadas.
+
 **Total Prompts:** 47 (38 críticos + 9 opcionales UK)
 
 ---

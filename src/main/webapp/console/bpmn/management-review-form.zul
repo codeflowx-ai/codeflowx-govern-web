@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Revisión de la dirección - ISO 42001"
+            width="80%"
+            height="75%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.ManagementReviewViewModel')">
+
+        <vlayout sclass="p-4">
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Datos de desempeño"/>
+                <grid width="100%">
+                    <rows>
+                        <row each="@load(vm.performanceData.entrySet())">
+                            <label value="@load(each.key)" sclass="font-weight-bold"/>
+                            <label value="@load(each.value != null ? each.value : 'N/D')"/>
+                        </row>
+                    </rows>
+                </grid>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Resumen ejecutivo"/>
+                <textbox value="@bind(vm.executiveSummary)"
+                         width="100%"
+                         rows="6"
+                         multiline="true"
+                         placeholder="Resumen de desempeño, oportunidades de mejora y hallazgos críticos"/>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Decisiones"/>
+                <textbox value="@bind(vm.decision)"
+                         width="100%"
+                         rows="5"
+                         multiline="true"
+                         placeholder="Indicadores aprobados, cambios de estrategia, recursos requeridos"/>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Riesgos de cumplimiento"/>
+                <textbox value="@bind(vm.complianceRisks)"
+                         width="100%"
+                         rows="4"
+                         multiline="true"
+                         placeholder="Riesgos detectados, controles a reforzar, dependencias"/>
+            </groupbox>
+
+            <hlayout hflex="1" pack="end" spacing="12px">
+                <button label="Cancelar" onClick="@command('doCancel')" width="120px"/>
+                <button label="Confirmar decisiones"
+                        onClick="@command('doSubmit')"
+                        width="200px"
+                        sclass="btn-primary"
+                        disabled="@load(vm.decision == null || vm.decision.isEmpty())"/>
+            </hlayout>
+        </vlayout>
+    </window>
+</zk>
+
+

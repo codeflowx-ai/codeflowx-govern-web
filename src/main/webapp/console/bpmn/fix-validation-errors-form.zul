@@ -1,0 +1,71 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.euregistration.FixValidationErrorsViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-circle-exclamation me-2"></h:i>
+						Fix Validation Errors
+					</h:h2>
+					<h:p class="text-muted">
+						Registration data validation failed - please correct errors
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-danger">
+					<div class="card-header bg-danger text-white">
+						<h:h5 class="card-title mb-0">⚠️ Validation Errors</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.validationErrors)" height="200px">
+							<listhead>
+								<listheader label="Error Description" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell>
+										<h:div class="d-flex align-items-center">
+											<h:i class="fa fa-times-circle text-danger me-2"></h:i>
+											<label value="@load(each)" />
+										</h:div>
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Correction Notes</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.correctionNotes)" 
+						         placeholder="Describe the corrections made to fix validation errors..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Retry Validation" 
+						        iconSclass="fa fa-rotate-right"
+						        zclass="btn btn-primary btn-lg"
+						        onClick="@command('retryValidation')" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

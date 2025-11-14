@@ -1,0 +1,468 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.FriaWizardViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-scale-balanced me-2"></h:i>
+						FRIA Wizard - Fundamental Rights Impact Assessment
+					</h:h2>
+					<h:p class="text-muted">
+						6-step wizard for Art. 27 EU AI Act compliance - High-risk AI systems
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Progress Bar -->
+			<div class="col-lg-12 s-bot">
+				<div class="card border-primary">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<h:h6 class="mb-0">
+								<label value="@load(vm.wizardTitle)" />
+							</h:h6>
+							<h:span class="badge bg-primary">
+								Step <label value="@load(vm.currentStep)" /> / <label value="@load(vm.totalSteps)" />
+							</h:span>
+						</div>
+						<div class="progress" style="height: 20px;">
+							<div class="progress-bar bg-primary" role="progressbar" 
+								style="@load(concat('width: ', vm.progressPercent, '%'))"
+								aria-valuenow="@load(vm.progressPercent)" 
+								aria-valuemin="0" 
+								aria-valuemax="100">
+								<label value="@load(concat(vm.progressPercent, '%'))" />
+							</div>
+						</div>
+						<h:p class="text-muted mt-2 mb-0" style="font-size: 0.9em;">
+							Project: <strong><label value="@load(vm.projectName)" /></strong>
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- STEP CONTENT -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+
+						<!-- STEP 1: Process Description -->
+						<div visible="@load(vm.currentStep eq 1)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-file-alt me-2"></h:i>
+								Art. 27.1.a - Process Description
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Describe the processes in which the AI system is intended to be used.
+							</h:p>
+							
+							<div class="mb-3">
+								<label class="form-label">Detailed Process Description * (min. 100 characters)</label>
+								<textbox
+									value="@bind(vm.processDescription)"
+									rows="8"
+									class="form-control"
+									placeholder="Provide a comprehensive description of:&#10;&#10;- The specific processes where the AI system will be deployed&#10;- How the system integrates with existing workflows&#10;- What decisions or actions the system will make or support&#10;- Who interacts with the system (users, operators, affected persons)&#10;- Any dependencies or interactions with other systems&#10;&#10;Example: 'The AI system will be used in our recruitment process to screen CVs and rank candidates...'&#10;"
+									maxlength="2000" />
+							</div>
+							
+							<div class="alert alert-info">
+								<h:p class="mb-0">
+									<label value="@load(vm.processDescription.length())" /> / 2000 characters
+									<h:span class="float-end">
+										<label value="@load(vm.processDescription.length() ge 100 ? '✓ Valid' : '✗ Minimum 100 characters required')" 
+											style="@load(vm.processDescription.length() ge 100 ? 'color: green; font-weight: bold;' : 'color: orange; font-weight: bold;')" />
+									</h:span>
+								</h:p>
+							</div>
+						</div>
+
+						<!-- STEP 2: Period & Frequency -->
+						<div visible="@load(vm.currentStep eq 2)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-calendar-clock me-2"></h:i>
+								Art. 27.1.b - Usage Period & Frequency
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Specify the period during which the AI system is intended to be used and the frequency of its use.
+							</h:p>
+							
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Usage Period Description *</label>
+									<textbox
+										value="@bind(vm.usagePeriod)"
+										class="form-control"
+										placeholder="e.g., 'Continuous deployment for 2 years', '6-month pilot', 'Permanent'"
+										maxlength="200" />
+								</div>
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Usage Frequency *</label>
+									<textbox
+										value="@bind(vm.usageFrequency)"
+										class="form-control"
+										placeholder="e.g., 'Per transaction', '100 times/day', 'Continuous 24/7'"
+										maxlength="200" />
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6 mb-3">
+									<label class="form-label">Start Date (optional)</label>
+									<textbox
+										value="@bind(vm.usageStartDate)"
+										class="form-control"
+										placeholder="YYYY-MM-DD"
+										maxlength="50" />
+								</div>
+								<div class="col-md-6 mb-3">
+									<label class="form-label">End Date (optional)</label>
+									<textbox
+										value="@bind(vm.usageEndDate)"
+										class="form-control"
+										placeholder="YYYY-MM-DD or 'Indefinite'"
+										maxlength="50" />
+								</div>
+							</div>
+						</div>
+
+						<!-- STEP 3: Affected Categories -->
+						<div visible="@load(vm.currentStep eq 3)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-users me-2"></h:i>
+								Art. 27.1.c - Categories of Affected Persons
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Identify the categories of natural persons or groups likely to be affected by the AI system.
+							</h:p>
+							
+							<div class="mb-3">
+								<label class="form-label">Select Affected Categories * (multiple selection)</label>
+								<listbox
+									model="@load(vm.availableCategories)"
+									selectedItems="@bind(vm.affectedCategories)"
+									rows="10"
+									multiple="true"
+									checkmark="true"
+									class="w-100">
+									<template name="model" var="category">
+										<listitem value="@load(category.value)">
+											<listcell>
+												<label value="@load(category.label)" />
+											</listcell>
+										</listitem>
+									</template>
+								</listbox>
+							</div>
+							
+							<div class="mb-3">
+								<label class="form-label">Custom Category (optional)</label>
+								<textbox
+									value="@bind(vm.customCategory)"
+									class="form-control"
+									placeholder="Add a custom category if not listed above"
+									maxlength="200" />
+							</div>
+							
+							<div class="form-check mb-3">
+								<checkbox id="vulnerableGroups" checked="@bind(vm.vulnerableGroupsIncluded)" />
+								<label for="vulnerableGroups" class="form-check-label">
+									<strong>Vulnerable groups are included</strong> (elderly, children, persons with disabilities, etc.)
+								</label>
+							</div>
+							
+							<div class="alert alert-success" visible="@load(vm.affectedCategories.size() gt 0)">
+								<h:i class="fa-duotone fa-solid fa-check-circle me-2"></h:i>
+								<strong><label value="@load(vm.affectedCategories.size())" /> categories selected</strong>
+							</div>
+						</div>
+
+						<!-- STEP 4: Specific Risks -->
+						<div visible="@load(vm.currentStep eq 4)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-triangle-exclamation me-2"></h:i>
+								Art. 27.1.d - Specific Risks to Fundamental Rights
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Identify and assess likely risks of harm to fundamental rights such as privacy, non-discrimination, freedom of expression, etc.
+							</h:p>
+							
+							<!-- Add Risk Form -->
+							<div class="card bg-light mb-3">
+								<div class="card-body">
+									<h:h6 class="mb-3">Add New Risk</h:h6>
+									<div class="row">
+										<div class="col-md-12 mb-2">
+											<label class="form-label">Risk Description</label>
+											<textbox
+												value="@bind(vm.riskDescription)"
+												rows="2"
+												class="form-control"
+												placeholder="Describe the specific risk to fundamental rights"
+												maxlength="500" />
+										</div>
+										<div class="col-md-4 mb-2">
+											<label class="form-label">Affected Group</label>
+											<textbox
+												value="@bind(vm.riskAffectedGroup)"
+												class="form-control"
+												placeholder="e.g., Job applicants"
+												maxlength="100" />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label class="form-label">Severity</label>
+											<combobox
+												selectedItem="@bind(vm.riskSeverity)"
+												class="form-control">
+												<comboitem label="LOW" value="LOW" />
+												<comboitem label="MEDIUM" value="MEDIUM" />
+												<comboitem label="HIGH" value="HIGH" />
+												<comboitem label="CRITICAL" value="CRITICAL" />
+											</combobox>
+										</div>
+										<div class="col-md-3 mb-2">
+											<label class="form-label">Probability</label>
+											<combobox
+												selectedItem="@bind(vm.riskProbability)"
+												class="form-control">
+												<comboitem label="LOW" value="LOW" />
+												<comboitem label="MEDIUM" value="MEDIUM" />
+												<comboitem label="HIGH" value="HIGH" />
+											</combobox>
+										</div>
+										<div class="col-md-2 mb-2">
+											<label class="form-label">&#160;</label>
+											<button
+												label="Add Risk"
+												onClick="@command('addRisk')"
+												class="btn btn-primary w-100"
+												iconSclass="fa-duotone fa-solid fa-plus" />
+										</div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Risks List -->
+							<div class="mb-3">
+								<label class="form-label">Identified Risks (<label value="@load(vm.risks.size())" />)</label>
+								<grid model="@load(vm.risks)" emptyMessage="No risks added yet. Add at least one risk to continue.">
+									<columns>
+										<column label="Description" width="40%" />
+										<column label="Affected Group" width="20%" />
+										<column label="Severity" width="15%" />
+										<column label="Probability" width="15%" />
+										<column label="Actions" width="10%" />
+									</columns>
+									<template name="model" var="risk">
+										<row>
+											<label value="@load(risk.description)" />
+											<label value="@load(risk.affectedGroup)" />
+											<h:span class="badge"
+												sclass="@load(risk.severity eq 'CRITICAL' ? 'bg-danger' : (risk.severity eq 'HIGH' ? 'bg-warning' : 'bg-info'))">
+												<label value="@load(risk.severity)" />
+											</h:span>
+											<label value="@load(risk.probability)" />
+											<button
+												iconSclass="fa-duotone fa-solid fa-trash"
+												tooltiptext="Remove"
+												onClick="@command('removeRisk', riskId=risk.id)"
+												class="btn btn-sm btn-soft-danger" />
+										</row>
+									</template>
+								</grid>
+							</div>
+						</div>
+
+						<!-- STEP 5: Human Oversight -->
+						<div visible="@load(vm.currentStep eq 5)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-user-shield me-2"></h:i>
+								Art. 27.1.e - Human Oversight Measures
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Describe the human oversight measures that will be implemented for the AI system.
+							</h:p>
+							
+							<div class="mb-3">
+								<label class="form-label">Human Oversight Description * (min. 50 characters)</label>
+								<textbox
+									value="@bind(vm.humanOversightDescription)"
+									rows="6"
+									class="form-control"
+									placeholder="Describe how human supervision is implemented:&#10;&#10;- Who is responsible for oversight&#10;- When and how humans intervene&#10;- Competence and training of oversight personnel&#10;- Tools and interfaces provided for oversight&#10;- Procedures for human override or intervention&#10;"
+									maxlength="1000" />
+							</div>
+							
+							<div class="mb-3">
+								<h:h6 class="mb-2">Oversight Capabilities</h:h6>
+								<div class="form-check mb-2">
+									<checkbox id="hitl" checked="@bind(vm.hitlEnabled)" />
+									<label for="hitl" class="form-check-label">
+										<strong>Human-In-The-Loop (HITL)</strong> - Human approval required for decisions
+									</label>
+								</div>
+								<div class="form-check mb-2">
+									<checkbox id="override" checked="@bind(vm.overrideCapability)" />
+									<label for="override" class="form-check-label">
+										<strong>Override Capability</strong> - Humans can override AI decisions
+									</label>
+								</div>
+								<div class="form-check mb-3">
+									<checkbox id="training" checked="@bind(vm.humanTrainingProvided)" />
+									<label for="training" class="form-check-label">
+										<strong>Training Provided</strong> - Oversight personnel receive appropriate training
+									</label>
+								</div>
+							</div>
+							
+							<div class="mb-3">
+								<label class="form-label">Additional Oversight Measures (optional)</label>
+								<textbox
+									value="@bind(vm.oversightMeasures)"
+									rows="3"
+									class="form-control"
+									placeholder="List any additional measures such as monitoring dashboards, alerts, audit trails, etc."
+									maxlength="500" />
+							</div>
+							
+							<div class="alert alert-info">
+								<h:p class="mb-0">
+									<label value="@load(vm.humanOversightDescription.length())" /> / 1000 characters
+									<h:span class="float-end">
+										<label value="@load(vm.humanOversightDescription.length() ge 50 ? '✓ Valid' : '✗ Minimum 50 characters required')" 
+											style="@load(vm.humanOversightDescription.length() ge 50 ? 'color: green; font-weight: bold;' : 'color: orange; font-weight: bold;')" />
+									</h:span>
+								</h:p>
+							</div>
+						</div>
+
+						<!-- STEP 6: Mitigation Measures -->
+						<div visible="@load(vm.currentStep eq 6)">
+							<h:h5 class="mb-3">
+								<h:i class="fa-duotone fa-solid fa-shield-check me-2"></h:i>
+								Art. 27.1.f - Risk Mitigation Measures
+							</h:h5>
+							<h:p class="text-muted mb-3">
+								Describe the measures planned or already in place to prevent or minimize the identified risks.
+							</h:p>
+							
+							<!-- Add Mitigation Form -->
+							<div class="card bg-light mb-3">
+								<div class="card-body">
+									<h:h6 class="mb-3">Add New Mitigation Measure</h:h6>
+									<div class="row">
+										<div class="col-md-6 mb-2">
+											<label class="form-label">Measure Description</label>
+											<textbox
+												value="@bind(vm.mitigationDescription)"
+												rows="2"
+												class="form-control"
+												placeholder="Describe the mitigation measure in detail"
+												maxlength="500" />
+										</div>
+										<div class="col-md-3 mb-2">
+											<label class="form-label">Type</label>
+											<combobox
+												selectedItem="@bind(vm.mitigationType)"
+												class="form-control">
+												<comboitem label="Preventive" value="PREVENTIVE" />
+												<comboitem label="Detective" value="DETECTIVE" />
+												<comboitem label="Corrective" value="CORRECTIVE" />
+											</combobox>
+										</div>
+										<div class="col-md-3 mb-2">
+											<label class="form-label">Responsible</label>
+											<textbox
+												value="@bind(vm.mitigationResponsible)"
+												class="form-control"
+												placeholder="Team/person"
+												maxlength="100" />
+										</div>
+									</div>
+									<button
+										label="Add Measure"
+										onClick="@command('addMitigationMeasure')"
+										class="btn btn-primary"
+										iconSclass="fa-duotone fa-solid fa-plus" />
+								</div>
+							</div>
+							
+							<!-- Mitigation List -->
+							<div class="mb-3">
+								<label class="form-label">Mitigation Measures (<label value="@load(vm.mitigationMeasures.size())" />)</label>
+								<grid model="@load(vm.mitigationMeasures)" emptyMessage="No mitigation measures added yet. Add at least one measure to continue.">
+									<columns>
+										<column label="Description" width="50%" />
+										<column label="Type" width="20%" />
+										<column label="Responsible" width="20%" />
+										<column label="Actions" width="10%" />
+									</columns>
+									<template name="model" var="measure">
+										<row>
+											<label value="@load(measure.description)" />
+											<h:span class="badge"
+												sclass="@load(measure.type eq 'PREVENTIVE' ? 'bg-success' : (measure.type eq 'DETECTIVE' ? 'bg-info' : 'bg-warning'))">
+												<label value="@load(measure.type)" />
+											</h:span>
+											<label value="@load(measure.responsible)" />
+											<button
+												iconSclass="fa-duotone fa-solid fa-trash"
+												tooltiptext="Remove"
+												onClick="@command('removeMitigationMeasure', measureId=measure.id)"
+												class="btn btn-sm btn-soft-danger" />
+										</row>
+									</template>
+								</grid>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+			<!-- Navigation Buttons -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div class="row align-items-center">
+							<div class="col-md-4">
+								<button
+									iconSclass="fa-duotone fa-solid fa-arrow-left me-2"
+									label="Previous"
+									onClick="@command('goPrevious')"
+									class="btn btn-secondary"
+									disabled="@load(vm.currentStep eq 1)" />
+							</div>
+							<div class="col-md-4 text-center">
+								<button
+									iconSclass="fa-duotone fa-solid fa-times me-2"
+									label="Cancel"
+									onClick="@command('cancel')"
+									class="btn btn-outline-secondary" />
+							</div>
+							<div class="col-md-4 text-end">
+								<button
+									iconSclass="fa-duotone fa-solid fa-arrow-right me-2"
+									label="@load(vm.currentStep eq vm.totalSteps ? 'Generate FRIA' : 'Next')"
+									onClick="@command('goNext')"
+									class="btn btn-primary"
+									disabled="@load(vm.generating)" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

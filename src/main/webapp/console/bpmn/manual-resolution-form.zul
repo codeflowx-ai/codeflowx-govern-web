@@ -1,0 +1,85 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.euregistration.ManualResolutionViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-user-gear me-2"></h:i>
+						Manual Resolution Required
+					</h:h2>
+					<h:p class="text-muted">
+						Automatic submission failed - manual registration required
+					</h:p>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-danger">
+					<div class="card-header bg-danger text-white">
+						<h:h5 class="card-title mb-0">⚠️ Submission Failed After <label value="@load(vm.retryAttempts)" /> Attempts</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Error:</strong></h:p>
+						<h:pre class="alert alert-danger"><label value="@load(vm.submissionError)" /></h:pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card border-info">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">ℹ️ Manual Registration Process</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p>Please register the system manually through the EU Database portal and enter the registration ID below:</h:p>
+						<h:ol>
+							<h:li>Access the EU AI Systems Database portal</h:li>
+							<h:li>Submit registration manually using the downloaded package</h:li>
+							<h:li>Obtain the EU Registration ID</h:li>
+							<h:li>Enter the ID below to complete the process</h:li>
+						</h:ol>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">EU Registration ID (from manual submission) *</h:h5>
+						<textbox width="100%" value="@bind(vm.manualRegistrationId)" 
+						         placeholder="e.g., EU_AI_REG_123456789..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Resolution Notes</h:h5>
+						<textbox rows="4" width="100%" value="@bind(vm.resolutionNotes)" 
+						         placeholder="Describe the manual registration process and any relevant details..." />
+					</div>
+				</div>
+			</div>
+
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Confirm Manual Registration" 
+						        iconSclass="fa fa-check-circle"
+						        zclass="btn btn-success btn-lg"
+						        onClick="@command('registerManually')" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

@@ -30,13 +30,16 @@ CodeflowX añade governance AI Act sin migración ✅
 Datos NO se mueven (solo metadata) ✅
 ```
 
-**Total prompts:** 12 prompts
+**Total prompts:** 18 prompts
 - **Databricks:** 3 prompts (conector, sync, webhooks)
 - **Snowflake:** 2 prompts (catalogación, quality)
 - **Azure ML / SageMaker:** 2 prompts (deployment monitoring)
 - **S3 / Azure Blob / GCS:** 2 prompts (catalogación data lakes)
 - **Apache Spark:** 1 prompt (evaluation jobs)
 - **Framework genérico:** 2 prompts (entity, orchestration)
+- **Google Vertex AI:** 1 prompt (model registry)
+- **IBM watsonx.ai:** 1 prompt (model sync)
+- **ServiceNow ITSM:** 2 prompts (change requests, issues governance)
 
 ---
 
@@ -1720,9 +1723,276 @@ async def catalog_s3_bucket(
 
 ---
 
+### **PROMPT 9: Conector Microsoft Purview**
+
+**Objetivo:** Reutilizar el catálogo de datos corporativo (Purview) como fuente primaria de metadatos para CodeflowX sin duplicar conectores.
+
+**Crear:**
+
+```java
+// service/external/PurviewConnectorService.java
+@Slf4j
+@Service
+public class PurviewConnectorService {
+
+    public List<ExternalDataset> syncCatalog(Long platformId) {
+        // 1. Resolve credentials (accountName, tenantId, clientId, clientSecret)
+        // 2. Acquire Azure AD token scope https://purview.azure.net/.default
+        // 3. POST /catalog/api/search/query (keywords="*") → lista activos
+        // 4. Para cada asset → upsert EXDEXTERNALDATASETS (purview://platformUUID/guid)
+        // 5. Guardar clasificación, dataSourceId y descripción en EXDMETADATA (JSONB)
+        // 6. Actualizar status plataforma → SUCCESS / ERROR
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // Valida token AAD con credenciales
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "accountName": "contoso-purview",
+  "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "clientId": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy",
+  "clientSecret": "********",
+  "collection": "contoso-main"
+}
+```
+
+**Verificar:**
+- Token AAD se obtiene correctamente.
+- Assets Purview aparecen como datasets externos (purview://...).
+- Metadatos (classification, dataSource, descripción) disponibles en CodeflowX.
+
+---
+
+### **PROMPT 10: Conector Microsoft Fabric**
+
+**Objetivo:** Sincronizar workspaces, lakehouses y pipelines de Microsoft Fabric como artefactos gobernados, aprovechando el overlay CodeflowX.
+
+**Crear:**
+
+```java
+// service/external/FabricConnectorService.java
+@Slf4j
+@Service
+public class FabricConnectorService {
+
+    public List<ExternalDataset> syncFabricAssets(Long platformId) {
+        // 1. Resolve tenant/client/secret (AAD)
+        // 2. Token scope https://analysis.windows.net/powerbi/api/.default
+        // 3. GET /workspaces → registrar workspace como dataset (fabric://workspace/{id})
+        // 4. GET /workspaces/{id}/items → lakehouses, pipelines, datasets
+        // 5. Guardar metadata JSON completa en EXDMETADATA
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // Valida token Fabric
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "tenantId": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "clientId": "yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy",
+  "clientSecret": "********",
+  "apiBase": "https://api.fabric.microsoft.com/v1"
+}
+```
+
+**Verificar:**
+- Workspaces e items Fabric registrados en CodeflowX.
+- Se conserva relación workspace → item en metadatos.
+- Integración lista para aplicar reglas de clasificación y aprobación IA Act.
+
+---
+
+### **PROMPT 11: Conector Google Vertex AI**
+
+**Objetivo:** Sincronizar modelos registrados en Vertex AI (Model Registry) reutilizando la infraestructura de ExternalModel sin mover datasets.
+
+**Crear:**
+
+```java
+// service/external/VertexAIConnectorService.java
+@Slf4j
+@Service
+public class VertexAIConnectorService {
+
+    public List<ExternalModel> syncModels(Long platformId) {
+        // 1. Resolver projectId, location y serviceAccountKey desde EPLMETADATA
+        // 2. Obtener token GCP scope https://www.googleapis.com/auth/cloud-platform
+        // 3. GET https://{location}-aiplatform.googleapis.com/v1/projects/{projectId}/locations/{location}/models
+        // 4. Upsert EXMEXTERNALMODELS (id, displayName, version, metadata completo)
+        // 5. Actualizar estado de sincronización en EPLEXTERNALPLATFORMS
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // Valida token Google (ADC o service account)
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "projectId": "codeflowx-sandbox",
+  "location": "us-central1",
+  "serviceAccountKey": "{...json service account...}"
+}
+```
+
+**Verificar:**
+- Modelos Vertex AI aparecen en `EXMEXTERNALMODELS` con metadata JSONB.
+- Se conserva `name` completo (projects/.../models/ID) para trazabilidad.
+- Token GCP se refresca correctamente (no expirado al sincronizar).
+
+---
+
+### **PROMPT 12: Conector IBM watsonx.ai**
+
+**Objetivo:** Integrar modelos hospedados en IBM watsonx / WML dentro de CodeflowX para clasificación de riesgo y aprobaciones.
+
+**Crear:**
+
+```java
+// service/external/IbmWatsonxConnectorService.java
+@Slf4j
+@Service
+public class IbmWatsonxConnectorService {
+
+    public List<ExternalModel> syncModels(Long platformId) {
+        // 1. Resolver instanceUrl, instanceId, projectId, apiKey desde EPLMETADATA
+        // 2. Obtener token IAM (POST https://iam.cloud.ibm.com/identity/token)
+        // 3. GET {instanceUrl}/ml/v4/models?project_id=...&version=...
+        // 4. Upsert EXMEXTERNALMODELS (metadata, version, href)
+        // 5. Actualizar EPLEXTERNALPLATFORMS con estado SUCCESS/ERROR
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // Valida token IBM IAM usando apiKey
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "instanceUrl": "https://us-south.ml.cloud.ibm.com",
+  "instanceId": "xxxxx-ml-instance-id",
+  "projectId": "yyyyy-project-id",
+  "apiKey": "********",
+  "apiVersion": "2023-10-01"
+}
+```
+
+**Verificar:**
+- Modelos watsonx sincronizados con su metadata y href original.
+- Token IAM se obtiene y expira según política (log warning si falla).
+- Riesgo CodeflowX puede ejecutarse about EXMEXTERNALMODELS importados.
+
+---
+
+### **PROMPT 13: Conector ServiceNow ITSM**
+
+**Objetivo:** Sincronizar change requests / incidentes críticos como datasets externos para trazabilidad IA Act (aprobaciones y remediaciones).
+
+**Crear:**
+
+```java
+// service/external/ServiceNowConnectorService.java
+@Slf4j
+@Service
+public class ServiceNowConnectorService {
+
+    public List<ExternalDataset> syncTickets(Long platformId) {
+        // 1. Resolver instanceUrl, username, password/token, table, query, limit
+        // 2. GET /api/now/table/{table}?sysparm_query=...&sysparm_limit=...
+        // 3. Upsert EXDEXTERNALDATASETS (servicenow://table/sys_id)
+        // 4. Guardar JSON completo en EXDMETADATA y estado plataforma
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // GET tabla con sysparm_limit=1 para validar credenciales
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "instanceUrl": "https://contoso.service-now.com",
+  "username": "governance.bot",
+  "password": "********",
+  "table": "change_request",
+  "query": "assignment_group=AI-Governance^state!=closed",
+  "limit": 100
+}
+```
+
+**Verificar:**
+- Tickets críticos aparecen en `EXDEXTERNALDATASETS` (servicenow://...).
+- Campos clave (state, assignment_group) preservados en metadata JSONB.
+- Integración lista para disparar flujos BPMN de aprobación / remediación.
+
+---
+
+### **PROMPT 14: Conector Jira Cloud (Atlassian)**
+
+**Objetivo:** Centralizar incidentes y tareas de gobernanza creadas en Jira dentro del dashboard CodeflowX.
+
+**Crear:**
+
+```java
+// service/external/JiraConnectorService.java
+@Slf4j
+@Service
+public class JiraConnectorService {
+
+    public List<ExternalDataset> syncIssues(Long platformId) {
+        // 1. Resolver baseUrl, email, apiToken, projectKey, maxResults
+        // 2. GET /rest/api/3/search?jql=project={KEY} ORDER BY updated DESC
+        // 3. Upsert EXDEXTERNALDATASETS (jira://project/ISSUE)
+        // 4. Guardar payload en EXDMETADATA y actualizar plataforma
+    }
+
+    public boolean testConnection(ExternalPlatformIntegration platform) {
+        // GET /rest/api/3/project/{KEY} con Basic Auth
+    }
+}
+```
+
+**Metadata esperada en `EPLMETADATA`:**
+
+```json
+{
+  "baseUrl": "https://contoso.atlassian.net",
+  "email": "ai.governance@contoso.com",
+  "apiToken": "********",
+  "projectKey": "AI-GOV",
+  "maxResults": 50
+}
+```
+
+**Verificar:**
+- Issues Jira aparecen en `EXDEXTERNALDATASETS` para plataformas tipo JIRA.
+- Se conservan labels, status y assignee dentro del JSON metadata.
+- Cambios en Jira (update) reflejados tras re-sincronización.
+
+---
+
 ## 📦 GRUPO E: APACHE SPARK (EVALUATION JOBS)
 
-### **PROMPT 9: Conector Spark Submit Evaluation Jobs**
+### **PROMPT 15: Conector Spark Submit Evaluation Jobs**
 
 **Objetivo:** Ejecutar evaluaciones big data (bias, quality) en Spark cluster cliente SIN mover datos
 
@@ -1870,7 +2140,7 @@ async def spark_bias_evaluation(
 
 ## 📦 GRUPO F: ORQUESTACIÓN + UI
 
-### **PROMPT 10: Service Orquestación Sync Multi-Plataforma**
+### **PROMPT 16: Service Orquestación Sync Multi-Plataforma**
 
 **Objetivo:** Service Java orquestar sync con todas las plataformas (scheduler + orchestration)
 
@@ -2000,7 +2270,7 @@ public class ExternalPlatformOrchestrationService {
 
 ---
 
-### **PROMPT 11: BPMN External Model Approval Workflow**
+### **PROMPT 17: BPMN External Model Approval Workflow**
 
 **Objetivo:** Workflow BPMN para aprobar modelos externos (Databricks, Azure ML) con notificación a plataforma
 
@@ -2111,7 +2381,7 @@ public class NotifyExternalPlatformDelegate implements JavaDelegate {
 
 ---
 
-### **PROMPT 12: Dashboard External Platforms Monitoring**
+### **PROMPT 18: Dashboard External Platforms Monitoring**
 
 **Objetivo:** Dashboard ZUL para monitorear status sync plataformas externas, modelos pendientes aprobación
 
@@ -2255,7 +2525,7 @@ public class ExternalPlatformsDashboardViewModel {
 
 ## ✅ RESUMEN PROMPTS_12
 
-**Total prompts:** 12 prompts
+**Total prompts:** 18 prompts
 
 ### **Databricks (3):**
 1. Conector + sync models bidireccional
@@ -2273,13 +2543,27 @@ public class ExternalPlatformsDashboardViewModel {
 ### **Data Lakes (1):**
 8. S3 / Azure Blob / GCS catalogación
 
+### **Microsoft Purview / Fabric (2):**
+9. Conector Purview (catálogo + clasificación)
+10. Conector Fabric (workspaces + artefactos)
+
+### **Vertex AI (1):**
+11. Conector Google Vertex AI (model registry)
+
+### **IBM watsonx.ai (1):**
+12. Conector IBM watsonx (model sync)
+
+### **ITSM / Ticketing (2):**
+13. Conector ServiceNow (change requests)
+14. Conector Jira Cloud (issues governance)
+
 ### **Spark (1):**
-9. Submit evaluation jobs (big data sin mover datos)
+15. Submit evaluation jobs (big data sin mover datos)
 
 ### **Framework (3):**
-10. Orquestación sync multi-plataforma
-11. BPMN external model approval workflow
-12. Dashboard monitoring
+16. Orquestación sync multi-plataforma
+17. BPMN external model approval workflow
+18. Dashboard monitoring
 
 ---
 
@@ -2317,3 +2601,13 @@ public class ExternalPlatformsDashboardViewModel {
 **Prioridad:** 🔴 **CRÍTICA COMERCIAL**  
 **Estimación:** 15-20 días (con 3-4 chats = 6-8 días reales)  
 **Impacto:** 4x TAM accesible (€3B → €12B)
+
+## ⚠️ Actualización 9 Nov 2025 – Estrategia de Implementación
+
+> **Decisión arquitectónica**: todos los conectores y servicios descritos en este prompt deben implementarse en **Java (Spring Boot / Spring Batch / Flowable)**. Los fragmentos en Python que se incluyen más abajo permanecen como referencia histórica del comportamiento deseado, pero deben portarse a Java o eliminarse durante la ejecución. Python queda reservado exclusivamente para microservicios de inferencia, RAG y evaluaciones especializadas ya aprobados.
+>
+> **Acciones obligatorias**
+> - Generar clientes e integraciones Databricks/Snowflake/Azure ML/SageMaker, catalogadores de data lakes y jobs Spark utilizando Java.
+> - Reemplazar los ejemplos FastAPI o scripts Python por módulos Spring Boot (REST + schedulers) o conectores Java standalone.
+> - Todo el orquestador, BPMN delegates y dashboards ZK deben consumir las nuevas clases Java.
+> - Documentar en cada entrega la eliminación de dependencias Python para integración.

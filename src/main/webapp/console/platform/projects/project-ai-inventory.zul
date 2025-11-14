@@ -1,0 +1,76 @@
+<?page title="ISO 42001 - Inventario de Sistemas de IA" contentType="text/html;charset=UTF-8"?>
+<window width="100%" height="100%" border="none"
+        viewModel="@id('invVm') @init('com.codeflowx.govern.viewmodel.projects.ProjectAIInventoryViewModel')">
+
+    <vlayout hflex="1" vflex="1" spacing="12px">
+        <hlayout spacing="10px">
+            <button label="Guardar inventario" iconSclass="z-icon-save"
+                    onClick="@command('saveInventory')" disabled="@load(invVm.projectInventory == null)"/>
+            <button label="Registrar revisión" iconSclass="z-icon-check"
+                    onClick="@command('reviewInventory')" disabled="@load(invVm.projectInventory == null)"/>
+            <button label="Recargar" iconSclass="z-icon-refresh"
+                    onClick="@command('refreshInventory')"/>
+            <separator orient="vertical"/>
+            <label value="Próxima revisión (días)" />
+            <label value="@load(invVm.daysToNextReview)" style="font-weight:bold"/>
+        </hlayout>
+
+        <groupbox title="Metadatos ISO 42001" width="100%">
+            <grid hflex="1">
+                <rows>
+                    <row>
+                        <label value="Tipo de sistema IA"/>
+                        <combobox value="@bind(invVm.projectInventory.prjaisystemtype)"
+                                  model="@load(invVm.systemTypes)" autodrop="true" readonly="true"
+                                  placeholder="Seleccionar tipo"/>
+                        <label value="Etapa ciclo de vida"/>
+                        <combobox value="@bind(invVm.projectInventory.prjailifecyclestage)"
+                                  model="@load(invVm.lifecycleStages)" autodrop="true" readonly="true"
+                                  placeholder="Seleccionar etapa"/>
+                    </row>
+                    <row>
+                        <label value="Nivel de riesgo"/>
+                        <combobox value="@bind(invVm.projectInventory.prjairisklevel)"
+                                  model="@load(invVm.riskLevels)" autodrop="true" readonly="true"
+                                  placeholder="Seleccionar riesgo"/>
+                        <label value="Usuarios previstos"/>
+                        <textbox value="@bind(invVm.projectInventory.prjaiusers)" width="320px" multiline="true"
+                                 rows="3" placeholder="Usuarios clave / stakeholders"/>
+                    </row>
+                    <row>
+                        <label value="Propósito del sistema"/>
+                        <textbox value="@bind(invVm.projectInventory.prjaipurpose)" multiline="true" rows="3"
+                                 hflex="1" placeholder="Descripción resumida del propósito"/>
+                    </row>
+                    <row>
+                        <label value="Uso previsto"/>
+                        <textbox value="@bind(invVm.projectInventory.prjaiintendeduse)" multiline="true" rows="3"
+                                 hflex="1" placeholder="Casos de uso y límites operativos"/>
+                    </row>
+                    <row>
+                        <label value="Controles aplicados (JSON)"/>
+                        <textbox value="@bind(invVm.projectInventory.prjaicontrolsapplied)" multiline="true" rows="4"
+                                 hflex="1" placeholder="Listado de controles ISO 42001 aplicados"/>
+                    </row>
+                    <row>
+                        <label value="Métricas de desempeño (JSON)"/>
+                        <textbox value="@bind(invVm.projectInventory.prjaiperformancemetrics)" multiline="true" rows="4"
+                                 hflex="1" placeholder="KPIs y métricas de desempeño monitoreadas"/>
+                    </row>
+                    <row>
+                        <label value="Última revisión"/>
+                        <datebox value="@bind(invVm.projectInventory.prjailastinventoryreview)"
+                                 format="dd/MM/yyyy" width="160px" readonly="true"/>
+                        <label value="Próxima revisión"/>
+                        <datebox value="@bind(invVm.projectInventory.prjainextinventoryreview)"
+                                 format="dd/MM/yyyy" width="160px"/>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+
+        <div visible="@load(invVm.projectInventory == null)" style="color:#d32f2f;font-weight:bold;">
+            No se encontró un proyecto válido. Abra este módulo desde el detalle de un proyecto ya creado.
+        </div>
+    </vlayout>
+</window>

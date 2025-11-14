@@ -1,0 +1,122 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.incident.DefineCorrectiveActionsViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-list-check me-2"></h:i>
+						Define Corrective Actions (Art. 20)
+					</h:h2>
+					<h:p class="text-muted">
+						Define immediate, short-term and long-term corrective actions
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Incident Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:p class="mb-2"><strong>Incident:</strong> <label value="@load(vm.incidentTitle)" /></h:p>
+						<h:p class="mb-0"><strong>Root Cause:</strong> <label value="@load(vm.rootCause)" /></h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Add New Action -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header bg-primary text-white">
+						<h:h5 class="card-title mb-0">Add Corrective Action</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6 mb-3">
+								<label>Action Type</label>
+								<combobox width="100%" value="@bind(vm.newActionType)">
+									<comboitem label="Immediate (Containment)" value="IMMEDIATE" />
+									<comboitem label="Short-term (Fix)" value="SHORT_TERM" selected="true" />
+									<comboitem label="Long-term (Prevention)" value="LONG_TERM" />
+								</combobox>
+							</div>
+							<div class="col-md-6 mb-3">
+								<label>Responsible Person</label>
+								<textbox width="100%" value="@bind(vm.newActionResponsible)" 
+								         placeholder="Name or role..." />
+							</div>
+							<div class="col-md-12 mb-3">
+								<label>Action Description *</label>
+								<textbox rows="2" width="100%" value="@bind(vm.newActionDescription)" 
+								         placeholder="Describe the corrective action..." />
+							</div>
+							<div class="col-md-12">
+								<button label="Add Action" 
+								        iconSclass="fa fa-plus"
+								        zclass="btn btn-primary"
+								        onClick="@command('addAction')" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Actions List -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Defined Actions (<label value="@load(vm.correctiveActions.size())" />)</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.correctiveActions)" emptyMessage="No actions defined yet">
+							<listhead>
+								<listheader label="Type" width="150px" />
+								<listheader label="Description" />
+								<listheader label="Responsible" width="200px" />
+								<listheader label="Actions" width="100px" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell>
+										<h:span class="badge bg-secondary"><label value="@load(each.type)" /></h:span>
+									</listcell>
+									<listcell>
+										<label value="@load(each.description)" />
+									</listcell>
+									<listcell>
+										<label value="@load(each.responsible)" />
+									</listcell>
+									<listcell>
+										<button iconSclass="fa fa-trash" 
+										        zclass="btn btn-sm btn-danger"
+										        onClick="@command('removeAction', action=each)" />
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Submit Corrective Actions" 
+						        iconSclass="fa fa-check"
+						        zclass="btn btn-success btn-lg"
+						        onClick="@command('submitActions')" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>
+

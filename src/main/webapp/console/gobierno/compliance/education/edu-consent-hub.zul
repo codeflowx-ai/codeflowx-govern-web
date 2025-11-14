@@ -1,0 +1,98 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+    xmlns:h="xhtml"
+    xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+    <idspace
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.education.EduConsentHubViewModel')"
+        validationMessages="@id('vmsgs')">
+
+        <div class="row">
+            <div class="col-lg-12 s-bot">
+                <div class="card border-primary">
+                    <div class="card-header bg-soft-primary">
+                        <h:h3 class="mb-0">
+                            <h:i class="fa-duotone fa-solid fa-user-shield me-2"></h:i>
+                            Hub de Consentimiento Educativo
+                        </h:h3>
+                        <h:p class="mb-0 text-muted">
+                            Gestiona consentimiento informado y revisión de sesgos para contenidos y evaluaciones asistidas por IA.
+                        </h:p>
+                    </div>
+                    <div class="card-body">
+
+                        <div class="alert alert-info">
+                            <h:i class="fa-duotone fa-solid fa-circle-info me-2"></h:i>
+                            Completa los datos para iniciar el proceso BPMN <code>edu_consent_hub</code>. El flujo solicitará consentimiento, evaluará sesgo y registrará evidencias en `gov_governance_events`.
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Caso de uso *</label>
+                                <combobox value="@bind(vm.useCaseCode)" autodrop="true" readonly="true" class="form-select"
+                                          model="@bind(vm.useCaseOptions)">
+                                    <template name="model" var="option">
+                                        <comboitem label="@load(option)" value="@load(option)" />
+                                    </template>
+                                </combobox>
+                                <small class="text-muted">Selecciona el escenario principal: proctoring, contenidos digitales o evaluaciones asistidas.</small>
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">Edad del estudiante *</label>
+                                <intbox value="@bind(vm.studentAge)" class="form-control" min="1" />
+                            </div>
+
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">ID estudiante</label>
+                                <textbox value="@bind(vm.studentIdentifier)" class="form-control" maxlength="64"
+                                         placeholder="Opcional" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nombre del estudiante</label>
+                                <textbox value="@bind(vm.studentName)" class="form-control" maxlength="120"
+                                         placeholder="Opcional" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Contacto tutor legal</label>
+                                <textbox value="@bind(vm.guardianContact)" class="form-control" maxlength="120"
+                                         placeholder="Email o teléfono" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">ID del contenido a revisar *</label>
+                                <textbox value="@bind(vm.contentId)" class="form-control" maxlength="120"
+                                         placeholder="Ej. LESSON-2025-01" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Justificación / contexto</label>
+                                <textbox value="@bind(vm.justification)" class="form-control" maxlength="240"
+                                         placeholder="Describe el motivo o contexto del uso" />
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button sclass="btn btn-light" onClick="@command('resetForm')">
+                                <h:i class="fa-duotone fa-solid fa-eraser me-1"></h:i>
+                                Limpiar
+                            </button>
+                            <button sclass="btn btn-primary" onClick="@command('startConsentWorkflow')">
+                                <h:i class="fa-duotone fa-solid fa-play me-1"></h:i>
+                                Iniciar flujo
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </idspace>
+</zk>
+

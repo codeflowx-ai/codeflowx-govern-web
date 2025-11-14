@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Ajustar plan de capacitación"
+            width="75%"
+            height="70%"
+            border="normal"
+            closable="true"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CompetenceGapReworkViewModel')">
+
+        <vlayout sclass="p-4" spacing="14px">
+            <groupbox mold="3d" width="100%">
+                <caption label="Módulos actuales"/>
+                <listbox model="@bind(vm.modules)" width="100%" height="220px">
+                    <listhead>
+                        <listheader label="Módulo"/>
+                        <listheader label="Horas"/>
+                        <listheader label=""/>
+                    </listhead>
+                    <template name="model">
+                        <listitem>
+                            <listcell>
+                                <textbox value="@bind(each[module])" width="320px"/>
+                            </listcell>
+                            <listcell>
+                                <intbox value="@bind(each[hours])" width="80px"/>
+                            </listcell>
+                            <listcell>
+                                <button label="Eliminar" width="90px" onClick="@command('removeModule', module=each)"/>
+                            </listcell>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Nuevo módulo"/>
+                <grid width="100%">
+                    <rows>
+                        <row>
+                            <label value="Título" sclass="font-weight-bold"/>
+                            <textbox value="@bind(vm.newModuleTitle)" width="300px"/>
+                        </row>
+                        <row>
+                            <label value="Horas" sclass="font-weight-bold"/>
+                            <intbox value="@bind(vm.newModuleHours)" width="120px"/>
+                        </row>
+                    </rows>
+                </grid>
+                <separator/>
+                <button label="Añadir módulo" width="160px" onClick="@command('addModule')" sclass="btn-primary"/>
+            </groupbox>
+
+            <groupbox mold="3d" width="100%">
+                <caption label="Notas de rework"/>
+                <textbox value="@bind(vm.reworkNotes)"
+                         width="100%"
+                         rows="4"
+                         multiline="true"
+                         placeholder="Observaciones para el equipo de formación"/>
+            </groupbox>
+        </vlayout>
+
+        <hlayout hflex="1" pack="end" spacing="12px" style="padding: 16px;">
+            <button label="Cancelar" width="120px" onClick="@command('doCancel')"/>
+            <button label="Guardar cambios" width="170px" sclass="btn-primary" onClick="@command('doSubmit')"/>
+        </hlayout>
+    </window>
+</zk>
+
+

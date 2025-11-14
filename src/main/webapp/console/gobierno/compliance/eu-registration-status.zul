@@ -1,0 +1,163 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+	
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.EURegistrationStatusViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-globe-europe me-2"></h:i>
+						EU Database Registration Status
+					</h:h2>
+					<h:p class="text-muted">
+						Estado de registros en EU Database for High-Risk AI Systems (Art. 51)
+					</h:p>
+				</div>
+			</div>
+
+			<!-- KPIs -->
+			<div class="col-md-3 s-bot">
+				<div class="card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+					<div class="card-body">
+						<h:p class="mb-2" style="opacity: 0.9;">Total Systems</h:p>
+						<h:h2 class="mb-0"><label value="@load(vm.totalSystems)" /></h:h2>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 s-bot">
+				<div class="card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+					<div class="card-body">
+						<h:p class="mb-2" style="opacity: 0.9;">Pending Registration</h:p>
+						<h:h2 class="mb-0"><label value="@load(vm.pendingRegistration)" /></h:h2>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 s-bot">
+				<div class="card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+					<div class="card-body">
+						<h:p class="mb-2" style="opacity: 0.9;">Registered</h:p>
+						<h:h2 class="mb-0"><label value="@load(vm.registered)" /></h:h2>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3 s-bot">
+				<div class="card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+					<div class="card-body">
+						<h:p class="mb-2" style="opacity: 0.9;">EU DB Status</h:p>
+						<h:h6 class="mb-0"><label value="@load(vm.euDatabaseStatus)" /></h:h6>
+						<h:small><label value="@load(vm.estimatedAvailability)" /></h:small>
+					</div>
+				</div>
+			</div>
+
+			<!-- Registros -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center gap-2">
+							<div class="flex-grow-1">
+								<h:h5 class="card-title mb-0">Registration Records</h:h5>
+							</div>
+							<button
+								iconSclass="fa-duotone fa-solid fa-arrows-rotate"
+								onClick="@command('refreshData')"
+								class="btn btn-sm btn-soft-primary" />
+							<button
+								iconSclass="fa-duotone fa-solid fa-globe"
+								label="Check EU DB Status"
+								onClick="@command('checkEUDatabaseStatus')"
+								class="btn btn-sm btn-soft-info" />
+						</div>
+					</div>
+					<div class="card-body">
+						<grid model="@load(vm.registrations)" emptyMessage="No registration records yet">
+							<columns sizable="true">
+								<column label="ID" width="8%" />
+								<column label="System Name" width="35%" />
+								<column label="Entity Type" width="15%" />
+								<column label="Prepared At" width="20%" />
+								<column label="Status" width="12%" />
+								<column label="Actions" width="10%" />
+							</columns>
+							<template name="model" var="reg">
+								<row>
+									<label value="@load(reg.id)" />
+									<label value="@load(reg.system_name)" />
+									<label value="@load(reg.entity_type)" />
+									<label value="@load(reg.prepared_at)" />
+									<label value="@load(reg.status)" 
+										sclass="@load(reg.status eq 'REGISTERED' ? 'badge bg-success' : 'badge bg-warning')" />
+									<hbox>
+										<button
+											iconSclass="fa-duotone fa-solid fa-upload"
+											tooltiptext="Prepare Registration"
+											onClick="@command('prepareRegistration', systemId=reg.id)"
+											class="btn btn-sm btn-soft-primary"
+											visible="@load(reg.status eq 'PENDING')" />
+									</hbox>
+								</row>
+							</template>
+						</grid>
+					</div>
+				</div>
+			</div>
+
+			<!-- Información -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:div class="alert alert-info mb-0">
+							<h:h5><h:i class="fa-duotone fa-solid fa-circle-info me-2"></h:i>EU Database Registration (Art. 51)</h:h5>
+							<h:p class="mb-2">
+								El EU AI Act requiere que sistemas de IA de alto riesgo se registren en una base de datos pública europea antes de su puesta en el mercado.
+							</h:p>
+							<h:p class="mb-0">
+								<strong>Estado actual:</strong> La API oficial está en desarrollo. Este sistema ha preparado los payloads de registro
+								y se integrará automáticamente cuando la API esté disponible (estimado Q2-Q3 2025).
+							</h:p>
+						</h:div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

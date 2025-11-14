@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  bias-detection:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bias-detection-service
+    ports:
+      - "8001:8001"
+    environment:
+      - LOG_LEVEL=INFO
+      - MAX_FILE_SIZE_MB=100
+      - TIMEOUT_SECONDS=30
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance
+    volumes:
+      # Optional: mount local directory for development
+      # - ./main.py:/app/main.py
+      - /tmp/bias-analysis:/tmp/bias-analysis
+    labels:
+      - "service=bias-detection"
+      - "environment=production"
+      - "version=1.0.0"
+
+networks:
+  ai-governance:
+    driver: bridge
+    name: ai-governance-network
+

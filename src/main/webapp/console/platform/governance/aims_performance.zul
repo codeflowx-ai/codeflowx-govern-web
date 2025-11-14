@@ -1,0 +1,108 @@
+<?page title="AIMS Performance" contentType="text/html;charset=UTF-8"?>
+<window width="100%" height="100%" border="normal"
+        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.AIMSPerformanceViewModel')">
+
+    <vlayout hflex="1" vflex="1" spacing="12px">
+        <hlayout spacing="10px">
+            <button label="Registrar métrica" iconSclass="z-icon-plus"
+                    onClick="@command('createMetric')" />
+            <button label="Refrescar" iconSclass="z-icon-refresh"
+                    onClick="@command('refresh')" />
+            <separator orient="vertical"/>
+            <groupbox title="Métricas en objetivo" width="220px">
+                <vlayout align="center">
+                    <label value="@load(vm.onTrackRatio)" style="font-size:26px;font-weight:bold" />
+                    <label value="% ON TRACK" />
+                </vlayout>
+            </groupbox>
+        </hlayout>
+
+        <groupbox title="Nueva métrica" width="100%">
+            <grid hflex="1">
+                <rows>
+                    <row>
+                        <label value="Nombre"/>
+                        <textbox value="@bind(vm.newMetric.apsmetricname)" width="320px" />
+                        <label value="Categoría"/>
+                        <combobox value="@bind(vm.newMetric.apsmetriccategory)" width="200px">
+                            <comboitem label="PERFORMANCE" value="PERFORMANCE"/>
+                            <comboitem label="QUALITY" value="QUALITY"/>
+                            <comboitem label="RISK" value="RISK"/>
+                            <comboitem label="SAFETY" value="SAFETY"/>
+                            <comboitem label="COMPLIANCE" value="COMPLIANCE"/>
+                        </combobox>
+                    </row>
+                    <row>
+                        <label value="Definición"/>
+                        <textbox value="@bind(vm.newMetric.apsmetricdefinition)" multiline="true" rows="3" hflex="1"/>
+                    </row>
+                    <row>
+                        <label value="Valor"/>
+                        <doublebox value="@bind(vm.newMetric.apsmetricvalue)" width="120px" />
+                        <label value="Objetivo"/>
+                        <doublebox value="@bind(vm.newMetric.apstargetvalue)" width="120px" />
+                        <label value="Estado"/>
+                        <combobox value="@bind(vm.newMetric.apsstatus)" width="180px">
+                            <comboitem label="ON_TRACK" value="ON_TRACK"/>
+                            <comboitem label="DEVIATION" value="DEVIATION"/>
+                            <comboitem label="CRITICAL" value="CRITICAL"/>
+                        </combobox>
+                    </row>
+                    <row>
+                        <label value="Fuente de datos"/>
+                        <textbox value="@bind(vm.newMetric.apsdatasource)" width="320px" />
+                        <label value="Periodo"/>
+                        <hlayout>
+                            <datebox value="@bind(vm.newMetric.apsperiodstart)" format="dd/MM/yyyy" width="140px"/>
+                            <label value="-" />
+                            <datebox value="@bind(vm.newMetric.apsperiodend)" format="dd/MM/yyyy" width="140px"/>
+                        </hlayout>
+                    </row>
+                    <row>
+                        <label value="Notas"/>
+                        <textbox value="@bind(vm.newMetric.apsnotes)" rows="3" multiline="true" hflex="1"/>
+                    </row>
+                </rows>
+            </grid>
+        </groupbox>
+
+        <listbox model="@load(vm.metrics)" selectedItem="@bind(vm.selectedMetric)" vflex="1" hflex="1"
+                 emptyMessage="No hay métricas registradas" mold="paging">
+            <listhead>
+                <listheader label="Nombre" width="220px"/>
+                <listheader label="Categoría" width="120px"/>
+                <listheader label="Valor" width="100px" align="center"/>
+                <listheader label="Objetivo" width="100px" align="center"/>
+                <listheader label="Varianza" width="100px" align="center"/>
+                <listheader label="Estado" width="120px"/>
+                <listheader label="Periodo" width="220px"/>
+                <listheader label="Acciones" width="220px"/>
+            </listhead>
+            <template name="model">
+                <listitem>
+                    <listcell><label value="@load(each.apsmetricname)"/></listcell>
+                    <listcell><label value="@load(each.apsmetriccategory)"/></listcell>
+                    <listcell align="center"><label value="@load(each.apsmetricvalue)"/></listcell>
+                    <listcell align="center"><label value="@load(each.apstargetvalue)"/></listcell>
+                    <listcell align="center"><label value="@load(each.apsvariance)"/></listcell>
+                    <listcell>
+                        <label value="@load(each.apsstatus)"
+                               style="@load(each.apsstatus eq 'ON_TRACK' ? 'color:green;font-weight:bold' : each.apsstatus eq 'DEVIATION' ? 'color:#fbc02d;font-weight:bold' : 'color:#d32f2f;font-weight:bold')"/>
+                    </listcell>
+                    <listcell>
+                        <label value="@load(each.apsperiodstart) @converter('formattedDate', format='dd/MM/yyyy')"/>
+                        <label value="@load(each.apsperiodend) @converter('formattedDate', format='dd/MM/yyyy')"/>
+                    </listcell>
+                    <listcell>
+                        <hlayout spacing="6px">
+                            <button label="Actualizar" sclass="btn-primary"
+                                    onClick="@command('updateMetric', metric=each)"/>
+                            <button label="Eliminar" sclass="btn-danger"
+                                    onClick="@command('deleteMetric', metric=each)"/>
+                        </hlayout>
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </vlayout>
+</window>
