@@ -23,8 +23,12 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.infrastructure.CloudResource;
+import com.codeflowx.govern.service.infrastructure.CloudResourceService;
 import com.codeflowx.govern.entity.views.infrastructure.InfrastructureMetricsSummary;
 import com.codeflowx.govern.entity.views.infrastructure.InfrastructureOverview;
+import com.codeflowx.govern.service.infrastructure.InfrastructureOverviewService;
+import com.codeflowx.govern.service.infrastructure.InfrastructureMetricsSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -45,9 +49,15 @@ public class InfrastructureOverviewViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
-    private BusinessService businessService;
+    private CloudResourceService cloudResourceService;
+
+    @WireVariable
+    private InfrastructureOverviewService infrastructureOverviewService;
+
+    @WireVariable
+    private InfrastructureMetricsSummaryService infrastructureMetricsSummaryService;
 
     @WireVariable
     public Environment environment;
@@ -76,13 +86,13 @@ public class InfrastructureOverviewViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadMetrics();
         loadData();
     }
@@ -92,25 +102,24 @@ public class InfrastructureOverviewViewModel extends MasterPage {
     public void loadData() {
         try {
             log.info("Cargando recursos - Página: {}", pageParams.getPageActual());
-            
+
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllView(
-                InfrastructureOverview.class,
+
+            pageResult = infrastructureOverviewService.findAll(
                 pageParams,
                 criterias
             );
-            
+
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredResources = pageResult.getContent();
                 log.info("Cargados {} recursos", filteredResources.size());
             } else {
                 filteredResources = new ArrayList<>();
             }
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar recursos", e);
-            Messagebox.show("Error al cargar recursos: " + e.getMessage(), 
+            Messagebox.show("Error al cargar recursos: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredResources = new ArrayList<>();
         }
@@ -145,22 +154,22 @@ public class InfrastructureOverviewViewModel extends MasterPage {
     public void loadMetrics() {
         try {
             log.debug("Cargando métricas globales");
-            
-            List<InfrastructureMetricsSummary> metrics = businessService.findAllView(InfrastructureMetricsSummary.class);
-            
+
+            List<InfrastructureMetricsSummary> metrics = infrastructureMetricsSummaryService.findAll();
+
             if (metrics != null && !metrics.isEmpty()) {
                 InfrastructureMetricsSummary summary = metrics.get(0);
-                
+
                 totalResources = summary.getTotalResources() != null ? summary.getTotalResources() : 0L;
                 computeResources = summary.getComputeResources() != null ? summary.getComputeResources() : 0L;
                 healthyResources = summary.getHealthyResources() != null ? summary.getHealthyResources() : 0L;
                 totalClusters = summary.getTotalClusters() != null ? summary.getTotalClusters() : 0L;
                 totalHourlyCost = summary.getTotalHourlyCost() != null ? summary.getTotalHourlyCost() : BigDecimal.ZERO;
-                
-                log.info("Métricas cargadas - Total: {}, Compute: {}, Healthy: {}", 
+
+                log.info("Métricas cargadas - Total: {}, Compute: {}, Healthy: {}",
                     totalResources, computeResources, healthyResources);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas", e);
         }
     }
@@ -236,22 +245,22 @@ public class InfrastructureOverviewViewModel extends MasterPage {
     public void deleteResource(@BindingParam("resourceId") Long resourceId) {
         try {
             Messagebox.show(
-                "¿Está seguro de eliminar este recurso?", 
-                "Confirmar eliminación", 
-                Messagebox.YES | Messagebox.NO, 
+                "¿Está seguro de eliminar este recurso?",
+                "Confirmar eliminación",
+                Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(CloudResource.class, resourceId);
+                            cloudResourceService.deleteById(resourceId);
                             log.info("Recurso eliminado: ID={}", resourceId);
                             loadData();
                             loadMetrics();
-                            Messagebox.show("Recurso eliminado correctamente", 
+                            Messagebox.show("Recurso eliminado correctamente",
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         } catch (Exception e) {
                             log.error("Error al eliminar recurso ID={}", resourceId, e);
-                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                            Messagebox.show("Error al eliminar: " + e.getMessage(),
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }
                     }

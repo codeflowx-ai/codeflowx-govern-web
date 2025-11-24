@@ -31,10 +31,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.infrastructure.CloudResource;
+import com.codeflowx.govern.service.infrastructure.CloudResourceService;
 import com.codeflowx.govern.entity.infrastructure.InfrastructureMetric;
 import com.codeflowx.govern.entity.infrastructure.InfrastructureCost;
 import com.codeflowx.govern.entity.functions.infrastructure.CalculateResourceEfficiency;
 import com.codeflowx.govern.entity.procedures.infrastructure.ExecuteHealthCheck;
+import com.codeflowx.govern.service.infrastructure.InfrastructureCostService;
+import com.codeflowx.govern.service.infrastructure.InfrastructureMetricService;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -70,7 +73,11 @@ public class InfrastructureDetailViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private CloudResourceService cloudResourceService;
+    @WireVariable
+    private InfrastructureMetricService infrastructureMetricService;
+    @WireVariable
+    private InfrastructureCostService infrastructureCostService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -86,9 +93,9 @@ public class InfrastructureDetailViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -169,7 +176,7 @@ public class InfrastructureDetailViewModel extends MasterPage {
         try {
             log.debug("Cargando recurso cloud ID={}", id);
             
-            currentResource = businessService.findById(CloudResource.class, id);
+            currentResource = cloudResourceService.findById(id);
             
             if (currentResource == null) {
                 log.error("Recurso cloud no encontrado: ID={}", id);
@@ -248,10 +255,7 @@ public class InfrastructureDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("infmetricresourceid", currentResource.getIdxcloudresource());
             
-            PageResult<InfrastructureMetric> result = businessService.findAllEntity(
-                InfrastructureMetric.class,
-                params,
-                filters
+            PageResult<InfrastructureMetric> result = infrastructureMetricService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -284,10 +288,7 @@ public class InfrastructureDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("infcostresourceid", currentResource.getIdxcloudresource());
             
-            PageResult<InfrastructureCost> result = businessService.findAllEntity(
-                InfrastructureCost.class,
-                params,
-                filters
+            PageResult<InfrastructureCost> result = infrastructureCostService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -327,14 +328,14 @@ public class InfrastructureDetailViewModel extends MasterPage {
             }
             
             if (currentResource.getIdxcloudresource() == null) {
-                businessService.save(currentResource);
+                currentResource = cloudResourceService.create(currentResource);
                 log.info("Recurso creado exitosamente: ID={}, nombre={}",
                     currentResource.getIdxcloudresource(), currentResource.getInfresname());
                 Messagebox.show("Recurso creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 currentResource.setInfresupdatedat(new Timestamp(System.currentTimeMillis()));
-                businessService.update(currentResource);
+                currentResource = cloudResourceService.update(currentResource);
                 log.info("Recurso actualizado exitosamente: ID={}, nombre={}",
                     currentResource.getIdxcloudresource(), currentResource.getInfresname());
                 Messagebox.show("Recurso actualizado exitosamente",
@@ -433,7 +434,9 @@ public class InfrastructureDetailViewModel extends MasterPage {
             }
             
             // Limpiar BusinessService
-            businessService = null;
+            cloudResourceService = null;
+            infrastructureMetricService = null;
+            infrastructureCostService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

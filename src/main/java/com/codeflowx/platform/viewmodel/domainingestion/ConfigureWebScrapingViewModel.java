@@ -13,6 +13,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.domainingestion.Domain;
 import com.codeflowx.govern.entity.domainingestion.DomainDataSource;
+import com.codeflowx.govern.service.domainingestion.DomainService;
+import com.codeflowx.govern.service.domainingestion.DomainDataSourceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -30,61 +34,71 @@ import lombok.extern.slf4j.Slf4j;
 @Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
 public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapingViewModel> {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
+    @WireVariable
+    private DomainService domainService;
+    @WireVariable
+    private DomainDataSourceService domainDataSourceService;
+
     private Domain selectedDomain;
     private DomainDataSource dataSource = new DomainDataSource();
     private List<Domain> domainsList = new ArrayList<>();
     private List<DomainDataSource> existingSources = new ArrayList<>();
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         dataSource.setDindstype("web");
         dataSource.setDindsenabled(true);
-        
+
         loadDomains();
         loadExistingSources();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadDomains() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dinstatus", "active"));
-            PageResult<Domain> result = businessService.findAllEntity(Domain.class, 
-                PageParams.builder().maxRows(1000).build(), criterias);
+            PageResult<Domain> result = domainService.findAll(PageParams.builder().maxRows(1000).build(), criterias);
             if (result != null && result.getContent() != null) {
                 domainsList = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar dominios", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadExistingSources() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dindstype", "web"));
-            PageResult<DomainDataSource> result = businessService.findAllEntity(DomainDataSource.class, 
+            PageResult<DomainDataSource> result = domainDataSourceService.findAll(
                 PageParams.builder().maxRows(1000).build(), criterias);
             if (result != null && result.getContent() != null) {
                 existingSources = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar fuentes", e);
         }
     }
-    
+
+    @Command
+    @NotifyChange("*")
+    public void saveItem() {
+        saveDataSource();
+    }
+
     @Command
     @NotifyChange("*")
     public void saveDataSource() {
@@ -100,33 +114,39 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
             Messagebox.show("Ingrese una URL", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             dataSource.setDomain(selectedDomain);
             dataSource.setDindstype("web");
-            businessService.save(dataSource);
-            logActivity("CREAR", "DOMAIN_DATA_SOURCE", dataSource.getIdxdatasource(), 
-                "Fuente Web Scraping creada: " + dataSource.getDindsname());
+            DomainDataSource saved = domainDataSourceService.create(dataSource);
+            logActivity("CREAR", "DOMAIN_DATA_SOURCE", saved.getIdxdatasource(),
+                "Fuente Web Scraping creada: " + saved.getDindsname());
             Messagebox.show("Fuente Web Scraping creada exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            
+
             dataSource = new DomainDataSource();
             dataSource.setDindstype("web");
             dataSource.setDindsenabled(true);
             selectedDomain = null;
             loadExistingSources();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     public void editSource(@BindingParam("source") DomainDataSource source) {
         selectedDomain = source.getDomain();
         dataSource = source;
         logActivity("EDITAR", "DOMAIN_DATA_SOURCE", source.getIdxdatasource(), "Edición: " + source.getDindsname());
     }
-    
+
+    @Command
+    @NotifyChange("*")
+    public void deleteItem(@BindingParam("source") DomainDataSource source) {
+        deleteSource(source);
+    }
+
     @Command
     @NotifyChange("*")
     public void deleteSource(@BindingParam("source") DomainDataSource source) {
@@ -135,19 +155,19 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(source);
-                        logActivity("ELIMINAR", "DOMAIN_DATA_SOURCE", source.getIdxdatasource(), 
+                        domainDataSourceService.deleteById(source.getIdxdatasource());
+                        logActivity("ELIMINAR", "DOMAIN_DATA_SOURCE", source.getIdxdatasource(),
                             "Fuente eliminada: " + source.getDindsname());
                         loadExistingSources();
                         Messagebox.show("Fuente eliminada", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al eliminar", e);
                         Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     @Command
     public void cancel() {
         dataSource = new DomainDataSource();
@@ -155,7 +175,7 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
         dataSource.setDindsenabled(true);
         selectedDomain = null;
     }
-    
+
     public String translateStatus(String status) {
         if (status == null) return "N/A";
         switch (status) {
@@ -165,7 +185,7 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
             default: return status;
         }
     }
-    
+
     public String getStatusBadge(String status) {
         if (status == null) return "badge bg-secondary";
         switch (status) {
@@ -175,7 +195,7 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
             default: return "badge bg-secondary";
         }
     }
-    
+
     @Destroy
     public void destroy() {
         if (domainsList != null) {
@@ -188,7 +208,7 @@ public class ConfigureWebScrapingViewModel extends BaseFront<ConfigureWebScrapin
         }
         dataSource = null;
         selectedDomain = null;
-        businessService = null;
+        domainService = null;
+        domainDataSourceService = null;
     }
 }
-

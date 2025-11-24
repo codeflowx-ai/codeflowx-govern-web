@@ -1,0 +1,160 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<idspace id="webscrapingDetail"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.datasources.DataSourceWebscrapingViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-spider label-icon align-middle fs-16 me-2"></h:i>
+						<label value="Gestión de Web Scraping" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Configurar web scraping de fuentes de datos" />
+					</h:p>
+				</h:div>
+			</h:div>
+
+			<h:div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1">
+								<h:h5 class="mb-0">
+									<label value="Nueva Configuración de Web Scraping" />
+								</h:h5>
+							</h:div>
+							<h:div class="flex-shrink-0">
+								<h:div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light btn btn-sm btn-primary"
+										onClick="@command('createWebscrapingDataSource')"
+										tooltiptext="Nueva Configuración">
+										<h:i class="fa-duotone fa-solid fa-plus me-1"></h:i>
+										<label value="Nueva" />
+									</a>
+									<a class="waves-effect waves-light btn btn-sm btn-success"
+										onClick="@command('saveWebscrapingDataSource')"
+										tooltiptext="Guardar">
+										<h:i class="fa-duotone fa-solid fa-save me-1"></h:i>
+										<label value="Guardar" />
+									</a>
+									<a class="waves-effect waves-light btn btn-sm btn-info"
+										onClick="@command('testWebscraping')"
+										tooltiptext="Probar">
+										<h:i class="fa-duotone fa-solid fa-vial me-1"></h:i>
+										<label value="Probar" />
+									</a>
+									<a class="waves-effect waves-light btn btn-sm btn-secondary"
+										onClick="@command('cancelWebscrapingConfig')"
+										tooltiptext="Cancelar">
+										<h:i class="fa-duotone fa-solid fa-times me-1"></h:i>
+										<label value="Cancelar" />
+									</a>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="card-body">
+						<h:div class="row">
+							<h:div class="col-lg-8">
+								<h:div class="card default shadow-sm mb-3">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-info-circle me-2"></h:i>
+											<label value="Configuración de Web Scraping" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Nombre *" /></h:label>
+												<textbox value="@bind(vm.wsName)" class="form-control" />
+											</h:div>
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Estado" /></h:label>
+												<combobox value="@bind(vm.wsStatus)" class="form-control">
+													<comboitem label="ACTIVE" value="ACTIVE" />
+													<comboitem label="INACTIVE" value="INACTIVE" />
+													<comboitem label="RUNNING" value="RUNNING" />
+													<comboitem label="ERROR" value="ERROR" />
+												</combobox>
+											</h:div>
+										</h:div>
+										<h:div class="row mb-3">
+											<h:div class="col-md-12">
+												<h:label class="form-label"><label value="URL *" /></h:label>
+												<textbox value="@bind(vm.wsUrl)" class="form-control" placeholder="https://example.com" />
+											</h:div>
+										</h:div>
+										<h:div class="row mb-3">
+											<h:div class="col-md-12">
+												<h:label class="form-label"><label value="Descripción" /></h:label>
+												<textbox value="@bind(vm.wsDescription)" class="form-control" multiline="true" rows="2" />
+											</h:div>
+										</h:div>
+										<h:div class="row mb-3">
+											<h:div class="col-md-12">
+												<h:label class="form-label"><label value="Cron Schedule" /></h:label>
+												<textbox value="@bind(vm.wsCronSchedule)" class="form-control" placeholder="0 0 * * *" />
+											</h:div>
+										</h:div>
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Title Selector" /></h:label>
+												<textbox value="@bind(vm.titleSelector)" class="form-control" placeholder="h1.title" />
+											</h:div>
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Content Selector" /></h:label>
+												<textbox value="@bind(vm.contentSelector)" class="form-control" placeholder="div.content" />
+											</h:div>
+										</h:div>
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Link Selector" /></h:label>
+												<textbox value="@bind(vm.linkSelector)" class="form-control" placeholder="a.link" />
+											</h:div>
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Date Selector" /></h:label>
+												<textbox value="@bind(vm.dateSelector)" class="form-control" placeholder="span.date" />
+											</h:div>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+							<h:div class="col-lg-4">
+								<h:div class="card default shadow-sm">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-list me-2"></h:i>
+											<label value="Configuraciones de Web Scraping" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<grid model="@load(vm.webscrapingList)" style="overflow:auto; max-height: 500px;">
+											<columns>
+												<column label="Nombre" width="100%" />
+											</columns>
+											<template name="model" var="ws">
+												<row onClick="@command('editWebscrapingSource', ws=ws)" style="cursor:pointer;">
+													<label value="@load(ws.wsname)" />
+												</row>
+											</template>
+										</grid>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

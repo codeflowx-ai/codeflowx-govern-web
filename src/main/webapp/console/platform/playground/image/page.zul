@@ -1,10 +1,10 @@
 <?page title="Image Generation - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
-    
+
     <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundImageViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
-        
+
         <!-- Header -->
         <n:div class="card border-0 shadow-sm mb-4">
             <n:div class="card-body p-4">
@@ -15,7 +15,7 @@
                         </n:h4>
                         <n:p class="text-muted mb-0">Crea imágenes únicas a partir de descripciones textuales</n:p>
                     </n:div>
-                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus"
                             sclass="btn btn-success"
                             onClick="@command('newSession')"/>
                 </n:div>
@@ -35,7 +35,7 @@
                         <!-- Model Selection -->
                         <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Modelo</label>
-                            <combobox placeholder="Seleccionar modelo..." 
+                            <combobox placeholder="Seleccionar modelo..."
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedModel)"
                                      sclass="form-control"/>
@@ -68,7 +68,7 @@
                         <!-- Style -->
                         <n:div class="mb-3">
                             <label class="form-label small fw-semibold">Estilo (Opcional)</label>
-                            <textbox value="@bind(vm.style)" 
+                            <textbox value="@bind(vm.style)"
                                     sclass="form-control"
                                     placeholder="ej: realistic, cartoon"/>
                         </n:div>
@@ -92,19 +92,19 @@
                 <n:div class="card border-0 shadow-sm mb-4">
                     <n:div class="card-body p-4">
                         <label class="form-label fw-semibold">Prompt</label>
-                        <textbox multiline="true" rows="3" 
+                        <textbox multiline="true" rows="3"
                                 value="@bind(vm.prompt)"
                                 sclass="form-control mb-3"
                                 placeholder="Describe la imagen que quieres generar en detalle..."/>
-                        
+
                         <label class="form-label fw-semibold">Negative Prompt (Opcional)</label>
-                        <textbox multiline="true" rows="2" 
+                        <textbox multiline="true" rows="2"
                                 value="@bind(vm.negativePrompt)"
                                 sclass="form-control mb-3"
                                 placeholder="Elementos que no quieres en la imagen..."/>
-                        
+
                         <n:div class="d-flex justify-content-end">
-                            <button label="Generar Imagen" iconSclass="fas fa-magic" 
+                            <button label="Generar Imagen" iconSclass="fas fa-magic"
                                     sclass="btn btn-success btn-lg"
                                     disabled="@load(empty vm.prompt)"
                                     onClick="@command('generateImage')"/>
@@ -124,11 +124,11 @@
                             <n:i class="fas fa-image fa-3x mb-3 opacity-25"></n:i>
                             <n:p>No hay imágenes generadas aún</n:p>
                         </n:div>
-                        
+
                         <n:div class="row g-4">
                             <n:div forEach="${vm.generatedImages}" class="col-md-4">
                                 <n:div class="card border-0 shadow-sm h-100">
-                                    <n:img src="${each.imageurl}" class="card-img-top" 
+                                    <n:img src="${each.imageurl}" class="card-img-top"
                                            style="height: 250px; object-fit: cover;" alt="Generated image"/>
                                     <n:div class="card-body p-3">
                                         <n:p class="small text-muted mb-2">${each.imageprompt}</n:p>
@@ -140,11 +140,11 @@
                                                         onClick="@command('downloadImage', image=each)"/>
                                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                                         sclass="btn btn-sm btn-outline-danger"
-                                                        onClick="@command('deleteItem', image=each)"/>
+                                                        onClick="@command('deleteImage', image=each)"/>
                                             </n:div>
                                         </n:div>
                                         <n:p class="mb-0 mt-2 text-muted" style="font-size: 0.75rem;">
-                                            <label value="@load(each.imagegenerationtime)"/>ms · 
+                                            <label value="@load(each.imagegenerationtime)"/>ms ·
                                             $<label value="@load(each.imagecost) @converter('formattedNumber', format='0.0000')"/>
                                         </n:p>
                                     </n:div>

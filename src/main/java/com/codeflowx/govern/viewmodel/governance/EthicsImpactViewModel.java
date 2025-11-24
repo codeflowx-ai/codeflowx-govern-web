@@ -30,7 +30,9 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.service.models.ModelService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -56,15 +58,18 @@ public class EthicsImpactViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private ModelService modelService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -101,19 +106,13 @@ public class EthicsImpactViewModel extends MasterPage {
     
     private void loadData() {
         try {
-            PageResult<ComplianceAssessment> result1 = businessService.findAllEntity(
-                ComplianceAssessment.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<ComplianceAssessment> result1 = complianceAssessmentService.findAll(pageParams, new Criterias()
             );
             if (result1 != null && result1.getContent() != null) {
                 assessmentsList = result1.getContent();
             }
             
-            PageResult<Model> result2 = businessService.findAllEntity(
-                Model.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<Model> result2 = modelService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 modelsList = result2.getContent();
@@ -161,10 +160,7 @@ public class EthicsImpactViewModel extends MasterPage {
             criteria.setValueEnd(status);
             criterias.addCriteria(criteria);
             
-            PageResult<ComplianceAssessment> result = businessService.findAllEntity(
-                ComplianceAssessment.class, 
-                pageParams, 
-                criterias
+            PageResult<ComplianceAssessment> result = complianceAssessmentService.findAll(pageParams, criterias
             );
             if (result != null && result.getContent() != null) {
                 assessmentsList = result.getContent();
@@ -185,7 +181,8 @@ public class EthicsImpactViewModel extends MasterPage {
             modelsList.clear(); 
             modelsList = null; 
         }
-        businessService = null;
+        complianceAssessmentService = null;
+            modelService = null;
     }
 }
 

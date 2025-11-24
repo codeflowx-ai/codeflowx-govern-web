@@ -28,9 +28,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.agents.Agent;
 import com.codeflowx.govern.entity.prompts.Prompt;
 import com.codeflowx.govern.entity.rag.RagSystem;
+import com.codeflowx.govern.service.prompts.PromptService;
+import com.codeflowx.govern.service.agents.AgentService;
+import com.codeflowx.govern.service.rag.RagSystemService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -56,15 +60,22 @@ public class CatalogDashboardViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private ModelService modelService;
+    @WireVariable
+    private RagSystemService ragSystemService;
+    @WireVariable
+    private AgentService agentService;
+    @WireVariable
+    private PromptService promptService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -214,7 +225,10 @@ public class CatalogDashboardViewModel extends MasterPage {
         if (agentsList != null) { agentsList.clear(); agentsList = null; }
         if (promptsList != null) { promptsList.clear(); promptsList = null; }
         if (ragSystemsList != null) { ragSystemsList.clear(); ragSystemsList = null; }
-        businessService = null;
+        ragSystemService = null;
+            modelService = null;
+            agentService = null;
+            promptService = null;
     }
 }
 

@@ -6,7 +6,7 @@
     xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
     <!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
     <idspace
-        viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.monitoring.AuditLogOverviewViewModel')"
+        viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.monitoring.AuditLogOverviewViewModel')"
         validationMessages="@id('vmsgs')">
 
         <h:div class="row" style="background-color:;">
@@ -21,7 +21,7 @@
                     </h:p>
                 </h:div>
             </h:div>
-            
+
             <h:div class="col-lg-12 s-bot">
                 <h:div class="card">
                     <h:div class="card-header">
@@ -38,26 +38,22 @@
                     </h:div>
                 </h:div>
             </h:div>
-            
+
             <h:div class="section filters">
                 <h:div class="search-bar">
                     <!-- Búsqueda por texto -->
                     <textbox value="@bind(vm.searchTerm)"
                         placeholder="Buscar..."
                         class="form-control" onOK="@command('applyFilters')" />
-                    
-                    <!-- Filtro por E N T I T Y T Y P E -->
+
+                    <!-- Filtro por Status -->
                     <combobox
-                        placeholder="Filtrar por E N T I T Y T Y P E"
-                        selectedItem="@bind(vm.entitytypeFilter)"
+                        placeholder="Filtrar por Status"
+                        selectedItem="@bind(vm.statusFilter)"
                         onChange="@command('applyFilters')">
                         <comboitem label="TODOS" value="ALL" />
-                        <comboitem label="LLM" value="LLM" />
-                        <comboitem label="VISION" value="VISION" />
-                        <comboitem label="AUDIO" value="AUDIO" />
-                        <comboitem label="EMBEDDING" value="EMBEDDING" />
                     </combobox>
-                    
+
                 </h:div>
                 <h:div class="filter-icons">
                     <a tooltiptext="Buscar"
@@ -68,13 +64,13 @@
                         onClick="@command('clearFilters')" />
                 </h:div>
             </h:div>
-            
+
             <h:div class="col-xxl-12 s-bot">
                 <h:div class="card">
                     <h:div class="card-body">
                         <h:div id="divTemplate" sclass="col-lg-12">
                             <!-- listado -->
-                            <grid model="@load(vm.filteredAuditLogs)" style="overflow:auto;">
+                            <grid model="@load(vm.filteredItems)" style="overflow:auto;">
                                 <columns sizable="true" columnsgroup="false" columnshide="false">
                                     <column
                                         label="I D X A U D I T L O G" align="center"
@@ -126,11 +122,11 @@
                                         </cell>
                                     </row>
                                 </template>
-                                
+
                                 <foot>
                                     <footer span="3" align="right">
                                         <paging id="topagin"
-                                            pageSize="@load(vm.pageParams.maxRows)" 
+                                            pageSize="@load(vm.pageParams.maxRows)"
                                             totalSize="@load(vm.pageResult.totalRows)"
                                             activePage="@load(vm.pageParams.pageActual - 1)"
                                             onPaging="@command('onPaging', event=event)"

@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.dashboard.CostMetrics;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.dashboard.CostMetricsService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,93 +55,96 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class CostMetricsDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private CostMetricsService costMetricsService;
+
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxcostmetric;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private CostMetrics currentCostMetrics;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
-    
+
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableDshcosttypes = new ArrayList<>();
     private List<String> availableDshperiods = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxcostmetric = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando CostMetricsDetailViewModel - mode: {}, idxcostmetric: {}", mode, idxcostmetric);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxcostmetric != null) {
@@ -148,13 +153,13 @@ public class CostMetricsDetailViewModel extends MasterPage {
             log.error("Modo inválido o falta idxcostmetric");
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("plataforma/dashboard/dashboard-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/dashboard/cost-metrics-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
-        unique = new UniqueValidator(currentCostMetrics, businessService);
+        unique = new UniqueValidator(currentCostMetrics, businessService); // Mantener businessService para validador
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentCostMetrics = new CostMetrics();
@@ -163,94 +168,94 @@ public class CostMetricsDetailViewModel extends MasterPage {
         loadDshcosttypes();
         loadDshperiods();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
-            // findById siempre recibe Long id (el PK)
-            currentCostMetrics = businessService.findById(CostMetrics.class, id);
-            
+
+            // findById usando servicio dedicado
+            currentCostMetrics = costMetricsService.findById(id);
+
             if (currentCostMetrics == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
-                appendPage("plataforma/dashboard/dashboard-overview.zul", page.getFellow(IDDESKTOP), params);
+                appendPage("plataforma/dashboard/cost-metrics-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentCostMetrics.getIdxcostmetric();
         loadDshcosttypes();
         loadDshperiods();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "DSHCOSTMETRICS", id, "Consulta: " + currentCostMetrics.getIdxcostmetric());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("plataforma/dashboard/dashboard-overview.zul", page.getFellow(IDDESKTOP), params);
+            appendPage("plataforma/dashboard/cost-metrics-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentCostMetrics.getIdxcostmetric() == null;
-            
+
             if (isNew) {
-                businessService.save(currentCostMetrics);
+                currentCostMetrics = costMetricsService.create(currentCostMetrics);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "DSHCOSTMETRICS", currentCostMetrics.getIdxcostmetric(), 
+                logActivity("CREACION", "DSHCOSTMETRICS", currentCostMetrics.getIdxcostmetric(),
                     "Creado: " + currentCostMetrics.getIdxcostmetric());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentCostMetrics);
+                currentCostMetrics = costMetricsService.update(currentCostMetrics);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "DSHCOSTMETRICS", currentCostMetrics.getIdxcostmetric(), 
+                logActivity("EDICION", "DSHCOSTMETRICS", currentCostMetrics.getIdxcostmetric(),
                     "Actualizado: " + currentCostMetrics.getIdxcostmetric());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
-            appendPage("plataforma/dashboard/dashboard-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+            appendPage("plataforma/dashboard/cost-metrics-overview.zul", page.getFellow(IDDESKTOP), params);
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentCostMetrics.getDshcosttype() == null || currentCostMetrics.getDshcosttype().trim().isEmpty()) {
             errors.append("- Dshcosttype\n");
         }
@@ -263,16 +268,16 @@ public class CostMetricsDetailViewModel extends MasterPage {
         if (currentCostMetrics.getDshupdatedat() == null) {
             errors.append("- Dshupdatedat\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -281,21 +286,21 @@ public class CostMetricsDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/dashboard/dashboard-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadDshcosttypes() {
         // TODO: Cargar valores desde configuración o BD
         availableDshcosttypes.add("OPTION_1");
         availableDshcosttypes.add("OPTION_2");
         availableDshcosttypes.add("OPTION_3");
     }
-    
+
     private void loadDshperiods() {
         // TODO: Cargar valores desde configuración o BD
         availableDshperiods.add("OPTION_1");
         availableDshperiods.add("OPTION_2");
         availableDshperiods.add("OPTION_3");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -321,7 +326,7 @@ public class CostMetricsDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -329,13 +334,13 @@ public class CostMetricsDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentCostMetrics = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableDshcosttypes != null) {
                 availableDshcosttypes.clear();
@@ -345,17 +350,17 @@ public class CostMetricsDetailViewModel extends MasterPage {
                 availableDshperiods.clear();
                 availableDshperiods = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

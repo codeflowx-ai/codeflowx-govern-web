@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentTool;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentToolService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentToolDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentToolService agentToolService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -179,7 +184,7 @@ public class AgentToolDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentTool = businessService.findById(AgentTool.class, id);
+            currentAgentTool = agentToolService.findById(id);
             
             if (currentAgentTool == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -231,14 +236,14 @@ public class AgentToolDetailViewModel extends MasterPage {
             boolean isNew = currentAgentTool.getIdxagenttool() == null;
             
             if (isNew) {
-                businessService.save(currentAgentTool);
+                currentAgentTool = agentToolService.create(currentAgentTool);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTTOOLS", currentAgentTool.getIdxagenttool(), 
                     "Creado: " + currentAgentTool.getAgttoolname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentTool);
+                currentAgentTool = agentToolService.update(currentAgentTool);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTTOOLS", currentAgentTool.getIdxagenttool(), 
                     "Actualizado: " + currentAgentTool.getAgttoolname());

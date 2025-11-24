@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.agents.AgentBiasDetection;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.agents.AgentBiasDetectionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class AgentBiasDetectionDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentBiasDetectionService agentBiasDetectionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -178,7 +183,7 @@ public class AgentBiasDetectionDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentBiasDetection = businessService.findById(AgentBiasDetection.class, id);
+            currentAgentBiasDetection = agentBiasDetectionService.findById(id);
             
             if (currentAgentBiasDetection == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -205,8 +210,15 @@ public class AgentBiasDetectionDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "AGTAGENTBIASDETECTIONS", id, "Consulta: " + currentAgentBiasDetection.getAgtdescription());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -229,14 +241,14 @@ public class AgentBiasDetectionDetailViewModel extends MasterPage {
             boolean isNew = currentAgentBiasDetection.getIdxagentbiasdetection() == null;
             
             if (isNew) {
-                businessService.save(currentAgentBiasDetection);
+                currentAgentBiasDetection = agentBiasDetectionService.create(currentAgentBiasDetection);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTBIASDETECTIONS", currentAgentBiasDetection.getIdxagentbiasdetection(), 
                     "Creado: " + currentAgentBiasDetection.getAgtdescription());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentBiasDetection);
+                currentAgentBiasDetection = agentBiasDetectionService.update(currentAgentBiasDetection);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTBIASDETECTIONS", currentAgentBiasDetection.getIdxagentbiasdetection(), 
                     "Actualizado: " + currentAgentBiasDetection.getAgtdescription());
@@ -249,8 +261,12 @@ public class AgentBiasDetectionDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }

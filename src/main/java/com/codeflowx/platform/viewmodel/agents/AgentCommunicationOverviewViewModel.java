@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentCommunication;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentCommunicationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentCommunicationService agentCommunicationService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -129,10 +134,7 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentCommunication.class,
-                pageParams,
-                criterias
+            pageResult = agentCommunicationService.findAll(pageParams, criterias
             );
             
             if (pageResult != null && pageResult.getContent() != null) {
@@ -271,7 +273,7 @@ public class AgentCommunicationOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentCommunication.class, itemId);
+                            agentCommunicationService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTCOMMUNICATIONS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();

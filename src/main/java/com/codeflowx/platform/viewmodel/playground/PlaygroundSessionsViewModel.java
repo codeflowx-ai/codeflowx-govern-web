@@ -12,9 +12,12 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import codeflowx.nocode.persist.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 @Getter
@@ -23,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 @VariableResolver(DelegatingVariableResolver.class)
 public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsViewModel> {
     private static final long serialVersionUID = 1L;
+    
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
     
     @Override
     public void setBeans(Object bean) {}
@@ -57,7 +63,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
     @NotifyChange("*")
     public void loadSessions() {
         try {
-            pageResult = businessService.findAllEntity(PlaygroundSession.class, pageParams, new Criterias());
+            pageResult = playgroundSessionService.findAll(pageParams, new Criterias());
             if (pageResult != null && pageResult.getContent() != null) {
                 sessionsList = pageResult.getContent();
                 
@@ -65,7 +71,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
                 logActivity("BUSCAR", "PLAYGROUNDSESSIONS", null, 
                     "Búsqueda: " + sessionsList.size() + " sesiones");
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar sesiones", e);
         }
     }
@@ -150,7 +156,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(session);
+                        playgroundSessionService.deleteById(session.getIdxplaygroundsession());
                         
                         // Auditar eliminación
                         logActivity("ELIMINAR", "PLAYGROUNDSESSIONS", session.getIdxplaygroundsession(), 
@@ -158,7 +164,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
                         
                         loadSessions();
                         loadMetrics();
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al eliminar sesión", e);
                     }
                 }

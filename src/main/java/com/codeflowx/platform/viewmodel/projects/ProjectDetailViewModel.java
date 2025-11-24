@@ -33,6 +33,11 @@ import com.codeflowx.govern.entity.projects.Project;
 import com.codeflowx.govern.entity.projects.ProjectArtifact;
 import com.codeflowx.govern.entity.projects.ProjectMember;
 import com.codeflowx.govern.entity.projects.ProjectTechnology;
+import com.codeflowx.govern.service.projects.ProjectService;
+import com.codeflowx.govern.service.projects.ProjectArtifactService;
+import com.codeflowx.govern.service.projects.ProjectMemberService;
+import com.codeflowx.govern.service.projects.ProjectTechnologyService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -56,61 +61,74 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class ProjectDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    @WireVariable
+    private ProjectService projectService;
+
+    @WireVariable
+    private ProjectArtifactService projectArtifactService;
+
+    @WireVariable
+    private ProjectMemberService projectMemberService;
+
+    @WireVariable
+    private ProjectTechnologyService projectTechnologyService;
+
+    @WireVariable
+    private BusinessService businessService; // Mantener para auditoría (Ssoractividad) y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxproject;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Project currentProject;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalName = null;
     private String originalProjectcode = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableProjecttypes = new ArrayList<>();
     private List<String> availableStatuss = new ArrayList<>();
     private List<String> availablePrioritys = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<ProjectArtifact> subgovprojectartifacts = new ArrayList<>();
     private List<ProjectMember> subgovprojectmembers = new ArrayList<>();
@@ -118,40 +136,40 @@ public class ProjectDetailViewModel extends MasterPage {
     private boolean subgovprojectartifactsLoaded = false;
     private boolean subgovprojectmembersLoaded = false;
     private boolean subprjprojecttechnologiesLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxproject = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ProjectDetailViewModel - mode: {}, idxproject: {}", mode, idxproject);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxproject != null) {
@@ -162,11 +180,11 @@ public class ProjectDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentProject, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentProject = new Project();
@@ -176,40 +194,40 @@ public class ProjectDetailViewModel extends MasterPage {
         loadStatuss();
         loadPrioritys();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentProject = businessService.findById(Project.class, id);
-            
+            currentProject = projectService.findById(id);
+
             if (currentProject == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentProject.getName();
         loadProjecttypes();
         loadStatuss();
         loadPrioritys();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalName = currentProject.getName();
             originalProjectcode = currentProject.getProjectcode();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "PRJPROJECTS", id, "Consulta: " + currentProject.getName());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -218,55 +236,55 @@ public class ProjectDetailViewModel extends MasterPage {
             appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentProject.getIdxproject() == null;
-            
+
             if (isNew) {
-                businessService.save(currentProject);
+                currentProject = projectService.create(currentProject);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "PRJPROJECTS", currentProject.getIdxproject(), 
+                logActivity("CREACION", "PRJPROJECTS", currentProject.getIdxproject(),
                     "Creado: " + currentProject.getName());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentProject);
+                currentProject = projectService.update(currentProject);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "PRJPROJECTS", currentProject.getIdxproject(), 
+                logActivity("EDICION", "PRJPROJECTS", currentProject.getIdxproject(),
                     "Actualizado: " + currentProject.getName());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentProject.getName() == null || currentProject.getName().trim().isEmpty()) {
             errors.append("- Name\n");
         }
@@ -291,16 +309,16 @@ public class ProjectDetailViewModel extends MasterPage {
         if (currentProject.getUpdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -309,28 +327,28 @@ public class ProjectDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadProjecttypes() {
         // TODO: Cargar valores desde configuración o BD
         availableProjecttypes.add("OPTION_1");
         availableProjecttypes.add("OPTION_2");
         availableProjecttypes.add("OPTION_3");
     }
-    
+
     private void loadStatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableStatuss.add("OPTION_1");
         availableStatuss.add("OPTION_2");
         availableStatuss.add("OPTION_3");
     }
-    
+
     private void loadPrioritys() {
         // TODO: Cargar valores desde configuración o BD
         availablePrioritys.add("OPTION_1");
         availablePrioritys.add("OPTION_2");
         availablePrioritys.add("OPTION_3");
     }
-    
+
     private void loadSubgovprojectartifacts() {
         try {
             if (currentProject != null && currentProject.getIdxproject() != null) {
@@ -338,25 +356,25 @@ public class ProjectDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "project");
                 criteria.setValues(new Object[]{currentProject.getIdxproject()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ProjectArtifact> result = businessService.findAllEntity(ProjectArtifact.class, collectionParams, criterias);
+
+                PageResult<ProjectArtifact> result = projectArtifactService.findAll(collectionParams, criterias);
                 subgovprojectartifacts = result != null ? result.getContent() : new ArrayList<>();
                 subgovprojectartifactsLoaded = true;
                 log.debug("Cargados {} subgovprojectartifacts", subgovprojectartifacts.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovprojectartifacts", e);
             subgovprojectartifacts = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovprojectmembers() {
         try {
             if (currentProject != null && currentProject.getIdxproject() != null) {
@@ -364,25 +382,25 @@ public class ProjectDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "project");
                 criteria.setValues(new Object[]{currentProject.getIdxproject()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ProjectMember> result = businessService.findAllEntity(ProjectMember.class, collectionParams, criterias);
+
+                PageResult<ProjectMember> result = projectMemberService.findAll(collectionParams, criterias);
                 subgovprojectmembers = result != null ? result.getContent() : new ArrayList<>();
                 subgovprojectmembersLoaded = true;
                 log.debug("Cargados {} subgovprojectmembers", subgovprojectmembers.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovprojectmembers", e);
             subgovprojectmembers = new ArrayList<>();
         }
     }
-    
+
     private void loadSubprjprojecttechnologies() {
         try {
             if (currentProject != null && currentProject.getIdxproject() != null) {
@@ -390,25 +408,25 @@ public class ProjectDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "project");
                 criteria.setValues(new Object[]{currentProject.getIdxproject()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ProjectTechnology> result = businessService.findAllEntity(ProjectTechnology.class, collectionParams, criterias);
+
+                PageResult<ProjectTechnology> result = projectTechnologyService.findAll(collectionParams, criterias);
                 subprjprojecttechnologies = result != null ? result.getContent() : new ArrayList<>();
                 subprjprojecttechnologiesLoaded = true;
                 log.debug("Cargados {} subprjprojecttechnologies", subprjprojecttechnologies.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subprjprojecttechnologies", e);
             subprjprojecttechnologies = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovprojectartifacts")
     public void onSelectSubgovprojectartifactsTab() {
@@ -416,7 +434,7 @@ public class ProjectDetailViewModel extends MasterPage {
             loadSubgovprojectartifacts();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovprojectmembers")
     public void onSelectSubgovprojectmembersTab() {
@@ -424,7 +442,7 @@ public class ProjectDetailViewModel extends MasterPage {
             loadSubgovprojectmembers();
         }
     }
-    
+
     @Command
     @NotifyChange("subprjprojecttechnologies")
     public void onSelectSubprjprojecttechnologiesTab() {
@@ -432,7 +450,7 @@ public class ProjectDetailViewModel extends MasterPage {
             loadSubprjprojecttechnologies();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -458,7 +476,7 @@ public class ProjectDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -466,13 +484,13 @@ public class ProjectDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentProject = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableProjecttypes != null) {
                 availableProjecttypes.clear();
@@ -486,7 +504,7 @@ public class ProjectDetailViewModel extends MasterPage {
                 availablePrioritys.clear();
                 availablePrioritys = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subgovprojectartifacts != null) {
                 subgovprojectartifacts.clear();
@@ -503,15 +521,15 @@ public class ProjectDetailViewModel extends MasterPage {
                 subprjprojecttechnologies = null;
             }
             subprjprojecttechnologiesLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

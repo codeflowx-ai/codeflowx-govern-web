@@ -1,0 +1,187 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.evaluation.rag.RAGEvaluationOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-clipboard-check me-2"></h:i>
+						<label value="Evaluaciones RAG" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de evaluaciones de sistemas RAG" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1"></div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
+										class="waves-effect waves-light"
+										onClick="@command('createEvaluation')"
+										label="Nueva Evaluación">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot">
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Evaluaciones</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.totalEvaluations)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Score Promedio</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.averageScore)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Riesgo Alto</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.highRiskEvaluations)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Riesgo Crítico</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.criticalRiskEvaluations)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="Buscar por query o ID..."
+						class="form-control" onOK="@command('applyFilters')" />
+					<combobox placeholder="Nivel de Riesgo"
+						selectedItem="@bind(vm.selectedRiskLevel)"
+						onChange="@command('applyFilters')">
+						<template name="model" var="option">
+							<comboitem label="@load(option.label)" value="@load(option.value)" />
+						</template>
+						<comboitem label="Todos" value="" />
+						<comboitem label="Bajo" value="LOW" />
+						<comboitem label="Medio" value="MEDIUM" />
+						<comboitem label="Alto" value="HIGH" />
+						<comboitem label="Crítico" value="CRITICAL" />
+					</combobox>
+					<combobox placeholder="Grado"
+						selectedItem="@bind(vm.selectedGrade)"
+						onChange="@command('applyFilters')">
+						<comboitem label="Todos" value="" />
+						<comboitem label="A" value="A" />
+						<comboitem label="B" value="B" />
+						<comboitem label="C" value="C" />
+						<comboitem label="D" value="D" />
+						<comboitem label="F" value="F" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Buscar"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Limpiar"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<grid model="@load(vm.evaluationsList)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column label="ID" align="center" sort="auto" width="8%" />
+									<column label="Query" align="center" width="30%" />
+									<column label="Score General" align="center" width="10%" />
+									<column label="Riesgo" align="center" width="10%" />
+									<column label="Faithfulness" align="center" width="10%" />
+									<column label="Relevancia" align="center" width="10%" />
+									<column label="Precisión" align="center" width="10%" />
+									<column label="Grado" align="center" width="8%" />
+									<column label="Acciones" align="center" width="4%" />
+								</columns>
+								<template name="model" var="eval">
+									<row style="text-align:right;cursor:pointer;"
+										onClick="@command('viewEvaluationDetails', evaluationId=eval.evaluationId)">
+										<label value="@load(eval.evaluationId)" />
+										<label value="@load(eval.query)" />
+										<label value="@load(eval.overallScore)"
+											sclass="badge ${eval.overallScore >= 80 ? 'bg-success' : (eval.overallScore >= 60 ? 'bg-warning' : 'bg-danger')}" />
+										<label value="@load(eval.riskLevel)"
+											sclass="badge ${eval.riskLevel eq 'LOW' ? 'bg-success' : (eval.riskLevel eq 'MEDIUM' ? 'bg-warning' : (eval.riskLevel eq 'HIGH' ? 'bg-danger' : 'bg-dark'))}" />
+										<label value="@load(eval.faithfulness)" />
+										<label value="@load(eval.answerRelevancy)" />
+										<label value="@load(eval.contextPrecision)" />
+										<label value="@load(eval.grade)" sclass="badge bg-info" />
+										<cell align="center" class="d-flex">
+											<div class="edit">
+												<a onClick="@command('viewEvaluationDetails', evaluationId=eval.evaluationId)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="Ver detalle" />
+											</div>
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.totalEvaluations)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+									</footer>
+									<footer span="4" align="left"></footer>
+									<footer></footer>
+								</foot>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

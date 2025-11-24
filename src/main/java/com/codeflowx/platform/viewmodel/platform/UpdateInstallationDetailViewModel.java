@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.platform.UpdateInstallation;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.UpdateInstallationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class UpdateInstallationDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private UpdateInstallationService updateInstallationService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -165,7 +170,7 @@ public class UpdateInstallationDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentUpdateInstallation = businessService.findById(UpdateInstallation.class, id);
+            currentUpdateInstallation = updateInstallationService.findById(id);
             
             if (currentUpdateInstallation == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -187,7 +192,7 @@ public class UpdateInstallationDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "UPDATEINSTALLATIONS", id, "Consulta: " + currentUpdateInstallation.getIdxupdateinstallation());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -211,14 +216,14 @@ public class UpdateInstallationDetailViewModel extends MasterPage {
             boolean isNew = currentUpdateInstallation.getIdxupdateinstallation() == null;
             
             if (isNew) {
-                businessService.save(currentUpdateInstallation);
+                currentUpdateInstallation = updateInstallationService.create(currentUpdateInstallation);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "UPDATEINSTALLATIONS", currentUpdateInstallation.getIdxupdateinstallation(), 
                     "Creado: " + currentUpdateInstallation.getIdxupdateinstallation());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentUpdateInstallation);
+                currentUpdateInstallation = updateInstallationService.update(currentUpdateInstallation);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "UPDATEINSTALLATIONS", currentUpdateInstallation.getIdxupdateinstallation(), 
                     "Actualizado: " + currentUpdateInstallation.getIdxupdateinstallation());
@@ -231,7 +236,7 @@ public class UpdateInstallationDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

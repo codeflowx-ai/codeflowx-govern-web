@@ -40,9 +40,14 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.models.ModelProvider;
 import com.codeflowx.govern.entity.views.models.ModelsMetricsSummary;
 import com.codeflowx.govern.entity.views.models.ModelsOverview;
+import com.codeflowx.govern.service.models.ModelProviderService;
+import com.codeflowx.govern.service.models.ModelsMetricsSummaryService;
+import com.codeflowx.govern.service.models.ModelsOverviewService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -58,14 +63,14 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel para BÚSQUEDA Y LISTADO de modelos AI/ML
- * 
+ *
  * Responsabilidades:
  * - Listado paginado con filtros
  * - Búsqueda avanzada (texto, proveedor, estado, tipo, compliance)
  * - Métricas generales del conjunto de modelos
  * - Navegación a pantalla de detalle/edición
  * - Eliminación con confirmación
- * 
+ *
  * NO incluye:
  * - Edición/creación de modelos (ver ModelsDetailViewModel)
  * - Operaciones de negocio complejas (ver ModelsDetailViewModel)
@@ -82,48 +87,54 @@ public class ModelsOverviewViewModel extends MasterPage {
     private static final String IDDESKTOP = "contenedor";
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
-    
+    private ModelService modelService;
+    @WireVariable
+    private ModelProviderService modelProviderService;
+    @WireVariable
+    private ModelsOverviewService modelsOverviewService;
+    @WireVariable
+    private ModelsMetricsSummaryService modelsMetricsSummaryService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
-    
+
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+    }
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<ModelsOverview> pageResult;
-    
+
     // ========== Filtros de búsqueda ==========
     private String searchTerm = "";
     private Long providerFilter = null;
     private String statusFilter = "ALL";
     private String typeFilter = "ALL";
     private String complianceFilter = "ALL";
-    
+
     // ========== Listas de datos ==========
     private List<ModelsOverview> filteredModels = new ArrayList<>();
     private List<ModelProvider> availableProviders = new ArrayList<>();
-    
+
     // ========== Métricas resumen generales ==========
     private int totalModels = 0;
     private long activeModels = 0L;
@@ -131,47 +142,44 @@ public class ModelsOverviewViewModel extends MasterPage {
     private long rejectedModels = 0L;
     private BigDecimal averageAccuracy = BigDecimal.ZERO;
     private BigDecimal averageBiasScore = BigDecimal.ZERO;
-    
+
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadAvailableProviders();
         loadData();
     }
-    
+
     /**
      * Carga proveedores desde BD para combo de filtros
      */
     private void loadAvailableProviders() {
         try {
             log.debug("Cargando proveedores desde MODPROVIDERS");
-            
+
             PageParams params = PageParams.builder()
                 .maxRows(100)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Map<String, Object> filters = new HashMap<>();
             filters.put("modstatus", "ACTIVE");
-            
-            PageResult<ModelProvider> result = businessService.findAllEntity(
-                ModelProvider.class,
-                params,
-                filters
+
+            PageResult<ModelProvider> result = modelProviderService.findAll(params, filters
             );
-            
+
             if (result != null && result.getContent() != null) {
                 availableProviders = result.getContent();
                 log.info("Cargados {} proveedores", availableProviders.size());
@@ -179,86 +187,87 @@ public class ModelsOverviewViewModel extends MasterPage {
                 availableProviders = new ArrayList<>();
                 log.warn("No se encontraron proveedores activos");
             }
-            
+
         } catch (Exception e) {
             log.error("Error al cargar proveedores", e);
             availableProviders = new ArrayList<>();
         }
     }
-    
+
     // ========== Carga de datos con filtros ==========
-    
+
     @Command
     @NotifyChange("*")
     public void loadData() {
         try {
             log.debug("Cargando modelos - Página: {}", pageParams.getPageActual());
-            
+
             Criterias criterias = buildCriterias();
-            
+
             // Usar la VIEW con Criterias para filtros
-            pageResult = businessService.findAllView(
-                ModelsOverview.class,
-                pageParams,
-                criterias
-            );
-            
+            pageResult = modelsOverviewService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredModels = pageResult.getContent();
                 totalModels = pageResult.getTotalRows();
-                
+
                 // Cargar métricas globales desde VIEW
                 loadGlobalMetrics();
-                
-                log.info("Cargados {} modelos de {} totales", 
+
+                log.info("Cargados {} modelos de {} totales",
                     filteredModels.size(), totalModels);
             } else {
                 filteredModels = new ArrayList<>();
                 totalModels = 0;
             }
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar modelos", e);
-            Messagebox.show(Labels.getLabel("models.error.load") + ": " + e.getMessage(), 
+            Messagebox.show(Labels.getLabel("models.error.load") + ": " + e.getMessage(),
+                Labels.getLabel("models.error.title"), Messagebox.OK, Messagebox.ERROR);
+            filteredModels = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar modelos", e);
+            Messagebox.show(Labels.getLabel("models.error.load") + ": " + e.getMessage(),
                 Labels.getLabel("models.error.title"), Messagebox.OK, Messagebox.ERROR);
             filteredModels = new ArrayList<>();
         }
     }
-    
+
     /**
      * Construye Criterias para filtros con BusinessService
      */
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         // Búsqueda por nombre (LIKE) - El framework agrega % automáticamente
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.LIKE, "modname");
             criteria.setValues(new Object[]{searchTerm.trim()});
             criterias.addCriteria(criteria);
         }
-        
+
         // Filtro por proveedor (EQUALS)
         if (providerFilter != null && providerFilter > 0) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "idmodprovider");
             criteria.setValues(new Object[]{providerFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         // Filtro por estado (EQUALS)
         if (!"ALL".equals(statusFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modstatus");
             criteria.setValues(new Object[]{statusFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         // Filtro por tipo (EQUALS)
         if (!"ALL".equals(typeFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modtype");
             criteria.setValues(new Object[]{typeFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         // Filtro por compliance (EQUALS)
         if (!"ALL".equals(complianceFilter)) {
             String approvalStatus = null;
@@ -273,37 +282,37 @@ public class ModelsOverviewViewModel extends MasterPage {
                     approvalStatus = "PENDING_APPROVAL";
                     break;
             }
-            
+
             if (approvalStatus != null) {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modapprovalstatus");
                 criteria.setValues(new Object[]{approvalStatus});
                 criterias.addCriteria(criteria);
             }
         }
-        
+
         return criterias;
     }
-    
+
     /**
      * Carga métricas globales desde VIEW (no de la página actual)
      */
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales desde V_MODELS_METRICS_SUMMARY");
-            
-            List<ModelsMetricsSummary> metrics = businessService.findAllView(ModelsMetricsSummary.class);
-            
+
+            List<ModelsMetricsSummary> metrics = modelsMetricsSummaryService.findAll();
+
             if (metrics != null && !metrics.isEmpty()) {
                 ModelsMetricsSummary summary = metrics.get(0);
-                
+
                 // Usar valores de la vista
                 activeModels = summary.getActiveModels() != null ? summary.getActiveModels() : 0L;
                 pendingApproval = summary.getPendingApproval() != null ? summary.getPendingApproval() : 0L;
                 rejectedModels = summary.getRejectedModels() != null ? summary.getRejectedModels() : 0L;
                 averageAccuracy = summary.getAverageAccuracy() != null ? summary.getAverageAccuracy() : BigDecimal.ZERO;
                 averageBiasScore = summary.getAverageBiasScore() != null ? summary.getAverageBiasScore() : BigDecimal.ZERO;
-                
-                log.info("Métricas globales cargadas - Total: {}, Activos: {}, Pendientes: {}", 
+
+                log.info("Métricas globales cargadas - Total: {}, Activos: {}, Pendientes: {}",
                     totalModels, activeModels, pendingApproval);
             } else {
                 log.warn("No se pudieron cargar métricas globales");
@@ -314,9 +323,17 @@ public class ModelsOverviewViewModel extends MasterPage {
                 averageAccuracy = BigDecimal.ZERO;
                 averageBiasScore = BigDecimal.ZERO;
             }
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas globales", e);
+            // Valores por defecto en caso de error
+            activeModels = 0L;
+            pendingApproval = 0L;
+            rejectedModels = 0L;
+            averageAccuracy = BigDecimal.ZERO;
+            averageBiasScore = BigDecimal.ZERO;
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar métricas globales", e);
             // Valores por defecto en caso de error
             activeModels = 0L;
             pendingApproval = 0L;
@@ -325,18 +342,18 @@ public class ModelsOverviewViewModel extends MasterPage {
             averageBiasScore = BigDecimal.ZERO;
         }
     }
-    
+
     // ========== Comandos de búsqueda y filtros ==========
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
-        log.debug("Aplicando filtros - searchTerm: {}, provider: {}, status: {}", 
+        log.debug("Aplicando filtros - searchTerm: {}, provider: {}, status: {}",
             searchTerm, providerFilter, statusFilter);
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearFilters() {
@@ -349,11 +366,11 @@ public class ModelsOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     // ========== Paginación ==========
-    
-   
-    
+
+
+
     /**
      * Maneja el evento de paginación del componente ZK Paging
      */
@@ -366,9 +383,9 @@ public class ModelsOverviewViewModel extends MasterPage {
         loadData();
     }
 
-    
+
     // ========== Navegación ==========
-    
+
     @Command
     public void registerModel() {
         log.info("Navegando a creación de nuevo modelo");
@@ -376,7 +393,7 @@ public class ModelsOverviewViewModel extends MasterPage {
         params.put("action", Action.CREATE);
         appendPage("gobierno/models/models-detail.zul", page.getFellow(IDDESKTOP), params);
      }
-    
+
     @Command
     public void viewModelDetails(@BindingParam("modelId") Long modelId) {
         log.info("Navegando a detalle de modelo ID={}", modelId);
@@ -385,29 +402,29 @@ public class ModelsOverviewViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("gobierno/models/models-detail.zul", page.getFellow(IDDESKTOP), params);
      }
-    
+
     // ========== Eliminación ==========
-    
+
     @Command
     @NotifyChange("*")
     public void deleteModel(@BindingParam("modelId") Long modelId) {
         try {
             Messagebox.show(
-                Labels.getLabel("models.confirm.delete.message"), 
-                Labels.getLabel("models.confirm.title"), 
-                Messagebox.YES | Messagebox.NO, 
+                Labels.getLabel("models.confirm.delete.message"),
+                Labels.getLabel("models.confirm.title"),
+                Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(Model.class, modelId);
+                            modelService.deleteById(modelId);
                             log.info("Modelo eliminado: ID={}", modelId);
                             loadData();
-                            Messagebox.show(Labels.getLabel("models.success.deleted"), 
+                            Messagebox.show(Labels.getLabel("models.success.deleted"),
                                 Labels.getLabel("models.success.title"), Messagebox.OK, Messagebox.INFORMATION);
                         } catch (Exception e) {
                             log.error("Error al eliminar modelo ID={}", modelId, e);
-                            Messagebox.show(Labels.getLabel("models.error.delete") + ": " + e.getMessage(), 
+                            Messagebox.show(Labels.getLabel("models.error.delete") + ": " + e.getMessage(),
                                 Labels.getLabel("models.error.title"), Messagebox.OK, Messagebox.ERROR);
                         }
                     }
@@ -417,14 +434,14 @@ public class ModelsOverviewViewModel extends MasterPage {
             log.error("Error en diálogo de eliminación", e);
         }
     }
-    
-   
+
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX 
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
      * @throws DaoException
      * @throws UiException
      */
@@ -437,9 +454,9 @@ public class ModelsOverviewViewModel extends MasterPage {
     	log.setIdtupla(pk.intValue());
     	log.setAplicacion(ctxBean.getApplicationName());
     	log.setValuetupla(mensaje);
-    	businessService.save(log);
+    	log = modelService.create(log);
  	}
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -447,20 +464,20 @@ public class ModelsOverviewViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar lista filtrada
             if (filteredModels != null) {
                 filteredModels.clear();
                 filteredModels = null;
             }
-            
+
             // Limpiar lista de providers
             if (availableProviders != null) {
                 availableProviders.clear();
                 availableProviders = null;
             }
-            
+
             // Limpiar PageResult
             if (pageResult != null) {
                 if (pageResult.getContent() != null) {
@@ -468,13 +485,16 @@ public class ModelsOverviewViewModel extends MasterPage {
                 }
                 pageResult = null;
             }
-            
+
             // Limpiar PageParams
             pageParams = null;
-            
-            // Limpiar BusinessService
-            businessService = null;
-            
+
+            // Limpiar Servicios
+            modelService = null;
+            modelProviderService = null;
+            modelsOverviewService = null;
+            modelsMetricsSummaryService = null;
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

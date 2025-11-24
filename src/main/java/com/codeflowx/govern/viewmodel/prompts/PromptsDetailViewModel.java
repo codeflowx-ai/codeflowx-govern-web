@@ -32,10 +32,14 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.prompts.Prompt;
+import com.codeflowx.govern.service.prompts.PromptService;
 import com.codeflowx.govern.entity.prompts.PromptVersion;
 import com.codeflowx.govern.entity.prompts.PromptValidation;
 import com.codeflowx.govern.entity.functions.prompts.CalculatePromptEffectiveness;
 import com.codeflowx.govern.entity.procedures.prompts.VersionPrompt;
+import com.codeflowx.govern.service.prompts.PromptValidationService;
+import com.codeflowx.govern.service.prompts.PromptVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,7 +57,7 @@ import org.zkoss.bind.annotation.Destroy;
 
 /**
  * ViewModel para DETALLE/EDICIÓN/CREACIÓN de prompts
- * 
+ *
  * Responsabilidades:
  * - Creación de nuevos prompts
  * - Edición de prompts existentes
@@ -68,73 +72,78 @@ import org.zkoss.bind.annotation.Destroy;
 public class PromptsDetailViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
-    
+
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
-    
+    private PromptService promptService;
+    @WireVariable
+    private PromptVersionService promptVersionService;
+    @WireVariable
+    private PromptValidationService promptValidationService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para procedimientos almacenados (callProcedure)
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
-    
+
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
     }
-    
+
     // ========== Modo de operación ==========
     private String mode; // "create" o "edit"
     private Long promptId;
     private boolean editing = false;
     private String pageTitle = "Detalle del Prompt";
-    
+
     // ========== Datos del prompt ==========
     private Prompt currentPrompt;
-    
+
     // ========== Información descendente ==========
     private List<PromptVersion> promptVersions = new ArrayList<>();
     private List<PromptValidation> promptValidations = new ArrayList<>();
-    
+
     // ========== Estadísticas específicas del prompt ==========
     private Long totalVersions = 0L;
     private Long totalValidations = 0L;
     private BigDecimal effectivenessScore = BigDecimal.ZERO;
     private Long successfulValidations = 0L;
     private Timestamp lastValidationDate;
-    
+
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación
         mode = (String) Executions.getCurrent().getParameter("mode");
         String promptIdStr = Executions.getCurrent().getParameter("promptId");
-        
+
         if (promptIdStr != null) {
             promptId = Long.parseLong(promptIdStr);
         }
-        
+
         log.info("Inicializando PromptsDetailViewModel - mode: {}, promptId: {}", mode, promptId);
-        
+
         if ("create".equals(mode)) {
             initNewPrompt();
         } else if ("edit".equals(mode) && promptId != null) {
@@ -144,10 +153,10 @@ public class PromptsDetailViewModel extends MasterPage {
             Executions.sendRedirect("/prompts/prompts-overview.zul");
         }
     }
-    
+
     /**
      * Inicializa un nuevo prompt con valores por defecto
-     * @throws UiException 
+     * @throws UiException
      */
     private void initNewPrompt() throws UiException {
         log.debug("Inicializando nuevo prompt");
@@ -158,61 +167,66 @@ public class PromptsDetailViewModel extends MasterPage {
         currentPrompt.setPrmstatus("DRAFT"); // LIST_STRING - valor simple
         currentPrompt.setPrmapprovalstatus("PENDING"); // LIST_STRING - valor simple
         currentPrompt.setPrmversion("1.0"); // VARCHAR - versión inicial
-        
+
         editing = false;
         pageTitle = "Crear Nuevo Prompt";
     }
-    
+
     /**
      * Carga prompt existente desde BD
      */
     private void loadPrompt(Long id) {
         try {
             log.debug("Cargando prompt ID={}", id);
-            
-            currentPrompt = businessService.findById(Prompt.class, id);
-            
+
+            currentPrompt = promptService.findById(id);
+
             if (currentPrompt == null) {
                 log.error("Prompt no encontrado: ID={}", id);
-                Messagebox.show("Prompt no encontrado", "Error", 
+                Messagebox.show("Prompt no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Executions.sendRedirect("/prompts/prompts-overview.zul");
                 return;
             }
-            
+
             log.info("Prompt cargado: {}", currentPrompt.getPrmname());
-            
+
             editing = true;
             pageTitle = "Editar Prompt: " + currentPrompt.getPrmname();
-            
+
             // Cargar información descendente
             loadPromptVersions();
             loadPromptValidations();
             loadPromptStatistics();
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar prompt ID={}", id, e);
+            Messagebox.show("Error al cargar prompt: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Executions.sendRedirect("/prompts/prompts-overview.zul");
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar prompt ID={}", id, e);
             Messagebox.show("Error al cargar prompt: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Executions.sendRedirect("/prompts/prompts-overview.zul");
         }
     }
-    
+
     /**
      * Carga estadísticas específicas del prompt
      */
     private void loadPromptStatistics() {
         try {
             log.debug("Cargando estadísticas del prompt ID={}", currentPrompt.getIdxprompt());
-            
+
             totalVersions = (long) promptVersions.size();
             totalValidations = (long) promptValidations.size();
-            
+
             // Calcular validaciones exitosas
             successfulValidations = promptValidations.stream()
                 .filter(v -> "SUCCESS".equals(v.getPrmstatus()))
                 .count();
-            
+
             // Calcular effectiveness score
             if (totalValidations > 0) {
                 effectivenessScore = BigDecimal.valueOf(successfulValidations)
@@ -221,38 +235,36 @@ public class PromptsDetailViewModel extends MasterPage {
             } else {
                 effectivenessScore = BigDecimal.ZERO;
             }
-            
+
             log.info("Estadísticas cargadas - Versiones: {}, Validaciones: {}, Effectiveness: {}%",
                 totalVersions, totalValidations, effectivenessScore);
-                
+
         } catch (Exception e) {
             log.error("Error al cargar estadísticas del prompt", e);
         }
     }
-    
+
     // ========== Información descendente ==========
-    
+
     @Command
     @NotifyChange({"promptVersions", "totalVersions"})
     public void loadPromptVersions() {
         try {
             log.debug("Cargando versiones del prompt ID={}", currentPrompt.getIdxprompt());
-            
+
             PageParams params = PageParams.builder()
                 .maxRows(50)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idprmprompts0", currentPrompt.getIdxprompt());
-            
-            PageResult<PromptVersion> result = businessService.findAllEntity(
-                PromptVersion.class,
-                params,
-                filters
-            );
-            
+
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prompt");
+            criteria.setValues(new Object[]{currentPrompt.getIdxprompt()});
+            criterias.addCriteria(criteria);
+
+            PageResult<PromptVersion> result = promptVersionService.findAll(params, criterias);
+
             if (result != null && result.getContent() != null) {
                 promptVersions = result.getContent();
                 totalVersions = (long) promptVersions.size();
@@ -261,34 +273,36 @@ public class PromptsDetailViewModel extends MasterPage {
                 promptVersions = new ArrayList<>();
                 totalVersions = 0L;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar versiones del prompt", e);
+            promptVersions = new ArrayList<>();
+            totalVersions = 0L;
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar versiones del prompt", e);
             promptVersions = new ArrayList<>();
             totalVersions = 0L;
         }
     }
-    
+
     @Command
     @NotifyChange({"promptValidations", "totalValidations"})
     public void loadPromptValidations() {
         try {
             log.debug("Cargando validaciones del prompt ID={}", currentPrompt.getIdxprompt());
-            
+
             PageParams params = PageParams.builder()
                 .maxRows(50)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idprmprompts0", currentPrompt.getIdxprompt());
-            
-            PageResult<PromptValidation> result = businessService.findAllEntity(
-                PromptValidation.class,
-                params,
-                filters
-            );
-            
+
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prompt");
+            criteria.setValues(new Object[]{currentPrompt.getIdxprompt()});
+            criterias.addCriteria(criteria);
+
+            PageResult<PromptValidation> result = promptValidationService.findAll(params, criterias);
+
             if (result != null && result.getContent() != null) {
                 promptValidations = result.getContent();
                 totalValidations = (long) promptValidations.size();
@@ -297,66 +311,74 @@ public class PromptsDetailViewModel extends MasterPage {
                 promptValidations = new ArrayList<>();
                 totalValidations = 0L;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar validaciones del prompt", e);
+            promptValidations = new ArrayList<>();
+            totalValidations = 0L;
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar validaciones del prompt", e);
             promptValidations = new ArrayList<>();
             totalValidations = 0L;
         }
     }
-    
+
     // ========== Comandos CRUD ==========
-    
+
     @Command
     @NotifyChange("*")
     public void savePrompt() {
         try {
             log.info("Guardando prompt: {}", currentPrompt.getPrmname());
-            
+
             // Validaciones de negocio
             if (currentPrompt.getPrmname() == null || currentPrompt.getPrmname().trim().isEmpty()) {
                 Messagebox.show("El nombre del prompt es requerido",
                     "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (currentPrompt.getPrmcontent() == null || currentPrompt.getPrmcontent().trim().isEmpty()) {
                 Messagebox.show("El contenido del prompt es requerido",
                     "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (currentPrompt.getIdxprompt() == null) {
-                businessService.save(currentPrompt);
+                currentPrompt = promptService.create(currentPrompt);
                 log.info("Prompt creado exitosamente: ID={}, nombre={}",
                     currentPrompt.getIdxprompt(), currentPrompt.getPrmname());
                 Messagebox.show("Prompt creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 currentPrompt.setPrmupdatedat(new Timestamp(System.currentTimeMillis()));
-                businessService.update(currentPrompt);
+                currentPrompt = promptService.update(currentPrompt);
                 log.info("Prompt actualizado exitosamente: ID={}, nombre={}",
                     currentPrompt.getIdxprompt(), currentPrompt.getPrmname());
                 Messagebox.show("Prompt actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             Executions.sendRedirect("/prompts/prompts-overview.zul");
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar prompt", e);
+            Messagebox.show("Error al guardar prompt: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar prompt", e);
             Messagebox.show("Error al guardar prompt: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición/creación de prompt, volviendo a overview");
         Executions.sendRedirect("/prompts/prompts-overview.zul");
     }
-    
+
     // ========== Operaciones especiales (funciones/procedimientos) ==========
-    
+
     @Command
     @NotifyChange({"currentPrompt", "effectivenessScore"})
     public void validatePrompt() {
@@ -378,7 +400,7 @@ public class PromptsDetailViewModel extends MasterPage {
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange({"promptVersions", "totalVersions"})
     public void createNewVersion() {
@@ -391,9 +413,9 @@ public class PromptsDetailViewModel extends MasterPage {
         try {
             VersionPrompt procedure = new VersionPrompt();
             procedure.setPInputParam(currentPrompt.getIdxprompt()); // Usar parámetro correcto del JPA
-            
+
             procedure = businessService.callProcedure(procedure);
-            
+
             if (procedure.getOSuccess() != null && procedure.getOSuccess()) {
                 Messagebox.show("Nueva versión creada exitosamente\nVersion ID: " + procedure.getOResult(),
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
@@ -417,11 +439,11 @@ public class PromptsDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar prompt actual
             currentPrompt = null;
-            
+
             // Limpiar listas descendentes
             if (promptVersions != null) {
                 promptVersions.clear();
@@ -431,10 +453,12 @@ public class PromptsDetailViewModel extends MasterPage {
                 promptValidations.clear();
                 promptValidations = null;
             }
-            
+
             // Limpiar BusinessService
-            businessService = null;
-            
+            promptService = null;
+            promptVersionService = null;
+            promptValidationService = null;
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
@@ -442,4 +466,3 @@ public class PromptsDetailViewModel extends MasterPage {
     }
 
 }
-

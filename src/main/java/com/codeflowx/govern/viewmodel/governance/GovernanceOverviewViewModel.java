@@ -41,6 +41,7 @@ import org.zkoss.bind.annotation.Destroy;
 
 import com.codeflowx.govern.entity.views.governance.GovernanceMetricsSummary;
 import com.codeflowx.govern.entity.views.governance.GovernanceOverview;
+import com.codeflowx.govern.service.governance.PolicyService;
 /**
  * ViewModel para la pantalla de búsqueda y listado de políticas de governance.
  * Incluye filtros avanzados, métricas globales y navegación a detalles.
@@ -55,15 +56,14 @@ public class GovernanceOverviewViewModel extends MasterPage {
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
 
-    @WireVariable private BusinessService businessService;
+    @WireVariable private PolicyService policyService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
 
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
 
     @Override
@@ -116,11 +116,7 @@ public class GovernanceOverviewViewModel extends MasterPage {
 
             Criterias criterias = buildCriterias();
 
-            pageResult = businessService.findAllView(
-                GovernanceOverview.class,
-                pageParams,
-                criterias
-            );
+            pageResult = policyService.findAllOverview(pageParams, criterias);
 
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredPolicies = pageResult.getContent();
@@ -181,9 +177,8 @@ public class GovernanceOverviewViewModel extends MasterPage {
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales desde V_GOVERNANCE_METRICS_SUMMARY");
-            List<GovernanceMetricsSummary> metrics = businessService.findAllView(GovernanceMetricsSummary.class);
-            if (metrics != null && !metrics.isEmpty()) {
-                GovernanceMetricsSummary summary = metrics.get(0);
+            GovernanceMetricsSummary summary = policyService.getMetricsSummary();
+            if (summary != null) {
                 activePolicies = summary.getActivePolicies() != null ? summary.getActivePolicies() : 0L;
                 pendingApproval = summary.getPendingApproval() != null ? summary.getPendingApproval() : 0L;
                 expiredPolicies = summary.getExpiredPolicies() != null ? summary.getExpiredPolicies() : 0L;
@@ -263,7 +258,7 @@ public class GovernanceOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(com.codeflowx.govern.entity.governance.Policy.class, policyId);
+                            policyService.deleteById(policyId);
                             log.info("Política eliminada: ID={}", policyId);
                             loadData();
                             Messagebox.show(Labels.getLabel("governance.success.deleted"),

@@ -51,6 +51,26 @@ import com.codeflowx.govern.entity.agents.AgentVersion;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentService;
+import com.codeflowx.govern.service.agents.AgentAlertService;
+import com.codeflowx.govern.service.agents.AgentApprovalService;
+import com.codeflowx.govern.service.agents.AgentBiasDetectionService;
+import com.codeflowx.govern.service.agents.AgentCollaborationService;
+import com.codeflowx.govern.service.agents.AgentCommunicationService;
+import com.codeflowx.govern.service.agents.AgentComplianceService;
+import com.codeflowx.govern.service.agents.AgentDecisionService;
+import com.codeflowx.govern.service.agents.AgentDeploymentService;
+import com.codeflowx.govern.service.agents.AgentEthicsAssessmentService;
+import com.codeflowx.govern.service.agents.AgentExpertiseService;
+import com.codeflowx.govern.service.agents.AgentGovernanceService;
+import com.codeflowx.govern.service.agents.AgentHealthService;
+import com.codeflowx.govern.service.agents.AgentInteractionService;
+import com.codeflowx.govern.service.agents.AgentMonitoringService;
+import com.codeflowx.govern.service.agents.AgentRollbackService;
+import com.codeflowx.govern.service.agents.AgentToolService;
+import com.codeflowx.govern.service.agents.AgentTransparencyService;
+import com.codeflowx.govern.service.agents.AgentVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -71,60 +91,117 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class AgentDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private AgentService agentService;
+
+    @WireVariable
+    private AgentAlertService agentAlertService;
+
+    @WireVariable
+    private AgentApprovalService agentApprovalService;
+
+    @WireVariable
+    private AgentBiasDetectionService agentBiasDetectionService;
+
+    @WireVariable
+    private AgentCollaborationService agentCollaborationService;
+
+    @WireVariable
+    private AgentCommunicationService agentCommunicationService;
+
+    @WireVariable
+    private AgentComplianceService agentComplianceService;
+
+    @WireVariable
+    private AgentDecisionService agentDecisionService;
+
+    @WireVariable
+    private AgentDeploymentService agentDeploymentService;
+
+    @WireVariable
+    private AgentEthicsAssessmentService agentEthicsAssessmentService;
+
+    @WireVariable
+    private AgentExpertiseService agentExpertiseService;
+
+    @WireVariable
+    private AgentGovernanceService agentGovernanceService;
+
+    @WireVariable
+    private AgentHealthService agentHealthService;
+
+    @WireVariable
+    private AgentInteractionService agentInteractionService;
+
+    @WireVariable
+    private AgentMonitoringService agentMonitoringService;
+
+    @WireVariable
+    private AgentRollbackService agentRollbackService;
+
+    @WireVariable
+    private AgentToolService agentToolService;
+
+    @WireVariable
+    private AgentTransparencyService agentTransparencyService;
+
+    @WireVariable
+    private AgentVersionService agentVersionService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxagent;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Agent currentAgent;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalAgtname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableAgttypes = new ArrayList<>();
     private List<String> availableAgtstatuss = new ArrayList<>();
     private List<String> availableAgtapprovalstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<AgentAlert> subagtagentalerts = new ArrayList<>();
     private List<AgentApproval> subagtagentapprovals = new ArrayList<>();
@@ -166,43 +243,43 @@ public class AgentDetailViewModel extends MasterPage {
     private boolean subagtagenttoolsLoaded = false;
     private boolean subagtagenttransparencyLoaded = false;
     private boolean subagtagentversionsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             // Si action es null, intentar determinar el modo por el contexto
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxagent = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando AgentDetailViewModel - mode: {}, idxagent: {}", mode, idxagent);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxagent != null) {
@@ -213,11 +290,11 @@ public class AgentDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentAgent, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentAgent = new Agent();
@@ -227,38 +304,38 @@ public class AgentDetailViewModel extends MasterPage {
         loadAgtstatuss();
         loadAgtapprovalstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentAgent = businessService.findById(Agent.class, id);
-            
+            currentAgent = agentService.findById(id);
+
             if (currentAgent == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentAgent.getAgtname();
         loadAgttypes();
         loadAgtstatuss();
         loadAgtapprovalstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalAgtname = currentAgent.getAgtname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "AGTAGENTS", id, "Consulta: " + currentAgent.getAgtname());
-            
+
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
@@ -268,55 +345,55 @@ public class AgentDetailViewModel extends MasterPage {
             appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentAgent.getIdxagent() == null;
-            
+
             if (isNew) {
-                businessService.save(currentAgent);
+                currentAgent = agentService.create(currentAgent);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "AGTAGENTS", currentAgent.getIdxagent(), 
+                logActivity("CREACION", "AGTAGENTS", currentAgent.getIdxagent(),
                     "Creado: " + currentAgent.getAgtname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgent);
+                currentAgent = agentService.update(currentAgent);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "AGTAGENTS", currentAgent.getIdxagent(), 
+                logActivity("EDICION", "AGTAGENTS", currentAgent.getIdxagent(),
                     "Actualizado: " + currentAgent.getAgtname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
-            
+
         } catch (Exception e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentAgent.getAgtname() == null || currentAgent.getAgtname().trim().isEmpty()) {
             errors.append("- Name\n");
         }
@@ -344,16 +421,16 @@ public class AgentDetailViewModel extends MasterPage {
         if (currentAgent.getAgtcreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -362,28 +439,28 @@ public class AgentDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadAgttypes() {
         // TODO: Cargar valores desde configuración o BD
         availableAgttypes.add("OPTION_1");
         availableAgttypes.add("OPTION_2");
         availableAgttypes.add("OPTION_3");
     }
-    
+
     private void loadAgtstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableAgtstatuss.add("OPTION_1");
         availableAgtstatuss.add("OPTION_2");
         availableAgtstatuss.add("OPTION_3");
     }
-    
+
     private void loadAgtapprovalstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableAgtapprovalstatuss.add("OPTION_1");
         availableAgtapprovalstatuss.add("OPTION_2");
         availableAgtapprovalstatuss.add("OPTION_3");
     }
-    
+
     private void loadSubagtagentalerts() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -391,25 +468,28 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentAlert> result = businessService.findAllEntity(AgentAlert.class, collectionParams, criterias);
+
+                PageResult<AgentAlert> result = agentAlertService.findAll(collectionParams, criterias);
                 subagtagentalerts = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentalertsLoaded = true;
                 log.debug("Cargados {} subagtagentalerts", subagtagentalerts.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentalerts", e);
+            subagtagentalerts = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar subagtagentalerts", e);
             subagtagentalerts = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentapprovals() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -417,25 +497,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentApproval> result = businessService.findAllEntity(AgentApproval.class, collectionParams, criterias);
+
+                PageResult<AgentApproval> result = agentApprovalService.findAll(collectionParams, criterias);
                 subagtagentapprovals = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentapprovalsLoaded = true;
                 log.debug("Cargados {} subagtagentapprovals", subagtagentapprovals.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentapprovals", e);
             subagtagentapprovals = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentbiasdetections() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -443,25 +523,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentBiasDetection> result = businessService.findAllEntity(AgentBiasDetection.class, collectionParams, criterias);
+
+                PageResult<AgentBiasDetection> result = agentBiasDetectionService.findAll(collectionParams, criterias);
                 subagtagentbiasdetections = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentbiasdetectionsLoaded = true;
                 log.debug("Cargados {} subagtagentbiasdetections", subagtagentbiasdetections.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentbiasdetections", e);
             subagtagentbiasdetections = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentcollaborations() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -469,25 +549,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent1");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentCollaboration> result = businessService.findAllEntity(AgentCollaboration.class, collectionParams, criterias);
+
+                PageResult<AgentCollaboration> result = agentCollaborationService.findAll(collectionParams, criterias);
                 subagtagentcollaborations = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentcollaborationsLoaded = true;
                 log.debug("Cargados {} subagtagentcollaborations", subagtagentcollaborations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentcollaborations", e);
             subagtagentcollaborations = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentcollaborationsByAgent2() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -495,25 +575,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent2");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentCollaboration> result = businessService.findAllEntity(AgentCollaboration.class, collectionParams, criterias);
+
+                PageResult<AgentCollaboration> result = agentCollaborationService.findAll(collectionParams, criterias);
                 subagtagentcollaborationsByAgent2 = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentcollaborationsByAgent2Loaded = true;
                 log.debug("Cargados {} subagtagentcollaborationsByAgent2", subagtagentcollaborationsByAgent2.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentcollaborationsByAgent2", e);
             subagtagentcollaborationsByAgent2 = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentcommunications() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -521,25 +601,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "senderAgent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentCommunication> result = businessService.findAllEntity(AgentCommunication.class, collectionParams, criterias);
+
+                PageResult<AgentCommunication> result = agentCommunicationService.findAll(collectionParams, criterias);
                 subagtagentcommunications = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentcommunicationsLoaded = true;
                 log.debug("Cargados {} subagtagentcommunications", subagtagentcommunications.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentcommunications", e);
             subagtagentcommunications = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentcommunicationsByReceiveragent() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -547,25 +627,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "receiverAgent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentCommunication> result = businessService.findAllEntity(AgentCommunication.class, collectionParams, criterias);
+
+                PageResult<AgentCommunication> result = agentCommunicationService.findAll(collectionParams, criterias);
                 subagtagentcommunicationsByReceiveragent = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentcommunicationsByReceiveragentLoaded = true;
                 log.debug("Cargados {} subagtagentcommunicationsByReceiveragent", subagtagentcommunicationsByReceiveragent.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentcommunicationsByReceiveragent", e);
             subagtagentcommunicationsByReceiveragent = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentcompliance() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -573,25 +653,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentCompliance> result = businessService.findAllEntity(AgentCompliance.class, collectionParams, criterias);
+
+                PageResult<AgentCompliance> result = agentComplianceService.findAll(collectionParams, criterias);
                 subagtagentcompliance = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentcomplianceLoaded = true;
                 log.debug("Cargados {} subagtagentcompliance", subagtagentcompliance.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentcompliance", e);
             subagtagentcompliance = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentdecisions() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -599,25 +679,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentDecision> result = businessService.findAllEntity(AgentDecision.class, collectionParams, criterias);
+
+                PageResult<AgentDecision> result = agentDecisionService.findAll(collectionParams, criterias);
                 subagtagentdecisions = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentdecisionsLoaded = true;
                 log.debug("Cargados {} subagtagentdecisions", subagtagentdecisions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentdecisions", e);
             subagtagentdecisions = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentdeployments() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -625,25 +705,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentDeployment> result = businessService.findAllEntity(AgentDeployment.class, collectionParams, criterias);
+
+                PageResult<AgentDeployment> result = agentDeploymentService.findAll(collectionParams, criterias);
                 subagtagentdeployments = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentdeploymentsLoaded = true;
                 log.debug("Cargados {} subagtagentdeployments", subagtagentdeployments.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentdeployments", e);
             subagtagentdeployments = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentethicsassessments() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -651,25 +731,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentEthicsAssessment> result = businessService.findAllEntity(AgentEthicsAssessment.class, collectionParams, criterias);
+
+                PageResult<AgentEthicsAssessment> result = agentEthicsAssessmentService.findAll(collectionParams, criterias);
                 subagtagentethicsassessments = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentethicsassessmentsLoaded = true;
                 log.debug("Cargados {} subagtagentethicsassessments", subagtagentethicsassessments.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentethicsassessments", e);
             subagtagentethicsassessments = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentexpertise() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -677,25 +757,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentExpertise> result = businessService.findAllEntity(AgentExpertise.class, collectionParams, criterias);
+
+                PageResult<AgentExpertise> result = agentExpertiseService.findAll(collectionParams, criterias);
                 subagtagentexpertise = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentexpertiseLoaded = true;
                 log.debug("Cargados {} subagtagentexpertise", subagtagentexpertise.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentexpertise", e);
             subagtagentexpertise = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentgovernance() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -703,25 +783,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentGovernance> result = businessService.findAllEntity(AgentGovernance.class, collectionParams, criterias);
+
+                PageResult<AgentGovernance> result = agentGovernanceService.findAll(collectionParams, criterias);
                 subagtagentgovernance = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentgovernanceLoaded = true;
                 log.debug("Cargados {} subagtagentgovernance", subagtagentgovernance.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentgovernance", e);
             subagtagentgovernance = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagenthealth() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -729,25 +809,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentHealth> result = businessService.findAllEntity(AgentHealth.class, collectionParams, criterias);
+
+                PageResult<AgentHealth> result = agentHealthService.findAll(collectionParams, criterias);
                 subagtagenthealth = result != null ? result.getContent() : new ArrayList<>();
                 subagtagenthealthLoaded = true;
                 log.debug("Cargados {} subagtagenthealth", subagtagenthealth.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagenthealth", e);
             subagtagenthealth = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentinteractions() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -755,25 +835,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentInteraction> result = businessService.findAllEntity(AgentInteraction.class, collectionParams, criterias);
+
+                PageResult<AgentInteraction> result = agentInteractionService.findAll(collectionParams, criterias);
                 subagtagentinteractions = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentinteractionsLoaded = true;
                 log.debug("Cargados {} subagtagentinteractions", subagtagentinteractions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentinteractions", e);
             subagtagentinteractions = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentmonitoring() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -781,25 +861,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentMonitoring> result = businessService.findAllEntity(AgentMonitoring.class, collectionParams, criterias);
+
+                PageResult<AgentMonitoring> result = agentMonitoringService.findAll(collectionParams, criterias);
                 subagtagentmonitoring = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentmonitoringLoaded = true;
                 log.debug("Cargados {} subagtagentmonitoring", subagtagentmonitoring.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentmonitoring", e);
             subagtagentmonitoring = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentrollbacks() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -807,25 +887,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentRollback> result = businessService.findAllEntity(AgentRollback.class, collectionParams, criterias);
+
+                PageResult<AgentRollback> result = agentRollbackService.findAll(collectionParams, criterias);
                 subagtagentrollbacks = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentrollbacksLoaded = true;
                 log.debug("Cargados {} subagtagentrollbacks", subagtagentrollbacks.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentrollbacks", e);
             subagtagentrollbacks = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagenttools() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -833,25 +913,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentTool> result = businessService.findAllEntity(AgentTool.class, collectionParams, criterias);
+
+                PageResult<AgentTool> result = agentToolService.findAll(collectionParams, criterias);
                 subagtagenttools = result != null ? result.getContent() : new ArrayList<>();
                 subagtagenttoolsLoaded = true;
                 log.debug("Cargados {} subagtagenttools", subagtagenttools.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagenttools", e);
             subagtagenttools = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagenttransparency() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -859,25 +939,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentTransparency> result = businessService.findAllEntity(AgentTransparency.class, collectionParams, criterias);
+
+                PageResult<AgentTransparency> result = agentTransparencyService.findAll(collectionParams, criterias);
                 subagtagenttransparency = result != null ? result.getContent() : new ArrayList<>();
                 subagtagenttransparencyLoaded = true;
                 log.debug("Cargados {} subagtagenttransparency", subagtagenttransparency.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagenttransparency", e);
             subagtagenttransparency = new ArrayList<>();
         }
     }
-    
+
     private void loadSubagtagentversions() {
         try {
             if (currentAgent != null && currentAgent.getIdxagent() != null) {
@@ -885,25 +965,25 @@ public class AgentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "agent");
                 criteria.setValues(new Object[]{currentAgent.getIdxagent()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<AgentVersion> result = businessService.findAllEntity(AgentVersion.class, collectionParams, criterias);
+
+                PageResult<AgentVersion> result = agentVersionService.findAll(collectionParams, criterias);
                 subagtagentversions = result != null ? result.getContent() : new ArrayList<>();
                 subagtagentversionsLoaded = true;
                 log.debug("Cargados {} subagtagentversions", subagtagentversions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subagtagentversions", e);
             subagtagentversions = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentalerts")
     public void onSelectSubagtagentalertsTab() {
@@ -911,7 +991,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentalerts();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentapprovals")
     public void onSelectSubagtagentapprovalsTab() {
@@ -919,7 +999,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentapprovals();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentbiasdetections")
     public void onSelectSubagtagentbiasdetectionsTab() {
@@ -927,7 +1007,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentbiasdetections();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentcollaborations")
     public void onSelectSubagtagentcollaborationsTab() {
@@ -935,7 +1015,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentcollaborations();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentcollaborationsByAgent2")
     public void onSelectSubagtagentcollaborationsByAgent2Tab() {
@@ -943,7 +1023,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentcollaborationsByAgent2();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentcommunications")
     public void onSelectSubagtagentcommunicationsTab() {
@@ -951,7 +1031,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentcommunications();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentcommunicationsByReceiveragent")
     public void onSelectSubagtagentcommunicationsByReceiveragentTab() {
@@ -959,7 +1039,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentcommunicationsByReceiveragent();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentcompliance")
     public void onSelectSubagtagentcomplianceTab() {
@@ -967,7 +1047,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentcompliance();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentdecisions")
     public void onSelectSubagtagentdecisionsTab() {
@@ -975,7 +1055,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentdecisions();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentdeployments")
     public void onSelectSubagtagentdeploymentsTab() {
@@ -983,7 +1063,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentdeployments();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentethicsassessments")
     public void onSelectSubagtagentethicsassessmentsTab() {
@@ -991,7 +1071,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentethicsassessments();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentexpertise")
     public void onSelectSubagtagentexpertiseTab() {
@@ -999,7 +1079,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentexpertise();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentgovernance")
     public void onSelectSubagtagentgovernanceTab() {
@@ -1007,7 +1087,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentgovernance();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagenthealth")
     public void onSelectSubagtagenthealthTab() {
@@ -1015,7 +1095,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagenthealth();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentinteractions")
     public void onSelectSubagtagentinteractionsTab() {
@@ -1023,7 +1103,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentinteractions();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentmonitoring")
     public void onSelectSubagtagentmonitoringTab() {
@@ -1031,7 +1111,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentmonitoring();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentrollbacks")
     public void onSelectSubagtagentrollbacksTab() {
@@ -1039,7 +1119,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentrollbacks();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagenttools")
     public void onSelectSubagtagenttoolsTab() {
@@ -1047,7 +1127,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagenttools();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagenttransparency")
     public void onSelectSubagtagenttransparencyTab() {
@@ -1055,7 +1135,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagenttransparency();
         }
     }
-    
+
     @Command
     @NotifyChange("subagtagentversions")
     public void onSelectSubagtagentversionsTab() {
@@ -1063,7 +1143,7 @@ public class AgentDetailViewModel extends MasterPage {
             loadSubagtagentversions();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -1089,7 +1169,7 @@ public class AgentDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -1097,13 +1177,13 @@ public class AgentDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentAgent = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableAgttypes != null) {
                 availableAgttypes.clear();
@@ -1117,7 +1197,7 @@ public class AgentDetailViewModel extends MasterPage {
                 availableAgtapprovalstatuss.clear();
                 availableAgtapprovalstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subagtagentalerts != null) {
                 subagtagentalerts.clear();
@@ -1219,15 +1299,15 @@ public class AgentDetailViewModel extends MasterPage {
                 subagtagentversions = null;
             }
             subagtagentversionsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

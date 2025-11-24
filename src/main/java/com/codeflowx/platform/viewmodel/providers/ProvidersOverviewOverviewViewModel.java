@@ -29,6 +29,8 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.views.providers.ProvidersOverview;
+import com.codeflowx.govern.service.providers.ProvidersOverviewService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -58,6 +60,9 @@ public class ProvidersOverviewOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private ProvidersOverviewService providersOverviewService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -124,11 +129,7 @@ public class ProvidersOverviewOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllView(
-                ProvidersOverview.class,
-                pageParams,
-                criterias
-            );
+            pageResult = providersOverviewService.findAll(pageParams, criterias);
             
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
@@ -146,7 +147,7 @@ public class ProvidersOverviewOverviewViewModel extends MasterPage {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
             Messagebox.show("Error al cargar datos: " + e.getMessage(), 
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -231,27 +232,14 @@ public class ProvidersOverviewOverviewViewModel extends MasterPage {
     @NotifyChange("*")
     public void deleteItem(@BindingParam("itemId") Long itemId) {
         try {
-            Messagebox.show("¿Está seguro de eliminar este registro?", 
-                "Confirmar eliminación", 
-                Messagebox.YES | Messagebox.NO, 
-                Messagebox.QUESTION,
-                event -> {
-                    if (Messagebox.ON_YES.equals(event.getName())) {
-                        try {
-                            businessService.removeFromID(ProvidersOverview.class, itemId);
-                            log.info("Registro eliminado: ID={}", itemId);
-                            logActivity("BORRAR", "V_PROVIDERS_OVERVIEW", itemId, "Eliminado registro ID: " + itemId);
-                            loadData();
-                            Messagebox.show("Registro eliminado correctamente", 
-                                "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
-                            log.error("Error al eliminar ID={}", itemId, e);
-                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
-                                "Error", Messagebox.OK, Messagebox.ERROR);
-                        }
-                    }
-                }
-            );
+            // NOTA: ProvidersOverview es una vista (VIEW), no una entidad.
+            // Las vistas son de solo lectura y no se pueden eliminar.
+            // Este método debería estar deshabilitado o mostrar un mensaje apropiado.
+            Messagebox.show("No se puede eliminar un registro de una vista de solo lectura.", 
+                "Operación no permitida", 
+                Messagebox.OK, 
+                Messagebox.INFORMATION);
+            log.warn("Intento de eliminar registro de vista ProvidersOverview - ID={}", itemId);
         } catch (Exception e) {
             log.error("Error en diálogo de eliminación", e);
         }

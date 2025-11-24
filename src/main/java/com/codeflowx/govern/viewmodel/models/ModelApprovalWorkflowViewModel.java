@@ -29,9 +29,11 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
 import com.codeflowx.govern.entity.procedures.governance.AutoApproveArtifact;
 import com.codeflowx.govern.entity.procedures.governance.RequestHumanReview;
+import com.codeflowx.govern.service.models.ModelService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -57,15 +59,18 @@ public class ModelApprovalWorkflowViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private ModelService modelService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -107,20 +112,14 @@ public class ModelApprovalWorkflowViewModel extends MasterPage {
             criteria1.setValueEnd("PENDING_APPROVAL");
             criterias1.addCriteria(criteria1);
             
-            PageResult<Model> result1 = businessService.findAllEntity(
-                Model.class, 
-                pageParams, 
-                criterias1
+            PageResult<Model> result1 = modelService.findAll(pageParams, criterias1
             );
             if (result1 != null && result1.getContent() != null) {
                 pendingModelsList = result1.getContent();
             }
             
             // Cargar assessments de compliance
-            PageResult<ComplianceAssessment> result2 = businessService.findAllEntity(
-                ComplianceAssessment.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<ComplianceAssessment> result2 = complianceAssessmentService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 assessmentsList = result2.getContent();
@@ -187,13 +186,13 @@ public class ModelApprovalWorkflowViewModel extends MasterPage {
     @NotifyChange("*")
     public void approveModel(Long modelId, String comments) {
         try {
-            Model model = businessService.findById(Model.class, modelId);
+            Model model = modelService.findById(modelId);
             if (model != null) {
             	model.setModapprovalstatus("APPROVED");
             	model.setModapprovedat(new Timestamp(System.currentTimeMillis()));
             	model.setModapprovedby(getUser().getUsername());
             	model.setModupdatedby(getUser().getUsername());
-                businessService.update(model);
+                model = complianceAssessmentService.update(model);
                 loadData();
                 calculateKPIs();
                 Messagebox.show("Modelo aprobado correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
@@ -208,12 +207,12 @@ public class ModelApprovalWorkflowViewModel extends MasterPage {
     @NotifyChange("*")
     public void rejectModel(Long modelId, String reason) {
         try {
-            Model model = businessService.findById(Model.class, modelId);
+            Model model = modelService.findById(modelId);
             if (model != null) {
                 model.setModapprovalstatus("REJECTED");
                 model.setModupdatedat(new Timestamp(System.currentTimeMillis()));
                 model.setModupdatedby(getUser().getUsername());
-                businessService.update(model);
+                model = complianceAssessmentService.update(model);
                 
                 loadData();
                 calculateKPIs();
@@ -257,7 +256,8 @@ public class ModelApprovalWorkflowViewModel extends MasterPage {
             assessmentsList.clear(); 
             assessmentsList = null; 
         }
-        businessService = null;
+        complianceAssessmentService = null;
+            modelService = null;
     }
 }
 

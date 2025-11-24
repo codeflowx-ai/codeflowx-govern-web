@@ -18,6 +18,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSource;
 import com.codeflowx.govern.entity.datasources.DataSourceApi;
+import com.codeflowx.govern.service.datasources.DataSourceApiService;
+import com.codeflowx.govern.service.datasources.DataSourceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criterias;
 import lombok.extern.slf4j.Slf4j;
@@ -25,11 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataSourceApiViewModel extends BaseFront {
 
+    @WireVariable
+    private DataSourceApiService dataSourceApiService;
+    @WireVariable
+    private DataSourceService dataSourceService;
+
     private Long datasourceId;
     private DataSource dataSource;
     private List<DataSourceApi> apiList = new ArrayList<>();
     private DataSourceApi selectedApi;
-    
+
     private List<String> availableMethods = List.of("GET", "POST", "PUT", "DELETE", "PATCH");
     private List<String> availableResponseTypes = List.of("JSON", "XML", "TEXT", "CSV");
     private List<String> availableStatuses = List.of("ACTIVE", "INACTIVE", "ERROR");
@@ -53,17 +62,16 @@ public class DataSourceApiViewModel extends BaseFront {
     private void loadDataSourceApis() {
         try {
             if (datasourceId != null) {
-                dataSource = businessService.findById(DataSource.class, datasourceId);
+                dataSource = dataSourceService.findById(datasourceId);
                 if (dataSource != null) {
                     apiList = dataSource.getSubdatasourceapis();
                 }
             } else {
-                Criterias criterias = new Criterias();
-                apiList = businessService.find(DataSourceApi.class, criterias);
+                apiList = dataSourceApiService.findAll();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error loading data source APIs", e);
-            Messagebox.show("Error al cargar las APIs: " + e.getMessage(), 
+            Messagebox.show("Error al cargar las APIs: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -77,11 +85,11 @@ public class DataSourceApiViewModel extends BaseFront {
         selectedApi.setApiresponsetype("JSON");
         selectedApi.setApitimeout(30000);
         selectedApi.setApicreatedat(new Timestamp(System.currentTimeMillis()));
-        
+
         if (dataSource != null) {
             selectedApi.setDataSource(dataSource);
         }
-        
+
         logActivity("CREATE_INIT", "DATA_SOURCES_API", null, "Iniciando creación de nueva API");
     }
 
@@ -93,21 +101,21 @@ public class DataSourceApiViewModel extends BaseFront {
                 Messagebox.show("El nombre de la API es obligatorio", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (selectedApi.getApiendpoint() == null || selectedApi.getApiendpoint().trim().isEmpty()) {
                 Messagebox.show("El endpoint es obligatorio", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             selectedApi.setApiupdatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(selectedApi);
-            
+            dataSourceApiService.create(selectedApi);
+
             Messagebox.show("API guardada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             logActivity("SAVE", "DATA_SOURCES_API", selectedApi.getIdxdatasourceapi(), "API guardada: " + selectedApi.getApiname());
-            
+
             loadDataSourceApis();
             selectedApi = null;
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error saving API", e);
             Messagebox.show("Error al guardar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -127,13 +135,13 @@ public class DataSourceApiViewModel extends BaseFront {
             api.setApilasttestat(new Timestamp(System.currentTimeMillis()));
             api.setApitestresult("Test ejecutado correctamente");
             api.setApistatus("ACTIVE");
-            businessService.save(api);
-            
+            dataSourceApiService.update(api);
+
             Messagebox.show("Test de conexión exitoso", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             logActivity("TEST", "DATA_SOURCES_API", api.getIdxdatasourceapi(), "Test de conexión: " + api.getApiname());
-            
+
             loadDataSourceApis();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error testing API", e);
             api.setApitestresult("Error: " + e.getMessage());
             api.setApistatus("ERROR");
@@ -149,15 +157,15 @@ public class DataSourceApiViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(DataSourceApi.class, api.getIdxdatasourceapi());
+                        dataSourceApiService.deleteById(api.getIdxdatasourceapi());
                         Messagebox.show("API eliminada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        
+
                         logActivity("DELETE", "DATA_SOURCES_API", api.getIdxdatasourceapi(), "API eliminada: " + api.getApiname());
                         loadDataSourceApis();
                         if (selectedApi != null && selectedApi.getIdxdatasourceapi().equals(api.getIdxdatasourceapi())) {
                             selectedApi = null;
                         }
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error deleting API", e);
                         Messagebox.show("Error al eliminar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
                     }

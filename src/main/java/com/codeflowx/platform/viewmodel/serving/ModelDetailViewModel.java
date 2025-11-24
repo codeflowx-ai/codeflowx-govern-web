@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.serving.Model;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,95 +55,98 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class ModelDetailViewModel extends MasterPage {
-    
+
+    @WireVariable
+    private ModelService modelService;
+
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxmodel;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Model currentModel;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalSrvmodelname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableSrvmodeltypes = new ArrayList<>();
     private List<String> availableSrvmodelframeworks = new ArrayList<>();
     private List<String> availableSrvmodelstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxmodel = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ModelDetailViewModel - mode: {}, idxmodel: {}", mode, idxmodel);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxmodel != null) {
@@ -152,11 +157,11 @@ public class ModelDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentModel, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentModel = new Model();
@@ -166,39 +171,39 @@ public class ModelDetailViewModel extends MasterPage {
         loadSrvmodelframeworks();
         loadSrvmodelstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentModel = businessService.findById(Model.class, id);
-            
+            currentModel = modelService.findById(id);
+
             if (currentModel == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentModel.getSrvmodelname();
         loadSrvmodeltypes();
         loadSrvmodelframeworks();
         loadSrvmodelstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalSrvmodelname = currentModel.getSrvmodelname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "SRVMODELS", id, "Consulta: " + currentModel.getSrvmodelname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -207,55 +212,55 @@ public class ModelDetailViewModel extends MasterPage {
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentModel.getIdxmodel() == null;
-            
+
             if (isNew) {
-                businessService.save(currentModel);
+                currentModel = modelService.create(currentModel);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "SRVMODELS", currentModel.getIdxmodel(), 
+                logActivity("CREACION", "SRVMODELS", currentModel.getIdxmodel(),
                     "Creado: " + currentModel.getSrvmodelname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentModel);
+                currentModel = modelService.update(currentModel);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "SRVMODELS", currentModel.getIdxmodel(), 
+                logActivity("EDICION", "SRVMODELS", currentModel.getIdxmodel(),
                     "Actualizado: " + currentModel.getSrvmodelname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentModel.getSrvmodelname() == null || currentModel.getSrvmodelname().trim().isEmpty()) {
             errors.append("- Srvmodelname\n");
         }
@@ -280,16 +285,16 @@ public class ModelDetailViewModel extends MasterPage {
         if (currentModel.getSrvmodelcreatedat() == null) {
             errors.append("- Srvmodelcreatedat\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -298,28 +303,28 @@ public class ModelDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadSrvmodeltypes() {
         // TODO: Cargar valores desde configuración o BD
         availableSrvmodeltypes.add("OPTION_1");
         availableSrvmodeltypes.add("OPTION_2");
         availableSrvmodeltypes.add("OPTION_3");
     }
-    
+
     private void loadSrvmodelframeworks() {
         // TODO: Cargar valores desde configuración o BD
         availableSrvmodelframeworks.add("OPTION_1");
         availableSrvmodelframeworks.add("OPTION_2");
         availableSrvmodelframeworks.add("OPTION_3");
     }
-    
+
     private void loadSrvmodelstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableSrvmodelstatuss.add("OPTION_1");
         availableSrvmodelstatuss.add("OPTION_2");
         availableSrvmodelstatuss.add("OPTION_3");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -345,7 +350,7 @@ public class ModelDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -353,13 +358,13 @@ public class ModelDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentModel = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableSrvmodeltypes != null) {
                 availableSrvmodeltypes.clear();
@@ -373,17 +378,17 @@ public class ModelDetailViewModel extends MasterPage {
                 availableSrvmodelstatuss.clear();
                 availableSrvmodelstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

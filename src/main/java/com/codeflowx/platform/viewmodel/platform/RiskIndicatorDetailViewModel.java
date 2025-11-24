@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.platform.RiskIndicator;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.RiskIndicatorService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class RiskIndicatorDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private RiskIndicatorService riskIndicatorService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -170,7 +175,7 @@ public class RiskIndicatorDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentRiskIndicator = businessService.findById(RiskIndicator.class, id);
+            currentRiskIndicator = riskIndicatorService.findById(id);
             
             if (currentRiskIndicator == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -195,7 +200,7 @@ public class RiskIndicatorDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "GOVRISKINDICATORS", id, "Consulta: " + currentRiskIndicator.getIndicatorname());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -219,14 +224,14 @@ public class RiskIndicatorDetailViewModel extends MasterPage {
             boolean isNew = currentRiskIndicator.getIdxriskindicator() == null;
             
             if (isNew) {
-                businessService.save(currentRiskIndicator);
+                currentRiskIndicator = riskIndicatorService.create(currentRiskIndicator);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "GOVRISKINDICATORS", currentRiskIndicator.getIdxriskindicator(), 
                     "Creado: " + currentRiskIndicator.getIndicatorname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentRiskIndicator);
+                currentRiskIndicator = riskIndicatorService.update(currentRiskIndicator);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "GOVRISKINDICATORS", currentRiskIndicator.getIdxriskindicator(), 
                     "Actualizado: " + currentRiskIndicator.getIndicatorname());
@@ -239,7 +244,7 @@ public class RiskIndicatorDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

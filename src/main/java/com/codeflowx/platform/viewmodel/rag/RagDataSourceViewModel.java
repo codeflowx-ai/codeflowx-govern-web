@@ -12,6 +12,9 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.rag.RagDataSource;
 import com.codeflowx.govern.entity.rag.RagSystem;
+import com.codeflowx.govern.service.rag.RagDataSourceService;
+import com.codeflowx.govern.service.rag.RagSystemService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -29,35 +32,41 @@ import lombok.extern.slf4j.Slf4j;
 @VariableResolver(DelegatingVariableResolver.class)
 public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
     private static final long serialVersionUID = 1L;
-    
+
+    @org.zkoss.zk.ui.select.annotation.WireVariable
+    private RagSystemService ragSystemService;
+
+    @org.zkoss.zk.ui.select.annotation.WireVariable
+    private RagDataSourceService ragDataSourceService;
+
     @Override
     public void setBeans(Object bean) {}
-    
+
     // Paginación
     private PageParams pageParams;
     private PageResult<RagDataSource> pageResult;
-    
+
     // Filtros
     private String searchText = "";
     private String filterRagSystem = "";
     private String filterType = "";
     private String filterStatus = "";
-    
+
     // Datos
     private List<RagDataSource> sourcesList = new ArrayList<>();
     private List<RagSystem> ragSystemsList = new ArrayList<>();
-    
+
     // Métricas
     private int totalSources = 0;
     private int indexedSources = 0;
     private int indexingSources = 0;
     private long totalDocuments = 0L;
-    
+
     // Modal de creación/edición
     private boolean showModal = false;
     private boolean isEditMode = false;
     private Long currentSourceId = null;
-    
+
     // Campos del formulario
     private Long sourceRagSystemId;
     private String sourceName;
@@ -65,70 +74,69 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
     private String sourceUrl;
     private String sourceIndexStatus = "PENDING";
     private String sourceDataClass = "INTERNAL";
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(50)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadRagSystems();
         loadSources();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadRagSystems() {
         try {
             PageParams params = PageParams.builder().maxRows(100).pageActual(1).build();
-            PageResult<RagSystem> result = businessService.findAllEntity(RagSystem.class, params, new Criterias());
-            
+            PageResult<RagSystem> result = ragSystemService.findAll(params);
+
             if (result != null && result.getContent() != null) {
                 ragSystemsList = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar sistemas RAG", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadSources() {
         try {
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllEntity(
-                RagDataSource.class,
+
+            pageResult = ragDataSourceService.findAll(
                 pageParams,
                 criterias
             );
-            
+
             if (pageResult != null && pageResult.getContent() != null) {
                 sourcesList = pageResult.getContent();
                 totalSources = pageResult.getTotalRows();
-                
+
                 // Auditar búsqueda
-                logActivity("BUSCAR", "RAGDATASOURCES", null, 
+                logActivity("BUSCAR", "RAGDATASOURCES", null,
                     "Búsqueda fuentes: " + sourcesList.size() + " resultados");
-                
+
                 log.info("Cargadas {} fuentes de datos RAG", sourcesList.size());
             } else {
                 sourcesList = new ArrayList<>();
                 totalSources = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar fuentes", e);
-            Messagebox.show("Error al cargar fuentes: " + e.getMessage(), 
+            Messagebox.show("Error al cargar fuentes: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadMetrics() {
@@ -136,11 +144,11 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             indexedSources = (int) sourcesList.stream()
                 .filter(s -> "COMPLETED".equals(s.getRagdsindexstatus()))
                 .count();
-                
+
             indexingSources = (int) sourcesList.stream()
                 .filter(s -> "IN_PROGRESS".equals(s.getRagdsindexstatus()))
                 .count();
-                
+
             totalDocuments = sourcesList.stream()
                 .mapToLong(s -> s.getRagdsdocumentcount() != null ? s.getRagdsdocumentcount() : 0)
                 .sum();
@@ -148,14 +156,14 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             log.error("Error al cargar métricas", e);
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         if (searchText != null && !searchText.trim().isEmpty()) {
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "ragdssourcename", searchText));
         }
-        
+
         if (filterRagSystem != null && !filterRagSystem.trim().isEmpty()) {
             try {
                 Long systemId = Long.parseLong(filterRagSystem);
@@ -164,18 +172,18 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
                 log.warn("Invalid RAG system ID filter: {}", filterRagSystem);
             }
         }
-        
+
         if (filterType != null && !filterType.trim().isEmpty()) {
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragdssourcetype", filterType));
         }
-        
+
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragdsindexstatus", filterStatus));
         }
-        
+
         return criterias;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void searchSources() {
@@ -183,7 +191,7 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         loadSources();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
@@ -191,14 +199,14 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         loadSources();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshSources() {
         loadSources();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void showCreateModal() {
@@ -207,13 +215,13 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         clearForm();
         showModal = true;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void editSource(@BindingParam("source") RagDataSource source) {
         isEditMode = true;
         currentSourceId = source.getIdxragdatasource();
-        
+
         // Cargar datos al formulario
         sourceRagSystemId = source.getRagSystem() != null ? source.getRagSystem().getIdxragsystem() : null;
         sourceName = source.getRagdssourcename();
@@ -221,10 +229,10 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         sourceUrl = source.getRagdssourceurl();
         sourceIndexStatus = source.getRagdsindexstatus();
         sourceDataClass = source.getRagdsdataclass();
-        
+
         showModal = true;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveSource() {
@@ -234,17 +242,17 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
                 Messagebox.show("Debe seleccionar un sistema RAG", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (sourceName == null || sourceName.trim().isEmpty()) {
                 Messagebox.show("El nombre es requerido", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             RagDataSource source;
-            
+
             if (isEditMode && currentSourceId != null) {
                 // Editar
-                source = businessService.findById(RagDataSource.class, currentSourceId);
+                source = ragDataSourceService.findById(currentSourceId);
                 if (source == null) {
                     Messagebox.show("Fuente no encontrada", "Error", Messagebox.OK, Messagebox.ERROR);
                     return;
@@ -256,68 +264,72 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
                 source.setRagdscreatedat(new Timestamp(System.currentTimeMillis()));
                 source.setRagdsdocumentcount(0);
             }
-            
+
             // Actualizar campos
-            RagSystem ragSystem = businessService.findById(RagSystem.class, sourceRagSystemId);
+            RagSystem ragSystem = ragSystemService.findById(sourceRagSystemId);
             if (ragSystem == null) {
                 Messagebox.show("Sistema RAG no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
                 return;
             }
-            
+
             source.setRagSystem(ragSystem);
             source.setRagdssourcename(sourceName);
             source.setRagdssourcetype(sourceType);
             source.setRagdssourceurl(sourceUrl);
             source.setRagdsindexstatus(sourceIndexStatus);
             source.setRagdsdataclass(sourceDataClass);
-            
-            businessService.save(source);
-            
+
+            if (isEditMode) {
+                ragDataSourceService.update(source);
+            } else {
+                ragDataSourceService.create(source);
+            }
+
             // Auditar
-            logActivity(isEditMode ? "EDITAR" : "CREAR", "RAGDATASOURCES", source.getIdxragdatasource(), 
+            logActivity(isEditMode ? "EDITAR" : "CREAR", "RAGDATASOURCES", source.getIdxragdatasource(),
                 (isEditMode ? "Editada" : "Creada") + " fuente: " + source.getRagdssourcename());
-            
+
             showModal = false;
             loadSources();
             loadMetrics();
-            
-            Messagebox.show("Fuente guardada exitosamente", 
+
+            Messagebox.show("Fuente guardada exitosamente",
                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar fuente", e);
-            Messagebox.show("Error al guardar: " + e.getMessage(), 
+            Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void closeModal() {
         showModal = false;
         clearForm();
     }
-    
+
     @Command
     public void viewSource(@BindingParam("source") RagDataSource source) {
         log.info("Ver fuente: {}", source.getRagdssourcename());
         // TODO: Navegar a vista detallada
     }
-    
+
     @Command
     @NotifyChange("*")
     public void reindexSource(@BindingParam("source") RagDataSource source) {
         log.info("Reindexar fuente: {}", source.getRagdssourcename());
-        
+
         // TODO: Integración con leka-server para reindexación
-        Messagebox.show("Funcionalidad de reindexación en desarrollo. Requiere integración con leka-server.", 
+        Messagebox.show("Funcionalidad de reindexación en desarrollo. Requiere integración con leka-server.",
             "Info", Messagebox.OK, Messagebox.INFORMATION);
-        
+
         // Auditar
-        logActivity("EDITAR", "RAGDATASOURCES", source.getIdxragdatasource(), 
+        logActivity("EDITAR", "RAGDATASOURCES", source.getIdxragdatasource(),
             "Reindexación solicitada: " + source.getRagdssourcename());
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteSource(@BindingParam("source") RagDataSource source) {
@@ -327,24 +339,24 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
                         businessService.removeFromID(source);
-                        
+
                         // Auditar eliminación
-                        logActivity("ELIMINAR", "RAGDATASOURCES", source.getIdxragdatasource(), 
+                        logActivity("ELIMINAR", "RAGDATASOURCES", source.getIdxragdatasource(),
                             "Fuente eliminada: " + source.getRagdssourcename());
-                        
+
                         loadSources();
                         loadMetrics();
-                        Messagebox.show("Fuente eliminada exitosamente", 
+                        Messagebox.show("Fuente eliminada exitosamente",
                             "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                     } catch (Exception e) {
                         log.error("Error al eliminar fuente", e);
-                        Messagebox.show("Error: " + e.getMessage(), 
+                        Messagebox.show("Error: " + e.getMessage(),
                             "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     private void clearForm() {
         sourceRagSystemId = null;
         sourceName = null;
@@ -353,11 +365,11 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         sourceIndexStatus = "PENDING";
         sourceDataClass = "INTERNAL";
     }
-    
+
     public String getRagSystemName(RagSystem system) {
         return system != null ? system.getRagsystemname() : "-";
     }
-    
+
     public String getStatusColor(String status) {
         if (status == null) return "badge bg-secondary";
         switch (status) {
@@ -368,7 +380,7 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             default: return "badge bg-secondary";
         }
     }
-    
+
     public String getClassificationColor(String classification) {
         if (classification == null) return "badge bg-secondary";
         switch (classification) {
@@ -379,17 +391,17 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
             default: return "badge bg-secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
-        if (sourcesList != null) { 
-            sourcesList.clear(); 
-            sourcesList = null; 
+        if (sourcesList != null) {
+            sourcesList.clear();
+            sourcesList = null;
         }
         if (ragSystemsList != null) {
             ragSystemsList.clear();
@@ -400,4 +412,3 @@ public class RagDataSourceViewModel extends BaseFront<RagDataSourceViewModel> {
         businessService = null;
     }
 }
-

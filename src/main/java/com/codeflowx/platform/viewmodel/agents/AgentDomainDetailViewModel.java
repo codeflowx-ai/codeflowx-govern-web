@@ -34,6 +34,8 @@ import com.codeflowx.govern.entity.agents.AgentExpertise;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentDomainService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -57,6 +59,9 @@ public class AgentDomainDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentDomainService agentDomainService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -181,7 +186,7 @@ public class AgentDomainDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentDomain = businessService.findById(AgentDomain.class, id);
+            currentAgentDomain = agentDomainService.findById(id);
             
             if (currentAgentDomain == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -233,14 +238,14 @@ public class AgentDomainDetailViewModel extends MasterPage {
             boolean isNew = currentAgentDomain.getIdxagentdomain() == null;
             
             if (isNew) {
-                businessService.save(currentAgentDomain);
+                currentAgentDomain = agentDomainService.create(currentAgentDomain);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTDOMAINS", currentAgentDomain.getIdxagentdomain(), 
                     "Creado: " + currentAgentDomain.getAgtdomainname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentDomain);
+                currentAgentDomain = agentDomainService.update(currentAgentDomain);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTDOMAINS", currentAgentDomain.getIdxagentdomain(), 
                     "Actualizado: " + currentAgentDomain.getAgtdomainname());

@@ -17,6 +17,11 @@ import com.codeflowx.govern.entity.agents.Agent;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundRouting;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.govern.service.agents.AgentService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.playground.PlaygroundRoutingService;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import com.codeflowx.platform.service.BaseFront;
 import com.codeflowx.platform.service.BaseFront.Criteria;
 import com.codeflowx.platform.service.BaseFront.Criterias;
@@ -24,21 +29,34 @@ import com.codeflowx.platform.service.BaseFront.Evaluation;
 import com.codeflowx.platform.service.BaseFront.Operation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 public class PlaygroundRoutingViewModel extends BaseFront {
 
+    @WireVariable
+    private ModelService modelService;
+
+    @WireVariable
+    private AgentService agentService;
+
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
+
+    @WireVariable
+    private PlaygroundRoutingService playgroundRoutingService;
+
     private PlaygroundSession currentSession;
     private List<PlaygroundRouting> allRoutings = new ArrayList<>();
     private List<PlaygroundRouting> filteredRoutings = new ArrayList<>();
-    
+
     private String inputQuery = "";
     private PlaygroundRouting routingResult;
-    
+
     private List<Model> availableModels = new ArrayList<>();
     private List<Agent> availableAgents = new ArrayList<>();
     private List<String> availableStatuses = List.of("PENDING", "ROUTING", "COMPLETED", "ERROR");
-    
+
     private String searchTerm = "";
     private String filterStatus = "";
     private int activePage = 0;
@@ -62,8 +80,8 @@ public class PlaygroundRoutingViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = businessService.find(Model.class, criterias);
-        } catch (Exception e) {
+            availableModels = modelService.findAll(criterias);
+        } catch (GovernanceServiceException e) {
             log.error("Error loading models", e);
         }
     }
@@ -72,8 +90,8 @@ public class PlaygroundRoutingViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("agentstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableAgents = businessService.find(Agent.class, criterias);
-        } catch (Exception e) {
+            availableAgents = agentService.findAll(criterias);
+        } catch (GovernanceServiceException e) {
             log.error("Error loading agents", e);
         }
     }
@@ -86,8 +104,8 @@ public class PlaygroundRoutingViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(currentSession);
-        } catch (Exception e) {
+            currentSession = playgroundSessionService.create(currentSession);
+        } catch (GovernanceServiceException e) {
             log.error("Error creating session", e);
         }
     }
@@ -110,7 +128,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
             Messagebox.show("Por favor ingresa una consulta", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             PlaygroundRouting routing = new PlaygroundRouting();
             routing.setSession(currentSession);
@@ -118,40 +136,40 @@ public class PlaygroundRoutingViewModel extends BaseFront {
             routing.setRoutingstatus("ROUTING");
             routing.setRoutingcreatedby(getUserName());
             routing.setRoutingcreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Simulate intelligent routing (in production, use ML/AI service)
             Model selectedModel = !availableModels.isEmpty() ? availableModels.get(0) : null;
             Agent selectedAgent = !availableAgents.isEmpty() ? availableAgents.get(0) : null;
-            
+
             if (selectedModel != null) {
                 routing.setRoutingselectedmodel(selectedModel.getModelname());
                 routing.setModel(selectedModel);
             }
-            
+
             if (selectedAgent != null) {
                 routing.setRoutingselectedagent(selectedAgent.getAgentname());
                 routing.setAgent(selectedAgent);
             }
-            
+
             routing.setRoutingconfidence(new BigDecimal("92.3"));
-            routing.setRoutingreason("El modelo " + (selectedModel != null ? selectedModel.getModelname() : "N/A") + 
+            routing.setRoutingreason("El modelo " + (selectedModel != null ? selectedModel.getModelname() : "N/A") +
                                      " es el más adecuado para este tipo de consulta basado en su especialización y rendimiento histórico.");
             routing.setRoutingoutput("Esta es una respuesta simulada al routing. En producción, aquí iría la respuesta del modelo/agente seleccionado.");
             routing.setRoutingstatus("COMPLETED");
             routing.setRoutingprocessingtime(450);
             routing.setRoutingcost(new BigDecimal("0.003"));
-            
+
             // Simulate alternatives
             routing.setRoutingalternatives("{\"alternatives\": [{\"model\": \"gpt-4\", \"confidence\": 88.1}, {\"model\": \"claude-3\", \"confidence\": 85.7}]}");
             
-            businessService.save(routing);
+            routing = playgroundRoutingService.create(routing);
             
             routingResult = routing;
             loadRoutings();
             
             logActivity("PLAYGROUND_ROUTING", "ANALYZE", null, "Consulta enrutada");
             Messagebox.show("Routing completado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error routing query", e);
             Messagebox.show("Error al enrutar: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -168,7 +186,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     @Command
     public void showAlternatives() {
         if (routingResult != null) {
-            Messagebox.show("Alternativas: " + routingResult.getRoutingalternatives(), 
+            Messagebox.show("Alternativas: " + routingResult.getRoutingalternatives(),
                           "Alternativas de Routing", Messagebox.OK, Messagebox.INFORMATION);
         }
     }
@@ -191,13 +209,13 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     @NotifyChange({"filteredRoutings", "routingHistory"})
     public void deleteRouting(PlaygroundRouting routing) {
         try {
-            businessService.removeFromID(PlaygroundRouting.class, routing.getIdxplaygroundrouting());
+            playgroundRoutingService.deleteById(routing.getIdxplaygroundrouting());
             if (routingResult != null && routingResult.getIdxplaygroundrouting().equals(routing.getIdxplaygroundrouting())) {
                 routingResult = null;
             }
             loadRoutings();
             logActivity("PLAYGROUND_ROUTING", "DELETE", null, "Routing eliminado");
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error deleting routing", e);
         }
     }
@@ -233,7 +251,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     private void applyFilters() {
         filteredRoutings = allRoutings.stream()
             .filter(r -> {
-                if (StringUtils.isNotBlank(searchTerm) && 
+                if (StringUtils.isNotBlank(searchTerm) &&
                     !r.getRoutinginput().toLowerCase().contains(searchTerm.toLowerCase())) {
                     return false;
                 }
@@ -249,7 +267,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     public List<PlaygroundRouting> getRoutingHistory() {
         int start = activePage * pageSize;
         int end = Math.min(start + pageSize, filteredRoutings.size());
-        return start < filteredRoutings.size() ? 
+        return start < filteredRoutings.size() ?
                filteredRoutings.subList(start, end) : new ArrayList<>();
     }
 

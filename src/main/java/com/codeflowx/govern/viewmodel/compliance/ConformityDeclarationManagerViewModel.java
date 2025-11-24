@@ -29,6 +29,7 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
 
 import codeflowx.nocode.persist.BusinessService;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class ConformityDeclarationManagerViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private ComplianceAssessmentService complianceAssessmentService;
     
     @WireVariable
     public Environment environment;
@@ -62,9 +63,9 @@ public class ConformityDeclarationManagerViewModel extends MasterPage {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -194,7 +195,7 @@ public class ConformityDeclarationManagerViewModel extends MasterPage {
         }
         
         try {
-            selectedAssessment = businessService.findById(ComplianceAssessment.class, selectedAssessmentId);
+            selectedAssessment = complianceAssessmentService.findById(selectedAssessmentId);
             
             if (selectedAssessment != null) {
                 // Cargar preview
@@ -380,7 +381,7 @@ public class ConformityDeclarationManagerViewModel extends MasterPage {
             
             selectedAssessment = null;
             selectedDeclaration = null;
-            businessService = null;
+            complianceAssessmentService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

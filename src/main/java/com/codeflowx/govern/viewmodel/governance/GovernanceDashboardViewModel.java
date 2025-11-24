@@ -30,12 +30,15 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.governance.GovernanceDashboardSummary;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.views.governance.ComplianceByFramework;
 import com.codeflowx.govern.entity.views.governance.PolicyEvaluationTrends;
 import com.codeflowx.govern.entity.views.governance.RiskAssessmentMatrix;
 import com.codeflowx.govern.entity.governance.Policy;
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
 import com.codeflowx.govern.entity.governance.PolicyViolation;
+import com.codeflowx.govern.service.governance.PolicyViolationService;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -65,7 +68,11 @@ public class GovernanceDashboardViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private PolicyService policyService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private PolicyViolationService policyViolationService;
     
     
     @WireVariable
@@ -79,9 +86,9 @@ public class GovernanceDashboardViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -191,7 +198,9 @@ public class GovernanceDashboardViewModel extends MasterPage {
             }
             
             pageParams = null;
-            businessService = null;
+            policyService = null;
+            complianceAssessmentService = null;
+            policyViolationService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

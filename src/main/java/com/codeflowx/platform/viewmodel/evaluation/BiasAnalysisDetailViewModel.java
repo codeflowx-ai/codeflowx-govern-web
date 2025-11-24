@@ -35,6 +35,11 @@ import com.codeflowx.govern.entity.evaluation.BiasRecommendation;
 import com.codeflowx.govern.entity.evaluation.FairnessMetric;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.evaluation.BiasAnalysisService;
+import com.codeflowx.govern.service.evaluation.BiasDetectionService;
+import com.codeflowx.govern.service.evaluation.BiasRecommendationService;
+import com.codeflowx.govern.service.evaluation.FairnessMetricService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,57 +61,69 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class BiasAnalysisDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private BiasAnalysisService biasAnalysisService;
+
+    @WireVariable
+    private BiasDetectionService biasDetectionService;
+
+    @WireVariable
+    private BiasRecommendationService biasRecommendationService;
+
+    @WireVariable
+    private FairnessMetricService fairnessMetricService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxbiasanalysis;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private BiasAnalysis currentBiasAnalysis;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
-    
+
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableStatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<BiasDetection> subgovbiasdetections = new ArrayList<>();
     private List<BiasRecommendation> subgovbiasrecommendations = new ArrayList<>();
@@ -114,40 +131,40 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
     private boolean subgovbiasdetectionsLoaded = false;
     private boolean subgovbiasrecommendationsLoaded = false;
     private boolean subgovfairnessmetricsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxbiasanalysis = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando BiasAnalysisDetailViewModel - mode: {}, idxbiasanalysis: {}", mode, idxbiasanalysis);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxbiasanalysis != null) {
@@ -158,11 +175,11 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/evaluation/evaluation-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentBiasAnalysis, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentBiasAnalysis = new BiasAnalysis();
@@ -170,36 +187,36 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadStatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentBiasAnalysis = businessService.findById(BiasAnalysis.class, id);
-            
+            currentBiasAnalysis = biasAnalysisService.findById(id);
+
             if (currentBiasAnalysis == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/evaluation/evaluation-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentBiasAnalysis.getIdxbiasanalysis();
         loadStatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "GOVBIASANALYSIS", id, "Consulta: " + currentBiasAnalysis.getIdxbiasanalysis());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -208,55 +225,55 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             appendPage("plataforma/evaluation/evaluation-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentBiasAnalysis.getIdxbiasanalysis() == null;
-            
+
             if (isNew) {
-                businessService.save(currentBiasAnalysis);
+                currentBiasAnalysis = biasAnalysisService.create(currentBiasAnalysis);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "GOVBIASANALYSIS", currentBiasAnalysis.getIdxbiasanalysis(), 
+                logActivity("CREACION", "GOVBIASANALYSIS", currentBiasAnalysis.getIdxbiasanalysis(),
                     "Creado: " + currentBiasAnalysis.getIdxbiasanalysis());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentBiasAnalysis);
+                currentBiasAnalysis = biasAnalysisService.update(currentBiasAnalysis);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "GOVBIASANALYSIS", currentBiasAnalysis.getIdxbiasanalysis(), 
+                logActivity("EDICION", "GOVBIASANALYSIS", currentBiasAnalysis.getIdxbiasanalysis(),
                     "Actualizado: " + currentBiasAnalysis.getIdxbiasanalysis());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/evaluation/evaluation-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentBiasAnalysis.getAnalysistimestamp() == null) {
             errors.append("- Analysistimestamp\n");
         }
@@ -278,16 +295,16 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
         if (currentBiasAnalysis.getUpdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -296,14 +313,14 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/evaluation/evaluation-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadStatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableStatuss.add("OPTION_1");
         availableStatuss.add("OPTION_2");
         availableStatuss.add("OPTION_3");
     }
-    
+
     private void loadSubgovbiasdetections() {
         try {
             if (currentBiasAnalysis != null && currentBiasAnalysis.getIdxbiasanalysis() != null) {
@@ -311,25 +328,25 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "analysis");
                 criteria.setValues(new Object[]{currentBiasAnalysis.getIdxbiasanalysis()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<BiasDetection> result = businessService.findAllEntity(BiasDetection.class, collectionParams, criterias);
+
+                PageResult<BiasDetection> result = biasDetectionService.findAll(collectionParams, criterias);
                 subgovbiasdetections = result != null ? result.getContent() : new ArrayList<>();
                 subgovbiasdetectionsLoaded = true;
                 log.debug("Cargados {} subgovbiasdetections", subgovbiasdetections.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovbiasdetections", e);
             subgovbiasdetections = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovbiasrecommendations() {
         try {
             if (currentBiasAnalysis != null && currentBiasAnalysis.getIdxbiasanalysis() != null) {
@@ -337,25 +354,25 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "analysis");
                 criteria.setValues(new Object[]{currentBiasAnalysis.getIdxbiasanalysis()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<BiasRecommendation> result = businessService.findAllEntity(BiasRecommendation.class, collectionParams, criterias);
+
+                PageResult<BiasRecommendation> result = biasRecommendationService.findAll(collectionParams, criterias);
                 subgovbiasrecommendations = result != null ? result.getContent() : new ArrayList<>();
                 subgovbiasrecommendationsLoaded = true;
                 log.debug("Cargados {} subgovbiasrecommendations", subgovbiasrecommendations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovbiasrecommendations", e);
             subgovbiasrecommendations = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovfairnessmetrics() {
         try {
             if (currentBiasAnalysis != null && currentBiasAnalysis.getIdxbiasanalysis() != null) {
@@ -363,25 +380,25 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "analysis");
                 criteria.setValues(new Object[]{currentBiasAnalysis.getIdxbiasanalysis()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<FairnessMetric> result = businessService.findAllEntity(FairnessMetric.class, collectionParams, criterias);
+
+                PageResult<FairnessMetric> result = fairnessMetricService.findAll(collectionParams, criterias);
                 subgovfairnessmetrics = result != null ? result.getContent() : new ArrayList<>();
                 subgovfairnessmetricsLoaded = true;
                 log.debug("Cargados {} subgovfairnessmetrics", subgovfairnessmetrics.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovfairnessmetrics", e);
             subgovfairnessmetrics = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovbiasdetections")
     public void onSelectSubgovbiasdetectionsTab() {
@@ -389,7 +406,7 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             loadSubgovbiasdetections();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovbiasrecommendations")
     public void onSelectSubgovbiasrecommendationsTab() {
@@ -397,7 +414,7 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             loadSubgovbiasrecommendations();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovfairnessmetrics")
     public void onSelectSubgovfairnessmetricsTab() {
@@ -405,7 +422,7 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             loadSubgovfairnessmetrics();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -431,7 +448,7 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -439,19 +456,19 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentBiasAnalysis = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableStatuss != null) {
                 availableStatuss.clear();
                 availableStatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subgovbiasdetections != null) {
                 subgovbiasdetections.clear();
@@ -468,15 +485,15 @@ public class BiasAnalysisDetailViewModel extends MasterPage {
                 subgovfairnessmetrics = null;
             }
             subgovfairnessmetricsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

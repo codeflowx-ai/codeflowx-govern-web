@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentHealth;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentHealthService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentHealthDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentHealthService agentHealthService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -172,7 +177,7 @@ public class AgentHealthDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentHealth = businessService.findById(AgentHealth.class, id);
+            currentAgentHealth = agentHealthService.findById(id);
             
             if (currentAgentHealth == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -220,14 +225,14 @@ public class AgentHealthDetailViewModel extends MasterPage {
             boolean isNew = currentAgentHealth.getIdxagenthealth() == null;
             
             if (isNew) {
-                businessService.save(currentAgentHealth);
+                currentAgentHealth = agentHealthService.create(currentAgentHealth);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTHEALTH", currentAgentHealth.getIdxagenthealth(), 
                     "Creado: " + currentAgentHealth.getIdxagenthealth());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentHealth);
+                currentAgentHealth = agentHealthService.update(currentAgentHealth);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTHEALTH", currentAgentHealth.getIdxagenthealth(), 
                     "Actualizado: " + currentAgentHealth.getIdxagenthealth());

@@ -63,62 +63,86 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class RunDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private RunService runService;
+    @WireVariable
+    private CheckpointService checkpointService;
+    @WireVariable
+    private EnvironmentService environmentService;
+    @WireVariable
+    private HPOTrialService hpoTrialService;
+    @WireVariable
+    private MetricSeriesService metricSeriesService;
+    @WireVariable
+    private MetricStreamService metricStreamService;
+    @WireVariable
+    private ParamService paramService;
+    @WireVariable
+    private TagService tagService;
+    @WireVariable
+    private TrainingAlertService trainingAlertService;
+    @WireVariable
+    private TrainingArtifactService trainingArtifactService;
+    @WireVariable
+    private TrainingLogService trainingLogService;
+    @WireVariable
+    private TrainingMetricService trainingMetricService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxrun;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Run currentRun;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalTrnrunname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableTrnstatuss = new ArrayList<>();
     private List<String> availableTrngovernancestatuss = new ArrayList<>();
     private List<String> availableTrnruntypes = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     private List<String> selectedTrntags = new ArrayList<>();
     private String newTrntag = "";
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<Checkpoint> subtrncheckpoints = new ArrayList<>();
     private List<Environment> subtrnenvironments = new ArrayList<>();
@@ -144,40 +168,40 @@ public class RunDetailViewModel extends MasterPage {
     private boolean subtrntrainingartifactsLoaded = false;
     private boolean subtrntraininglogsLoaded = false;
     private boolean subtrntrainingmetricsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxrun = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando RunDetailViewModel - mode: {}, idxrun: {}", mode, idxrun);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxrun != null) {
@@ -188,11 +212,11 @@ public class RunDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentRun, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentRun = new Run();
@@ -202,40 +226,40 @@ public class RunDetailViewModel extends MasterPage {
         loadTrngovernancestatuss();
         loadTrnruntypes();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentRun = businessService.findById(Run.class, id);
-            
+            currentRun = runService.findById(id);
+
             if (currentRun == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentRun.getTrnrunname();
         loadTrnstatuss();
         loadTrngovernancestatuss();
         loadTrnruntypes();
-            
+
             // Cargar tags/roles existentes desde JSON
             selectedTrntags = convertJsonToList(currentRun.getTrntags());
-            
+
             // Guardar valores originales para validación de unicidad
             originalTrnrunname = currentRun.getTrnrunname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "TRNRUNS", id, "Consulta: " + currentRun.getTrnrunname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -244,55 +268,55 @@ public class RunDetailViewModel extends MasterPage {
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentRun.getIdxrun() == null;
-            
+
             if (isNew) {
-                businessService.save(currentRun);
+                currentRun = runService.create(currentRun);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "TRNRUNS", currentRun.getIdxrun(), 
+                logActivity("CREACION", "TRNRUNS", currentRun.getIdxrun(),
                     "Creado: " + currentRun.getTrnrunname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentRun);
+                currentRun = runService.update(currentRun);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "TRNRUNS", currentRun.getIdxrun(), 
+                logActivity("EDICION", "TRNRUNS", currentRun.getIdxrun(),
                     "Actualizado: " + currentRun.getTrnrunname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentRun.getTrnrunuuid() == null || currentRun.getTrnrunuuid().trim().isEmpty()) {
             errors.append("- Runuuid\n");
         }
@@ -317,16 +341,16 @@ public class RunDetailViewModel extends MasterPage {
         if (currentRun.getTrnupdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -335,28 +359,28 @@ public class RunDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadTrnstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableTrnstatuss.add("OPTION_1");
         availableTrnstatuss.add("OPTION_2");
         availableTrnstatuss.add("OPTION_3");
     }
-    
+
     private void loadTrngovernancestatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableTrngovernancestatuss.add("OPTION_1");
         availableTrngovernancestatuss.add("OPTION_2");
         availableTrngovernancestatuss.add("OPTION_3");
     }
-    
+
     private void loadTrnruntypes() {
         // TODO: Cargar valores desde configuración o BD
         availableTrnruntypes.add("OPTION_1");
         availableTrnruntypes.add("OPTION_2");
         availableTrnruntypes.add("OPTION_3");
     }
-    
+
     @Command
     @NotifyChange("{'selectedTrntags', 'currentRun'}")
     public void addTrntag() {
@@ -367,7 +391,7 @@ public class RunDetailViewModel extends MasterPage {
             currentRun.setTrntags(convertListToJson(selectedTrntags));
         }
     }
-    
+
     @Command
     @NotifyChange("{'selectedTrntags', 'currentRun'}")
     public void removeTrntag(@BindingParam("tag") String tag) {
@@ -375,7 +399,7 @@ public class RunDetailViewModel extends MasterPage {
         // Convertir lista a JSON y actualizar en currentRun
         currentRun.setTrntags(convertListToJson(selectedTrntags));
     }
-    
+
     private String convertListToJson(List<String> list) {
         if (list == null || list.isEmpty()) {
             return "[]";
@@ -388,7 +412,7 @@ public class RunDetailViewModel extends MasterPage {
         json.append("]");
         return json.toString();
     }
-    
+
     private List<String> convertJsonToList(String json) {
         List<String> result = new ArrayList<>();
         if (json == null || json.trim().isEmpty() || json.equals("[]")) {
@@ -403,7 +427,7 @@ public class RunDetailViewModel extends MasterPage {
         }
         return result;
     }
-    
+
     private void loadSubtrncheckpoints() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -411,25 +435,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Checkpoint> result = businessService.findAllEntity(Checkpoint.class, collectionParams, criterias);
+
+                PageResult<Checkpoint> result = checkpointService.findAll(collectionParams, criterias);
                 subtrncheckpoints = result != null ? result.getContent() : new ArrayList<>();
                 subtrncheckpointsLoaded = true;
                 log.debug("Cargados {} subtrncheckpoints", subtrncheckpoints.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrncheckpoints", e);
             subtrncheckpoints = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnenvironments() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -437,25 +461,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Environment> result = businessService.findAllEntity(Environment.class, collectionParams, criterias);
+
+                PageResult<Environment> result = environmentService.findAll(collectionParams, criterias);
                 subtrnenvironments = result != null ? result.getContent() : new ArrayList<>();
                 subtrnenvironmentsLoaded = true;
                 log.debug("Cargados {} subtrnenvironments", subtrnenvironments.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnenvironments", e);
             subtrnenvironments = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnhpotrials() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -463,25 +487,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<HPOTrial> result = businessService.findAllEntity(HPOTrial.class, collectionParams, criterias);
+
+                PageResult<HPOTrial> result = hpoTrialService.findAll(collectionParams, criterias);
                 subtrnhpotrials = result != null ? result.getContent() : new ArrayList<>();
                 subtrnhpotrialsLoaded = true;
                 log.debug("Cargados {} subtrnhpotrials", subtrnhpotrials.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnhpotrials", e);
             subtrnhpotrials = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnmetricseries() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -489,25 +513,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<MetricSeries> result = businessService.findAllEntity(MetricSeries.class, collectionParams, criterias);
+
+                PageResult<MetricSeries> result = metricSeriesService.findAll(collectionParams, criterias);
                 subtrnmetricseries = result != null ? result.getContent() : new ArrayList<>();
                 subtrnmetricseriesLoaded = true;
                 log.debug("Cargados {} subtrnmetricseries", subtrnmetricseries.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnmetricseries", e);
             subtrnmetricseries = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnmetricstreams() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -515,25 +539,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<MetricStream> result = businessService.findAllEntity(MetricStream.class, collectionParams, criterias);
+
+                PageResult<MetricStream> result = metricStreamService.findAll(collectionParams, criterias);
                 subtrnmetricstreams = result != null ? result.getContent() : new ArrayList<>();
                 subtrnmetricstreamsLoaded = true;
                 log.debug("Cargados {} subtrnmetricstreams", subtrnmetricstreams.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnmetricstreams", e);
             subtrnmetricstreams = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnparams() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -541,25 +565,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Param> result = businessService.findAllEntity(Param.class, collectionParams, criterias);
+
+                PageResult<Param> result = paramService.findAll(collectionParams, criterias);
                 subtrnparams = result != null ? result.getContent() : new ArrayList<>();
                 subtrnparamsLoaded = true;
                 log.debug("Cargados {} subtrnparams", subtrnparams.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnparams", e);
             subtrnparams = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnruns() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -567,25 +591,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "parentRun");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Run> result = businessService.findAllEntity(Run.class, collectionParams, criterias);
+
+                PageResult<Run> result = runService.findAll(collectionParams, criterias);
                 subtrnruns = result != null ? result.getContent() : new ArrayList<>();
                 subtrnrunsLoaded = true;
                 log.debug("Cargados {} subtrnruns", subtrnruns.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnruns", e);
             subtrnruns = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrntags() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -593,25 +617,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Tag> result = businessService.findAllEntity(Tag.class, collectionParams, criterias);
+
+                PageResult<Tag> result = tagService.findAll(collectionParams, criterias);
                 subtrntags = result != null ? result.getContent() : new ArrayList<>();
                 subtrntagsLoaded = true;
                 log.debug("Cargados {} subtrntags", subtrntags.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrntags", e);
             subtrntags = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrntrainingalerts() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -619,25 +643,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<TrainingAlert> result = businessService.findAllEntity(TrainingAlert.class, collectionParams, criterias);
+
+                PageResult<TrainingAlert> result = trainingAlertService.findAll(collectionParams, criterias);
                 subtrntrainingalerts = result != null ? result.getContent() : new ArrayList<>();
                 subtrntrainingalertsLoaded = true;
                 log.debug("Cargados {} subtrntrainingalerts", subtrntrainingalerts.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrntrainingalerts", e);
             subtrntrainingalerts = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrntrainingartifacts() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -645,25 +669,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<TrainingArtifact> result = businessService.findAllEntity(TrainingArtifact.class, collectionParams, criterias);
+
+                PageResult<TrainingArtifact> result = trainingArtifactService.findAll(collectionParams, criterias);
                 subtrntrainingartifacts = result != null ? result.getContent() : new ArrayList<>();
                 subtrntrainingartifactsLoaded = true;
                 log.debug("Cargados {} subtrntrainingartifacts", subtrntrainingartifacts.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrntrainingartifacts", e);
             subtrntrainingartifacts = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrntraininglogs() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -671,25 +695,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<TrainingLog> result = businessService.findAllEntity(TrainingLog.class, collectionParams, criterias);
+
+                PageResult<TrainingLog> result = trainingLogService.findAll(collectionParams, criterias);
                 subtrntraininglogs = result != null ? result.getContent() : new ArrayList<>();
                 subtrntraininglogsLoaded = true;
                 log.debug("Cargados {} subtrntraininglogs", subtrntraininglogs.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrntraininglogs", e);
             subtrntraininglogs = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrntrainingmetrics() {
         try {
             if (currentRun != null && currentRun.getIdxrun() != null) {
@@ -697,25 +721,25 @@ public class RunDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "run");
                 criteria.setValues(new Object[]{currentRun.getIdxrun()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<TrainingMetric> result = businessService.findAllEntity(TrainingMetric.class, collectionParams, criterias);
+
+                PageResult<TrainingMetric> result = trainingMetricService.findAll(collectionParams, criterias);
                 subtrntrainingmetrics = result != null ? result.getContent() : new ArrayList<>();
                 subtrntrainingmetricsLoaded = true;
                 log.debug("Cargados {} subtrntrainingmetrics", subtrntrainingmetrics.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrntrainingmetrics", e);
             subtrntrainingmetrics = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrncheckpoints")
     public void onSelectSubtrncheckpointsTab() {
@@ -723,7 +747,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrncheckpoints();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnenvironments")
     public void onSelectSubtrnenvironmentsTab() {
@@ -731,7 +755,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnenvironments();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnhpotrials")
     public void onSelectSubtrnhpotrialsTab() {
@@ -739,7 +763,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnhpotrials();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnmetricseries")
     public void onSelectSubtrnmetricseriesTab() {
@@ -747,7 +771,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnmetricseries();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnmetricstreams")
     public void onSelectSubtrnmetricstreamsTab() {
@@ -755,7 +779,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnmetricstreams();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnparams")
     public void onSelectSubtrnparamsTab() {
@@ -763,7 +787,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnparams();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnruns")
     public void onSelectSubtrnrunsTab() {
@@ -771,7 +795,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrnruns();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrntags")
     public void onSelectSubtrntagsTab() {
@@ -779,7 +803,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrntags();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrntrainingalerts")
     public void onSelectSubtrntrainingalertsTab() {
@@ -787,7 +811,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrntrainingalerts();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrntrainingartifacts")
     public void onSelectSubtrntrainingartifactsTab() {
@@ -795,7 +819,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrntrainingartifacts();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrntraininglogs")
     public void onSelectSubtrntraininglogsTab() {
@@ -803,7 +827,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrntraininglogs();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrntrainingmetrics")
     public void onSelectSubtrntrainingmetricsTab() {
@@ -811,7 +835,7 @@ public class RunDetailViewModel extends MasterPage {
             loadSubtrntrainingmetrics();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -837,7 +861,7 @@ public class RunDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -845,13 +869,13 @@ public class RunDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentRun = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableTrnstatuss != null) {
                 availableTrnstatuss.clear();
@@ -865,7 +889,7 @@ public class RunDetailViewModel extends MasterPage {
                 availableTrnruntypes.clear();
                 availableTrnruntypes = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subtrncheckpoints != null) {
                 subtrncheckpoints.clear();
@@ -927,20 +951,20 @@ public class RunDetailViewModel extends MasterPage {
                 subtrntrainingmetrics = null;
             }
             subtrntrainingmetricsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
             if (selectedTrntags != null) {
                 selectedTrntags.clear();
                 selectedTrntags = null;
             }
             newTrntag = null;
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

@@ -4,7 +4,10 @@ import com.codeflowx.govern.business.governance.AICompetenceBusinessService;
 import com.codeflowx.govern.business.governance.AICompetenceBusinessService.CompetenceDashboard;
 import com.codeflowx.govern.business.governance.AICompetenceBusinessService.GapAnalysisResult;
 import com.codeflowx.govern.entity.governance.AICCompetence;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.governance.AITTrainingRecord;
+import com.codeflowx.govern.service.governance.AITTrainingRecordService;
+import com.codeflowx.govern.service.governance.AICCompetenceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,10 +58,14 @@ public class AICompetenceViewModel extends MasterPage {
     private static final long serialVersionUID = 1L;
 
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
 
     @WireVariable
     private AICompetenceBusinessService competenceBusinessService;
+    @WireVariable
+    private AICCompetenceService aICCompetenceService;
+    @WireVariable
+    private AITTrainingRecordService aITTrainingRecordService;
 
     @WireVariable
     public Environment environment;
@@ -92,9 +99,9 @@ public class AICompetenceViewModel extends MasterPage {
     private CompetenceDashboard dashboard = CompetenceDashboard.empty();
 
     protected void initDao() {
-        if (businessService == null && environment != null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     @Override
@@ -311,7 +318,8 @@ public class AICompetenceViewModel extends MasterPage {
         trainingRecords = null;
         trainingRecordForm = null;
         dashboard = null;
-        businessService = null;
+        aICCompetenceService = null;
+            aITTrainingRecordService = null;
         competenceBusinessService = null;
     }
 }

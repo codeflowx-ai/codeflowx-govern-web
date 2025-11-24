@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentEthicsAssessment;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentEthicsAssessmentService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentEthicsAssessmentDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentEthicsAssessmentService agentEthicsAssessmentService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -174,7 +179,7 @@ public class AgentEthicsAssessmentDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentEthicsAssessment = businessService.findById(AgentEthicsAssessment.class, id);
+            currentAgentEthicsAssessment = agentEthicsAssessmentService.findById(id);
             
             if (currentAgentEthicsAssessment == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -223,14 +228,14 @@ public class AgentEthicsAssessmentDetailViewModel extends MasterPage {
             boolean isNew = currentAgentEthicsAssessment.getIdxagentethicsassessment() == null;
             
             if (isNew) {
-                businessService.save(currentAgentEthicsAssessment);
+                currentAgentEthicsAssessment = agentEthicsAssessmentService.create(currentAgentEthicsAssessment);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTETHICSASSESSMENTS", currentAgentEthicsAssessment.getIdxagentethicsassessment(), 
                     "Creado: " + currentAgentEthicsAssessment.getIdxagentethicsassessment());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentEthicsAssessment);
+                currentAgentEthicsAssessment = agentEthicsAssessmentService.update(currentAgentEthicsAssessment);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTETHICSASSESSMENTS", currentAgentEthicsAssessment.getIdxagentethicsassessment(), 
                     "Actualizado: " + currentAgentEthicsAssessment.getIdxagentethicsassessment());

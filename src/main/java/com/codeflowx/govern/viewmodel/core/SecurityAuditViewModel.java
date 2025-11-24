@@ -21,6 +21,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.views.core.SecurityAuditSummary;
+import com.codeflowx.govern.service.core.SecurityAuditSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -41,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SecurityAuditViewModel extends MasterPage {
     
     @WireVariable
-    private BusinessService businessService;
+    private SecurityAuditSummaryService securityAuditSummaryService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -52,9 +54,9 @@ public class SecurityAuditViewModel extends MasterPage {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     private Long totalItems = 0L;
@@ -77,7 +79,7 @@ public class SecurityAuditViewModel extends MasterPage {
     public void loadSecurityData() {
         try {
             log.debug("Cargando auditoría de seguridad");
-            List<SecurityAuditSummary> securityData = businessService.findAllView(SecurityAuditSummary.class);
+            List<SecurityAuditSummary> securityData = securityAuditSummaryService.findAll();
             
             if (securityData != null && !securityData.isEmpty()) {
                 SecurityAuditSummary security = securityData.get(0);
@@ -94,7 +96,7 @@ public class SecurityAuditViewModel extends MasterPage {
                 log.info("Auditoría de seguridad - Total: {}, Score: {}, Level: {}", 
                          totalItems, avgScore, getSecurityLevel());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando auditoría de seguridad", e);
         }
     }

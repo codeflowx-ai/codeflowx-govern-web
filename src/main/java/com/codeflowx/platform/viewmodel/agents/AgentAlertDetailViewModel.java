@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.agents.AgentAlert;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.agents.AgentAlertService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class AgentAlertDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentAlertService agentAlertService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -164,7 +169,7 @@ public class AgentAlertDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentAlert = businessService.findById(AgentAlert.class, id);
+            currentAgentAlert = agentAlertService.findById(id);
             
             if (currentAgentAlert == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -191,8 +196,15 @@ public class AgentAlertDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "AGTAGENTALERTS", id, "Consulta: " + currentAgentAlert.getAgttitle());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -215,14 +227,14 @@ public class AgentAlertDetailViewModel extends MasterPage {
             boolean isNew = currentAgentAlert.getIdxagentalert() == null;
             
             if (isNew) {
-                businessService.save(currentAgentAlert);
+                currentAgentAlert = agentAlertService.create(currentAgentAlert);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTALERTS", currentAgentAlert.getIdxagentalert(), 
                     "Creado: " + currentAgentAlert.getAgttitle());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentAlert);
+                currentAgentAlert = agentAlertService.update(currentAgentAlert);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTALERTS", currentAgentAlert.getIdxagentalert(), 
                     "Actualizado: " + currentAgentAlert.getAgttitle());
@@ -235,8 +247,12 @@ public class AgentAlertDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/agents/agents-alert-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }

@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentExpertise;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentExpertiseService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentExpertiseDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentExpertiseService agentExpertiseService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -178,7 +183,7 @@ public class AgentExpertiseDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentExpertise = businessService.findById(AgentExpertise.class, id);
+            currentAgentExpertise = agentExpertiseService.findById(id);
             
             if (currentAgentExpertise == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -229,14 +234,14 @@ public class AgentExpertiseDetailViewModel extends MasterPage {
             boolean isNew = currentAgentExpertise.getIdxagentexpertise() == null;
             
             if (isNew) {
-                businessService.save(currentAgentExpertise);
+                currentAgentExpertise = agentExpertiseService.create(currentAgentExpertise);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTEXPERTISE", currentAgentExpertise.getIdxagentexpertise(), 
                     "Creado: " + currentAgentExpertise.getIdxagentexpertise());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentExpertise);
+                currentAgentExpertise = agentExpertiseService.update(currentAgentExpertise);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTEXPERTISE", currentAgentExpertise.getIdxagentexpertise(), 
                     "Actualizado: " + currentAgentExpertise.getIdxagentexpertise());

@@ -30,9 +30,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.ComplianceFinding;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.governance.PolicyViolation;
 import com.codeflowx.govern.entity.evaluation.BiasRecommendation;
 import com.codeflowx.govern.entity.procedures.governance.RemediateComplianceFinding;
+import com.codeflowx.govern.service.governance.ComplianceFindingService;
+import com.codeflowx.govern.service.governance.PolicyViolationService;
+import com.codeflowx.govern.service.evaluation.BiasRecommendationService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -58,15 +62,22 @@ public class EthicsMitigationViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private PolicyService policyService;
+    @WireVariable
+    private PolicyViolationService policyViolationService;
+    @WireVariable
+    private ComplianceFindingService complianceFindingService;
+    @WireVariable
+    private BiasRecommendationService biasRecommendationService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -103,28 +114,18 @@ public class EthicsMitigationViewModel extends MasterPage {
     
     private void loadData() {
         try {
-            PageResult<BiasRecommendation> result1 = businessService.findAllEntity(
-                BiasRecommendation.class, 
-                pageParams, 
-                new Criterias()
-            );
+            PageResult<BiasRecommendation> result1 = biasRecommendationService.findAll(pageParams, new Criterias());
             if (result1 != null && result1.getContent() != null) {
                 recommendationsList = result1.getContent();
             }
             
-            PageResult<ComplianceFinding> result2 = businessService.findAllEntity(
-                ComplianceFinding.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<ComplianceFinding> result2 = complianceFindingService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 findingsList = result2.getContent();
             }
             
-            PageResult<PolicyViolation> result3 = businessService.findAllEntity(
-                PolicyViolation.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<PolicyViolation> result3 = policyViolationService.findAll(pageParams, new Criterias()
             );
             if (result3 != null && result3.getContent() != null) {
                 violationsList = result3.getContent();
@@ -200,7 +201,9 @@ public class EthicsMitigationViewModel extends MasterPage {
             violationsList.clear(); 
             violationsList = null; 
         }
-        businessService = null;
+        policyService = null;
+            policyViolationService = null;
+            complianceFindingService = null;
     }
 }
 

@@ -31,9 +31,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.ComplianceRequirement;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
 import com.codeflowx.govern.entity.governance.PolicyChecklistItem;
 import com.codeflowx.govern.entity.procedures.governance.RunComplianceCheck;
+import com.codeflowx.govern.service.governance.ComplianceRequirementService;
+import com.codeflowx.govern.service.governance.PolicyChecklistItemService;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -61,7 +65,13 @@ public class ComplianceAiActViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private PolicyService policyService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private PolicyChecklistItemService policyChecklistItemService;
+    @WireVariable
+    private ComplianceRequirementService complianceRequirementService;
     
     
     @WireVariable
@@ -75,9 +85,9 @@ public class ComplianceAiActViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -363,7 +373,10 @@ public class ComplianceAiActViewModel extends MasterPage {
             
             currentAssessment = null;
             pageParams = null;
-            businessService = null;
+            policyService = null;
+            complianceAssessmentService = null;
+            policyChecklistItemService = null;
+            complianceRequirementService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

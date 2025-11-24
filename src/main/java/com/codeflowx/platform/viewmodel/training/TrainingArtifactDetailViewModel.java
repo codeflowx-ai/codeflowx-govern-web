@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.training.TrainingArtifact;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.training.TrainingArtifactService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,93 +55,96 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class TrainingArtifactDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private TrainingArtifactService trainingArtifactService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxtrainingartifact;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private TrainingArtifact currentTrainingArtifact;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalName = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableArtifacttypes = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxtrainingartifact = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando TrainingArtifactDetailViewModel - mode: {}, idxtrainingartifact: {}", mode, idxtrainingartifact);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxtrainingartifact != null) {
@@ -150,11 +155,11 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentTrainingArtifact, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentTrainingArtifact = new TrainingArtifact();
@@ -162,36 +167,43 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadArtifacttypes();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentTrainingArtifact = businessService.findById(TrainingArtifact.class, id);
-            
+            currentTrainingArtifact = trainingArtifactService.findById(id);
+
             if (currentTrainingArtifact == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentTrainingArtifact.getName();
         loadArtifacttypes();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalName = currentTrainingArtifact.getName();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "TRNTRAININGARTIFACTS", id, "Consulta: " + currentTrainingArtifact.getName());
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
@@ -201,55 +213,59 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentTrainingArtifact.getIdxtrainingartifact() == null;
-            
+
             if (isNew) {
-                businessService.save(currentTrainingArtifact);
+                currentTrainingArtifact = trainingArtifactService.create(currentTrainingArtifact);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "TRNTRAININGARTIFACTS", currentTrainingArtifact.getIdxtrainingartifact(), 
+                logActivity("CREACION", "TRNTRAININGARTIFACTS", currentTrainingArtifact.getIdxtrainingartifact(),
                     "Creado: " + currentTrainingArtifact.getName());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentTrainingArtifact);
+                currentTrainingArtifact = trainingArtifactService.update(currentTrainingArtifact);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "TRNTRAININGARTIFACTS", currentTrainingArtifact.getIdxtrainingartifact(), 
+                logActivity("EDICION", "TRNTRAININGARTIFACTS", currentTrainingArtifact.getIdxtrainingartifact(),
                     "Actualizado: " + currentTrainingArtifact.getName());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
         } catch (Exception e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentTrainingArtifact.getArtifacttype() == null || currentTrainingArtifact.getArtifacttype().trim().isEmpty()) {
             errors.append("- Artifact Type\n");
         }
@@ -262,16 +278,16 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
         if (currentTrainingArtifact.getCreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -280,14 +296,14 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadArtifacttypes() {
         // TODO: Cargar valores desde configuración o BD
         availableArtifacttypes.add("OPTION_1");
         availableArtifacttypes.add("OPTION_2");
         availableArtifacttypes.add("OPTION_3");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -313,7 +329,7 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -321,29 +337,29 @@ public class TrainingArtifactDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentTrainingArtifact = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableArtifacttypes != null) {
                 availableArtifacttypes.clear();
                 availableArtifacttypes = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

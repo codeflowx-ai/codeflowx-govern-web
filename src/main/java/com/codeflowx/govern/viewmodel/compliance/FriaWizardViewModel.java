@@ -29,6 +29,7 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.compliance.FriaAssessment;
+import com.codeflowx.govern.service.projects.ProjectService;
 import com.codeflowx.govern.entity.projects.Project;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -61,7 +62,7 @@ public class FriaWizardViewModel extends MasterPage {
     
     // ========== Servicios Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private ProjectService projectService;
     
     @WireVariable
     public Environment environment;
@@ -73,9 +74,9 @@ public class FriaWizardViewModel extends MasterPage {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -201,7 +202,7 @@ public class FriaWizardViewModel extends MasterPage {
             loading = true;
             log.info("Cargando proyecto ID: {}", projectId);
             
-            currentProject = businessService.findById(Project.class, projectId);
+            currentProject = projectService.findById(projectId);
             
             if (currentProject != null) {
                 projectName = currentProject.getName() != null ? currentProject.getName() : "";
@@ -730,7 +731,7 @@ public class FriaWizardViewModel extends MasterPage {
             
             currentProject = null;
             generatedFria = null;
-            businessService = null;
+            projectService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

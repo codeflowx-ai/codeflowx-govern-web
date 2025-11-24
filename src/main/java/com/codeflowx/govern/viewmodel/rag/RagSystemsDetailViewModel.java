@@ -32,9 +32,12 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.procedures.rag.IngestDocuments;
+import com.codeflowx.govern.service.rag.RagDataSourceService;
 import com.codeflowx.govern.entity.rag.RagDataSource;
 import com.codeflowx.govern.entity.rag.RagSystem;
 import com.codeflowx.govern.entity.rag.RagVersion;
+import com.codeflowx.govern.service.rag.RagSystemService;
+import com.codeflowx.govern.service.rag.RagVersionService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.PageParams;
@@ -63,7 +66,11 @@ public class RagSystemsDetailViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private RagDataSourceService ragDataSourceService;
+    @WireVariable
+    private RagVersionService ragVersionService;
+    @WireVariable
+    private RagSystemService ragSystemService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -79,9 +86,9 @@ public class RagSystemsDetailViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -163,7 +170,7 @@ public class RagSystemsDetailViewModel extends MasterPage {
         try {
             log.debug("Cargando sistema RAG ID={}", id);
             
-            currentRagSystem = businessService.findById(RagSystem.class, id);
+            currentRagSystem = ragSystemService.findById(id);
             
             if (currentRagSystem == null) {
                 log.error("Sistema RAG no encontrado: ID={}", id);
@@ -246,10 +253,7 @@ public class RagSystemsDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("idragragsystems0", currentRagSystem.getIdxragsystem());
             
-            PageResult<RagDataSource> result = businessService.findAllEntity(
-                RagDataSource.class,
-                params,
-                filters
+            PageResult<RagDataSource> result = ragDataSourceService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -282,10 +286,7 @@ public class RagSystemsDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("idragragsystems0", currentRagSystem.getIdxragsystem());
             
-            PageResult<RagVersion> result = businessService.findAllEntity(
-                RagVersion.class,
-                params,
-                filters
+            PageResult<RagVersion> result = ragVersionService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -325,14 +326,14 @@ public class RagSystemsDetailViewModel extends MasterPage {
             }
             
             if (currentRagSystem.getIdxragsystem() == null) {
-                businessService.save(currentRagSystem);
+                currentRagSystem = ragDataSourceService.create(currentRagSystem);
                 log.info("Sistema RAG creado exitosamente: ID={}, nombre={}",
                     currentRagSystem.getIdxragsystem(), currentRagSystem.getRagsystemname());
                 Messagebox.show("Sistema RAG creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 currentRagSystem.setRagupdatedat(new Timestamp(System.currentTimeMillis()));
-                businessService.update(currentRagSystem);
+                currentRagSystem = ragDataSourceService.update(currentRagSystem);
                 log.info("Sistema RAG actualizado exitosamente: ID={}, nombre={}",
                     currentRagSystem.getIdxragsystem(), currentRagSystem.getRagsystemname());
                 Messagebox.show("Sistema RAG actualizado exitosamente",
@@ -433,7 +434,9 @@ public class RagSystemsDetailViewModel extends MasterPage {
             }
             
             // Limpiar BusinessService
-            businessService = null;
+            ragDataSourceService = null;
+            ragVersionService = null;
+            ragSystemService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

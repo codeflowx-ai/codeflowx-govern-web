@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.platform.UpdateSchedule;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.UpdateScheduleService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class UpdateScheduleDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private UpdateScheduleService updateScheduleService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -165,7 +170,7 @@ public class UpdateScheduleDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentUpdateSchedule = businessService.findById(UpdateSchedule.class, id);
+            currentUpdateSchedule = updateScheduleService.findById(id);
             
             if (currentUpdateSchedule == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -187,7 +192,7 @@ public class UpdateScheduleDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "UPDATESCHEDULES", id, "Consulta: " + currentUpdateSchedule.getIdxupdateschedule());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -211,14 +216,14 @@ public class UpdateScheduleDetailViewModel extends MasterPage {
             boolean isNew = currentUpdateSchedule.getIdxupdateschedule() == null;
             
             if (isNew) {
-                businessService.save(currentUpdateSchedule);
+                currentUpdateSchedule = updateScheduleService.create(currentUpdateSchedule);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "UPDATESCHEDULES", currentUpdateSchedule.getIdxupdateschedule(), 
                     "Creado: " + currentUpdateSchedule.getIdxupdateschedule());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentUpdateSchedule);
+                currentUpdateSchedule = updateScheduleService.update(currentUpdateSchedule);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "UPDATESCHEDULES", currentUpdateSchedule.getIdxupdateschedule(), 
                     "Actualizado: " + currentUpdateSchedule.getIdxupdateschedule());
@@ -231,7 +236,7 @@ public class UpdateScheduleDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

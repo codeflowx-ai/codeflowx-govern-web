@@ -2,7 +2,6 @@ package com.codeflowx.govern.viewmodel.monitoring;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -28,9 +27,15 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.monitoring.AlertSummary;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.views.monitoring.AnomalyHeatmap;
 import com.codeflowx.govern.entity.views.monitoring.MetricsVisualization;
 import com.codeflowx.govern.entity.views.monitoring.MonitoringDashboard;
+import com.codeflowx.govern.service.monitoring.MonitoringDashboardService;
+import com.codeflowx.govern.service.monitoring.MetricsVisualizationService;
+import com.codeflowx.govern.service.monitoring.AnomalyHeatmapService;
+import com.codeflowx.govern.service.monitoring.AlertSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -51,27 +56,38 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
-    
+    private ModelService modelService;
+
+    @WireVariable
+    private MonitoringDashboardService monitoringDashboardService;
+
+    @WireVariable
+    private MetricsVisualizationService metricsVisualizationService;
+
+    @WireVariable
+    private AnomalyHeatmapService anomalyHeatmapService;
+
+    @WireVariable
+    private AlertSummaryService alertSummaryService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
-    
+
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -79,12 +95,12 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
 
     // ========== Paginación ==========
     private PageParams pageParams;
-    
+
     private MonitoringDashboard monitoringDashboard;
     private List<MetricsVisualization> metricsVisualizations = new ArrayList<>();
     private List<AnomalyHeatmap> anomalyHeatmaps = new ArrayList<>();
     private List<AlertSummary> alertSummaries = new ArrayList<>();
-    
+
     private Long totalMetrics = 0L;
     private Long totalAlerts = 0L;
     private Long criticalAlerts = 0L;
@@ -96,16 +112,16 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
         super.doAfterCompose(view);
         initDao();
         initializePageParams();
-        
+
         log.info("Inicializando MonitoringDashboardViewModel");
-        
+
         loadMonitoringDashboard();
         loadMetricsVisualizations();
         loadAnomalyHeatmaps();
         loadAlertSummaries();
         calculateKPIs();
     }
-    
+
     private void initializePageParams() {
         pageParams = PageParams.builder()
                 .maxRows(20)
@@ -116,80 +132,72 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
                 .build();
     }
 
-    
+
 
     private void loadMonitoringDashboard() {
         try {
-            PageResult<MonitoringDashboard> result = businessService.findAllEntity(
-                MonitoringDashboard.class, pageParams, new HashMap<>()
-            );
-            
+            PageResult<MonitoringDashboard> result = monitoringDashboardService.findAll(pageParams, new Criterias());
+
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 monitoringDashboard = result.getContent().get(0);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar monitoring dashboard", e);
         }
     }
-    
+
     private void loadMetricsVisualizations() {
         try {
-            PageResult<MetricsVisualization> result = businessService.findAllEntity(
-                MetricsVisualization.class, pageParams, new HashMap<>()
-            );
-            
+            PageResult<MetricsVisualization> result = metricsVisualizationService.findAll(pageParams, new Criterias());
+
             if (result != null && result.getContent() != null) {
                 metricsVisualizations = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar metrics visualizations", e);
         }
     }
-    
+
     private void loadAnomalyHeatmaps() {
         try {
-            PageResult<AnomalyHeatmap> result = businessService.findAllEntity(
-                AnomalyHeatmap.class, pageParams, new HashMap<>()
-            );
-            
+            PageResult<AnomalyHeatmap> result = anomalyHeatmapService.findAll(pageParams, new Criterias());
+
             if (result != null && result.getContent() != null) {
                 anomalyHeatmaps = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar anomaly heatmaps", e);
         }
     }
-    
+
     private void loadAlertSummaries() {
         try {
-            PageResult<AlertSummary> result = businessService.findAllEntity(
-                AlertSummary.class, pageParams, new HashMap<>()
-            );
-            
+            PageResult<AlertSummary> result = alertSummaryService.findAll(pageParams, new Criterias());
+
             if (result != null && result.getContent() != null) {
                 alertSummaries = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar alert summaries", e);
         }
     }
-    
+
     private void calculateKPIs() {
         try {
             if (monitoringDashboard != null) {
                 totalMetrics = monitoringDashboard.getTotalItems() != null ? monitoringDashboard.getTotalItems() : 0L;
             }
-            
+
             totalAlerts = alertSummaries.stream()
                 .filter(a -> a.getTotalItems() != null)
                 .mapToLong(a -> a.getTotalItems())
                 .sum();
-            
+
             criticalAlerts = alertSummaries.stream()
                 .filter(a -> a.getActiveItems() != null)
                 .mapToLong(a -> Long.parseLong(a.getActiveItems()))
                 .sum();
-            
+
             if (totalAlerts > 0) {
                 systemHealth = (int) Math.max(0, 100 - (criticalAlerts * 10));
             }
@@ -208,8 +216,8 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
             loadAnomalyHeatmaps();
             loadAlertSummaries();
             calculateKPIs();
-            
-            Messagebox.show("Dashboard actualizado correctamente", "Éxito", 
+
+            Messagebox.show("Dashboard actualizado correctamente", "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error al refrescar dashboard", e);
@@ -234,11 +242,8 @@ public class MonitoringDashboardViewModel extends MasterPage implements Serializ
             if (anomalyHeatmaps != null) { anomalyHeatmaps.clear(); anomalyHeatmaps = null; }
             if (alertSummaries != null) { alertSummaries.clear(); alertSummaries = null; }
             pageParams = null;
-            businessService = null;
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
         }
     }
 }
-
-

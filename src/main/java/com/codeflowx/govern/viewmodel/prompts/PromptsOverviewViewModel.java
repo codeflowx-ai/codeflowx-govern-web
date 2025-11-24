@@ -31,7 +31,11 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.util.resource.Labels;
 
 import com.codeflowx.govern.entity.views.prompts.PromptsOverview;
+import com.codeflowx.govern.service.prompts.PromptService;
+import com.codeflowx.govern.service.prompts.PromptsOverviewService;
+import com.codeflowx.govern.service.prompts.PromptsMetricsSummaryService;
 import com.codeflowx.govern.entity.views.prompts.PromptsMetricsSummary;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.PageParams;
 import codeflowx.nocode.persist.PageResult;
@@ -59,37 +63,43 @@ public class PromptsOverviewViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
-    @WireVariable private BusinessService businessService;
+
+    @WireVariable
+    private PromptService promptService;
+    @WireVariable
+    private PromptsOverviewService promptsOverviewService;
+    @WireVariable
+    private PromptsMetricsSummaryService promptsMetricsSummaryService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para procedimientos almacenados si es necesario
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
-    
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
     }
-    
+
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<PromptsOverview> pageResult;
-    
+
     // ========== Filtros ==========
     private String searchTerm = "";
     private String typeFilter = "ALL";
     private String statusFilter = "ALL";
     private String categoryFilter = "ALL";
     private String approvalStatusFilter = "ALL";
-    
+
     // ========== Datos ==========
     private List<PromptsOverview> filteredPrompts = new ArrayList<>();
-    
+
     // ========== Métricas globales ==========
     private int totalPrompts = 0;
     private long activePrompts = 0L;
@@ -97,96 +107,99 @@ public class PromptsOverviewViewModel extends MasterPage {
     private long rejectedPrompts = 0L;
     private BigDecimal averageValidationScore = BigDecimal.ZERO;
     private long totalFailedValidations = 0L;
-    
+    private long totalVersions = 0L; // Total de versiones de todos los prompts
+    private BigDecimal avgRating = BigDecimal.ZERO; // Rating promedio (averageValidationScore)
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadData() {
         try {
             log.debug("Cargando prompts - Página: {}", pageParams.getPageActual());
-            
+
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllView(
-                PromptsOverview.class,
-                pageParams,
-                criterias
-            );
-            
+
+            pageResult = promptsOverviewService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredPrompts = pageResult.getContent();
                 totalPrompts = pageResult.getTotalRows();
-                
+
                 loadGlobalMetrics();
-                
-                log.info("Cargados {} prompts de {} totales", 
+
+                log.info("Cargados {} prompts de {} totales",
                     filteredPrompts.size(), totalPrompts);
             } else {
                 filteredPrompts = new ArrayList<>();
                 totalPrompts = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar prompts", e);
-            Messagebox.show(Labels.getLabel("prompts.error.load") + ": " + e.getMessage(), 
+            Messagebox.show(Labels.getLabel("prompts.error.load") + ": " + e.getMessage(),
+                Labels.getLabel("prompts.error.title"), Messagebox.OK, Messagebox.ERROR);
+            filteredPrompts = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar prompts", e);
+            Messagebox.show(Labels.getLabel("prompts.error.load") + ": " + e.getMessage(),
                 Labels.getLabel("prompts.error.title"), Messagebox.OK, Messagebox.ERROR);
             filteredPrompts = new ArrayList<>();
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.LIKE, "prmname");
             criteria.setValues(new Object[]{searchTerm.trim()});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(typeFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmtype");
             criteria.setValues(new Object[]{typeFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(statusFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmstatus");
             criteria.setValues(new Object[]{statusFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(categoryFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmcategory");
             criteria.setValues(new Object[]{categoryFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(approvalStatusFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "prmapprovalstatus");
             criteria.setValues(new Object[]{approvalStatusFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         return criterias;
     }
-    
+
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales desde V_PROMPTS_METRICS_SUMMARY");
-            List<PromptsMetricsSummary> metrics = businessService.findAllView(PromptsMetricsSummary.class);
+            List<PromptsMetricsSummary> metrics = promptsMetricsSummaryService.findAll();
             if (metrics != null && !metrics.isEmpty()) {
                 PromptsMetricsSummary summary = metrics.get(0);
                 activePrompts = summary.getActivePrompts() != null ? summary.getActivePrompts() : 0L;
@@ -194,20 +207,29 @@ public class PromptsOverviewViewModel extends MasterPage {
                 rejectedPrompts = summary.getRejectedPrompts() != null ? summary.getRejectedPrompts() : 0L;
                 averageValidationScore = summary.getAverageValidationScore() != null ? summary.getAverageValidationScore() : BigDecimal.ZERO;
                 totalFailedValidations = summary.getTotalFailedValidations() != null ? summary.getTotalFailedValidations() : 0L;
-                log.info("Métricas globales cargadas - Total: {}, Activos: {}, Pendientes: {}", 
-                    totalPrompts, activePrompts, pendingApproval);
+                totalVersions = summary.getTotalVersionsAll() != null ? summary.getTotalVersionsAll() : 0L;
+                avgRating = averageValidationScore; // avgRating es el mismo que averageValidationScore
+                log.info("Métricas globales cargadas - Total: {}, Activos: {}, Pendientes: {}, Versiones: {}",
+                    totalPrompts, activePrompts, pendingApproval, totalVersions);
             } else {
                 log.warn("No se pudieron cargar métricas globales");
                 activePrompts = 0L; pendingApproval = 0L; rejectedPrompts = 0L;
                 averageValidationScore = BigDecimal.ZERO; totalFailedValidations = 0L;
+                totalVersions = 0L; avgRating = BigDecimal.ZERO;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas globales", e);
             activePrompts = 0L; pendingApproval = 0L; rejectedPrompts = 0L;
             averageValidationScore = BigDecimal.ZERO; totalFailedValidations = 0L;
+            totalVersions = 0L; avgRating = BigDecimal.ZERO;
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar métricas globales", e);
+            activePrompts = 0L; pendingApproval = 0L; rejectedPrompts = 0L;
+            averageValidationScore = BigDecimal.ZERO; totalFailedValidations = 0L;
+            totalVersions = 0L; avgRating = BigDecimal.ZERO;
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
@@ -215,20 +237,20 @@ public class PromptsOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearFilters() {
         log.debug("Limpiando filtros");
-        searchTerm = ""; 
-        typeFilter = "ALL"; 
+        searchTerm = "";
+        typeFilter = "ALL";
         statusFilter = "ALL";
-        categoryFilter = "ALL"; 
-        approvalStatusFilter = "ALL"; 
+        categoryFilter = "ALL";
+        approvalStatusFilter = "ALL";
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void onPaging(@BindingParam("event") PagingEvent event) {
@@ -237,9 +259,9 @@ public class PromptsOverviewViewModel extends MasterPage {
         pageParams.setRowActual(pageIndex * pageParams.getMaxRows());
         loadData();
     }
-    
+
     // ========== Navegación ==========
-    
+
     @Command
     public void createPrompt() {
         log.info("Navegando a creación de nuevo prompt");
@@ -247,7 +269,7 @@ public class PromptsOverviewViewModel extends MasterPage {
         params.put("mode", "create");
         appendPage("gobierno/prompts/prompts-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     public void viewPromptDetails(@BindingParam("promptId") Long promptId) {
         log.info("Navegando a detalle de prompt ID={}", promptId);
@@ -256,26 +278,30 @@ public class PromptsOverviewViewModel extends MasterPage {
         params.put("mode", "edit");
         appendPage("gobierno/prompts/prompts-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deletePrompt(@BindingParam("promptId") Long promptId) {
         try {
-            Messagebox.show(Labels.getLabel("prompts.confirm.delete.message"), 
-                Labels.getLabel("prompts.confirm.title"), 
-                Messagebox.YES | Messagebox.NO, 
+            Messagebox.show(Labels.getLabel("prompts.confirm.delete.message"),
+                Labels.getLabel("prompts.confirm.title"),
+                Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(com.codeflowx.govern.entity.prompts.Prompt.class, promptId);
+                            promptService.deleteById(promptId);
                             log.info("Prompt eliminado: ID={}", promptId);
                             loadData();
-                            Messagebox.show(Labels.getLabel("prompts.success.deleted"), 
+                            Messagebox.show(Labels.getLabel("prompts.success.deleted"),
                                 Labels.getLabel("prompts.success.title"), Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar prompt ID={}", promptId, e);
-                            Messagebox.show(Labels.getLabel("prompts.error.delete") + ": " + e.getMessage(), 
+                            Messagebox.show(Labels.getLabel("prompts.error.delete") + ": " + e.getMessage(),
+                                Labels.getLabel("prompts.error.title"), Messagebox.OK, Messagebox.ERROR);
+                        } catch (Exception e) {
+                            log.error("Error inesperado al eliminar prompt ID={}", promptId, e);
+                            Messagebox.show(Labels.getLabel("prompts.error.delete") + ": " + e.getMessage(),
                                 Labels.getLabel("prompts.error.title"), Messagebox.OK, Messagebox.ERROR);
                         }
                     }

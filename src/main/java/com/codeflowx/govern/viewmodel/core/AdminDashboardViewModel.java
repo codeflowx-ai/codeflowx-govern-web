@@ -21,6 +21,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.views.core.AdminDashboardSummary;
+import com.codeflowx.govern.service.core.AdminDashboardSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -41,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AdminDashboardViewModel extends MasterPage {
     
     @WireVariable
-    private BusinessService businessService;
+    private AdminDashboardSummaryService adminDashboardSummaryService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -52,9 +54,9 @@ public class AdminDashboardViewModel extends MasterPage {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     // Métricas principales
@@ -79,7 +81,7 @@ public class AdminDashboardViewModel extends MasterPage {
         try {
             log.debug("Cargando dashboard administrativo");
             // Cargar resumen desde vista (devuelve 1 fila con agregados)
-            List<AdminDashboardSummary> summaries = businessService.findAllView(AdminDashboardSummary.class);
+            List<AdminDashboardSummary> summaries = adminDashboardSummaryService.findAll();
             
             if (summaries != null && !summaries.isEmpty()) {
                 AdminDashboardSummary summary = summaries.get(0);
@@ -96,7 +98,7 @@ public class AdminDashboardViewModel extends MasterPage {
                 log.info("Dashboard administrativo cargado - Total: {}, Activos: {}, Desplegados: {}, Training: {}", 
                          totalItems, activeItems, deployedItems, trainingItems);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando dashboard administrativo", e);
         }
     }

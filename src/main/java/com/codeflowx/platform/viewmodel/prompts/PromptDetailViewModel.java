@@ -32,6 +32,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.prompts.Prompt;
 import com.codeflowx.govern.entity.prompts.PromptValidation;
 import com.codeflowx.govern.entity.prompts.PromptVersion;
+import com.codeflowx.govern.service.prompts.PromptService;
+import com.codeflowx.govern.service.prompts.PromptValidationService;
+import com.codeflowx.govern.service.prompts.PromptVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -58,6 +62,12 @@ public class PromptDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    @WireVariable
+    private PromptService promptService;
+    @WireVariable
+    private PromptValidationService promptValidationService;
+    @WireVariable
+    private PromptVersionService promptVersionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -178,7 +188,7 @@ public class PromptDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentPrompt = businessService.findById(Prompt.class, id);
+            currentPrompt = promptService.findById(id);
             
             if (currentPrompt == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -204,8 +214,15 @@ public class PromptDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "PRMPROMPTS", id, "Consulta: " + currentPrompt.getPrmname());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/prompts/prompts-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -228,14 +245,14 @@ public class PromptDetailViewModel extends MasterPage {
             boolean isNew = currentPrompt.getIdxprompt() == null;
             
             if (isNew) {
-                businessService.save(currentPrompt);
+                currentPrompt = promptService.create(currentPrompt);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "PRMPROMPTS", currentPrompt.getIdxprompt(), 
                     "Creado: " + currentPrompt.getPrmname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentPrompt);
+                currentPrompt = promptService.update(currentPrompt);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "PRMPROMPTS", currentPrompt.getIdxprompt(), 
                     "Actualizado: " + currentPrompt.getPrmname());
@@ -248,8 +265,12 @@ public class PromptDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/prompts/prompts-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -344,13 +365,16 @@ public class PromptDetailViewModel extends MasterPage {
                     .rowActual(0)
                     .build();
                 
-                PageResult<PromptValidation> result = businessService.findAllEntity(PromptValidation.class, collectionParams, criterias);
+                PageResult<PromptValidation> result = promptValidationService.findAll(collectionParams, criterias);
                 subprmpromptvalidations = result != null ? result.getContent() : new ArrayList<>();
                 subprmpromptvalidationsLoaded = true;
                 log.debug("Cargados {} subprmpromptvalidations", subprmpromptvalidations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subprmpromptvalidations", e);
+            subprmpromptvalidations = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar subprmpromptvalidations", e);
             subprmpromptvalidations = new ArrayList<>();
         }
     }
@@ -370,13 +394,16 @@ public class PromptDetailViewModel extends MasterPage {
                     .rowActual(0)
                     .build();
                 
-                PageResult<PromptVersion> result = businessService.findAllEntity(PromptVersion.class, collectionParams, criterias);
+                PageResult<PromptVersion> result = promptVersionService.findAll(collectionParams, criterias);
                 subprmpromptversions = result != null ? result.getContent() : new ArrayList<>();
                 subprmpromptversionsLoaded = true;
                 log.debug("Cargados {} subprmpromptversions", subprmpromptversions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subprmpromptversions", e);
+            subprmpromptversions = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar subprmpromptversions", e);
             subprmpromptversions = new ArrayList<>();
         }
     }

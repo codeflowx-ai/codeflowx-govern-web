@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentRollback;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentRollbackService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentRollbackDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentRollbackService agentRollbackService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -172,7 +177,7 @@ public class AgentRollbackDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentRollback = businessService.findById(AgentRollback.class, id);
+            currentAgentRollback = agentRollbackService.findById(id);
             
             if (currentAgentRollback == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -220,14 +225,14 @@ public class AgentRollbackDetailViewModel extends MasterPage {
             boolean isNew = currentAgentRollback.getIdxagentrollback() == null;
             
             if (isNew) {
-                businessService.save(currentAgentRollback);
+                currentAgentRollback = agentRollbackService.create(currentAgentRollback);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTROLLBACKS", currentAgentRollback.getIdxagentrollback(), 
                     "Creado: " + currentAgentRollback.getIdxagentrollback());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentRollback);
+                currentAgentRollback = agentRollbackService.update(currentAgentRollback);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTROLLBACKS", currentAgentRollback.getIdxagentrollback(), 
                     "Actualizado: " + currentAgentRollback.getIdxagentrollback());

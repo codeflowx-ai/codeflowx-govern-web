@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.serving.DeploymentInstance;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.serving.DeploymentInstanceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,95 +55,98 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class DeploymentInstanceDetailViewModel extends MasterPage {
-    
+
+    @WireVariable
+    private DeploymentInstanceService deploymentInstanceService;
+
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxdeploymentinstance;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private DeploymentInstance currentDeploymentInstance;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalInstancename = null;
     private String originalNodename = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableInstancetypes = new ArrayList<>();
     private List<String> availableStatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxdeploymentinstance = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando DeploymentInstanceDetailViewModel - mode: {}, idxdeploymentinstance: {}", mode, idxdeploymentinstance);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxdeploymentinstance != null) {
@@ -152,11 +157,11 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentDeploymentInstance, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentDeploymentInstance = new DeploymentInstance();
@@ -165,39 +170,39 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
         loadInstancetypes();
         loadStatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentDeploymentInstance = businessService.findById(DeploymentInstance.class, id);
-            
+            currentDeploymentInstance = deploymentInstanceService.findById(id);
+
             if (currentDeploymentInstance == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentDeploymentInstance.getInstancename();
         loadInstancetypes();
         loadStatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalInstancename = currentDeploymentInstance.getInstancename();
             originalNodename = currentDeploymentInstance.getNodename();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "SRVDEPLOYMENTINSTANCES", id, "Consulta: " + currentDeploymentInstance.getInstancename());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -206,55 +211,55 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentDeploymentInstance.getIdxdeploymentinstance() == null;
-            
+
             if (isNew) {
-                businessService.save(currentDeploymentInstance);
+                currentDeploymentInstance = deploymentInstanceService.create(currentDeploymentInstance);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "SRVDEPLOYMENTINSTANCES", currentDeploymentInstance.getIdxdeploymentinstance(), 
+                logActivity("CREACION", "SRVDEPLOYMENTINSTANCES", currentDeploymentInstance.getIdxdeploymentinstance(),
                     "Creado: " + currentDeploymentInstance.getInstancename());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentDeploymentInstance);
+                currentDeploymentInstance = deploymentInstanceService.update(currentDeploymentInstance);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "SRVDEPLOYMENTINSTANCES", currentDeploymentInstance.getIdxdeploymentinstance(), 
+                logActivity("EDICION", "SRVDEPLOYMENTINSTANCES", currentDeploymentInstance.getIdxdeploymentinstance(),
                     "Actualizado: " + currentDeploymentInstance.getInstancename());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentDeploymentInstance.getInstanceid() == null || currentDeploymentInstance.getInstanceid().trim().isEmpty()) {
             errors.append("- Instanceid\n");
         }
@@ -279,16 +284,16 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
         if (currentDeploymentInstance.getUpdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -297,21 +302,21 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadInstancetypes() {
         // TODO: Cargar valores desde configuración o BD
         availableInstancetypes.add("OPTION_1");
         availableInstancetypes.add("OPTION_2");
         availableInstancetypes.add("OPTION_3");
     }
-    
+
     private void loadStatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableStatuss.add("OPTION_1");
         availableStatuss.add("OPTION_2");
         availableStatuss.add("OPTION_3");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -337,7 +342,7 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -345,13 +350,13 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentDeploymentInstance = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableInstancetypes != null) {
                 availableInstancetypes.clear();
@@ -361,17 +366,17 @@ public class DeploymentInstanceDetailViewModel extends MasterPage {
                 availableStatuss.clear();
                 availableStatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

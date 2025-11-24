@@ -31,6 +31,9 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.core.Department;
 import com.codeflowx.govern.entity.core.User;
+import com.codeflowx.govern.service.core.DepartmentService;
+import com.codeflowx.govern.service.core.UserService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -54,95 +57,99 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class DepartmentDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private DepartmentService departmentService;
+    @WireVariable
+    private UserService userService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxdepartment;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Department currentDepartment;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalCorname = null;
     private String originalCode = null;
-    
+
     // ========== Listas para combos (FK) ==========
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<User> subcorusers = new ArrayList<>();
     private boolean subcorusersLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxdepartment = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando DepartmentDetailViewModel - mode: {}, idxdepartment: {}", mode, idxdepartment);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxdepartment != null) {
@@ -153,48 +160,48 @@ public class DepartmentDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/core/core-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentDepartment, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentDepartment = new Department();
         editing = false;
         pageTitle = "Crear Nuevo";
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentDepartment = businessService.findById(Department.class, id);
-            
+            currentDepartment = departmentService.findById(id);
+
             if (currentDepartment == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/core/core-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentDepartment.getCorname();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalCorname = currentDepartment.getCorname();
             originalCode = currentDepartment.getCode();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "CORDEPARTMENTS", id, "Consulta: " + currentDepartment.getCorname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -203,55 +210,55 @@ public class DepartmentDetailViewModel extends MasterPage {
             appendPage("plataforma/core/core-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentDepartment.getIdxdepartment() == null;
-            
+
             if (isNew) {
-                businessService.save(currentDepartment);
+                currentDepartment = departmentService.create(currentDepartment);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "CORDEPARTMENTS", currentDepartment.getIdxdepartment(), 
+                logActivity("CREACION", "CORDEPARTMENTS", currentDepartment.getIdxdepartment(),
                     "Creado: " + currentDepartment.getCorname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentDepartment);
+                currentDepartment = departmentService.update(currentDepartment);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "CORDEPARTMENTS", currentDepartment.getIdxdepartment(), 
+                logActivity("EDICION", "CORDEPARTMENTS", currentDepartment.getIdxdepartment(),
                     "Actualizado: " + currentDepartment.getCorname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/core/core-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentDepartment.getCreatedat() == null) {
             errors.append("- Created At\n");
         }
@@ -264,16 +271,16 @@ public class DepartmentDetailViewModel extends MasterPage {
         if (currentDepartment.getCorname() != null && currentDepartment.getCorname().length() > 100) {
             errors.append("- Corname no puede exceder 100 caracteres\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -282,7 +289,7 @@ public class DepartmentDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/core/core-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadSubcorusers() {
         try {
             if (currentDepartment != null && currentDepartment.getIdxdepartment() != null) {
@@ -290,25 +297,25 @@ public class DepartmentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "department");
                 criteria.setValues(new Object[]{currentDepartment.getIdxdepartment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<User> result = businessService.findAllEntity(User.class, collectionParams, criterias);
+
+                PageResult<User> result = userService.findAll(collectionParams, criterias);
                 subcorusers = result != null ? result.getContent() : new ArrayList<>();
                 subcorusersLoaded = true;
                 log.debug("Cargados {} subcorusers", subcorusers.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subcorusers", e);
             subcorusers = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subcorusers")
     public void onSelectSubcorusersTab() {
@@ -316,7 +323,7 @@ public class DepartmentDetailViewModel extends MasterPage {
             loadSubcorusers();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -342,7 +349,7 @@ public class DepartmentDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -350,30 +357,30 @@ public class DepartmentDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentDepartment = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
-            
+
             // Limpiar colecciones @OneToMany
             if (subcorusers != null) {
                 subcorusers.clear();
                 subcorusers = null;
             }
             subcorusersLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

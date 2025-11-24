@@ -31,6 +31,7 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.agents.Agent;
+import com.codeflowx.govern.service.agents.AgentService;
 import com.codeflowx.govern.entity.agents.AgentCollaboration;
 import com.codeflowx.govern.entity.agents.AgentDecision;
 import com.codeflowx.govern.entity.agents.AgentDeployment;
@@ -43,6 +44,17 @@ import com.codeflowx.govern.entity.views.agents.AgentComplianceStatus;
 import com.codeflowx.govern.entity.views.agents.AgentDeploymentStatus;
 import com.codeflowx.govern.entity.views.agents.AgentHealthDashboard;
 import com.codeflowx.govern.entity.views.agents.AgentPerformanceMetrics;
+import com.codeflowx.govern.service.agents.AgentDecisionService;
+import com.codeflowx.govern.service.agents.AgentCollaborationService;
+import com.codeflowx.govern.service.agents.AgentMonitoringService;
+import com.codeflowx.govern.service.agents.AgentHealthService;
+import com.codeflowx.govern.service.agents.AgentWorkflowService;
+import com.codeflowx.govern.service.agents.AgentToolService;
+import com.codeflowx.govern.service.agents.AgentDeploymentService;
+import com.codeflowx.govern.service.agents.AgentVersionService;
+import com.codeflowx.govern.service.agents.AgentPerformanceMetricsService;
+import com.codeflowx.govern.service.agents.AgentComplianceStatusService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -57,7 +69,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel complejo para DETALLE/EDICIÓN/CREACIÓN de Agentes
- * 
+ *
  * Funcionalidad:
  * - CRUD completo de agentes
  * - Deploy/undeploy de agentes
@@ -75,13 +87,21 @@ import lombok.extern.slf4j.Slf4j;
 public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> implements Serializable {
 
     private static final long serialVersionUID = 1L;
-   
+
+    @WireVariable
+    private AgentService agentService;
+
+    @WireVariable
+    private AgentPerformanceMetricsService agentPerformanceMetricsService;
+
+    @WireVariable
+    private AgentComplianceStatusService agentComplianceStatusService;
 
     // ========== Entidad Principal ==========
     private Agent currentAgent;
     private boolean isNewAgent = false;
     private boolean isEditMode = false;
-    
+
     // ========== Información Descendente (Tabs) ==========
     private List<AgentVersion> agentVersions = new ArrayList<>();
     private List<AgentDeployment> agentDeployments = new ArrayList<>();
@@ -91,11 +111,11 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     private List<AgentMonitoring> monitoringData = new ArrayList<>();
     private List<AgentCollaboration> collaborations = new ArrayList<>();
     private List<AgentDecision> recentDecisions = new ArrayList<>();
-    
+
     // ========== Métricas y Análisis ==========
     private AgentPerformanceMetrics performanceMetrics;
     private AgentComplianceStatus complianceStatus;
-    
+
     // ========== KPIs del Agente ==========
     private Integer totalExecutions = 0;
     private Integer successfulExecutions = 0;
@@ -105,19 +125,19 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     private Timestamp lastHealthCheck;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         log.info("Inicializando AgentsDetailViewModel");
-        
+
         // Obtener ID desde parámetros
         Map<String, Object> params = (Map<String, Object>) Executions.getCurrent().getArg();
         String idParam = Executions.getCurrent().getParameter("id");
-        
+
         if (idParam != null && !idParam.trim().isEmpty()) {
             try {
                 Long agentId = Long.parseLong(idParam);
@@ -131,17 +151,17 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
         }
     }
 
-  
+
     /**
      * Inicializa un nuevo agente
-     * @throws Exception 
+     * @throws Exception
      */
     private void initNewAgent() throws Exception {
         log.info("Inicializando nuevo agente");
         isNewAgent = true;
         isEditMode = true;
         currentAgent = new Agent();
-        
+
         // Valores por defecto
         currentAgent.setAgtstatus("DRAFT");
         currentAgent.setAgtversion("1.0.0");
@@ -157,13 +177,13 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     private void loadAgent(Long agentId) {
         try {
             log.info("Cargando agente ID: {}", agentId);
-            
-            currentAgent = businessService.findById(Agent.class, agentId);
-            
+
+            currentAgent = agentService.findById(agentId);
+
             if (currentAgent != null) {
                 isNewAgent = false;
                 isEditMode = false;
-                
+
                 // Cargar información relacionada
                 loadAgentVersions(agentId);
                 loadAgentDeployments(agentId);
@@ -175,47 +195,43 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 loadRecentDecisions(agentId);
                 loadPerformanceMetrics(agentId);
                 loadComplianceStatus(agentId);
-                
+
                 calculateKPIs();
-                
+
                 log.info("Agente cargado correctamente: {}", currentAgent.getAgtname());
             } else {
                 log.warn("No se encontró agente con ID: {}", agentId);
-                Messagebox.show("Agente no encontrado", "Advertencia", 
+                Messagebox.show("Agente no encontrado", "Advertencia",
                     Messagebox.OK, Messagebox.EXCLAMATION);
                 initNewAgent();
             }
         } catch (Exception e) {
             log.error("Error al cargar agente", e);
-            Messagebox.show("Error al cargar agente: " + e.getMessage(), "Error", 
+            Messagebox.show("Error al cargar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
 
     // ========== Carga de Datos Relacionados ==========
-    
+
     private void loadAgentVersions(Long agentId) {
         try {
             log.debug("Cargando versiones del agente");
-            
+
             // TABLE - usar findAllEntity() con filtros
             PageParams pageParams = PageParams.builder()
                 .maxRows(50)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentVersion> result = businessService.findAllEntity(
-                AgentVersion.class, 
-                pageParams, 
-                criterias
-            );
-            
+
+            PageResult<AgentVersion> result = agentVersionService.findAll(pageParams, criterias);
+
             if (result != null && result.getContent() != null) {
                 agentVersions = result.getContent();
                 log.info("Cargadas {} versiones", agentVersions.size());
@@ -224,29 +240,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar versiones", e);
         }
     }
-    
+
     private void loadAgentDeployments(Long agentId) {
         try {
             log.debug("Cargando deployments del agente");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentDeployment> result = businessService.findAllEntity(
-                AgentDeployment.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentDeployment> result = agentDeploymentService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 agentDeployments = result.getContent();
                 log.info("Cargados {} deployments", agentDeployments.size());
@@ -255,29 +268,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar deployments", e);
         }
     }
-    
+
     private void loadAgentTools(Long agentId) {
         try {
             log.debug("Cargando tools del agente");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(50)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentTool> result = businessService.findAllEntity(
-                AgentTool.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentTool> result = agentToolService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 agentTools = result.getContent();
                 log.info("Cargadas {} tools", agentTools.size());
@@ -286,29 +296,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar tools", e);
         }
     }
-    
+
     private void loadAgentWorkflows(Long agentId) {
         try {
             log.debug("Cargando workflows del agente");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentWorkflow> result = businessService.findAllEntity(
-                AgentWorkflow.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentWorkflow> result = agentWorkflowService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 agentWorkflows = result.getContent();
                 log.info("Cargados {} workflows", agentWorkflows.size());
@@ -317,33 +324,30 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar workflows", e);
         }
     }
-    
+
     private void loadHealthChecks(Long agentId) {
         try {
             log.debug("Cargando health checks");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(10)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentHealth> result = businessService.findAllEntity(
-                AgentHealth.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentHealth> result = agentHealthService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 healthChecks = result.getContent();
                 log.info("Cargados {} health checks", healthChecks.size());
-                
+
                 // Actualizar health status actual
                 if (!healthChecks.isEmpty()) {
                     AgentHealth latest = healthChecks.get(0);
@@ -355,29 +359,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar health checks", e);
         }
     }
-    
+
     private void loadMonitoringData(Long agentId) {
         try {
             log.debug("Cargando datos de monitoreo");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(100)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentMonitoring> result = businessService.findAllEntity(
-                AgentMonitoring.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentMonitoring> result = agentMonitoringService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 monitoringData = result.getContent();
                 log.info("Cargados {} registros de monitoreo", monitoringData.size());
@@ -386,29 +387,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar datos de monitoreo", e);
         }
     }
-    
+
     private void loadCollaborations(Long agentId) {
         try {
             log.debug("Cargando colaboraciones");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentCollaboration> result = businessService.findAllEntity(
-                AgentCollaboration.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentCollaboration> result = agentCollaborationService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 collaborations = result.getContent();
                 log.info("Cargadas {} colaboraciones", collaborations.size());
@@ -417,29 +415,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar colaboraciones", e);
         }
     }
-    
+
     private void loadRecentDecisions(Long agentId) {
         try {
             log.debug("Cargando decisiones recientes");
-            
+
             // TABLE - usar findAllEntity() con filtro por FK
             PageParams pageParams = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDAGTAGENTS0");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentDecision> result = businessService.findAllEntity(
-                AgentDecision.class, 
-                pageParams, 
-                criterias
+
+            PageResult<AgentDecision> result = agentDecisionService.findAll(pageParams, criterias
             );
-            
+
             if (result != null && result.getContent() != null) {
                 recentDecisions = result.getContent();
                 log.info("Cargadas {} decisiones", recentDecisions.size());
@@ -448,83 +443,79 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             log.error("Error al cargar decisiones", e);
         }
     }
-    
+
     private void loadPerformanceMetrics(Long agentId) {
         try {
             log.debug("Cargando métricas de performance");
-            
+
             // VIEW - usar findAllView() con filtro
             PageParams pageParams = PageParams.builder()
                 .maxRows(1)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDXAGENT");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentPerformanceMetrics> result = businessService.findAllView(
-                AgentPerformanceMetrics.class, 
-                pageParams, 
-                criterias
-            );
-            
+
+            PageResult<AgentPerformanceMetrics> result = agentPerformanceMetricsService.findAll(pageParams, criterias);
+
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 performanceMetrics = result.getContent().get(0);
                 log.info("Métricas de performance cargadas");
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas de performance", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar métricas de performance", e);
         }
     }
-    
+
     private void loadComplianceStatus(Long agentId) {
         try {
             log.debug("Cargando estado de compliance");
-            
+
             // VIEW - usar findAllView() con filtro
             PageParams pageParams = PageParams.builder()
                 .maxRows(1)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             Criterias criterias = new Criterias();
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "IDXAGENT");
             criteria.setValueEnd(agentId);
             criterias.addCriteria(criteria);
-            
-            PageResult<AgentComplianceStatus> result = businessService.findAllView(
-                AgentComplianceStatus.class, 
-                pageParams, 
-                criterias
-            );
-            
+
+            PageResult<AgentComplianceStatus> result = agentComplianceStatusService.findAll(pageParams, criterias);
+
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 complianceStatus = result.getContent().get(0);
                 log.info("Estado de compliance cargado");
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar estado de compliance", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar estado de compliance", e);
         }
     }
-    
+
     private void calculateKPIs() {
         try {
             log.debug("Calculando KPIs del agente");
-            
+
             totalExecutions = monitoringData.size();
-            
+
             successfulExecutions = (int) monitoringData.stream()
                 .filter(m -> "SUCCESS".equals(m.getAgtstatus()))
                 .count();
-            
+
             failedExecutions = (int) monitoringData.stream()
                 .filter(m -> "FAILED".equals(m.getAgtstatus()))
                 .count();
-            
+
             // Calcular tiempo promedio de ejecución (en segundos)
             if (!monitoringData.isEmpty()) {
                 double totalTime = monitoringData.stream()
@@ -533,8 +524,8 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                     .sum();
                 averageExecutionTime = totalTime / monitoringData.size();
             }
-            
-            log.info("KPIs calculados - Total: {}, Success: {}, Failed: {}", 
+
+            log.info("KPIs calculados - Total: {}, Success: {}, Failed: {}",
                 totalExecutions, successfulExecutions, failedExecutions);
         } catch (Exception e) {
             log.error("Error al calcular KPIs", e);
@@ -542,7 +533,7 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     }
 
     // ========== Comandos CRUD ==========
-    
+
     @Command
     @NotifyChange("*")
     public void saveAgent() {
@@ -553,34 +544,34 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                     currentAgent.setAgtcreatedby(getUser().getUsername());
                     currentAgent.setAgtcreatedat(new Timestamp(System.currentTimeMillis()));
                 }
-                
+
                 currentAgent.setAgtupdatedby(getUser().getUsername());
                 currentAgent.setAgtupdatedat(new Timestamp(System.currentTimeMillis()));
-                
-                businessService.save(currentAgent);
-                
+
+                currentAgent = agentService.create(currentAgent);
+
                 isNewAgent = false;
                 isEditMode = false;
-                
-                Messagebox.show("Agente guardado correctamente", "Éxito", 
+
+                Messagebox.show("Agente guardado correctamente", "Éxito",
                     Messagebox.OK, Messagebox.INFORMATION);
-                
+
                 log.info("Agente guardado exitosamente: {}", currentAgent.getIdxagent());
             }
         } catch (Exception e) {
             log.error("Error al guardar agente", e);
-            Messagebox.show("Error al guardar agente: " + e.getMessage(), "Error", 
+            Messagebox.show("Error al guardar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange({"isEditMode"})
     public void enableEdit() {
         log.info("Habilitando modo edición");
         isEditMode = true;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void cancelEdit() {
@@ -592,25 +583,25 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             isEditMode = false;
         }
     }
-    
+
     private boolean validateAgent() {
         if (currentAgent.getAgtname() == null || currentAgent.getAgtname().trim().isEmpty()) {
-            Messagebox.show("El nombre del agente es obligatorio", "Validación", 
+            Messagebox.show("El nombre del agente es obligatorio", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         if (currentAgent.getAgttype() == null || currentAgent.getAgttype().trim().isEmpty()) {
-            Messagebox.show("El tipo de agente es obligatorio", "Validación", 
+            Messagebox.show("El tipo de agente es obligatorio", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
 
     // ========== Comandos de Operaciones Especiales ==========
-    
+
     @Command
     @NotifyChange({"currentHealthStatus", "lastHealthCheck", "healthChecks"})
     public void performHealthCheck() {
@@ -620,7 +611,7 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             AgentHealth healthCheck = new AgentHealth();
             healthCheck.setAgent(currentAgent);
             healthCheck.setAgtcreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Lógica simplificada de health check
             // En producción, esto llamaría a un procedimiento o servicio externo
             if ("ACTIVE".equals(currentAgent.getAgtstatus())) {
@@ -628,24 +619,24 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             } else {
                 healthCheck.setAgthealthstatus("UNHEALTHY");
             }
-            
-            businessService.save(healthCheck);
-            
+
+            healthCheck = agentService.create(healthCheck);
+
             currentHealthStatus = healthCheck.getAgthealthstatus();
             lastHealthCheck = healthCheck.getAgtcreatedat();
-            
+
             // Recargar health checks
             loadHealthChecks(currentAgent.getIdxagent());
-            
-            Messagebox.show("Health check completado: " + currentHealthStatus, "Éxito", 
+
+            Messagebox.show("Health check completado: " + currentHealthStatus, "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error al ejecutar health check", e);
-            Messagebox.show("Error al ejecutar health check: " + e.getMessage(), "Error", 
+            Messagebox.show("Error al ejecutar health check: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deployAgent(@BindingParam("environment") String environment) {
@@ -654,7 +645,7 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             if (environment == null || environment.trim().isEmpty()) {
                 environment = "PRODUCTION";
             }
-            
+
             AgentDeployment deployment = new AgentDeployment();
             deployment.setAgent(currentAgent);
             deployment.setAgtdeploymentname("Deployment " + environment);
@@ -663,26 +654,26 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             deployment.setAgtversion(currentAgent.getAgtversion());
             deployment.setAgtcreatedby(getUser().getUsername());
             deployment.setAgtcreatedat(new Timestamp(System.currentTimeMillis()));
-            
-            businessService.save(deployment);
-            
+
+            deployment = agentService.create(deployment);
+
             // Actualizar estado del agente
             currentAgent.setAgtstatus("DEPLOYED");
             currentAgent.setAgtupdatedby(getUser().getUsername());
             currentAgent.setAgtupdatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(currentAgent);
-            
+            currentAgent = agentService.create(currentAgent);
+
             loadAgentDeployments(currentAgent.getIdxagent());
-            
-            Messagebox.show("Agente desplegado correctamente en " + environment, "Éxito", 
+
+            Messagebox.show("Agente desplegado correctamente en " + environment, "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error al desplegar agente", e);
-            Messagebox.show("Error al desplegar agente: " + e.getMessage(), "Error", 
+            Messagebox.show("Error al desplegar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshData() {
@@ -693,7 +684,7 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     }
 
     // ========== Getters ==========
-    
+
     public Agent getCurrentAgent() {
         return currentAgent;
     }
@@ -771,7 +762,7 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
     }
 
     // ========== Cleanup ==========
-    
+
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
@@ -779,49 +770,57 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
             currentAgent = null;
             performanceMetrics = null;
             complianceStatus = null;
-            
+
             if (agentVersions != null) {
                 agentVersions.clear();
                 agentVersions = null;
             }
-            
+
             if (agentDeployments != null) {
                 agentDeployments.clear();
                 agentDeployments = null;
             }
-            
+
             if (agentTools != null) {
                 agentTools.clear();
                 agentTools = null;
             }
-            
+
             if (agentWorkflows != null) {
                 agentWorkflows.clear();
                 agentWorkflows = null;
             }
-            
+
             if (healthChecks != null) {
                 healthChecks.clear();
                 healthChecks = null;
             }
-            
+
             if (monitoringData != null) {
                 monitoringData.clear();
                 monitoringData = null;
             }
-            
+
             if (collaborations != null) {
                 collaborations.clear();
                 collaborations = null;
             }
-            
+
             if (recentDecisions != null) {
                 recentDecisions.clear();
                 recentDecisions = null;
             }
-            
-            businessService = null;
-            
+
+            agentService = null;
+            agentVersionService = null;
+            agentDeploymentService = null;
+            agentToolService = null;
+            agentWorkflowService = null;
+            agentHealthService = null;
+            agentMonitoringService = null;
+            agentCollaborationService = null;
+            agentDecisionService = null;
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
@@ -831,7 +830,6 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
 	@Override
 	public void setBeans(Object bean) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
-

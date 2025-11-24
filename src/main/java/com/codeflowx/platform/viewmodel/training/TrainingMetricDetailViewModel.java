@@ -30,6 +30,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.training.TrainingMetric;
+import com.codeflowx.govern.service.training.TrainingMetricService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -53,283 +55,281 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class TrainingMetricDetailViewModel extends MasterPage {
-    
-    @WireVariable
-    private BusinessService businessService;
-    
-    @Autowired
-    protected IEntityLocal dao;
-    
-    @WireVariable
-    public Environment environment;
-    
-    @WireVariable("context")
-    protected GenericApplicationContext contexto;
-    
-    @WireVariable("ctxBean")
-    protected Context ctxBean;
-    
-    @WireVariable("APPLICATION_DS")
-    protected DataSource ds;
-    
-    protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
-    }
-    
-    @Override
-    public void setBeans(Object bean) {
-        // Auto-generated method stub
-    }
-    
-    private static final long serialVersionUID = 1L;
-    private static final String IDDESKTOP = "contenedor";
-    
-    // ========== Modo de operación ==========
-    private String mode;
-    private Long idxtrainingmetric;
-    private boolean editing = false;
-    private String pageTitle = "Detalle";
-    
-    // ========== Datos ==========
-    private TrainingMetric currentTrainingMetric;
-    
-    // ========== Validadores ==========
-    private UniqueValidator unique;
-    
-    private String originalMetricname = null;
-    
-    // ========== Listas para combos (FK) ==========
-    
-    // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
-    // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
-    @AfterCompose
-    public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
-        Selectors.wireComponents(view, this, false);
-        super.doAfterCompose(view);
-        initDao();
-        
-        // Obtener parámetros de navegación - con protección para action null
 
-        
-        if (super.action != null) {
+  @WireVariable
+  private TrainingMetricService trainingMetricService;
+  @WireVariable
+  private BusinessService businessService; // Mantener para logActivity y UniqueValidator
 
-        
-            mode = super.action.name();
+  @Autowired
+  protected IEntityLocal dao;
 
-        
-        } else {
+  @WireVariable
+  public Environment environment;
 
-        
-            mode = (dataParam != null) ? "LOAD" : "NEW";
+  @WireVariable("context")
+  protected GenericApplicationContext contexto;
 
-        
-            log.warn("Action es null, infiriendo modo: {}", mode);
+  @WireVariable("ctxBean")
+  protected Context ctxBean;
 
-        
-        }
-        
-        // dataParam siempre contiene el ID (PK de tipo Long)
-        if (dataParam != null) {
-            idxtrainingmetric = Long.valueOf(String.valueOf(dataParam));
-        }
-        
-        log.info("Inicializando TrainingMetricDetailViewModel - mode: {}, idxtrainingmetric: {}", mode, idxtrainingmetric);
-        
-        if ("NEW".equals(mode)) {
-            initNew();
-        } else if ("LOAD".equals(mode) && idxtrainingmetric != null) {
-            loadItem(idxtrainingmetric);
-        } else {
-            log.error("Modo inválido o falta idxtrainingmetric");
-            Map<String, Object> params = new HashMap<>();
-            params.put("action", Action.LOAD);
-            appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-        }
-        
-        // Inicializar validador de unicidad
-        unique = new UniqueValidator(currentTrainingMetric, businessService);
+  @WireVariable("APPLICATION_DS")
+  protected DataSource ds;
+
+  protected void initDao() {
+    if (businessService == null) {
+      businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
     }
-    
-    private void initNew() {
-        log.debug("Inicializando nuevo registro");
-        currentTrainingMetric = new TrainingMetric();
-        editing = false;
-        pageTitle = "Crear Nuevo";
+  }
+
+  @Override
+  public void setBeans(Object bean) {
+    // Auto-generated method stub
+  }
+
+  private static final long serialVersionUID = 1L;
+  private static final String IDDESKTOP = "contenedor";
+
+  // ========== Modo de operación ==========
+  private String mode;
+  private Long idxtrainingmetric;
+  private boolean editing = false;
+  private String pageTitle = "Detalle";
+
+  // ========== Datos ==========
+  private TrainingMetric currentTrainingMetric;
+
+  // ========== Validadores ==========
+  private UniqueValidator unique;
+
+  private String originalMetricname = null;
+
+  // ========== Listas para combos (FK) ==========
+
+  // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
+
+  // ========== Colecciones descendientes (tabs con lazy loading) ==========
+
+  @AfterCompose
+  public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
+    Selectors.wireComponents(view, this, false);
+    super.doAfterCompose(view);
+    initDao();
+
+    // Obtener parámetros de navegación - con protección para action null
+
+    if (super.action != null) {
+
+      mode = super.action.name();
+
+    } else {
+
+      mode = (dataParam != null) ? "LOAD" : "NEW";
+
+      log.warn("Action es null, infiriendo modo: {}", mode);
+
     }
-    
-    private void loadItem(Long id) {
-        try {
-            log.debug("Cargando registro ID={}", id);
-            
-            // findById siempre recibe Long id (el PK)
-            currentTrainingMetric = businessService.findById(TrainingMetric.class, id);
-            
-            if (currentTrainingMetric == null) {
-                log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
-                    Messagebox.OK, Messagebox.ERROR);
-                Map<String, Object> params = new HashMap<>();
-                params.put("action", Action.LOAD);
-                appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-                return;
-            }
-            
-            editing = true;
-            pageTitle = "Editar: " + currentTrainingMetric.getMetricname();
-            
-            // Cargar tags/roles existentes desde JSON
-            
-            // Guardar valores originales para validación de unicidad
-            originalMetricname = currentTrainingMetric.getMetricname();
-            
-            // Auditar carga de registro
-            logActivity("CONSULTA", "TRNTRAININGMETRICS", id, "Consulta: " + currentTrainingMetric.getMetricname());
-            
-        } catch (Exception e) {
-            log.error("Error al cargar registro ID={}", id, e);
-            Messagebox.show("Error al cargar: " + e.getMessage(),
-                "Error", Messagebox.OK, Messagebox.ERROR);
-            Map<String, Object> params = new HashMap<>();
-            params.put("action", Action.LOAD);
-            appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-        }
+
+    // dataParam siempre contiene el ID (PK de tipo Long)
+    if (dataParam != null) {
+      idxtrainingmetric = Long.valueOf(String.valueOf(dataParam));
     }
-    
-    @Command
-    @NotifyChange("*")
-    public void saveItem() {
-        try {
-            log.info("Guardando registro");
-            
-            // Validar campos obligatorios
-            if (!validateRequiredFields()) {
-                return;
-            }
-            
-            boolean isNew = currentTrainingMetric.getIdxtrainingmetric() == null;
-            
-            if (isNew) {
-                businessService.save(currentTrainingMetric);
-                log.info("Registro creado exitosamente");
-                logActivity("CREACION", "TRNTRAININGMETRICS", currentTrainingMetric.getIdxtrainingmetric(), 
-                    "Creado: " + currentTrainingMetric.getMetricname());
-                Messagebox.show("Registro creado exitosamente",
-                    "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            } else {
-                businessService.update(currentTrainingMetric);
-                log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "TRNTRAININGMETRICS", currentTrainingMetric.getIdxtrainingmetric(), 
-                    "Actualizado: " + currentTrainingMetric.getMetricname());
-                Messagebox.show("Registro actualizado exitosamente",
-                    "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            }
-            
-            // Regresar al overview
-            Map<String, Object> params = new HashMap<>();
-            params.put("action", Action.LOAD);
-            appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
-            log.error("Error al guardar", e);
-            Messagebox.show("Error al guardar: " + e.getMessage(),
-                "Error", Messagebox.OK, Messagebox.ERROR);
-        }
+
+    log.info("Inicializando TrainingMetricDetailViewModel - mode: {}, idxtrainingmetric: {}", mode, idxtrainingmetric);
+
+    if ("NEW".equals(mode)) {
+      initNew();
+    } else if ("LOAD".equals(mode) && idxtrainingmetric != null) {
+      loadItem(idxtrainingmetric);
+    } else {
+      log.error("Modo inválido o falta idxtrainingmetric");
+      Map<String, Object> params = new HashMap<>();
+      params.put("action", Action.LOAD);
+      appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
-    /**
-     * Valida que todos los campos obligatorios estén completos
-     * @return true si la validación es exitosa
-     */
-    private boolean validateRequiredFields() {
-        StringBuilder errors = new StringBuilder();
-        
-        if (currentTrainingMetric.getMetricname() == null || currentTrainingMetric.getMetricname().trim().isEmpty()) {
-            errors.append("- Metric Name\n");
-        }
-        if (currentTrainingMetric.getMetricname() != null && currentTrainingMetric.getMetricname().length() > 100) {
-            errors.append("- Metric Name no puede exceder 100 caracteres\n");
-        }
-        if (currentTrainingMetric.getTimestamp() == null) {
-            errors.append("- Time Stamp\n");
-        }
-        
-        if (errors.length() > 0) {
-            Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
-                "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
-            return false;
-        }
-        
-        return true;
-    }
-    
-    @Command
-    public void cancelEdit() {
-        log.debug("Cancelando edición");
+
+    // Inicializar validador de unicidad
+    unique = new UniqueValidator(currentTrainingMetric, businessService);
+  }
+
+  private void initNew() {
+    log.debug("Inicializando nuevo registro");
+    currentTrainingMetric = new TrainingMetric();
+    editing = false;
+    pageTitle = "Crear Nuevo";
+  }
+
+  private void loadItem(Long id) {
+    try {
+      log.debug("Cargando registro ID={}", id);
+
+      // findById siempre recibe Long id (el PK)
+      currentTrainingMetric = trainingMetricService.findById(id);
+
+      if (currentTrainingMetric == null) {
+        log.error("Registro no encontrado: ID={}", id);
+        Messagebox.show("Registro no encontrado", "Error",
+            Messagebox.OK, Messagebox.ERROR);
         Map<String, Object> params = new HashMap<>();
-        params.put("dataParam", idxtrainingmetric);
         params.put("action", Action.LOAD);
         appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
+        return;
+      }
+
+      editing = true;
+      pageTitle = "Editar: " + currentTrainingMetric.getMetricname();
+
+      // Cargar tags/roles existentes desde JSON
+
+      // Guardar valores originales para validación de unicidad
+      originalMetricname = currentTrainingMetric.getMetricname();
+
+      // Auditar carga de registro
+      logActivity("CONSULTA", "TRNTRAININGMETRICS", id, "Consulta: " + currentTrainingMetric.getMetricname());
+
+    } catch (GovernanceServiceException e) {
+      log.error("Error al cargar registro ID={}", id, e);
+      Messagebox.show("Error al cargar: " + e.getMessage(),
+          "Error", Messagebox.OK, Messagebox.ERROR);
+      Map<String, Object> params = new HashMap<>();
+      params.put("action", Action.LOAD);
+      appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
-    /**
-     * audita las acciones de un usuario
-     * @param action - buscar, edicion ,borrar,creacion ...
-     * @param model - nombre del modulo/tabla
-     * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
-        }
+  }
+
+  @Command
+  @NotifyChange("*")
+  public void saveItem() {
+    try {
+      log.info("Guardando registro");
+
+      // Validar campos obligatorios
+      if (!validateRequiredFields()) {
+        return;
+      }
+
+      boolean isNew = currentTrainingMetric.getIdxtrainingmetric() == null;
+
+      if (isNew) {
+        currentTrainingMetric = trainingMetricService.create(currentTrainingMetric);
+        log.info("Registro creado exitosamente");
+        logActivity("CREACION", "TRNTRAININGMETRICS", currentTrainingMetric.getIdxtrainingmetric(),
+            "Creado: " + currentTrainingMetric.getMetricname());
+        Messagebox.show("Registro creado exitosamente",
+            "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+      } else {
+        currentTrainingMetric = trainingMetricService.update(currentTrainingMetric);
+        log.info("Registro actualizado exitosamente");
+        logActivity("EDICION", "TRNTRAININGMETRICS", currentTrainingMetric.getIdxtrainingmetric(),
+            "Actualizado: " + currentTrainingMetric.getMetricname());
+        Messagebox.show("Registro actualizado exitosamente",
+            "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+      }
+
+      // Regresar al overview
+      Map<String, Object> params = new HashMap<>();
+      params.put("action", Action.LOAD);
+      appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
+
+    } catch (GovernanceServiceException e) {
+      log.error("Error al guardar", e);
+      Messagebox.show("Error al guardar: " + e.getMessage(),
+          "Error", Messagebox.OK, Messagebox.ERROR);
     }
-    
-    /**
-     * Libera recursos y limpia referencias para ayudar al GC
-     * Se llama automáticamente cuando el ViewModel se destruye
-     */
-    @Destroy
-    public void destroy() {
-        log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
-        try {
-            // Limpiar entidad actual
-            currentTrainingMetric = null;
-            
-            // Limpiar listas de FK
-            
-            // Limpiar listas de LIST_STRING
-            
-            // Limpiar colecciones @OneToMany
-            
-            // Limpiar tags/roles JSONB
-            
-            // Limpiar validadores
-            unique = null;
-            
-            // Limpiar BusinessService
-            businessService = null;
-            
-            log.debug("[Destroy] Recursos liberados correctamente");
-        } catch (Exception e) {
-            log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
-        }
+  }
+
+  /**
+   * Valida que todos los campos obligatorios estén completos
+   *
+   * @return true si la validación es exitosa
+   */
+  private boolean validateRequiredFields() {
+    StringBuilder errors = new StringBuilder();
+
+    if (currentTrainingMetric.getMetricname() == null || currentTrainingMetric.getMetricname().trim().isEmpty()) {
+      errors.append("- Metric Name\n");
     }
+    if (currentTrainingMetric.getMetricname() != null && currentTrainingMetric.getMetricname().length() > 100) {
+      errors.append("- Metric Name no puede exceder 100 caracteres\n");
+    }
+    if (currentTrainingMetric.getTimestamp() == null) {
+      errors.append("- Time Stamp\n");
+    }
+
+    if (errors.length() > 0) {
+      Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
+          "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
+      return false;
+    }
+
+    return true;
+  }
+
+  @Command
+  public void cancelEdit() {
+    log.debug("Cancelando edición");
+    Map<String, Object> params = new HashMap<>();
+    params.put("dataParam", idxtrainingmetric);
+    params.put("action", Action.LOAD);
+    appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
+  }
+
+  /**
+   * audita las acciones de un usuario
+   *
+   * @param action  - buscar, edicion ,borrar,creacion ...
+   * @param model   - nombre del modulo/tabla
+   * @param pk      - clave primaria del registro
+   * @param mensaje -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
+   * @throws DaoException
+   * @throws UiException
+   */
+  private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
+    try {
+      Ssoractividad log = new Ssoractividad();
+      log.setUsername(getUser().getUsername());
+      log.setAccion(action);
+      log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
+      log.setModulo(model);
+      log.setIdtupla(pk != null ? pk.intValue() : 0);
+      log.setAplicacion(ctxBean.getApplicationName());
+      log.setValuetupla(mensaje);
+      businessService.save(log);
+    } catch (Exception e) {
+      log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
+      // No lanzar excepción para que no interrumpa el flujo normal
+    }
+  }
+
+  /**
+   * Libera recursos y limpia referencias para ayudar al GC
+   * Se llama automáticamente cuando el ViewModel se destruye
+   */
+  @Destroy
+  public void destroy() {
+    log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
+
+    try {
+      // Limpiar entidad actual
+      currentTrainingMetric = null;
+
+      // Limpiar listas de FK
+
+      // Limpiar listas de LIST_STRING
+
+      // Limpiar colecciones @OneToMany
+
+      // Limpiar tags/roles JSONB
+
+      // Limpiar validadores
+      unique = null;
+
+      // Limpiar BusinessService
+      businessService = null;
+
+      log.debug("[Destroy] Recursos liberados correctamente");
+    } catch (Exception e) {
+      log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
+    }
+  }
 }

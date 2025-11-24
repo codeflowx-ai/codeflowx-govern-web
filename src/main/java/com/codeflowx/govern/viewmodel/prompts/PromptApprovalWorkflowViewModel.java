@@ -28,9 +28,11 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.prompts.Prompt;
+import com.codeflowx.govern.service.prompts.PromptService;
 import com.codeflowx.govern.entity.prompts.PromptVersion;
 import com.codeflowx.govern.entity.procedures.governance.AutoApproveArtifact;
 import com.codeflowx.govern.entity.procedures.governance.RequestHumanReview;
+import com.codeflowx.govern.service.prompts.PromptVersionService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -56,15 +58,18 @@ public class PromptApprovalWorkflowViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private PromptService promptService;
+    @WireVariable
+    private PromptVersionService promptVersionService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -106,20 +111,14 @@ public class PromptApprovalWorkflowViewModel extends MasterPage {
             criteria1.setValueEnd("PENDING_APPROVAL");
             criterias1.addCriteria(criteria1);
             
-            PageResult<Prompt> result1 = businessService.findAllEntity(
-                Prompt.class, 
-                pageParams, 
-                criterias1
+            PageResult<Prompt> result1 = promptService.findAll(pageParams, criterias1
             );
             if (result1 != null && result1.getContent() != null) {
                 pendingPromptsList = result1.getContent();
             }
             
             // Cargar versiones de prompts
-            PageResult<PromptVersion> result2 = businessService.findAllEntity(
-                PromptVersion.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<PromptVersion> result2 = promptVersionService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 versionsList = result2.getContent();
@@ -186,10 +185,10 @@ public class PromptApprovalWorkflowViewModel extends MasterPage {
     @NotifyChange("*")
     public void approvePrompt(Long promptId, String comments) {
         try {
-            Prompt prompt = businessService.findById(Prompt.class, promptId);
+            Prompt prompt = promptService.findById(promptId);
             if (prompt != null) {
                 prompt.setPrmstatus("APPROVED");
-                businessService.update(prompt);
+                prompt = promptService.update(prompt);
                 
                 loadData();
                 calculateKPIs();
@@ -205,10 +204,10 @@ public class PromptApprovalWorkflowViewModel extends MasterPage {
     @NotifyChange("*")
     public void rejectPrompt(Long promptId, String reason) {
         try {
-            Prompt prompt = businessService.findById(Prompt.class, promptId);
+            Prompt prompt = promptService.findById(promptId);
             if (prompt != null) {
                 prompt.setPrmstatus("REJECTED");
-                businessService.update(prompt);
+                prompt = promptService.update(prompt);
                 
                 loadData();
                 calculateKPIs();
@@ -248,7 +247,8 @@ public class PromptApprovalWorkflowViewModel extends MasterPage {
             versionsList.clear(); 
             versionsList = null; 
         }
-        businessService = null;
+        promptService = null;
+            promptVersionService = null;
     }
 }
 

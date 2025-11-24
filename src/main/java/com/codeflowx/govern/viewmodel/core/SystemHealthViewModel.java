@@ -21,6 +21,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.views.core.SystemHealthOverview;
+import com.codeflowx.govern.service.core.SystemHealthOverviewService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -41,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 public class SystemHealthViewModel extends MasterPage {
     
     @WireVariable
-    private BusinessService businessService;
+    private SystemHealthOverviewService systemHealthOverviewService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -52,9 +54,9 @@ public class SystemHealthViewModel extends MasterPage {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     private Long totalItems = 0L;
@@ -77,7 +79,7 @@ public class SystemHealthViewModel extends MasterPage {
     public void loadHealthData() {
         try {
             log.debug("Cargando salud del sistema");
-            List<SystemHealthOverview> healthData = businessService.findAllView(SystemHealthOverview.class);
+            List<SystemHealthOverview> healthData = systemHealthOverviewService.findAll();
             
             if (healthData != null && !healthData.isEmpty()) {
                 SystemHealthOverview health = healthData.get(0);
@@ -94,7 +96,7 @@ public class SystemHealthViewModel extends MasterPage {
                 log.info("Salud del sistema - Total: {}, Activos: {}, Offline: {}, Score: {}", 
                          totalItems, activeItems, offlineItems, avgScore);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando salud del sistema", e);
         }
     }

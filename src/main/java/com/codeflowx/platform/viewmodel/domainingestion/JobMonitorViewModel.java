@@ -14,6 +14,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.domainingestion.Domain;
 import com.codeflowx.govern.entity.domainingestion.IngestionJob;
+import com.codeflowx.govern.service.domainingestion.DomainService;
+import com.codeflowx.govern.service.domainingestion.IngestionJobService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -31,79 +35,84 @@ import lombok.extern.slf4j.Slf4j;
 @Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
 public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
     private PageParams pageParams;
     private PageResult<IngestionJob> pageResult;
-    
+
     private String searchText = "";
     private Domain filterDomain;
     private String filterType = "";
     private String filterStatus = "";
-    
+
+    @WireVariable
+    private DomainService domainService;
+    @WireVariable
+    private IngestionJobService ingestionJobService;
+
     private List<IngestionJob> jobsList = new ArrayList<>();
     private List<Domain> domainsList = new ArrayList<>();
-    
+
     // Métricas
     private Long totalJobs = 0L;
     private Long runningJobs = 0L;
     private Long completedJobs = 0L;
     private Long failedJobs = 0L;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(100)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadDomains();
         loadJobs();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadDomains() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "dinstatus", "active"));
-            PageResult<Domain> result = businessService.findAllEntity(Domain.class, PageParams.builder().maxRows(1000).build(), criterias);
+            PageResult<Domain> result = domainService.findAll(PageParams.builder().maxRows(1000).build(), criterias);
             if (result != null && result.getContent() != null) {
                 domainsList = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar dominios", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadJobs() {
         try {
             Criterias criterias = buildCriterias();
-            pageResult = businessService.findAllEntity(IngestionJob.class, pageParams, criterias);
-            
+            pageResult = ingestionJobService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 jobsList = pageResult.getContent();
                 logActivity("BUSCAR", "INGESTION_JOBS", null, "Monitor: " + jobsList.size() + " jobs");
             } else {
                 jobsList = new ArrayList<>();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar jobs", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
@@ -120,40 +129,40 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
         }
         return criterias;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadMetrics() {
         try {
             Criterias criterias = new Criterias();
-            PageResult<IngestionJob> allJobs = businessService.findAllEntity(IngestionJob.class, 
+            PageResult<IngestionJob> allJobs = ingestionJobService.findAll(
                 PageParams.builder().maxRows(10000).build(), criterias);
-            
+
             if (allJobs != null && allJobs.getContent() != null) {
                 totalJobs = (long) allJobs.getContent().size();
                 runningJobs = allJobs.getContent().stream().filter(j -> "running".equals(j.getDinstatus())).count();
                 completedJobs = allJobs.getContent().stream().filter(j -> "completed".equals(j.getDinstatus())).count();
                 failedJobs = allJobs.getContent().stream().filter(j -> "failed".equals(j.getDinstatus())).count();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void searchJobs() {
         pageParams.setPageActual(1);
         loadJobs();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
         pageParams.setPageActual(1);
         loadJobs();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshJobs() {
@@ -161,48 +170,48 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
         loadMetrics();
         Messagebox.show("Jobs actualizados", "Actualización", Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     @Command
     public void createNewJob() {
         log.info("Crear nuevo job");
     }
-    
+
     @Command
     public void viewJobDetail(@BindingParam("job") IngestionJob job) {
         logActivity("VER", "INGESTION_JOBS", job.getIdxingestionjob(), "Detalle: " + job.getDinjobname());
         log.info("Ver detalle job: {}", job.getDinjobname());
     }
-    
+
     @Command
     @NotifyChange("*")
     public void pauseJob(@BindingParam("job") IngestionJob job) {
         try {
             job.setDinstatus("paused");
-            businessService.save(job);
+            ingestionJobService.update(job);
             logActivity("PAUSAR", "INGESTION_JOBS", job.getIdxingestionjob(), "Job pausado: " + job.getDinjobname());
             loadJobs();
             Messagebox.show("Job pausado", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al pausar job", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void resumeJob(@BindingParam("job") IngestionJob job) {
         try {
             job.setDinstatus("running");
-            businessService.save(job);
+            ingestionJobService.update(job);
             logActivity("REANUDAR", "INGESTION_JOBS", job.getIdxingestionjob(), "Job reanudado: " + job.getDinjobname());
             loadJobs();
             Messagebox.show("Job reanudado", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al reanudar job", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void cancelJob(@BindingParam("job") IngestionJob job) {
@@ -213,20 +222,20 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
                     try {
                         job.setDinstatus("failed");
                         job.setDinerrormessage("Cancelado por el usuario");
-                        businessService.save(job);
-                        logActivity("CANCELAR", "INGESTION_JOBS", job.getIdxingestionjob(), 
+                        ingestionJobService.update(job);
+                        logActivity("CANCELAR", "INGESTION_JOBS", job.getIdxingestionjob(),
                             "Job cancelado: " + job.getDinjobname());
                         loadJobs();
                         loadMetrics();
                         Messagebox.show("Job cancelado", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al cancelar job", e);
                         Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     public String translateStatus(String status) {
         if (status == null) return "N/A";
         switch (status) {
@@ -239,7 +248,7 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
             default: return status;
         }
     }
-    
+
     public String getStatusBadgeClass(String status) {
         if (status == null) return "badge bg-secondary";
         switch (status) {
@@ -252,7 +261,7 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
             default: return "badge bg-secondary";
         }
     }
-    
+
     public String getProgressBarClass(String status) {
         if (status == null) return "bg-secondary";
         switch (status) {
@@ -263,12 +272,12 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
             default: return "bg-secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
         if (jobsList != null) {
@@ -281,7 +290,7 @@ public class JobMonitorViewModel extends BaseFront<JobMonitorViewModel> {
         }
         pageResult = null;
         pageParams = null;
-        businessService = null;
+        domainService = null;
+        ingestionJobService = null;
     }
 }
-

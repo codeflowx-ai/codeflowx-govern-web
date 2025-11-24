@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentWorkflowExecution;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentWorkflowService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentWorkflowExecutionOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentWorkflowService agentWorkflowService;
     
     @Autowired
     protected IEntityLocal dao;

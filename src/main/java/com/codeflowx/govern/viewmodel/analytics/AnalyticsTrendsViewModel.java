@@ -8,6 +8,9 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.suinsit.nocode.web.MasterBeanUI;
 import codeflowx.nocode.persist.*;
 import com.codeflowx.govern.entity.views.analytics.AnalyticsTrends;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.analytics.AnalyticsTrendsService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +32,9 @@ import org.springframework.core.env.Environment;
 public class AnalyticsTrendsViewModel extends MasterBeanUI {
     
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+    @WireVariable
+    private AnalyticsTrendsService analyticsTrendsService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -40,9 +45,9 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     
@@ -66,7 +71,7 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
     public void loadTrendsData() {
         try {
             log.debug("Cargando tendencias de analytics");
-            List<AnalyticsTrends> trends = businessService.findAllView(AnalyticsTrends.class);
+            List<AnalyticsTrends> trends = analyticsTrendsService.findAll();
             
             if (trends != null && !trends.isEmpty()) {
                 AnalyticsTrends trend = trends.get(0);
@@ -82,7 +87,7 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
                 log.info("Tendencias cargadas - Total: {}, Activos: {}, Score: {}", 
                          totalItems, activeItems, avgScore);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando tendencias de analytics", e);
         }
     }

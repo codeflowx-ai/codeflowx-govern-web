@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.artefacto.ArtifactDependency;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.artefacto.ArtifactDependencyService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class ArtifactDependencyDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private ArtifactDependencyService artifactDependencyService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -167,7 +172,7 @@ public class ArtifactDependencyDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentArtifactDependency = businessService.findById(ArtifactDependency.class, id);
+            currentArtifactDependency = artifactDependencyService.findById(id);
             
             if (currentArtifactDependency == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -190,7 +195,7 @@ public class ArtifactDependencyDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "CATARTIFACTDEPENDENCIES", id, "Consulta: " + currentArtifactDependency.getCatdepdescription());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -214,14 +219,14 @@ public class ArtifactDependencyDetailViewModel extends MasterPage {
             boolean isNew = currentArtifactDependency.getIdxartifactdependency() == null;
             
             if (isNew) {
-                businessService.save(currentArtifactDependency);
+                currentArtifactDependency = artifactDependencyService.create(currentArtifactDependency);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "CATARTIFACTDEPENDENCIES", currentArtifactDependency.getIdxartifactdependency(), 
                     "Creado: " + currentArtifactDependency.getCatdepdescription());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentArtifactDependency);
+                currentArtifactDependency = artifactDependencyService.update(currentArtifactDependency);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "CATARTIFACTDEPENDENCIES", currentArtifactDependency.getIdxartifactdependency(), 
                     "Actualizado: " + currentArtifactDependency.getCatdepdescription());
@@ -234,7 +239,7 @@ public class ArtifactDependencyDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/artefacto/artefacto-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

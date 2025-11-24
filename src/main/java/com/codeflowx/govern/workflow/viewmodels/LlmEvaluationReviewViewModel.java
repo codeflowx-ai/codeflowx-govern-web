@@ -34,6 +34,8 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.govern.entity.evaluation.LlmEvaluation;
+import com.codeflowx.govern.service.evaluation.LlmEvaluationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -43,20 +45,20 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: LLM Evaluation Review
- * 
+ *
  * Proceso BPMN: 04_LLM_EVALUATION (llm-evaluation-v1)
  * User Task: llmReviewTask
  * Candidate Groups: ai-governance-team, ml-engineers
- * 
+ *
  * Funcionalidad:
  * Permite revisar los resultados de evaluación de un LLM (accuracy, toxicity, bias, etc.)
  * y decidir si aprobar o rechazar el modelo según los resultados.
- * 
+ *
  * Input Variables:
  * - evaluation_id: Long
  * - model_name: String
  * - overall_score: Double
- * 
+ *
  * Output Variables:
  * - action: "approve" | "reject"
  * - justification: String
@@ -74,28 +76,31 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
 
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private LlmEvaluationService llmEvaluationService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -127,7 +132,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
 
     private String taskId;
     private String processInstanceId;
-    
+
     // Mock mode
     private boolean mockMode = false;
 
@@ -136,22 +141,22 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        
+
         // Detectar mock mode
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
-        
-        
+
+
+
         if (params.containsKey("taskId")) {
             this.taskId = params.get("taskId")[0];
             loadTaskData();
         } else {
-            Messagebox.show("Error: No se proporcionó taskId", "Error", 
+            Messagebox.show("Error: No se proporcionó taskId", "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -172,7 +177,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
             this.gap = String.format("-%.2f", (threshold - overallScore) * 100) + "%";
 
             // Cargar evaluación desde BBDD
-            LlmEvaluation evaluation = businessService.findById(LlmEvaluation.class, evaluationId);
+            LlmEvaluation evaluation = llmEvaluationService.findById(evaluationId);
 
             // Parsear métricas
             if (evaluation.getEvalresults() != null) {
@@ -185,9 +190,13 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
 
             log.info("✅ Task data loaded: evaluationId={}, score={}", evaluationId, overallScore);
 
+        } catch (GovernanceServiceException e) {
+            log.error("❌ Error cargando task data", e);
+            Messagebox.show("Error: " + e.getMessage(), "Error",
+                Messagebox.OK, Messagebox.ERROR);
         } catch (Exception e) {
             log.error("❌ Error cargando task data", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -216,7 +225,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
 
     private String generateRecommendations() {
         List<String> recs = new ArrayList<>();
-        
+
         if (overallScore < 0.70) {
             recs.add("🔴 CRITICAL: Score is significantly below threshold");
             recs.add("Recommended action: REJECT or major model revision");
@@ -242,7 +251,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
     @Command
     public void doSubmit() {
         if (action == null || justification == null || justification.trim().length() < 20) {
-            Messagebox.show("Por favor completa todos los campos", "Validación", 
+            Messagebox.show("Por favor completa todos los campos", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
@@ -251,14 +260,14 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando submit - action={}", action);
                 logActivity("MOCK_SUBMIT_LLM_EVAL", "LlmEvaluation", evaluationId, "Simulación de decisión: " + action);
-                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode", 
+                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode",
                     Messagebox.OK, Messagebox.INFORMATION,
                     event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
                 return;
             }
-            
+
             String username = getUser() != null ? getUser().getUsername() : "SYSTEM";
-            
+
             // Completar tarea de Flowable
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("action", action);
@@ -267,7 +276,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
             taskVariables.put("reviewed_at", new Timestamp(System.currentTimeMillis()).toString());
 
             taskService.complete(taskId, taskVariables);
-            
+
             logActivity("SUBMIT_LLM_EVAL", "LlmEvaluation", evaluationId, "Decisión: " + action);
 
             Messagebox.show(
@@ -280,7 +289,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
 
         } catch (Exception e) {
             log.error("❌ Error submitting decision", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -290,7 +299,7 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/plataforma/workflow/my-tasks.zul";
         Executions.getCurrent().sendRedirect(redirect);
     }
-    
+
     /**
      * Mock data para demos
      */
@@ -301,22 +310,22 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
         this.evaluationId = 1001L;
         this.overallScore = 0.76;
         this.gap = String.format("-%.2f%%", (threshold - overallScore) * 100);
-        
+
         // Mock metrics
         metrics.add(new MetricRow("Accuracy", "0.82", "0.80", true));
         metrics.add(new MetricRow("Toxicity", "0.95", "0.80", true));
         metrics.add(new MetricRow("Bias", "0.72", "0.80", false));
         metrics.add(new MetricRow("Coherence", "0.85", "0.80", true));
         metrics.add(new MetricRow("Relevance", "0.68", "0.80", false));
-        
+
         this.totalTestCases = 5;
         this.passedTestCases = 3;
         this.failedTestCases = 2;
-        
+
         this.recommendations = "⚠️ WARNING: Score is below threshold but close\n" +
                               "Consider: Re-run with adjusted parameters, or approve with mitigation plan\n\n" +
                               "Failed metrics: Bias, Relevance";
-        
+
         log.info("🎭 Mock data loaded for LLM Evaluation Review");
     }
 
@@ -346,13 +355,13 @@ public class LlmEvaluationReviewViewModel extends MasterPage {
             log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
         }
     }
-    
+
     @Destroy
     public void destroy() {
         businessService = null;
         taskService = null;
     }
-    
+
     @Getter
     @Setter
     public static class MetricRow {

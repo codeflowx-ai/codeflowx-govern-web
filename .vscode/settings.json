@@ -1,0 +1,146 @@
+{
+  // ============================================
+  // Configuración Java para Cursor/VSCode
+  // Detecta los mismos errores que IntelliJ/Eclipse
+  // ============================================
+  
+  // Java Language Server Configuration
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-17",
+      "path": "/usr/lib/jvm/java-17-openjdk-amd64",
+      "default": true
+    }
+  ],
+  
+  // Maven Configuration
+  "java.configuration.maven.userSettings": "${env:HOME}/.m2/settings.xml",
+  "maven.executable.path": "/usr/bin/mvn",
+  "maven.terminal.useJavaHome": true,
+  "maven.terminal.customEnv": [
+    {
+      "environmentVariable": "JAVA_HOME",
+      "value": "/usr/lib/jvm/java-17-openjdk-amd64"
+    }
+  ],
+  
+  // Compiler Configuration - Estricto como IntelliJ
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.errors.incompleteClasspath.severity": "warning",
+  "java.configuration.checkProjectSettingsExclusions": false,
+  
+  // Code Analysis - Activar todas las validaciones
+  "java.codeGeneration.generateComments": true,
+  "java.codeGeneration.toString.template": "${object.className} [${member.name()}=${member.value}, ${otherMembers}]",
+  "java.codeGeneration.toString.codeStyle": "STRING_BUILDER",
+  "java.codeGeneration.toString.listArrayContents": true,
+  "java.codeGeneration.toString.limitElements": 0,
+  
+  // Import Organization
+  "java.completion.importOrder": [
+    "java",
+    "javax",
+    "org",
+    "com",
+    "codeflowx"
+  ],
+  "java.completion.favoriteStaticMembers": [
+    "org.junit.Assert.*",
+    "org.junit.Assume.*",
+    "org.junit.jupiter.api.Assertions.*",
+    "org.junit.jupiter.api.Assumptions.*",
+    "org.junit.jupiter.api.DynamicContainer.*",
+    "org.junit.jupiter.api.DynamicTest.*",
+    "org.mockito.Mockito.*",
+    "org.mockito.ArgumentMatchers.*",
+    "org.mockito.Answers.*"
+  ],
+  
+  // Formatting - Igual que IntelliJ
+  "java.format.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+  "java.format.settings.profile": "GoogleStyle",
+  "java.format.enabled": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  
+  // Save Actions
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  
+  // Error Detection - Activar todo
+  "java.maxConcurrentBuilds": 1,
+  "java.autobuild.enabled": true,
+  "java.clean.workspace": false,
+  
+  // Lombok Support
+  "java.jdt.ls.lombokSupport.enabled": true,
+  
+  // Project Structure
+  "java.project.sourcePaths": [],
+  "java.project.outputPath": "",
+  "java.project.referencedLibraries": [
+    "lib/**/*.jar",
+    "target/**/*.jar"
+  ],
+  
+  // Exclude Patterns
+  "files.exclude": {
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true,
+    "**/target": true,
+    "**/.idea": false
+  },
+  "files.watcherExclude": {
+    "**/target/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/target": true,
+    "**/node_modules": true,
+    "**/.git": true
+  },
+  
+  // Editor Settings
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.encoding": "utf8",
+  
+  // Java Specific Editor Settings
+  "[java]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "redhat.java"
+  },
+  
+  // XML Settings (para pom.xml)
+  "[xml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": true
+  },
+  
+  // Problemas y Diagnósticos
+  "problems.showCurrentInStatus": true,
+  "problems.sortOrder": "severity",
+  
+  // Terminal Configuration
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.env.linux": {
+    "JAVA_HOME": "/usr/lib/jvm/java-17-openjdk-amd64",
+    "MAVEN_HOME": "/opt/maven",
+    "PATH": "/usr/lib/jvm/java-17-openjdk-amd64/bin:/opt/maven/bin:${env:PATH}"
+  }
+}
+

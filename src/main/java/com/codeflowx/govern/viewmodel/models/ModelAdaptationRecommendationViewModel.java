@@ -34,7 +34,9 @@ import com.codeflowx.govern.business.models.ModelAdaptationBusinessService.Adapt
 import com.codeflowx.govern.business.models.ModelAdaptationBusinessService.AdapterConfig;
 import com.codeflowx.govern.business.models.ModelAdaptationBusinessService.StrategyAlternative;
 import com.codeflowx.govern.entity.models.Model;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.models.ModelAdaptationStrategy;
+import com.codeflowx.govern.service.models.ModelAdaptationStrategyService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.PageParams;
@@ -58,10 +60,12 @@ public class ModelAdaptationRecommendationViewModel extends MasterPage {
     private static final String DEFAULT_PRIORITY = "cost";
 
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
 
     @WireVariable
     private ModelAdaptationBusinessService adaptationBusinessService;
+    @WireVariable
+    private ModelAdaptationStrategyService modelAdaptationStrategyService;
 
     @WireVariable
     public Environment environment;
@@ -86,9 +90,9 @@ public class ModelAdaptationRecommendationViewModel extends MasterPage {
     private List<String> priorityOptions = List.of("cost", "time", "co2", "performance");
 
     protected void initDao() {
-        if (businessService == null && environment != null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     @Override
@@ -113,7 +117,7 @@ public class ModelAdaptationRecommendationViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("modstatus", "ACTIVE");
 
-            PageResult<Model> result = businessService.findAllEntity(Model.class, params, filters);
+            PageResult<Model> result = modelService.findAll(params, filters);
             if (result != null && result.getContent() != null) {
                 baseModels = result.getContent();
             } else {

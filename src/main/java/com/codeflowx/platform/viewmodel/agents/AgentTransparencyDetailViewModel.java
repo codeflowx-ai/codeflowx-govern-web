@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentTransparency;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentTransparencyService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentTransparencyDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentTransparencyService agentTransparencyService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -174,7 +179,7 @@ public class AgentTransparencyDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentTransparency = businessService.findById(AgentTransparency.class, id);
+            currentAgentTransparency = agentTransparencyService.findById(id);
             
             if (currentAgentTransparency == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -223,14 +228,14 @@ public class AgentTransparencyDetailViewModel extends MasterPage {
             boolean isNew = currentAgentTransparency.getIdxagenttransparency() == null;
             
             if (isNew) {
-                businessService.save(currentAgentTransparency);
+                currentAgentTransparency = agentTransparencyService.create(currentAgentTransparency);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTTRANSPARENCY", currentAgentTransparency.getIdxagenttransparency(), 
                     "Creado: " + currentAgentTransparency.getIdxagenttransparency());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentTransparency);
+                currentAgentTransparency = agentTransparencyService.update(currentAgentTransparency);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTTRANSPARENCY", currentAgentTransparency.getIdxagenttransparency(), 
                     "Actualizado: " + currentAgentTransparency.getIdxagenttransparency());

@@ -1,0 +1,222 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.datasources.DataSourceApiOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<h:div class="row" style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-plug me-2"></h:i>
+						<label value="APIs de Data Sources" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de APIs de fuentes de datos" />
+					</h:p>
+				</h:div>
+			</div>
+			<h:div class="col-lg-12 s-bot ">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1"></h:div>
+							<h:div class="flex-shrink-0">
+								<h:div class="hstack text-nowrap gap-2 d-flex">
+									<a
+										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
+										class="waves-effect waves-light"
+										onClick="@command('createApi')"
+										label="Nueva API">
+									</a>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+				<!--end col-->
+			</h:div>
+			<h:div class="col-lg-12 s-bot ">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total APIs</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.totalApis)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activas</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.activeApis)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Con Errores</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.errorApis)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="section filters">
+				<h:div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchText)"
+						placeholder="Buscar por nombre..."
+						class="form-control" onOK="@command('searchApis')" />
+					<!-- Filtro por Método -->
+					<combobox mold="rounded" autodrop="true"
+						selectedItem="@bind(vm.filterMethod)"
+						onChange="@command('filterApis')"
+						placeholder="Filtrar por Método">
+						<comboitem label="TODOS" value="" />
+						<comboitem label="GET" value="GET" />
+						<comboitem label="POST" value="POST" />
+						<comboitem label="PUT" value="PUT" />
+						<comboitem label="DELETE" value="DELETE" />
+						<comboitem label="PATCH" value="PATCH" />
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox
+						placeholder="Filtrar por Estado"
+						selectedItem="@bind(vm.filterStatus)"
+						onChange="@command('filterApis')">
+						<comboitem label="TODOS" value="" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="INACTIVE" value="INACTIVE" />
+						<comboitem label="ERROR" value="ERROR" />
+					</combobox>
+				</h:div>
+				<h:div class="filter-icons">
+					<a tooltiptext="Buscar"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('searchApis')" />
+					<a tooltiptext="Limpiar"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+					<a tooltiptext="Refrescar"
+						iconSclass="fa-duotone fa-arrows-rotate"
+						onClick="@command('refreshApis')" />
+				</h:div>
+			</h:div>
+			<h:div class="col-xxl-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.apiSourcesList)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column
+										label="Nombre" align="center"
+										sort="auto" width="20%" />
+									<column sclass=" text-capitalize "
+										label="Endpoint" align="center"
+										width="25%" />
+									<column sclass=" text-capitalize "
+										label="Método" align="center"
+										width="10%" />
+									<column sclass=" text-capitalize "
+										label="Estado" align="center"
+										width="10%" />
+									<column sclass=" text-capitalize "
+										label="Última Prueba" align="center"
+										width="15%" />
+									<column
+										label="Acciones"
+										align="center" width="20%" />
+								</columns>
+
+								<template name="model" var="api">
+									<row
+										style="text-align:right;cursor:pointer;">
+										<label
+											value="@load(api.apiname)">
+										</label>
+										<label
+											value="@load(api.apiendpoint)">
+										</label>
+										<label
+											value="@load(api.apimethod)"
+											sclass="badge bg-info" />
+										<label
+											value="@load(api.apistatus)"
+											sclass="badge ${api.apistatus eq 'ACTIVE' ? 'bg-success' : (api.apistatus eq 'INACTIVE' ? 'bg-secondary' : 'bg-danger')}" />
+										<label
+											value="@load(api.apilasttestat) @converter('vm.formatDate')">
+										</label>
+										<cell align="center"
+											class="d-flex">
+											<h:div class="edit">
+												<a
+													onClick="@command('viewApi', api=api)"
+													iconSclass="fa-duotone fa-solid fa-eye fs-2x"
+													sclass="waves-effect waves-info"
+													tooltiptext="Ver detalles" />
+											</h:div>
+											<h:div class="edit">
+												<a
+													onClick="@command('editApi', api=api)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="Editar" />
+											</h:div>
+											<h:div class="test">
+												<a
+													onClick="@command('testApi', api=api)"
+													iconSclass="fa-duotone fa-solid fa-vial fs-2x"
+													sclass="waves-effect waves-warning"
+													tooltiptext="Probar API" />
+											</h:div>
+											<h:div class="delete">
+												<a
+													onClick="@command('deleteApi', api=api)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="Eliminar" />
+											</h:div>
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)"
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('loadData')"
+											mold="os" width="100%" />
+									</footer>
+									<footer span="4" align="left"></footer>
+									<footer></footer>
+								</foot>
+							</grid>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div><!--end col-->
+	</idspace>
+</zk>

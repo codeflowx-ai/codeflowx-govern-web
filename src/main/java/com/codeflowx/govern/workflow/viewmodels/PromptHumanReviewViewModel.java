@@ -33,6 +33,9 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.govern.entity.prompts.Prompt;
 import com.codeflowx.govern.entity.prompts.PromptApproval;
+import com.codeflowx.govern.service.prompts.PromptApprovalService;
+import com.codeflowx.govern.service.prompts.PromptService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -56,28 +59,34 @@ public class PromptHumanReviewViewModel extends MasterPage {
     // ========== Servicios y contexto Spring ==========
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private PromptService promptService;
+
+    @WireVariable
+    private PromptApprovalService promptApprovalService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -86,7 +95,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
     // ========== Servicios Flowable ==========
     @WireVariable
     private TaskService taskService;
-    
+
     private ObjectMapper objectMapper;
 
     // ========== Datos ==========
@@ -103,32 +112,32 @@ public class PromptHumanReviewViewModel extends MasterPage {
     private Boolean approved;
     private String approvalNotes;
     private String rejectionReason;
-    
+
     private boolean mockMode = false;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         log.info("🚀 Inicializando PromptHumanReviewViewModel");
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         try {
             objectMapper = new ObjectMapper();
 
@@ -140,7 +149,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
             }
 
             loadTaskData();
-            
+
         } catch (Exception e) {
             log.error("Error inicializando PromptHumanReviewViewModel", e);
             showError("Error al inicializar el formulario: " + e.getMessage());
@@ -161,16 +170,16 @@ public class PromptHumanReviewViewModel extends MasterPage {
 
             // 2. Obtener variables del proceso
             Map<String, Object> processVariables = taskService.getVariables(taskId);
-            
+
             Long promptId = (Long) processVariables.get("promptId");
             Long approvalId = (Long) processVariables.get("approvalId");
 
             // 3. Cargar prompt y approval desde BBDD
             if (promptId != null) {
-                prompt = businessService.findById(Prompt.class, promptId);
+                prompt = promptService.findById(promptId);
             }
             if (approvalId != null) {
-                approval = businessService.findById(PromptApproval.class, approvalId);
+                approval = promptApprovalService.findById(approvalId);
             }
 
             // 4. Cargar resultados de safety check
@@ -178,7 +187,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
             jailbreakDetected = (Boolean) processVariables.get("jailbreakDetected");
             injectionDetected = (Boolean) processVariables.get("injectionDetected");
             maliciousContentDetected = (Boolean) processVariables.get("maliciousContentDetected");
-            
+
             // Parsear riesgos de seguridad desde el resultado JSON
             String safetyCheckResult = (String) processVariables.get("safetyCheckResult");
             if (safetyCheckResult != null) {
@@ -195,7 +204,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
 
             // 5. Cargar resultados de compliance check
             complianceScore = (Integer) processVariables.get("complianceScore");
-            
+
             String complianceCheckResult = (String) processVariables.get("complianceCheckResult");
             if (complianceCheckResult != null) {
                 try {
@@ -209,6 +218,9 @@ public class PromptHumanReviewViewModel extends MasterPage {
             log.info("Datos de tarea cargados - Task ID: {}, Prompt: {}, Safety Score: {}, Compliance Score: {}",
                      taskId, prompt != null ? prompt.getPrmname() : "N/A", safetyScore, complianceScore);
 
+        } catch (GovernanceServiceException e) {
+            log.error("Error cargando datos de la tarea", e);
+            showError("Error cargando datos: " + e.getMessage());
         } catch (Exception e) {
             log.error("Error cargando datos de la tarea", e);
             showError("Error cargando datos: " + e.getMessage());
@@ -225,7 +237,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
             if (!validateDecision()) {
                 return;
             }
-            
+
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando confirmDecision - approved={}", approved);
                 String accion = Boolean.TRUE.equals(approved) ? "MOCK_APPROVE_PROMPT" : "MOCK_REJECT_PROMPT";
@@ -249,7 +261,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
                     approval.setPrmapprovalnotes(approvalNotes);
                 }
                 approval.setPrmupdatedat(Timestamp.valueOf(LocalDateTime.now()));
-                businessService.save(approval);
+                promptApprovalService.update(approval);
             }
 
             // 2. Actualizar Prompt en BBDD
@@ -262,7 +274,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
                     prompt.setPrmapprovalstatus("REJECTED");
                 }
                 prompt.setPrmupdatedat(Timestamp.valueOf(LocalDateTime.now()));
-                businessService.save(prompt);
+                promptService.update(prompt);
             }
 
             // 3. Completar tarea en Flowable con las variables de decisión
@@ -278,10 +290,10 @@ public class PromptHumanReviewViewModel extends MasterPage {
             log.info("Tarea completada exitosamente - Task ID: {}, Approved: {}", taskId, approved);
 
             // 4. Mostrar mensaje de éxito y cerrar ventana
-            String message = Boolean.TRUE.equals(approved) 
-                ? "Prompt aprobado exitosamente." 
+            String message = Boolean.TRUE.equals(approved)
+                ? "Prompt aprobado exitosamente."
                 : "Prompt rechazado exitosamente.";
-            
+
             Messagebox.show(
                 message,
                 "Decisión Confirmada",
@@ -292,16 +304,19 @@ public class PromptHumanReviewViewModel extends MasterPage {
 
             // 5. Registrar actividad
             String accion = Boolean.TRUE.equals(approved) ? "APROBACION" : "RECHAZO";
-            logActivity(accion, "PRMPROMPTAPPROVALS", approval != null ? approval.getIdxpromptapproval() : null, 
-                       "Revisión de prompt: " + (prompt != null ? prompt.getPrmname() : "N/A") + " - " + 
+            logActivity(accion, "PRMPROMPTAPPROVALS", approval != null ? approval.getIdxpromptapproval() : null,
+                       "Revisión de prompt: " + (prompt != null ? prompt.getPrmname() : "N/A") + " - " +
                        (Boolean.TRUE.equals(approved) ? "APROBADO" : "RECHAZADO"));
 
+        } catch (GovernanceServiceException e) {
+            log.error("Error confirmando decisión", e);
+            showError("Error al confirmar la decisión: " + e.getMessage());
         } catch (Exception e) {
             log.error("Error confirmando decisión", e);
             showError("Error al confirmar la decisión: " + e.getMessage());
         }
     }
-    
+
     private void loadMockData() {
         this.taskId = "mock-prompt-review-001";
         this.safetyScore = 85;
@@ -326,7 +341,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
             return false;
         }
 
-        if (Boolean.FALSE.equals(approved) && 
+        if (Boolean.FALSE.equals(approved) &&
             (rejectionReason == null || rejectionReason.trim().isEmpty())) {
             Messagebox.show(
                 "Debe proporcionar una razón del rechazo",
@@ -383,7 +398,7 @@ public class PromptHumanReviewViewModel extends MasterPage {
             return "System User";
         }
     }
-    
+
     /**
      * Registra la actividad del usuario en la base de datos
      */
@@ -403,8 +418,3 @@ public class PromptHumanReviewViewModel extends MasterPage {
         }
     }
 }
-
-
-
-
-

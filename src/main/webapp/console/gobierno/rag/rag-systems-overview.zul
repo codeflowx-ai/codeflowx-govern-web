@@ -37,7 +37,7 @@
 									<a
 										iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2 "
 										class="waves-effect waves-light"
-										onClick="@command('createRagSystem')"
+										onClick="@command('registerRagSystem')"
 										label="${labels.rag.overview.button.create}">
 									</a>
 								</div>
@@ -57,7 +57,7 @@
 							    <fragment exps="${labels.rag.overview.metrics.total}">
 	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
 								</fragment>
-								<fragment exps="@load(vm.totalSystems)">
+								<fragment exps="@load(vm.totalRagSystems)">
 	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
 								</fragment>
 							</h:div>
@@ -71,7 +71,7 @@
 							    <fragment exps="${labels.rag.overview.metrics.active}">
 	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
 								</fragment>
-								<fragment exps="@load(vm.activeSystems)">
+								<fragment exps="@load(vm.activeRagSystems)">
 	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
 								</fragment>
 							</h:div>
@@ -85,7 +85,7 @@
 							   <fragment exps="${labels.rag.overview.metrics.datasources}">
 	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
 								</fragment>
-								<fragment exps="@load(vm.totalDataSources)">
+								<fragment exps="@load(vm.totalDatasources)">
 	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
 								</fragment>
 							</h:div>
@@ -96,10 +96,10 @@
 						<h:div class="card shadow-sm border-0"
 							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
 							<h:div class="card-body p-4">
-							     <fragment exps="${labels.rag.overview.metrics.avgaccuracy}">
+							     <fragment exps="${labels.rag.overview.metrics.documents}">
 	                              <![CDATA[ <p class="mb-2" style="font-size: 14px; opacity: 0.9;" textContent='@load(exps)'></p> ]]>
 								</fragment>
-								<fragment exps="@load(vm.avgAccuracy)">
+								<fragment exps="@load(vm.totalDocuments)">
 	                              <![CDATA[ <h2 class="mb-1" style="font-size: 42px; font-weight: bold;" textContent='@load(exps)'></h2> ]]>
 								</fragment>
 							</h:div>
@@ -117,7 +117,7 @@
 					<!-- Filtro por Tipo -->
 					<combobox
 						placeholder="${labels.rag.overview.filters.type}"
-						selectedItem="@bind(vm.typeFilter)"
+						selectedItem="@bind(vm.selectedType)"
 						onChange="@command('applyFilters')">
 						<comboitem label="ALL" value="ALL" />
 						<comboitem label="VECTOR_DB" value="VECTOR_DB" />
@@ -128,22 +128,22 @@
 					<!-- Filtro por Estado -->
 					<combobox
 						placeholder="${labels.rag.overview.filters.status}"
-						selectedItem="@bind(vm.statusFilter)"
+						selectedItem="@bind(vm.selectedStatus)"
 						onChange="@command('applyFilters')">
 						<comboitem label="ALL" value="ALL" />
 						<comboitem label="ACTIVE" value="ACTIVE" />
 						<comboitem label="INACTIVE" value="INACTIVE" />
 						<comboitem label="INDEXING" value="INDEXING" />
 					</combobox>
-					<!-- Filtro por Embedding -->
+					<!-- Filtro por Aprobación -->
 					<combobox
-						placeholder="${labels.rag.overview.filters.embedding}"
-						selectedItem="@bind(vm.embeddingFilter)"
+						placeholder="${labels.rag.overview.filters.approval}"
+						selectedItem="@bind(vm.selectedApprovalStatus)"
 						onChange="@command('applyFilters')">
-						<comboitem label="ALL" value="ALL" />
-						<comboitem label="OPENAI" value="OPENAI" />
-						<comboitem label="COHERE" value="COHERE" />
-						<comboitem label="HUGGINGFACE" value="HUGGINGFACE" />
+						<comboitem label="ALL" value="" />
+						<comboitem label="PENDING" value="PENDING" />
+						<comboitem label="APPROVED" value="APPROVED" />
+						<comboitem label="REJECTED" value="REJECTED" />
 					</combobox>
 				</div>
 				<div class="filter-icons">
@@ -160,7 +160,7 @@
 					<div class="card-body">
 						<div id="divTemplate" sclass="col-lg-12">
 							<!-- listado -->
-							<grid model="@load(vm.filteredSystems)"
+							<grid model="@load(vm.ragSystems)"
 								style="overflow:auto;">
 								<columns sizable="true"
 									columnsgroup="false" columnshide="false">
@@ -204,7 +204,7 @@
 								<template name="model" var="system">
 									<row
 										style="text-align:right;cursor:pointer;"
-										onClick="@command('viewSystemDetails', systemId=system.idxragsystem)">
+										onClick="@command('viewRagSystemDetails', ragSystemId=system.idxragsystem)">
 										<label
 											value="@load(system.idxragsystem) @converter(vm.fieldConverter)">
 										</label>
@@ -242,14 +242,14 @@
 											class="d-flex">
 											<div class="edit">
 												<a
-													onClick="@command('viewSystemDetails', systemId=system.idxragsystem)"
+													onClick="@command('viewRagSystemDetails', ragSystemId=system.idxragsystem)"
 													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
 													sclass="waves-effect waves-success"
 													tooltiptext="${labels.rag.overview.button.view.tooltip}" />
 											</div>
 											<div class="delete">
 												<a
-													onClick="@command('deleteSystem', systemId=system.idxragsystem)"
+													onClick="@command('deleteRagSystem', ragSystemId=system.idxragsystem)"
 													iconSclass="fa-light fa-nfc-trash fa-xl"
 													sclass="waves-effect waves-danger"
 													tooltiptext="${labels.rag.overview.button.delete.tooltip}" />
@@ -261,7 +261,7 @@
 								<foot>
 									<footer span="3" align="right">
 										<paging id="topagin"
-											pageSize="@load(vm.pageParams.maxRows)" 
+											pageSize="@load(vm.pageParams.maxRows)"
 											totalSize="@load(vm.pageResult.totalRows)"
 											activePage="@load(vm.pageParams.pageActual - 1)"
 											onPaging="@command('onPaging', event=event)"

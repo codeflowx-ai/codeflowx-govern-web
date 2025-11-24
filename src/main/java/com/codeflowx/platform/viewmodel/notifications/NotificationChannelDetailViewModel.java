@@ -34,6 +34,10 @@ import com.codeflowx.govern.entity.notifications.Notification;
 import com.codeflowx.govern.entity.notifications.NotificationLog;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.notifications.NotificationChannelService;
+import com.codeflowx.govern.service.notifications.NotificationLogService;
+import com.codeflowx.govern.service.notifications.NotificationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -55,97 +59,106 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class NotificationChannelDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private NotificationChannelService notificationChannelService;
+
+    @WireVariable
+    private NotificationLogService notificationLogService;
+
+    @WireVariable
+    private NotificationService notificationService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxnotificationchannel;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private NotificationChannel currentNotificationChannel;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalNtfchannelname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableNtfchanneltypes = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<NotificationLog> subntflogs = new ArrayList<>();
     private List<Notification> subntfnotifications = new ArrayList<>();
     private boolean subntflogsLoaded = false;
     private boolean subntfnotificationsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxnotificationchannel = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando NotificationChannelDetailViewModel - mode: {}, idxnotificationchannel: {}", mode, idxnotificationchannel);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxnotificationchannel != null) {
@@ -156,11 +169,11 @@ public class NotificationChannelDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentNotificationChannel, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentNotificationChannel = new NotificationChannel();
@@ -168,36 +181,43 @@ public class NotificationChannelDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadNtfchanneltypes();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentNotificationChannel = businessService.findById(NotificationChannel.class, id);
-            
+            currentNotificationChannel = notificationChannelService.findById(id);
+
             if (currentNotificationChannel == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentNotificationChannel.getNtfchannelname();
         loadNtfchanneltypes();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalNtfchannelname = currentNotificationChannel.getNtfchannelname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "NTFCHANNELS", id, "Consulta: " + currentNotificationChannel.getNtfchannelname());
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
@@ -207,55 +227,59 @@ public class NotificationChannelDetailViewModel extends MasterPage {
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentNotificationChannel.getIdxnotificationchannel() == null;
-            
+
             if (isNew) {
-                businessService.save(currentNotificationChannel);
+                currentNotificationChannel = notificationChannelService.create(currentNotificationChannel);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "NTFCHANNELS", currentNotificationChannel.getIdxnotificationchannel(), 
+                logActivity("CREACION", "NTFCHANNELS", currentNotificationChannel.getIdxnotificationchannel(),
                     "Creado: " + currentNotificationChannel.getNtfchannelname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentNotificationChannel);
+                currentNotificationChannel = notificationChannelService.update(currentNotificationChannel);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "NTFCHANNELS", currentNotificationChannel.getIdxnotificationchannel(), 
+                logActivity("EDICION", "NTFCHANNELS", currentNotificationChannel.getIdxnotificationchannel(),
                     "Actualizado: " + currentNotificationChannel.getNtfchannelname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
         } catch (Exception e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentNotificationChannel.getNtfchannelname() == null || currentNotificationChannel.getNtfchannelname().trim().isEmpty()) {
             errors.append("- Ntfchannelname\n");
         }
@@ -268,16 +292,16 @@ public class NotificationChannelDetailViewModel extends MasterPage {
         if (currentNotificationChannel.getNtfchannelcreatedat() == null) {
             errors.append("- Ntfchannelcreatedat\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -286,14 +310,14 @@ public class NotificationChannelDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadNtfchanneltypes() {
         // TODO: Cargar valores desde configuración o BD
         availableNtfchanneltypes.add("OPTION_1");
         availableNtfchanneltypes.add("OPTION_2");
         availableNtfchanneltypes.add("OPTION_3");
     }
-    
+
     private void loadSubntflogs() {
         try {
             if (currentNotificationChannel != null && currentNotificationChannel.getIdxnotificationchannel() != null) {
@@ -301,25 +325,28 @@ public class NotificationChannelDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "channel");
                 criteria.setValues(new Object[]{currentNotificationChannel.getIdxnotificationchannel()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<NotificationLog> result = businessService.findAllEntity(NotificationLog.class, collectionParams, criterias);
+
+                PageResult<NotificationLog> result = notificationLogService.findAll(collectionParams, criterias);
                 subntflogs = result != null ? result.getContent() : new ArrayList<>();
                 subntflogsLoaded = true;
                 log.debug("Cargados {} subntflogs", subntflogs.size());
             }
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar subntflogs", e);
+            subntflogs = new ArrayList<>();
         } catch (Exception e) {
             log.error("Error al cargar subntflogs", e);
             subntflogs = new ArrayList<>();
         }
     }
-    
+
     private void loadSubntfnotifications() {
         try {
             if (currentNotificationChannel != null && currentNotificationChannel.getIdxnotificationchannel() != null) {
@@ -327,25 +354,28 @@ public class NotificationChannelDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "channel");
                 criteria.setValues(new Object[]{currentNotificationChannel.getIdxnotificationchannel()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Notification> result = businessService.findAllEntity(Notification.class, collectionParams, criterias);
+
+                PageResult<Notification> result = notificationService.findAll(collectionParams, criterias);
                 subntfnotifications = result != null ? result.getContent() : new ArrayList<>();
                 subntfnotificationsLoaded = true;
                 log.debug("Cargados {} subntfnotifications", subntfnotifications.size());
             }
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar subntfnotifications", e);
+            subntfnotifications = new ArrayList<>();
         } catch (Exception e) {
             log.error("Error al cargar subntfnotifications", e);
             subntfnotifications = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subntflogs")
     public void onSelectSubntflogsTab() {
@@ -353,7 +383,7 @@ public class NotificationChannelDetailViewModel extends MasterPage {
             loadSubntflogs();
         }
     }
-    
+
     @Command
     @NotifyChange("subntfnotifications")
     public void onSelectSubntfnotificationsTab() {
@@ -361,7 +391,7 @@ public class NotificationChannelDetailViewModel extends MasterPage {
             loadSubntfnotifications();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -387,7 +417,7 @@ public class NotificationChannelDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -395,19 +425,19 @@ public class NotificationChannelDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentNotificationChannel = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableNtfchanneltypes != null) {
                 availableNtfchanneltypes.clear();
                 availableNtfchanneltypes = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subntflogs != null) {
                 subntflogs.clear();
@@ -419,15 +449,15 @@ public class NotificationChannelDetailViewModel extends MasterPage {
                 subntfnotifications = null;
             }
             subntfnotificationsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

@@ -12,6 +12,8 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.rag.RagSystem;
+import com.codeflowx.govern.service.rag.RagSystemService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -29,31 +31,34 @@ import lombok.extern.slf4j.Slf4j;
 @VariableResolver(DelegatingVariableResolver.class)
 public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
     private static final long serialVersionUID = 1L;
-    
+
+    @org.zkoss.zk.ui.select.annotation.WireVariable
+    private RagSystemService ragSystemService;
+
     @Override
     public void setBeans(Object bean) {}
-    
+
     // Paginación
     private PageParams pageParams;
     private PageResult<RagSystem> pageResult;
-    
+
     // Vista
     private String viewMode = "grid"; // grid o list
-    
+
     // Filtros
     private String searchText = "";
     private String filterStatus = "";
     private String filterType = "";
     private String filterPerformance = "";
-    
+
     // Datos
     private List<RagSystem> registryList = new ArrayList<>();
-    
+
     // Modal de creación/edición
     private boolean showModal = false;
     private boolean isEditMode = false;
     private Long currentSystemId = null;
-    
+
     // Campos del formulario
     private String systemName;
     private String systemDescription;
@@ -62,67 +67,66 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
     private String systemStatus = "ACTIVE";
     private String systemRiskLevel = "LOW";
     private String systemTags;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(50)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadRegistry();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadRegistry() {
         try {
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllEntity(
-                RagSystem.class,
+
+            pageResult = ragSystemService.findAll(
                 pageParams,
                 criterias
             );
-            
+
             if (pageResult != null && pageResult.getContent() != null) {
                 registryList = pageResult.getContent();
-                
+
                 // Auditar búsqueda
-                logActivity("BUSCAR", "RAGSYSTEMS", null, 
+                logActivity("BUSCAR", "RAGSYSTEMS", null,
                     "Búsqueda registry: " + registryList.size() + " sistemas");
-                
+
                 log.info("Cargados {} sistemas en registry", registryList.size());
             } else {
                 registryList = new ArrayList<>();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registry", e);
-            Messagebox.show("Error al cargar sistemas: " + e.getMessage(), 
+            Messagebox.show("Error al cargar sistemas: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         if (searchText != null && !searchText.trim().isEmpty()) {
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.LIKE, "ragsystemname", searchText));
         }
-        
+
         if (filterStatus != null && !filterStatus.trim().isEmpty()) {
             String status = filterStatus.toUpperCase();
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragstatus", status));
         }
-        
+
         if (filterType != null && !filterType.trim().isEmpty()) {
             criterias.addCriteria(new Criteria(Operation.AND, Evaluation.EQUALS, "ragtype", filterType));
         }
-        
+
         // Filtro de rendimiento (basado en ragoverallscore)
         if (filterPerformance != null && !filterPerformance.trim().isEmpty()) {
             switch (filterPerformance) {
@@ -138,24 +142,24 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
                     break;
             }
         }
-        
+
         return criterias;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void searchRegistry() {
         pageParams.setPageActual(1);
         loadRegistry();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
         pageParams.setPageActual(1);
         loadRegistry();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearFilters() {
@@ -166,13 +170,13 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
         pageParams.setPageActual(1);
         loadRegistry();
     }
-    
+
     @Command
     @NotifyChange("viewMode")
     public void toggleView(@BindingParam("view") String view) {
         this.viewMode = view;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void showCreateModal() {
@@ -181,13 +185,13 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
         clearForm();
         showModal = true;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void editSystem(@BindingParam("system") RagSystem system) {
         isEditMode = true;
         currentSystemId = system.getIdxragsystem();
-        
+
         // Cargar datos al formulario
         systemName = system.getRagsystemname();
         systemDescription = system.getRagdescription();
@@ -196,10 +200,10 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
         systemStatus = system.getRagstatus();
         systemRiskLevel = system.getRagrisklevel();
         systemTags = system.getRagtags();
-        
+
         showModal = true;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveSystem() {
@@ -209,17 +213,17 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
                 Messagebox.show("El nombre es requerido", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (systemVersion == null || systemVersion.trim().isEmpty()) {
                 Messagebox.show("La versión es requerida", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             RagSystem system;
-            
+
             if (isEditMode && currentSystemId != null) {
                 // Editar
-                system = businessService.findById(RagSystem.class, currentSystemId);
+                system = ragSystemService.findById(currentSystemId);
                 if (system == null) {
                     Messagebox.show("Sistema no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
                     return;
@@ -230,7 +234,7 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
                 system = new RagSystem();
                 system.setRagcreatedat(new Timestamp(System.currentTimeMillis()));
                 system.setRagcreatedby("System"); // TODO: Obtener usuario actual
-                
+
                 // Inicializar valores por defecto
                 system.setRagcompliance("PENDING_REVIEW");
                 system.setRaggovernancestatus("PENDING");
@@ -238,7 +242,7 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
                 system.setRagdocuments(0);
                 system.setRagqueries(0L);
             }
-            
+
             // Actualizar campos
             system.setRagsystemname(systemName);
             system.setRagdescription(systemDescription);
@@ -247,39 +251,43 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
             system.setRagstatus(systemStatus);
             system.setRagrisklevel(systemRiskLevel);
             system.setRagtags(systemTags);
-            
-            businessService.save(system);
-            
+
+            if (isEditMode) {
+                ragSystemService.update(system);
+            } else {
+                ragSystemService.create(system);
+            }
+
             // Auditar
-            logActivity(isEditMode ? "EDITAR" : "CREAR", "RAGSYSTEMS", system.getIdxragsystem(), 
+            logActivity(isEditMode ? "EDITAR" : "CREAR", "RAGSYSTEMS", system.getIdxragsystem(),
                 (isEditMode ? "Editado" : "Creado") + " sistema: " + system.getRagsystemname());
-            
+
             showModal = false;
             loadRegistry();
-            
-            Messagebox.show("Sistema guardado exitosamente", 
+
+            Messagebox.show("Sistema guardado exitosamente",
                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar sistema", e);
-            Messagebox.show("Error al guardar: " + e.getMessage(), 
+            Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void closeModal() {
         showModal = false;
         clearForm();
     }
-    
+
     @Command
     public void viewSystem(@BindingParam("system") RagSystem system) {
         log.info("Ver sistema: {}", system.getRagsystemname());
         // TODO: Navegar a vista detallada
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteSystem(@BindingParam("system") RagSystem system) {
@@ -288,32 +296,32 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(system);
-                        
+                        ragSystemService.deleteById(system.getIdxragsystem());
+
                         // Auditar eliminación
-                        logActivity("ELIMINAR", "RAGSYSTEMS", system.getIdxragsystem(), 
+                        logActivity("ELIMINAR", "RAGSYSTEMS", system.getIdxragsystem(),
                             "Sistema eliminado: " + system.getRagsystemname());
-                        
+
                         loadRegistry();
-                        Messagebox.show("Sistema eliminado exitosamente", 
+                        Messagebox.show("Sistema eliminado exitosamente",
                             "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                     } catch (Exception e) {
                         log.error("Error al eliminar sistema", e);
-                        Messagebox.show("Error: " + e.getMessage(), 
+                        Messagebox.show("Error: " + e.getMessage(),
                             "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     @Command
     public void downloadConfig(@BindingParam("system") RagSystem system) {
         log.info("Descargar configuración: {}", system.getRagsystemname());
         // TODO: Implementar descarga de configuración JSON
-        Messagebox.show("Funcionalidad de descarga en desarrollo", 
+        Messagebox.show("Funcionalidad de descarga en desarrollo",
             "Info", Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     private void clearForm() {
         systemName = null;
         systemDescription = null;
@@ -323,14 +331,14 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
         systemRiskLevel = "LOW";
         systemTags = null;
     }
-    
+
     public List<String> getTags(String tagsString) {
         if (tagsString == null || tagsString.trim().isEmpty()) {
             return new ArrayList<>();
         }
         return Arrays.asList(tagsString.split(","));
     }
-    
+
     public String getStatusColor(String status) {
         if (status == null) return "badge bg-secondary";
         switch (status.toUpperCase()) {
@@ -341,21 +349,20 @@ public class RagRegistryViewModel extends BaseFront<RagRegistryViewModel> {
             default: return "badge bg-secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
-        if (registryList != null) { 
-            registryList.clear(); 
-            registryList = null; 
+        if (registryList != null) {
+            registryList.clear();
+            registryList = null;
         }
         pageResult = null;
         pageParams = null;
         businessService = null;
     }
 }
-

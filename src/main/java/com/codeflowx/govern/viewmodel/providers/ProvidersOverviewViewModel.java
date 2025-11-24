@@ -24,9 +24,12 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.providers.ProvidersMetricsSummary;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.views.providers.ProvidersOverview;
+import com.codeflowx.govern.service.providers.ProvidersOverviewService;
+import com.codeflowx.govern.service.providers.ProvidersMetricsSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
-import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -52,7 +55,13 @@ public class ProvidersOverviewViewModel extends MasterPage {
     private static final String IDDESKTOP = "contenedor";
     
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+
+    @WireVariable
+    private ProvidersOverviewService providersOverviewService;
+
+    @WireVariable
+    private ProvidersMetricsSummaryService providersMetricsSummaryService;
 
     @WireVariable
     public Environment environment;
@@ -158,14 +167,14 @@ public class ProvidersOverviewViewModel extends MasterPage {
                 pageParams.getPageActual(), pageParams.getMaxRows());
             
             Criterias criterias = buildCriterias();
-            pageResult = businessService.findAllView(ProvidersOverview.class, pageParams, criterias);
+            pageResult = providersOverviewService.findAll(pageParams, criterias);
             
             providers = pageResult != null ? pageResult.getContent() : new ArrayList<>();
             
             log.info("Cargados {} proveedores de {} totales", 
                 providers.size(), pageResult != null ? pageResult.getTotalRows() : 0);
                 
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar proveedores", e);
             Messagebox.show(Labels.getLabel("common.error.load"), 
                 Labels.getLabel("common.error.title"),
@@ -214,7 +223,7 @@ public class ProvidersOverviewViewModel extends MasterPage {
     public void loadMetrics() {
         try {
             log.debug("Cargando métricas globales desde V_PROVIDERS_METRICS_SUMMARY");
-            List<ProvidersMetricsSummary> metrics = businessService.findAllView(ProvidersMetricsSummary.class);
+            List<ProvidersMetricsSummary> metrics = providersMetricsSummaryService.findAll();
             
             if (metrics != null && !metrics.isEmpty()) {
                 ProvidersMetricsSummary summary = metrics.get(0);
@@ -233,7 +242,7 @@ public class ProvidersOverviewViewModel extends MasterPage {
                 totalProviders = 0L; activeProviders = 0L; inactiveProviders = 0L;
                 totalModels = 0L; totalCredentials = 0L; supportsText = 0L; supportsEmbeddings = 0L;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas de proveedores", e);
             totalProviders = 0L; activeProviders = 0L; inactiveProviders = 0L;
             totalModels = 0L; totalCredentials = 0L; supportsText = 0L; supportsEmbeddings = 0L;

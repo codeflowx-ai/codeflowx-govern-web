@@ -16,6 +16,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundTranslation;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
+import com.codeflowx.govern.service.playground.PlaygroundTranslationService;
 import com.codeflowx.platform.service.BaseFront;
 import com.codeflowx.platform.service.BaseFront.Criteria;
 import com.codeflowx.platform.service.BaseFront.Criterias;
@@ -23,9 +27,19 @@ import com.codeflowx.platform.service.BaseFront.Evaluation;
 import com.codeflowx.platform.service.BaseFront.Operation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 public class PlaygroundTranslationViewModel extends BaseFront {
+
+    @WireVariable
+    private ModelService modelService;
+    
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
+    
+    @WireVariable
+    private PlaygroundTranslationService playgroundTranslationService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundTranslation> allTranslations = new ArrayList<>();
@@ -62,8 +76,8 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = businessService.find(Model.class, criterias);
-        } catch (Exception e) {
+            availableModels = modelService.findAll(criterias);
+        } catch (GovernanceServiceException e) {
             log.error("Error loading models", e);
         }
     }
@@ -76,8 +90,8 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(currentSession);
-        } catch (Exception e) {
+            currentSession = playgroundSessionService.create(currentSession);
+        } catch (GovernanceServiceException e) {
             log.error("Error creating session", e);
         }
     }
@@ -125,14 +139,14 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             translation.setTranslationcost(new BigDecimal("0.002"));
             translation.setTranslationmethod("NEURAL");
             
-            businessService.save(translation);
+            translation = playgroundTranslationService.create(translation);
             
             targetText = translation.getTranslationtargettext();
             confidence = translation.getTranslationconfidence();
             
             loadTranslations();
             logActivity("PLAYGROUND_TRANSLATION", "TRANSLATE", null, "Texto traducido");
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error translating", e);
             Messagebox.show("Error al traducir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -181,10 +195,10 @@ public class PlaygroundTranslationViewModel extends BaseFront {
     @NotifyChange({"filteredTranslations", "translationHistory"})
     public void deleteTranslation(PlaygroundTranslation translation) {
         try {
-            businessService.removeFromID(PlaygroundTranslation.class, translation.getIdxplaygroundtranslation());
+            playgroundTranslationService.deleteById(translation.getIdxplaygroundtranslation());
             loadTranslations();
             logActivity("PLAYGROUND_TRANSLATION", "DELETE", null, "Traducción eliminada");
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error deleting translation", e);
         }
     }

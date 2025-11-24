@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.artefacto.ArtifactVersion;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.artefacto.ArtifactVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class ArtifactVersionDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private ArtifactVersionService artifactVersionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -165,7 +170,7 @@ public class ArtifactVersionDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentArtifactVersion = businessService.findById(ArtifactVersion.class, id);
+            currentArtifactVersion = artifactVersionService.findById(id);
             
             if (currentArtifactVersion == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -187,7 +192,7 @@ public class ArtifactVersionDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "CATARTIFACTVERSIONS", id, "Consulta: " + currentArtifactVersion.getCatverdescription());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -211,14 +216,14 @@ public class ArtifactVersionDetailViewModel extends MasterPage {
             boolean isNew = currentArtifactVersion.getIdxartifactversion() == null;
             
             if (isNew) {
-                businessService.save(currentArtifactVersion);
+                currentArtifactVersion = artifactVersionService.create(currentArtifactVersion);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "CATARTIFACTVERSIONS", currentArtifactVersion.getIdxartifactversion(), 
                     "Creado: " + currentArtifactVersion.getCatverdescription());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentArtifactVersion);
+                currentArtifactVersion = artifactVersionService.update(currentArtifactVersion);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "CATARTIFACTVERSIONS", currentArtifactVersion.getIdxartifactversion(), 
                     "Actualizado: " + currentArtifactVersion.getCatverdescription());
@@ -231,7 +236,7 @@ public class ArtifactVersionDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/artefacto/artefacto-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

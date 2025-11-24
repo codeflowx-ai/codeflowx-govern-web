@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentCompliance;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentComplianceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentComplianceService agentComplianceService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -129,10 +134,7 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentCompliance.class,
-                pageParams,
-                criterias
+            pageResult = agentComplianceService.findAll(pageParams, criterias
             );
             
             if (pageResult != null && pageResult.getContent() != null) {
@@ -272,7 +274,7 @@ public class AgentComplianceOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentCompliance.class, itemId);
+                            agentComplianceService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTCOMPLIANCE", itemId, "Eliminado registro ID: " + itemId);
                             loadData();

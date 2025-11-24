@@ -1,0 +1,125 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.datasources.DataSourceWebscrapingOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<h:div class="row" style="background-color:;">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-spider me-2"></h:i>
+						<label value="Web Scraping de Data Sources" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de configuraciones de web scraping" />
+					</h:p>
+				</h:div>
+			</div>
+			<h:div class="col-lg-12 s-bot ">
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Web Scrapings</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.totalWebscrapings)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Activos</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.activeWebscrapings)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+					<h:div class="col-md-4">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+							    <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">En Ejecución</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.runningWebscrapings)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="section filters">
+				<h:div class="search-bar">
+					<textbox value="@bind(vm.searchText)"
+						placeholder="Buscar por nombre..."
+						class="form-control" onOK="@command('refreshWebscrapings')" />
+					<combobox
+						placeholder="Filtrar por Estado"
+						selectedItem="@bind(vm.filterStatus)"
+						onChange="@command('refreshWebscrapings')">
+						<comboitem label="TODOS" value="" />
+						<comboitem label="ACTIVE" value="ACTIVE" />
+						<comboitem label="RUNNING" value="RUNNING" />
+						<comboitem label="ERROR" value="ERROR" />
+					</combobox>
+				</h:div>
+				<h:div class="filter-icons">
+					<a tooltiptext="Refrescar"
+						iconSclass="fa-duotone fa-arrows-rotate"
+						onClick="@command('refreshWebscrapings')" />
+				</h:div>
+			</h:div>
+			<h:div class="col-xxl-12 s-bot">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div id="divTemplate" sclass="col-lg-12">
+							<grid model="@load(vm.webscrapingList)" style="overflow:auto;">
+								<columns sizable="true">
+									<column label="Nombre" width="25%" />
+									<column label="URL" width="35%" />
+									<column label="Cron Schedule" width="15%" />
+									<column label="Estado" width="10%" />
+									<column label="Acciones" width="15%" align="center" />
+								</columns>
+								<template name="model" var="ws">
+									<row>
+										<label value="@load(ws.wsname)" />
+										<label value="@load(ws.wsurl)" />
+										<label value="@load(ws.wscronschedule)" />
+										<label value="@load(ws.wsstatus)"
+											sclass="badge ${ws.wsstatus eq 'ACTIVE' ? 'bg-success' : (ws.wsstatus eq 'RUNNING' ? 'bg-primary' : (ws.wsstatus eq 'ERROR' ? 'bg-danger' : 'bg-secondary'))}" />
+										<cell align="center" class="d-flex">
+											<a onClick="@command('deleteWebscraping', ws=ws)"
+												iconSclass="fa-light fa-nfc-trash fa-xl"
+												sclass="waves-effect waves-danger"
+												tooltiptext="Eliminar" />
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)"
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('loadData')"
+											mold="os" width="100%" />
+									</footer>
+								</foot>
+							</grid>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

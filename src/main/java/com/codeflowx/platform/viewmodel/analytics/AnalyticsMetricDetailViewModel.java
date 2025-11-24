@@ -30,6 +30,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.analytics.AnalyticsMetric;
+import com.codeflowx.govern.service.analytics.AnalyticsMetricService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -56,6 +58,8 @@ public class AnalyticsMetricDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    @WireVariable
+    private AnalyticsMetricService analyticsMetricService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -173,7 +177,7 @@ public class AnalyticsMetricDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAnalyticsMetric = businessService.findById(AnalyticsMetric.class, id);
+            currentAnalyticsMetric = analyticsMetricService.findById(id);
             
             if (currentAnalyticsMetric == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -198,7 +202,7 @@ public class AnalyticsMetricDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "ANLANALYTICSMETRICS", id, "Consulta: " + currentAnalyticsMetric.getAnlmetricname());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -222,14 +226,14 @@ public class AnalyticsMetricDetailViewModel extends MasterPage {
             boolean isNew = currentAnalyticsMetric.getIdxanalyticsmetric() == null;
             
             if (isNew) {
-                businessService.save(currentAnalyticsMetric);
+                currentAnalyticsMetric = analyticsMetricService.create(currentAnalyticsMetric);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "ANLANALYTICSMETRICS", currentAnalyticsMetric.getIdxanalyticsmetric(), 
                     "Creado: " + currentAnalyticsMetric.getAnlmetricname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAnalyticsMetric);
+                currentAnalyticsMetric = analyticsMetricService.update(currentAnalyticsMetric);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "ANLANALYTICSMETRICS", currentAnalyticsMetric.getIdxanalyticsmetric(), 
                     "Actualizado: " + currentAnalyticsMetric.getAnlmetricname());
@@ -242,7 +246,7 @@ public class AnalyticsMetricDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/analytics/analytics-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

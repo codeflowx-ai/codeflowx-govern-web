@@ -30,10 +30,17 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.projects.ProjectCostBreakdown;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.views.projects.ProjectFinancialSummary;
 import com.codeflowx.govern.entity.views.projects.ProjectPortfolioDashboard;
 import com.codeflowx.govern.entity.views.projects.ProjectResourceAllocation;
 import com.codeflowx.govern.entity.views.projects.ProjectRiskAssessment;
+import com.codeflowx.govern.service.projects.ProjectPortfolioDashboardService;
+import com.codeflowx.govern.service.projects.ProjectFinancialSummaryService;
+import com.codeflowx.govern.service.projects.ProjectResourceAllocationService;
+import com.codeflowx.govern.service.projects.ProjectRiskAssessmentService;
+import com.codeflowx.govern.service.projects.ProjectCostBreakdownService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -54,8 +61,22 @@ public class ProjectsDashboardViewModel extends MasterPage implements Serializab
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
     
+    @WireVariable
+    private ProjectPortfolioDashboardService projectPortfolioDashboardService;
+    
+    @WireVariable
+    private ProjectFinancialSummaryService projectFinancialSummaryService;
+    
+    @WireVariable
+    private ProjectResourceAllocationService projectResourceAllocationService;
+    
+    @WireVariable
+    private ProjectRiskAssessmentService projectRiskAssessmentService;
+    
+    @WireVariable
+    private ProjectCostBreakdownService projectCostBreakdownService;
     
     @WireVariable
     public Environment environment;
@@ -68,9 +89,8 @@ public class ProjectsDashboardViewModel extends MasterPage implements Serializab
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
     
     @Override
@@ -124,70 +144,70 @@ public class ProjectsDashboardViewModel extends MasterPage implements Serializab
 
     private void loadPortfolioDashboard() {
         try {
-            PageResult<ProjectPortfolioDashboard> result = businessService.findAllView(
-                ProjectPortfolioDashboard.class, pageParams, new Criterias()
+            PageResult<ProjectPortfolioDashboard> result = projectPortfolioDashboardService.findAll(
+                pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 portfolioDashboard = result.getContent().get(0);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar portfolio dashboard", e);
         }
     }
     
     private void loadFinancialSummaries() {
         try {
-            PageResult<ProjectFinancialSummary> result = businessService.findAllView(
-                ProjectFinancialSummary.class, pageParams, new Criterias()
+            PageResult<ProjectFinancialSummary> result = projectFinancialSummaryService.findAll(
+                pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
                 financialSummaries = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar financial summaries", e);
         }
     }
     
     private void loadResourceAllocations() {
         try {
-            PageResult<ProjectResourceAllocation> result = businessService.findAllView(
-                ProjectResourceAllocation.class, pageParams, new Criterias()
+            PageResult<ProjectResourceAllocation> result = projectResourceAllocationService.findAll(
+                pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
                 resourceAllocations = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar resource allocations", e);
         }
     }
     
     private void loadRiskAssessments() {
         try {
-            PageResult<ProjectRiskAssessment> result = businessService.findAllView(
-                ProjectRiskAssessment.class, pageParams, new Criterias()
+            PageResult<ProjectRiskAssessment> result = projectRiskAssessmentService.findAll(
+                pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
                 riskAssessments = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar risk assessments", e);
         }
     }
     
     private void loadCostBreakdowns() {
         try {
-            PageResult<ProjectCostBreakdown> result = businessService.findAllView(
-                ProjectCostBreakdown.class, pageParams, new Criterias()
+            PageResult<ProjectCostBreakdown> result = projectCostBreakdownService.findAll(
+                pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
                 costBreakdowns = result.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar cost breakdowns", e);
         }
     }
@@ -269,7 +289,6 @@ public class ProjectsDashboardViewModel extends MasterPage implements Serializab
             if (riskAssessments != null) { riskAssessments.clear(); riskAssessments = null; }
             if (costBreakdowns != null) { costBreakdowns.clear(); costBreakdowns = null; }
             pageParams = null;
-            businessService = null;
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
         }

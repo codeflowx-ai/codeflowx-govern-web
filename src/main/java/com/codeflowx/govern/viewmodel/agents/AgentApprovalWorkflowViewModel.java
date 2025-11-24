@@ -18,7 +18,9 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.agents.Agent;
+import com.codeflowx.govern.service.agents.AgentService;
 import com.codeflowx.govern.entity.agents.AgentApproval;
+import com.codeflowx.govern.service.agents.AgentApprovalService;
 
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.PageParams;
@@ -81,20 +83,14 @@ public class AgentApprovalWorkflowViewModel extends BaseFront<AgentApprovalWorkf
                 .rowActual(0)
                 .build();
             
-            PageResult<AgentApproval> result1 = businessService.findAllEntity(
-                AgentApproval.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<AgentApproval> result1 = agentApprovalService.findAll(pageParams, new Criterias()
             );
             if (result1 != null && result1.getContent() != null) {
                 approvalsList = result1.getContent();
             }
             
             // Cargar agentes (TABLE - usar findAllEntity)
-            PageResult<Agent> result2 = businessService.findAllEntity(
-                Agent.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<Agent> result2 = agentService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 agentsList = result2.getContent();
@@ -166,11 +162,11 @@ public class AgentApprovalWorkflowViewModel extends BaseFront<AgentApprovalWorkf
     @NotifyChange("*")
     public void approveAgent(Long approvalId, String comments) {
         try {
-            AgentApproval approval = businessService.findById(AgentApproval.class, approvalId);
+            AgentApproval approval = agentApprovalService.findById(approvalId);
             if (approval != null) {
                 approval.setAgtapprovalstatus("APPROVED");
                 approval.setAgtapprovalnotes(comments);
-                businessService.update(approval);
+                approval = agentService.update(approval);
                 
                 // Registrar actividad en auditoría
                 logActivity("APPROVE", "AGENT_APPROVAL", approvalId, 
@@ -190,11 +186,11 @@ public class AgentApprovalWorkflowViewModel extends BaseFront<AgentApprovalWorkf
     @NotifyChange("*")
     public void rejectAgent(Long approvalId, String reason) {
         try {
-            AgentApproval approval = businessService.findById(AgentApproval.class, approvalId);
+            AgentApproval approval = agentApprovalService.findById(approvalId);
             if (approval != null) {
                 approval.setAgtapprovalstatus("REJECTED");
                 approval.setAgtapprovalnotes(reason);
-                businessService.update(approval);
+                approval = agentService.update(approval);
                 
                 // Registrar actividad en auditoría
                 logActivity("REJECT", "AGENT_APPROVAL", approvalId, 
@@ -222,7 +218,8 @@ public class AgentApprovalWorkflowViewModel extends BaseFront<AgentApprovalWorkf
             agentsList.clear(); 
             agentsList = null; 
         }
-        businessService = null;
+        agentService = null;
+            agentApprovalService = null;
     }
 }
 

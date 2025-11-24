@@ -8,6 +8,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.suinsit.nocode.web.MasterBeanUI;
 import codeflowx.nocode.persist.*;
 import com.codeflowx.govern.entity.core.Menu;
+import com.codeflowx.govern.service.core.MenuService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +31,7 @@ import org.springframework.core.env.Environment;
 public class MenuViewModel extends MasterBeanUI {
     
     @WireVariable
-    private BusinessService businessService;
+    private MenuService menuService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -40,9 +42,9 @@ public class MenuViewModel extends MasterBeanUI {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     
@@ -137,10 +139,10 @@ public class MenuViewModel extends MasterBeanUI {
     @NotifyChange({"selectedMenu", "showDialog", "isEditing"})
     public void editMenu(@BindingParam("item") Menu menu) {
         try {
-            selectedMenu = businessService.findById(Menu.class, menu.getIdxmenu());
+            selectedMenu = menuService.findById(menu.getIdxmenu());
             isEditing = true;
             showDialog = true;
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando menú para edición", e);
         }
     }
@@ -151,13 +153,17 @@ public class MenuViewModel extends MasterBeanUI {
         try {
             if (selectedMenu != null) {
                 log.debug("Guardando menú: {}", selectedMenu.getMenuname());
-                businessService.save(selectedMenu);
+                if (selectedMenu.getIdxmenu() == null) {
+                    selectedMenu = menuService.create(selectedMenu);
+                } else {
+                    selectedMenu = menuService.update(selectedMenu);
+                }
                 log.info("Menú guardado exitosamente: ID={}", selectedMenu.getIdxmenu());
                 showDialog = false;
                 selectedMenu = null;
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error guardando menú", e);
         }
     }
@@ -168,11 +174,11 @@ public class MenuViewModel extends MasterBeanUI {
         try {
             if (menu != null) {
                 log.debug("Eliminando menú: ID={}", menu.getIdxmenu());
-                businessService.removeFromID(menu);
+                menuService.deleteById(menu.getIdxmenu());
                 log.info("Menú eliminado exitosamente: ID={}", menu.getIdxmenu());
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error eliminando menú", e);
         }
     }

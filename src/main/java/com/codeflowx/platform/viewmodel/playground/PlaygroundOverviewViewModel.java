@@ -20,6 +20,8 @@ import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import com.codeflowx.platform.service.BaseFront;
 import com.codeflowx.platform.service.BaseFront.Criteria;
 import com.codeflowx.platform.service.BaseFront.Criterias;
@@ -27,9 +29,13 @@ import com.codeflowx.platform.service.BaseFront.Evaluation;
 import com.codeflowx.platform.service.BaseFront.Operation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 public class PlaygroundOverviewViewModel extends BaseFront {
+
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
 
     private List<PlaygroundSession> allSessions = new ArrayList<>();
     private List<PlaygroundSession> filteredSessions = new ArrayList<>();
@@ -66,9 +72,9 @@ public class PlaygroundOverviewViewModel extends BaseFront {
     private void loadSessions() {
         try {
             Criterias criterias = new Criterias();
-            allSessions = businessService.find(PlaygroundSession.class, criterias);
+            allSessions = playgroundSessionService.findAll(criterias);
             applyFilters();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error loading playground sessions", e);
             Messagebox.show("Error al cargar las sesiones: " + e.getMessage(), 
                           "Error", Messagebox.OK, Messagebox.ERROR);
@@ -156,14 +162,14 @@ public class PlaygroundOverviewViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(PlaygroundSession.class, session.getIdxplaygroundsession());
+                        playgroundSessionService.deleteById(session.getIdxplaygroundsession());
                         Messagebox.show("Sesión eliminada correctamente", 
                                       "Éxito", Messagebox.OK, Messagebox.INFORMATION);
                         
                         logActivity("PLAYGROUND", "DELETE_SESSION", "Sesión eliminada: " + session.getSessionname());
                         loadSessions();
                         calculateStatistics();
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error deleting session", e);
                         Messagebox.show("Error al eliminar: " + e.getMessage(), 
                                       "Error", Messagebox.OK, Messagebox.ERROR);

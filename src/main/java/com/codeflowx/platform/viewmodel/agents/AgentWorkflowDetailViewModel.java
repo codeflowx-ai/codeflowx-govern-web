@@ -34,6 +34,8 @@ import com.codeflowx.govern.entity.agents.AgentWorkflowExecution;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentWorkflowService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -57,6 +59,9 @@ public class AgentWorkflowDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentWorkflowService agentWorkflowService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -178,7 +183,7 @@ public class AgentWorkflowDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentWorkflow = businessService.findById(AgentWorkflow.class, id);
+            currentAgentWorkflow = agentWorkflowService.findById(id);
             
             if (currentAgentWorkflow == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -228,14 +233,14 @@ public class AgentWorkflowDetailViewModel extends MasterPage {
             boolean isNew = currentAgentWorkflow.getIdxagentworkflow() == null;
             
             if (isNew) {
-                businessService.save(currentAgentWorkflow);
+                currentAgentWorkflow = agentWorkflowService.create(currentAgentWorkflow);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTWORKFLOWS", currentAgentWorkflow.getIdxagentworkflow(), 
                     "Creado: " + currentAgentWorkflow.getAgtname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentWorkflow);
+                currentAgentWorkflow = agentWorkflowService.update(currentAgentWorkflow);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTWORKFLOWS", currentAgentWorkflow.getIdxagentworkflow(), 
                     "Actualizado: " + currentAgentWorkflow.getAgtname());

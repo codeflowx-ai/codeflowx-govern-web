@@ -36,6 +36,7 @@ import com.codeflowx.govern.workflow.services.TaskManagementService;
 import com.codeflowx.govern.workflow.services.TaskManagementService.TaskDTO;
 
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.models.ModelService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -60,7 +61,7 @@ public class DashboardViewModel extends MasterPage {
 
     // ========== Servicios y contexto ==========
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -380,9 +381,9 @@ public class DashboardViewModel extends MasterPage {
     // ===============================================
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     public String formatCandidateGroups(List<String> groups) {

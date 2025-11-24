@@ -17,6 +17,7 @@ import com.codeflowx.govern.business.integrations.SnowflakeConnectorService.Snow
 import com.codeflowx.govern.business.integrations.SparkEvaluationService;
 import com.codeflowx.govern.business.integrations.VertexAIConnectorService;
 import com.codeflowx.govern.entity.integrations.ExternalDataset;
+import com.codeflowx.govern.service.integrations.ExternalPlatformService;
 import com.codeflowx.govern.entity.integrations.ExternalModel;
 import com.codeflowx.govern.entity.integrations.ExternalPlatformIntegration;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -122,6 +123,8 @@ public class ExternalPlatformsViewModel extends MasterPage implements Serializab
 
     @WireVariable
     private JiraConnectorService jiraConnectorService;
+    @WireVariable
+    private ExternalPlatformService externalPlatformService;
 
     @WireVariable("context")
     protected GenericApplicationContext contexto;

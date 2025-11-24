@@ -1,10 +1,10 @@
 <?page title="Translation Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
-    
+
     <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundTranslationViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
-        
+
         <!-- Header -->
         <n:div class="card border-0 shadow-sm mb-4">
             <n:div class="card-body p-4">
@@ -15,7 +15,7 @@
                         </n:h4>
                         <n:p class="text-muted mb-0">Traduce textos entre múltiples idiomas con IA</n:p>
                     </n:div>
-                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus"
                             sclass="btn btn-warning"
                             onClick="@command('newSession')"/>
                 </n:div>
@@ -39,7 +39,7 @@
                                         onClick="@command('transcribeSource')"/>
                             </n:div>
                         </n:div>
-                        <textbox multiline="true" rows="12" 
+                        <textbox multiline="true" rows="12"
                                 value="@bind(vm.sourceText)"
                                 sclass="form-control"
                                 placeholder="Ingresa el texto a traducir..."
@@ -51,20 +51,20 @@
 
                     <!-- Translation Controls -->
                     <n:div class="col-md-2 d-flex flex-column justify-content-center align-items-center">
-                        <button iconSclass="fas fa-exchange-alt fa-2x" 
+                        <button iconSclass="fas fa-exchange-alt fa-2x"
                                 tooltiptext="Intercambiar idiomas"
                                 sclass="btn btn-lg btn-outline-secondary rounded-circle mb-3"
                                 style="width: 60px; height: 60px;"
                                 onClick="@command('swapLanguages')"/>
-                        
-                        <button label="Traducir" iconSclass="fas fa-language" 
+
+                        <button label="Traducir" iconSclass="fas fa-language"
                                 sclass="btn btn-warning btn-lg"
                                 disabled="@load(empty vm.sourceText)"
                                 onClick="@command('translate')"/>
 
                         <n:div class="mt-4 text-center">
                             <n:p class="small text-muted mb-2">Modelo</n:p>
-                            <combobox placeholder="Seleccionar..." 
+                            <combobox placeholder="Seleccionar..."
                                      model="@load(vm.availableModels)"
                                      selectedItem="@bind(vm.selectedModel)"
                                      sclass="form-control form-control-sm"/>
@@ -95,10 +95,10 @@
                         </n:div>
                         <n:div class="mt-2 d-flex justify-content-between align-items-center">
                             <n:p class="mb-0 text-muted small">
-                                Caracteres: <label value="@load(vm.targetText.length())"/> · 
+                                Caracteres: <label value="@load(vm.targetText.length())"/> ·
                                 Confianza: <label value="@load(vm.confidence)"/>%
                             </n:p>
-                            <button label="Copiar" iconSclass="fas fa-copy" 
+                            <button label="Copiar" iconSclass="fas fa-copy"
                                     sclass="btn btn-sm btn-outline-primary"
                                     disabled="@load(empty vm.targetText)"
                                     onClick="@command('copyTranslation')"/>
@@ -133,9 +133,9 @@
                     </columns>
                     <template name="model">
                         <row>
-                            <label value="@load(each.translationsourcetext)" 
+                            <label value="@load(each.translationsourcetext)"
                                    style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
-                            <label value="@load(each.translationtargettext)" 
+                            <label value="@load(each.translationtargettext)"
                                    style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
                             <label>
                                 <n:span class="badge bg-primary">${each.translationsourcelanguage}</n:span>
@@ -154,14 +154,14 @@
                                         onClick="@command('reuseTranslation', translation=each)"/>
                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                         sclass="btn btn-sm btn-outline-danger"
-                                        onClick="@command('deleteItem', translation=each)"/>
+                                        onClick="@command('deleteTranslation', translation=each)"/>
                             </n:div>
                         </row>
                     </template>
                 </grid>
             </n:div>
             <n:div class="card-footer bg-white border-0 p-3" if="${vm.totalSize > vm.pageSize}">
-                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)"
                         activePage="@bind(vm.activePage)" onPaging="@command('changePage')"
                         sclass="pagination pagination-sm justify-content-end mb-0"/>
             </n:div>

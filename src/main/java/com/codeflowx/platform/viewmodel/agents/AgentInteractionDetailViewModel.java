@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentInteraction;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentInteractionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentInteractionDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentInteractionService agentInteractionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -168,7 +173,7 @@ public class AgentInteractionDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentInteraction = businessService.findById(AgentInteraction.class, id);
+            currentAgentInteraction = agentInteractionService.findById(id);
             
             if (currentAgentInteraction == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -214,14 +219,14 @@ public class AgentInteractionDetailViewModel extends MasterPage {
             boolean isNew = currentAgentInteraction.getIdxagentinteraction() == null;
             
             if (isNew) {
-                businessService.save(currentAgentInteraction);
+                currentAgentInteraction = agentInteractionService.create(currentAgentInteraction);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTINTERACTIONS", currentAgentInteraction.getIdxagentinteraction(), 
                     "Creado: " + currentAgentInteraction.getIdxagentinteraction());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentInteraction);
+                currentAgentInteraction = agentInteractionService.update(currentAgentInteraction);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTINTERACTIONS", currentAgentInteraction.getIdxagentinteraction(), 
                     "Actualizado: " + currentAgentInteraction.getIdxagentinteraction());

@@ -34,6 +34,8 @@ import com.codeflowx.govern.entity.agents.AgentRollback;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentDeploymentService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -57,6 +59,9 @@ public class AgentDeploymentDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentDeploymentService agentDeploymentService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -174,7 +179,7 @@ public class AgentDeploymentDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentDeployment = businessService.findById(AgentDeployment.class, id);
+            currentAgentDeployment = agentDeploymentService.findById(id);
             
             if (currentAgentDeployment == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -222,14 +227,14 @@ public class AgentDeploymentDetailViewModel extends MasterPage {
             boolean isNew = currentAgentDeployment.getIdxagentdeployment() == null;
             
             if (isNew) {
-                businessService.save(currentAgentDeployment);
+                currentAgentDeployment = agentDeploymentService.create(currentAgentDeployment);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTDEPLOYMENTS", currentAgentDeployment.getIdxagentdeployment(), 
                     "Creado: " + currentAgentDeployment.getAgtdeploymentname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentDeployment);
+                currentAgentDeployment = agentDeploymentService.update(currentAgentDeployment);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTDEPLOYMENTS", currentAgentDeployment.getIdxagentdeployment(), 
                     "Actualizado: " + currentAgentDeployment.getAgtdeploymentname());

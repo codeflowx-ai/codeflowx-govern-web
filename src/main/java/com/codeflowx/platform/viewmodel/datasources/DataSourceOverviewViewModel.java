@@ -20,6 +20,9 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSource;
+import com.codeflowx.govern.service.datasources.DataSourceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criterias;
 import lombok.extern.slf4j.Slf4j;
@@ -27,24 +30,27 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DataSourceOverviewViewModel extends BaseFront {
 
+    @WireVariable
+    private DataSourceService dataSourceService;
+
     private List<DataSource> allDataSources = new ArrayList<>();
     private List<DataSource> filteredDataSources = new ArrayList<>();
-    
+
     // Filters
     private String searchTerm = "";
     private String filterType;
     private String filterStatus;
-    
+
     // Pagination
     private int activePage = 0;
     private int pageSize = 20;
-    
+
     // Statistics
     private long totalDataSources = 0;
     private long activeDataSources = 0;
     private long syncingDataSources = 0;
     private long errorDataSources = 0;
-    
+
     private List<String> availableTypes = List.of("API", "DATABASE", "UPLOAD_DOCUMENTS", "WEB_SCRAPING");
     private List<String> availableStatuses = List.of("ACTIVE", "INACTIVE", "ERROR", "SYNCING");
 
@@ -71,12 +77,11 @@ public class DataSourceOverviewViewModel extends BaseFront {
 
     private void loadDataSources() {
         try {
-            Criterias criterias = new Criterias();
-            allDataSources = businessService.find(DataSource.class, criterias);
+            allDataSources = dataSourceService.findAll();
             applyFilters();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error loading data sources", e);
-            Messagebox.show("Error al cargar las fuentes de datos: " + e.getMessage(), 
+            Messagebox.show("Error al cargar las fuentes de datos: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -86,7 +91,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
     public void applyFilters() {
         filteredDataSources = allDataSources.stream()
             .filter(ds -> {
-                if (StringUtils.isNotBlank(searchTerm) && 
+                if (StringUtils.isNotBlank(searchTerm) &&
                     !ds.getDsname().toLowerCase().contains(searchTerm.toLowerCase())) {
                     return false;
                 }
@@ -112,7 +117,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
     }
 
     @Command
-    @NotifyChange({"allDataSources", "filteredDataSources", "dataSourcesList", "totalDataSources", 
+    @NotifyChange({"allDataSources", "filteredDataSources", "dataSourcesList", "totalDataSources",
                    "activeDataSources", "syncingDataSources", "errorDataSources"})
     public void showCreateDialog() {
         // Navigate to create page or show dialog
@@ -138,23 +143,23 @@ public class DataSourceOverviewViewModel extends BaseFront {
             item.setDsstatus("SYNCING");
             item.setDssyncstatus("IN_PROGRESS");
             item.setDsupdatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(item);
-            
-            Messagebox.show("Sincronización iniciada para: " + item.getDsname(), 
+            dataSourceService.update(item);
+
+            Messagebox.show("Sincronización iniciada para: " + item.getDsname(),
                           "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-            
+
             logActivity("SYNC", "DATA_SOURCES", item.getIdxdatasource(), "Sincronización iniciada: " + item.getDsname());
             loadDataSources();
             calculateStatistics();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error syncing data source", e);
-            Messagebox.show("Error al sincronizar: " + e.getMessage(), 
+            Messagebox.show("Error al sincronizar: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
 
     @Command
-    @NotifyChange({"allDataSources", "filteredDataSources", "dataSourcesList", "totalDataSources", 
+    @NotifyChange({"allDataSources", "filteredDataSources", "dataSourcesList", "totalDataSources",
                    "activeDataSources", "syncingDataSources", "errorDataSources"})
     public void deleteDataSource(DataSource item) {
         Messagebox.show("¿Está seguro de eliminar la fuente de datos '" + item.getDsname() + "'?",
@@ -162,16 +167,16 @@ public class DataSourceOverviewViewModel extends BaseFront {
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(DataSource.class, item.getIdxdatasource());
-                        Messagebox.show("Fuente de datos eliminada correctamente", 
+                        dataSourceService.deleteById(item.getIdxdatasource());
+                        Messagebox.show("Fuente de datos eliminada correctamente",
                                       "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        
+
                         logActivity("DELETE", "DATA_SOURCES", item.getIdxdatasource(), "Fuente de datos eliminada: " + item.getDsname());
                         loadDataSources();
                         calculateStatistics();
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error deleting data source", e);
-                        Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                        Messagebox.show("Error al eliminar: " + e.getMessage(),
                                       "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
@@ -196,7 +201,7 @@ public class DataSourceOverviewViewModel extends BaseFront {
     public List<DataSource> getDataSourcesList() {
         int start = activePage * pageSize;
         int end = Math.min(start + pageSize, filteredDataSources.size());
-        return start < filteredDataSources.size() ? 
+        return start < filteredDataSources.size() ?
                filteredDataSources.subList(start, end) : new ArrayList<>();
     }
 
@@ -265,5 +270,3 @@ public class DataSourceOverviewViewModel extends BaseFront {
         return availableStatuses;
     }
 }
-
-

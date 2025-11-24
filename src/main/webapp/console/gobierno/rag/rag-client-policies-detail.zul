@@ -1,0 +1,204 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="rag"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.rag.RagClientPoliciesDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-shield-halved label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión y configuración de políticas de cliente RAG" class="text-muted" />
+					</h:p>
+				</div>
+			</div>
+			
+			<div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light" 
+									tooltiptext="Volver">
+								</a>
+							</div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light"
+										iconSclass="fa-duotone fa-solid fa-floppy-disks label-icon align-middle fs-16 me-2"
+										onClick="@command('savePolicy')"
+										tooltiptext="Guardar política de cliente RAG">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div><!--header-->
+					
+					<div class="card-body">
+						<div class="row">
+							<!-- Formulario Principal -->
+							<div class="col-lg-12 col-xlg-12 col-md-12">
+								<div class="card default shadow-xl">
+									<div class="card-body">
+										<div class="form-group row">
+											<!-- Nombre de Política -->
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Nombre de Política *" />
+														<textbox tabindex="1" id="rcppolicyname"
+															value="@bind(vm.currentPolicy.rcppolicyname)"
+															sclass="border-danger" maxlength="255" />
+														<label sclass="text-danger" value="@load(vmsgs['rcppolicyname'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Cliente ID -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Cliente ID *" />
+														<intbox tabindex="2" id="rcpclientid"
+															value="@bind(vm.currentPolicy.rcpclientid)"
+															sclass="border-danger" />
+														<label sclass="text-danger" value="@load(vmsgs['rcpclientid'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Tipo de Política -->
+											<div class="default col-lg-3 col-xlg-3 col-md-3">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Tipo de Política *" />
+														<combobox tabindex="3" id="rcppolicytype"
+															selectedItem="@bind(vm.currentPolicy.rcppolicytype)"
+															readonly="true">
+															<comboitem label="Tono" value="TONE"/>
+															<comboitem label="Contenido" value="CONTENT"/>
+															<comboitem label="Ética" value="ETHICS"/>
+															<comboitem label="Valores" value="VALUES"/>
+															<comboitem label="Idioma" value="LANGUAGE"/>
+														</combobox>
+														<label sclass="text-danger" value="@load(vmsgs['rcppolicytype'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Score Mínimo -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Score Mínimo (0-100)" />
+														<decimalbox tabindex="4" id="rcpminscore"
+															value="@bind(vm.currentPolicy.rcpminscore)"
+															format="###.##" maxlength="5" />
+														<label sclass="text-danger" value="@load(vmsgs['rcpminscore'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Peso -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Peso" />
+														<decimalbox tabindex="5" id="rcpweight"
+															value="@bind(vm.currentPolicy.rcpweight)"
+															format="###.##" maxlength="5" />
+														<label sclass="text-danger" value="@load(vmsgs['rcpweight'])" />
+													</div>
+												</div>
+											</div>
+											
+											<!-- Habilitada -->
+											<div class="default col-lg-4 col-xlg-4 col-md-4">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Habilitada" />
+														<checkbox tabindex="6" id="rcpenabled"
+															checked="@bind(vm.currentPolicy.rcpenabled)" />
+														<label sclass="text-danger" value="@load(vmsgs['rcpenabled'])" />
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<div class="form-group row">
+											<!-- Reglas de Política (JSONB) -->
+											<div class="default col-lg-12 col-xlg-12 col-md-12">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Reglas de Política (JSON) *" />
+														<textbox tabindex="7" id="rcppolicyrules"
+															value="@bind(vm.currentPolicy.rcppolicyrules)"
+															rows="8" multiline="true"
+															placeholder='{"rule1": "value1", "rule2": "value2"}' />
+														<label sclass="text-danger" value="@load(vmsgs['rcppolicyrules'])" />
+														<h:small class="text-muted">
+															<label value="Formato JSON válido requerido. Ejemplo: {\"maxLength\": 500, \"forbiddenWords\": [\"word1\", \"word2\"]}" />
+														</h:small>
+													</div>
+												</div>
+											</div>
+										</div>
+										
+										<!-- Información de Auditoría (solo lectura) -->
+										<div class="form-group row" visible="@load(vm.editing)">
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fecha de Creación" />
+														<datebox id="rcpcreatedat"
+															value="@bind(vm.currentPolicy.rcpcreatedat)"
+															readonly="true"
+															format="yyyy-MM-dd HH:mm:ss" />
+													</div>
+												</div>
+											</div>
+											
+											<div class="default col-lg-6 col-xlg-6 col-md-6">
+												<div class="row">
+													<div class="col-md-12 input-group">
+														<label sclass="text form-label text-capitalize font-weight-normal align-text-middle"
+															value="Fecha de Actualización" />
+														<datebox id="rcpupdatedat"
+															value="@bind(vm.currentPolicy.rcpupdatedat)"
+															readonly="true"
+															format="yyyy-MM-dd HH:mm:ss" />
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>
+

@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentMonitoring;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentMonitoringService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentMonitoringDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentMonitoringService agentMonitoringService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -177,7 +182,7 @@ public class AgentMonitoringDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentMonitoring = businessService.findById(AgentMonitoring.class, id);
+            currentAgentMonitoring = agentMonitoringService.findById(id);
             
             if (currentAgentMonitoring == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -228,14 +233,14 @@ public class AgentMonitoringDetailViewModel extends MasterPage {
             boolean isNew = currentAgentMonitoring.getIdxagentmonitoring() == null;
             
             if (isNew) {
-                businessService.save(currentAgentMonitoring);
+                currentAgentMonitoring = agentMonitoringService.create(currentAgentMonitoring);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTMONITORING", currentAgentMonitoring.getIdxagentmonitoring(), 
                     "Creado: " + currentAgentMonitoring.getAgtmetricname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentMonitoring);
+                currentAgentMonitoring = agentMonitoringService.update(currentAgentMonitoring);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTMONITORING", currentAgentMonitoring.getIdxagentmonitoring(), 
                     "Actualizado: " + currentAgentMonitoring.getAgtmetricname());

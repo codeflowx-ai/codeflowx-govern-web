@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <zk xmlns:h="native" xmlns:zk="http://www.zkoss.org/2005/zul">
-    
+
     <!-- ViewModel binding -->
     <window viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.serving.ServingDashboardViewModel')"
             border="none" width="100%" height="100%">
-        
+
         <h:div class="container-fluid p-4">
-            
+
             <!-- Header -->
             <h:div class="row mb-4">
                 <h:div class="col-12">
@@ -14,19 +14,19 @@
                     <h:p class="text-muted">Monitoreo de endpoints y performance en producción</h:p>
                 </h:div>
             </h:div>
-            
+
             <!-- Botón de refrescar -->
             <h:div class="row mb-4">
                 <h:div class="col-12 text-end">
-                    <button label="🔄 Refrescar" 
+                    <button label="🔄 Refrescar"
                             class="btn btn-primary"
                             onClick="@command('refreshDashboard')" />
                 </h:div>
             </h:div>
-            
+
             <!-- KPIs Principales -->
             <h:div class="row g-3 mb-4">
-                
+
                 <!-- Total Endpoints -->
                 <h:div class="col-md-3">
                     <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px;">
@@ -39,7 +39,7 @@
                         </h:div>
                     </h:div>
                 </h:div>
-                
+
                 <!-- Active Endpoints -->
                 <h:div class="col-md-3">
                     <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
@@ -52,7 +52,7 @@
                         </h:div>
                     </h:div>
                 </h:div>
-                
+
                 <!-- Avg Latency -->
                 <h:div class="col-md-3">
                     <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
@@ -65,22 +65,22 @@
                         </h:div>
                     </h:div>
                 </h:div>
-                
-                <!-- Requests Today -->
+
+                <!-- Total Requests -->
                 <h:div class="col-md-3">
                     <h:div class="card shadow-sm border-0" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
                         <h:div class="card-body p-4">
-                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Requests Hoy</h:p>
+                            <h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Requests</h:p>
                             <h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
-                                <label value="@load(vm.requestsToday) @converter('formatedNumber', format='###,###')"/>
+                                <label value="@load(vm.totalRequests) @converter('formatedNumber', format='###,###')"/>
                             </h:h2>
                             <h:p class="mb-0" style="font-size: 12px; opacity: 0.8;">total</h:p>
                         </h:div>
                     </h:div>
                 </h:div>
-                
+
             </h:div>
-            
+
             <!-- Performance Dashboard -->
             <h:div class="row mb-4">
                 <h:div class="col-12">
@@ -102,7 +102,7 @@
                                     <template name="model">
                                         <row>
                                             <label value="@load(each.endpointname)"/>
-                                            <label value="@load(each.status)" 
+                                            <label value="@load(each.status)"
                                                    style="@load(each.status eq 'ACTIVE' ? 'color: green; font-weight: bold;' : 'color: red;')"/>
                                             <label value="@load(each.requestsperhour) @converter('formatedNumber', format='###,###')"/>
                                             <label value="@load(each.avglatency) @converter('formatedNumber', format='###,##0')"/>
@@ -116,7 +116,7 @@
                     </h:div>
                 </h:div>
             </h:div>
-            
+
             <!-- Deployment Status & SLA Compliance -->
             <h:div class="row mb-4">
                 <h:div class="col-md-6">
@@ -136,7 +136,7 @@
                                     <row>
                                         <label value="@load(each.modelname)"/>
                                         <label value="@load(each.version)"/>
-                                        <label value="@load(each.status)" 
+                                        <label value="@load(each.status)"
                                                style="@load(each.status eq 'DEPLOYED' ? 'color: green; font-weight: bold;' : 'color: orange;')"/>
                                         <label value="@load(each.instances)"/>
                                     </row>
@@ -145,7 +145,7 @@
                         </h:div>
                     </h:div>
                 </h:div>
-                
+
                 <h:div class="col-md-6">
                     <h:div class="card shadow-sm">
                         <h:div class="card-header bg-warning text-dark">
@@ -164,7 +164,7 @@
                                         <label value="@load(each.endpointname)"/>
                                         <label value="@load(each.slatarget) @converter('formatedNumber', format='###,##0.0')"/>
                                         <label value="@load(each.currentvalue) @converter('formatedNumber', format='###,##0.0')"/>
-                                        <label value="@load(each.status)" 
+                                        <label value="@load(each.status)"
                                                style="@load(each.status eq 'COMPLIANT' ? 'color: green; font-weight: bold;' : 'color: red;')"/>
                                     </row>
                                 </template>
@@ -173,10 +173,9 @@
                     </h:div>
                 </h:div>
             </h:div>
-            
-        </h:div>
-        
-    </window>
-    
-</zk>
 
+        </h:div>
+
+    </window>
+
+</zk>

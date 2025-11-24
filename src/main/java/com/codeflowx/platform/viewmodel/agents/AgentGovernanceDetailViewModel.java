@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentGovernance;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentGovernanceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentGovernanceDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentGovernanceService agentGovernanceService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -177,7 +182,7 @@ public class AgentGovernanceDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentGovernance = businessService.findById(AgentGovernance.class, id);
+            currentAgentGovernance = agentGovernanceService.findById(id);
             
             if (currentAgentGovernance == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -228,14 +233,14 @@ public class AgentGovernanceDetailViewModel extends MasterPage {
             boolean isNew = currentAgentGovernance.getIdxagentgovernance() == null;
             
             if (isNew) {
-                businessService.save(currentAgentGovernance);
+                currentAgentGovernance = agentGovernanceService.create(currentAgentGovernance);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTGOVERNANCE", currentAgentGovernance.getIdxagentgovernance(), 
                     "Creado: " + currentAgentGovernance.getAgtpolicyname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentGovernance);
+                currentAgentGovernance = agentGovernanceService.update(currentAgentGovernance);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTGOVERNANCE", currentAgentGovernance.getIdxagentgovernance(), 
                     "Actualizado: " + currentAgentGovernance.getAgtpolicyname());

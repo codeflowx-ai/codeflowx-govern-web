@@ -14,6 +14,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundImage;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.playground.PlaygroundImageService;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import com.codeflowx.platform.service.BaseFront;
 import com.codeflowx.platform.service.BaseFront.Criteria;
 import com.codeflowx.platform.service.BaseFront.Criterias;
@@ -21,9 +25,19 @@ import com.codeflowx.platform.service.BaseFront.Evaluation;
 import com.codeflowx.platform.service.BaseFront.Operation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 public class PlaygroundImageViewModel extends BaseFront {
+
+    @WireVariable
+    private ModelService modelService;
+    
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
+    
+    @WireVariable
+    private PlaygroundImageService playgroundImageService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundImage> generatedImages = new ArrayList<>();
@@ -62,8 +76,8 @@ public class PlaygroundImageViewModel extends BaseFront {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modeltype", Operation.EQUAL, "IMAGE", Evaluation.STRING);
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = businessService.find(Model.class, criterias);
-        } catch (Exception e) {
+            availableModels = modelService.findAll(criterias);
+        } catch (GovernanceServiceException e) {
             log.error("Error loading models", e);
         }
     }
@@ -76,8 +90,8 @@ public class PlaygroundImageViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(currentSession);
-        } catch (Exception e) {
+            currentSession = playgroundSessionService.create(currentSession);
+        } catch (GovernanceServiceException e) {
             log.error("Error creating session", e);
         }
     }
@@ -121,14 +135,14 @@ public class PlaygroundImageViewModel extends BaseFront {
             image.setImagegenerationtime(3500);
             image.setImagecost(new BigDecimal("0.04"));
             
-            businessService.save(image);
+            image = playgroundImageService.create(image);
             loadGeneratedImages();
             prompt = "";
             negativePrompt = "";
             
             logActivity("PLAYGROUND_IMAGE", "GENERATE", null, "Imagen generada");
             Messagebox.show("Imagen generada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error generating image", e);
             Messagebox.show("Error al generar imagen: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -144,10 +158,10 @@ public class PlaygroundImageViewModel extends BaseFront {
     @NotifyChange({"generatedImages", "imageCount", "totalCost"})
     public void deleteImage(PlaygroundImage image) {
         try {
-            businessService.removeFromID(PlaygroundImage.class, image.getIdxplaygroundimage());
+            playgroundImageService.deleteById(image.getIdxplaygroundimage());
             loadGeneratedImages();
             logActivity("PLAYGROUND_IMAGE", "DELETE", null, "Imagen eliminada");
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error deleting image", e);
         }
     }

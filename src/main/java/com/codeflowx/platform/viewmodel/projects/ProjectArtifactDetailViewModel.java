@@ -30,6 +30,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.projects.ProjectArtifact;
+import com.codeflowx.govern.service.projects.ProjectArtifactService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -55,7 +57,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjectArtifactDetailViewModel extends MasterPage {
     
     @WireVariable
-    private BusinessService businessService;
+    private ProjectArtifactService projectArtifactService;
+    
+    @WireVariable
+    private BusinessService businessService; // Mantener para auditoría (Ssoractividad) y UniqueValidator
     
     @Autowired
     protected IEntityLocal dao;
@@ -170,7 +175,7 @@ public class ProjectArtifactDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentProjectArtifact = businessService.findById(ProjectArtifact.class, id);
+            currentProjectArtifact = projectArtifactService.findById(id);
             
             if (currentProjectArtifact == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -195,7 +200,7 @@ public class ProjectArtifactDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "GOVPROJECTARTIFACTS", id, "Consulta: " + currentProjectArtifact.getArtifactname());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -219,14 +224,14 @@ public class ProjectArtifactDetailViewModel extends MasterPage {
             boolean isNew = currentProjectArtifact.getIdxprojectartifact() == null;
             
             if (isNew) {
-                businessService.save(currentProjectArtifact);
+                currentProjectArtifact = projectArtifactService.create(currentProjectArtifact);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "GOVPROJECTARTIFACTS", currentProjectArtifact.getIdxprojectartifact(), 
                     "Creado: " + currentProjectArtifact.getArtifactname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentProjectArtifact);
+                currentProjectArtifact = projectArtifactService.update(currentProjectArtifact);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "GOVPROJECTARTIFACTS", currentProjectArtifact.getIdxprojectartifact(), 
                     "Actualizado: " + currentProjectArtifact.getArtifactname());
@@ -239,7 +244,7 @@ public class ProjectArtifactDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/projects/projects-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

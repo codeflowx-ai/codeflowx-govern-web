@@ -33,6 +33,9 @@ import com.codeflowx.govern.entity.platform.PlatformNode;
 import com.codeflowx.govern.entity.platform.UpdateInstallation;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.PlatformNodeService;
+import com.codeflowx.govern.service.platform.UpdateInstallationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -57,6 +60,12 @@ public class PlatformNodeDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private PlatformNodeService platformNodeService;
+    
+    @WireVariable
+    private UpdateInstallationService updateInstallationService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -169,7 +178,7 @@ public class PlatformNodeDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentPlatformNode = businessService.findById(PlatformNode.class, id);
+            currentPlatformNode = platformNodeService.findById(id);
             
             if (currentPlatformNode == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -192,7 +201,7 @@ public class PlatformNodeDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "PLATFORMNODES", id, "Consulta: " + currentPlatformNode.getNodename());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -216,14 +225,14 @@ public class PlatformNodeDetailViewModel extends MasterPage {
             boolean isNew = currentPlatformNode.getIdxplatformnode() == null;
             
             if (isNew) {
-                businessService.save(currentPlatformNode);
+                currentPlatformNode = platformNodeService.create(currentPlatformNode);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "PLATFORMNODES", currentPlatformNode.getIdxplatformnode(), 
                     "Creado: " + currentPlatformNode.getNodename());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentPlatformNode);
+                currentPlatformNode = platformNodeService.update(currentPlatformNode);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "PLATFORMNODES", currentPlatformNode.getIdxplatformnode(), 
                     "Actualizado: " + currentPlatformNode.getNodename());
@@ -236,7 +245,7 @@ public class PlatformNodeDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -299,12 +308,12 @@ public class PlatformNodeDetailViewModel extends MasterPage {
                     .rowActual(0)
                     .build();
                 
-                PageResult<UpdateInstallation> result = businessService.findAllEntity(UpdateInstallation.class, collectionParams, criterias);
+                PageResult<UpdateInstallation> result = updateInstallationService.findAll(collectionParams, criterias);
                 subupdateinstallations = result != null ? result.getContent() : new ArrayList<>();
                 subupdateinstallationsLoaded = true;
                 log.debug("Cargados {} subupdateinstallations", subupdateinstallations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subupdateinstallations", e);
             subupdateinstallations = new ArrayList<>();
         }

@@ -1,0 +1,350 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # MICROSERVICIOS EXISTENTES (PROMPTS_01)
+  # ============================================
+  
+  leka-bias-detection-service:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-bias-detection-service
+      dockerfile: Dockerfile
+    container_name: leka-bias-detection-service
+    ports:
+      - "8001:8001"
+    environment:
+      - LOG_LEVEL=INFO
+      - MAX_FILE_SIZE_MB=1024
+      - BASE_TIMEOUT_SECONDS=30
+      - TIMEOUT_PER_MB=0.5
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=bias-detection"
+      - "compliance=true"
+      - "port=8001"
+
+  leka-llm-evaluation:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-llm-evaluation
+      dockerfile: Dockerfile
+    container_name: leka-llm-evaluation
+    ports:
+      - "8002:8002"
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=llm-evaluation"
+      - "compliance=true"
+      - "port=8002"
+
+  leka-prompt-governance:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-prompt-governance
+      dockerfile: Dockerfile
+    container_name: leka-prompt-governance
+    ports:
+      - "8003:8003"
+    environment:
+      - LOG_LEVEL=INFO
+      - MAX_FILE_SIZE_MB=100
+      - TIMEOUT_SECONDS=30
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=prompt-governance"
+      - "compliance=true"
+      - "port=8003"
+
+  leka-rag-evaluation:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-rag-evaluation
+      dockerfile: Dockerfile
+    container_name: leka-rag-evaluation
+    ports:
+      - "8004:8004"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=rag-evaluation"
+      - "compliance=true"
+      - "port=8004"
+
+  leka-agent-monitoring:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-agent-monitoring
+      dockerfile: Dockerfile
+    container_name: leka-agent-monitoring
+    ports:
+      - "8005:8005"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=agent-monitoring"
+      - "compliance=true"
+      - "port=8005"
+
+  leka-model-wrapper:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-model-wrapper
+      dockerfile: Dockerfile
+    container_name: leka-model-wrapper
+    ports:
+      - "8006:8006"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8006/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=model-wrapper"
+      - "compliance=true"
+      - "port=8006"
+
+  leka-adversarial-robustness:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-adversarial-robustness
+      dockerfile: Dockerfile
+    container_name: leka-adversarial-robustness
+    ports:
+      - "8007:8007"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8007/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=adversarial-robustness"
+      - "compliance=true"
+      - "port=8007"
+
+  # ============================================
+  # MICROSERVICIOS NUEVOS (PROMPTS_02)
+  # ============================================
+
+  leka-technical-documentation-generator:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-technical-documentation-generator
+      dockerfile: Dockerfile
+    container_name: leka-technical-documentation-generator
+    ports:
+      - "8008:8008"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=technical-documentation-generator"
+      - "compliance=true"
+      - "port=8008"
+
+  leka-conformity-assessment:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-conformity-assessment
+      dockerfile: Dockerfile
+    container_name: leka-conformity-assessment
+    ports:
+      - "8009:8009"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=conformity-assessment"
+      - "compliance=true"
+      - "port=8009"
+
+  leka-eu-declaration-generator:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-eu-declaration-generator
+      dockerfile: Dockerfile
+    container_name: leka-eu-declaration-generator
+    ports:
+      - "8010:8010"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8010/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=eu-declaration-generator"
+      - "compliance=true"
+      - "port=8010"
+
+  leka-llm-interpreter:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-llm-interpreter
+      dockerfile: Dockerfile
+    container_name: leka-llm-interpreter
+    ports:
+      - "8011:8011"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=llm-interpreter"
+      - "compliance=true"
+      - "port=8011"
+
+  leka-fria-generator:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-fria-generator
+      dockerfile: Dockerfile
+    container_name: leka-fria-generator
+    ports:
+      - "8012:8012"
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8012/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=fria-generator"
+      - "compliance=true"
+      - "port=8012"
+
+  leka-copyright-compliance:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-copyright-compliance
+      dockerfile: Dockerfile
+    container_name: leka-copyright-compliance
+    ports:
+      - "8013:8013"
+    environment:
+      - LOG_LEVEL=INFO
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8013/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=copyright-compliance"
+      - "compliance=true"
+      - "port=8013"
+
+  # ============================================
+  # MICROSERVICIO ADICIONAL
+  # ============================================
+
+  leka-server-serving-evaluation:
+    build:
+      context: /mnt/c/Users/ManuelGonzalez/git/leka-server-serving-evaluation
+      dockerfile: Dockerfile
+    container_name: leka-server-serving-evaluation
+    ports:
+      - "8014:8003"
+    environment:
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - ai-governance-network
+    labels:
+      - "service=server-serving-evaluation"
+      - "compliance=true"
+      - "port=8014"
+
+networks:
+  ai-governance-network:
+    driver: bridge
+    name: ai-governance-network
+

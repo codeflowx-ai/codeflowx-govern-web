@@ -24,7 +24,11 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.rag.RagOverview;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.views.rag.RagMetricsSummary;
+import com.codeflowx.govern.service.rag.RagOverviewService;
+import com.codeflowx.govern.service.rag.RagMetricsSummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -52,7 +56,13 @@ public class RagSystemsOverviewViewModel extends MasterPage {
     private static final String IDDESKTOP = "contenedor";
     
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+
+    @WireVariable
+    private RagOverviewService ragOverviewService;
+
+    @WireVariable
+    private RagMetricsSummaryService ragMetricsSummaryService;
 
     @WireVariable
     public Environment environment;
@@ -150,14 +160,14 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 pageParams.getPageActual(), pageParams.getMaxRows());
             
             Criterias criterias = buildCriterias();
-            pageResult = businessService.findAllView(RagOverview.class, pageParams, criterias);
+            pageResult = ragOverviewService.findAll(pageParams, criterias);
             
             ragSystems = pageResult != null ? pageResult.getContent() : new ArrayList<>();
             
             log.info("Cargados {} sistemas RAG de {} totales", 
                 ragSystems.size(), pageResult != null ? pageResult.getTotalRows() : 0);
                 
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar sistemas RAG", e);
             Messagebox.show(Labels.getLabel("common.error.load"), 
                 Labels.getLabel("common.error.title"),
@@ -211,8 +221,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            PageResult<RagMetricsSummary> result = businessService.findAllView(
-                RagMetricsSummary.class, 
+            PageResult<RagMetricsSummary> result = ragMetricsSummaryService.findAll(
                 metricsParams, 
                 new Criterias()
             );
@@ -230,7 +239,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 log.info("Métricas RAG cargadas - Total: {}, Activos: {}, Borradores: {}", 
                     totalRagSystems, activeRagSystems, draftRagSystems);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas de RAG", e);
         }
     }

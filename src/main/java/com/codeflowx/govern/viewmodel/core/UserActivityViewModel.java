@@ -21,6 +21,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.views.core.UserActivitySummary;
+import com.codeflowx.govern.service.core.UserActivitySummaryService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -39,9 +41,9 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class UserActivityViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
+    private UserActivitySummaryService userActivitySummaryService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -50,13 +52,13 @@ public class UserActivityViewModel extends MasterPage {
     protected GenericApplicationContext contexto;
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+    }
+
     private Long totalItems = 0L;
     private Long activeItems = 0L;
     private Long deployedItems = 0L;
@@ -64,7 +66,7 @@ public class UserActivityViewModel extends MasterPage {
     private Long offlineItems = 0L;
     private java.math.BigDecimal avgScore = java.math.BigDecimal.ZERO;
     private String activityRate = "0";
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
@@ -72,18 +74,18 @@ public class UserActivityViewModel extends MasterPage {
         initDao();
         loadActivityData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadActivityData() {
         try {
             log.debug("Cargando actividad de usuarios");
-            List<UserActivitySummary> activityData = businessService.findAllView(UserActivitySummary.class);
-            
+            List<UserActivitySummary> activityData = userActivitySummaryService.findAll();
+
             if (activityData != null && !activityData.isEmpty()) {
                 UserActivitySummary activity = activityData.get(0);
                 log.debug("Actividad cargada - Total users: {}, Active: {}", activity.getTotalItems(), activity.getActiveItems());
-                
+
                 // Mapear datos
                 this.totalItems = activity.getTotalItems() != null ? activity.getTotalItems() : 0L;
                 this.activeItems = activity.getActiveItems() != null ? activity.getActiveItems() : 0L;
@@ -91,29 +93,29 @@ public class UserActivityViewModel extends MasterPage {
                 this.trainingItems = activity.getTrainingItems() != null ? activity.getTrainingItems() : 0L;
                 this.offlineItems = activity.getOfflineItems() != null ? activity.getOfflineItems() : 0L;
                 this.avgScore = activity.getAvgScore() != null ? activity.getAvgScore() : java.math.BigDecimal.ZERO;
-                
+
                 // Calcular tasa de actividad
                 if (totalItems != null && totalItems > 0 && activeItems != null) {
                     this.activityRate = String.format("%.1f", (activeItems * 100.0 / totalItems));
                 } else {
                     this.activityRate = "0";
                 }
-                
-                log.info("Actividad de usuarios - Total: {}, Activos: {}, Tasa: {}%", 
+
+                log.info("Actividad de usuarios - Total: {}, Activos: {}, Tasa: {}%",
                          totalItems, activeItems, activityRate);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando actividad de usuarios", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refresh() {
         log.debug("Refrescando actividad de usuarios");
         loadActivityData();
     }
-    
+
     public String getActivityLevel() {
         if (activityRate == null || activityRate.isEmpty()) return "Desconocido";
         double rate = Double.parseDouble(activityRate);
@@ -123,7 +125,7 @@ public class UserActivityViewModel extends MasterPage {
         if (rate >= 20) return "Bajo";
         return "Muy Bajo";
     }
-    
+
     public String getActivityColor() {
         String level = getActivityLevel();
         switch (level) {
@@ -136,7 +138,7 @@ public class UserActivityViewModel extends MasterPage {
         }
     }
 
-  
+
 
     @Override
     public void setBeans(Object bean) {

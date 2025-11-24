@@ -34,6 +34,12 @@ import com.codeflowx.govern.entity.governance.PolicyAuditLog;
 import com.codeflowx.govern.entity.governance.PolicyChecklistItem;
 import com.codeflowx.govern.entity.governance.PolicyEvaluation;
 import com.codeflowx.govern.entity.governance.PolicyRule;
+import com.codeflowx.govern.service.governance.PolicyService;
+import com.codeflowx.govern.service.governance.PolicyAuditLogService;
+import com.codeflowx.govern.service.governance.PolicyChecklistItemService;
+import com.codeflowx.govern.service.governance.PolicyEvaluationService;
+import com.codeflowx.govern.service.governance.PolicyRuleService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -57,60 +63,70 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class PolicyDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private PolicyService policyService;
+    @WireVariable
+    private PolicyAuditLogService policyAuditLogService;
+    @WireVariable
+    private PolicyChecklistItemService policyChecklistItemService;
+    @WireVariable
+    private PolicyEvaluationService policyEvaluationService;
+    @WireVariable
+    private PolicyRuleService policyRuleService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para procedimientos almacenados y auditoría
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxpolicy;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Policy currentPolicy;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalName = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableEnforcementlevels = new ArrayList<>();
     private List<String> availablePolicytypes = new ArrayList<>();
     private List<String> availableStatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<PolicyAuditLog> subgovpolicyauditlogs = new ArrayList<>();
     private List<PolicyChecklistItem> subgovpolicychecklistitems = new ArrayList<>();
@@ -120,40 +136,40 @@ public class PolicyDetailViewModel extends MasterPage {
     private boolean subgovpolicychecklistitemsLoaded = false;
     private boolean subgovpolicyevaluationsLoaded = false;
     private boolean subgovpolicyrulesLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxpolicy = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando PolicyDetailViewModel - mode: {}, idxpolicy: {}", mode, idxpolicy);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxpolicy != null) {
@@ -164,11 +180,11 @@ public class PolicyDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentPolicy, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentPolicy = new Policy();
@@ -178,39 +194,39 @@ public class PolicyDetailViewModel extends MasterPage {
         loadPolicytypes();
         loadStatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentPolicy = businessService.findById(Policy.class, id);
-            
+            currentPolicy = policyService.findById(id);
+
             if (currentPolicy == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentPolicy.getName();
         loadEnforcementlevels();
         loadPolicytypes();
         loadStatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalName = currentPolicy.getName();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "GOVPOLICIES", id, "Consulta: " + currentPolicy.getName());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -219,55 +235,55 @@ public class PolicyDetailViewModel extends MasterPage {
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentPolicy.getIdxpolicy() == null;
-            
+
             if (isNew) {
-                businessService.save(currentPolicy);
+                currentPolicy = policyService.create(currentPolicy);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "GOVPOLICIES", currentPolicy.getIdxpolicy(), 
+                logActivity("CREACION", "GOVPOLICIES", currentPolicy.getIdxpolicy(),
                     "Creado: " + currentPolicy.getName());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentPolicy);
+                currentPolicy = policyService.update(currentPolicy);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "GOVPOLICIES", currentPolicy.getIdxpolicy(), 
+                logActivity("EDICION", "GOVPOLICIES", currentPolicy.getIdxpolicy(),
                     "Actualizado: " + currentPolicy.getName());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentPolicy.getName() == null || currentPolicy.getName().trim().isEmpty()) {
             errors.append("- Name\n");
         }
@@ -301,16 +317,16 @@ public class PolicyDetailViewModel extends MasterPage {
         if (currentPolicy.getUpdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -319,28 +335,28 @@ public class PolicyDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadEnforcementlevels() {
         // TODO: Cargar valores desde configuración o BD
         availableEnforcementlevels.add("OPTION_1");
         availableEnforcementlevels.add("OPTION_2");
         availableEnforcementlevels.add("OPTION_3");
     }
-    
+
     private void loadPolicytypes() {
         // TODO: Cargar valores desde configuración o BD
         availablePolicytypes.add("OPTION_1");
         availablePolicytypes.add("OPTION_2");
         availablePolicytypes.add("OPTION_3");
     }
-    
+
     private void loadStatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableStatuss.add("OPTION_1");
         availableStatuss.add("OPTION_2");
         availableStatuss.add("OPTION_3");
     }
-    
+
     private void loadSubgovpolicyauditlogs() {
         try {
             if (currentPolicy != null && currentPolicy.getIdxpolicy() != null) {
@@ -348,25 +364,25 @@ public class PolicyDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "policy");
                 criteria.setValues(new Object[]{currentPolicy.getIdxpolicy()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<PolicyAuditLog> result = businessService.findAllEntity(PolicyAuditLog.class, collectionParams, criterias);
+
+                PageResult<PolicyAuditLog> result = policyAuditLogService.findAll(collectionParams, criterias);
                 subgovpolicyauditlogs = result != null ? result.getContent() : new ArrayList<>();
                 subgovpolicyauditlogsLoaded = true;
                 log.debug("Cargados {} subgovpolicyauditlogs", subgovpolicyauditlogs.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovpolicyauditlogs", e);
             subgovpolicyauditlogs = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovpolicychecklistitems() {
         try {
             if (currentPolicy != null && currentPolicy.getIdxpolicy() != null) {
@@ -374,25 +390,25 @@ public class PolicyDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "policy");
                 criteria.setValues(new Object[]{currentPolicy.getIdxpolicy()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<PolicyChecklistItem> result = businessService.findAllEntity(PolicyChecklistItem.class, collectionParams, criterias);
+
+                PageResult<PolicyChecklistItem> result = policyChecklistItemService.findAll(collectionParams, criterias);
                 subgovpolicychecklistitems = result != null ? result.getContent() : new ArrayList<>();
                 subgovpolicychecklistitemsLoaded = true;
                 log.debug("Cargados {} subgovpolicychecklistitems", subgovpolicychecklistitems.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovpolicychecklistitems", e);
             subgovpolicychecklistitems = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovpolicyevaluations() {
         try {
             if (currentPolicy != null && currentPolicy.getIdxpolicy() != null) {
@@ -400,25 +416,25 @@ public class PolicyDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "policy");
                 criteria.setValues(new Object[]{currentPolicy.getIdxpolicy()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<PolicyEvaluation> result = businessService.findAllEntity(PolicyEvaluation.class, collectionParams, criterias);
+
+                PageResult<PolicyEvaluation> result = policyEvaluationService.findAll(collectionParams, criterias);
                 subgovpolicyevaluations = result != null ? result.getContent() : new ArrayList<>();
                 subgovpolicyevaluationsLoaded = true;
                 log.debug("Cargados {} subgovpolicyevaluations", subgovpolicyevaluations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovpolicyevaluations", e);
             subgovpolicyevaluations = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovpolicyrules() {
         try {
             if (currentPolicy != null && currentPolicy.getIdxpolicy() != null) {
@@ -426,25 +442,25 @@ public class PolicyDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "policy");
                 criteria.setValues(new Object[]{currentPolicy.getIdxpolicy()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<PolicyRule> result = businessService.findAllEntity(PolicyRule.class, collectionParams, criterias);
+
+                PageResult<PolicyRule> result = policyRuleService.findAll(collectionParams, criterias);
                 subgovpolicyrules = result != null ? result.getContent() : new ArrayList<>();
                 subgovpolicyrulesLoaded = true;
                 log.debug("Cargados {} subgovpolicyrules", subgovpolicyrules.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovpolicyrules", e);
             subgovpolicyrules = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovpolicyauditlogs")
     public void onSelectSubgovpolicyauditlogsTab() {
@@ -452,7 +468,7 @@ public class PolicyDetailViewModel extends MasterPage {
             loadSubgovpolicyauditlogs();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovpolicychecklistitems")
     public void onSelectSubgovpolicychecklistitemsTab() {
@@ -460,7 +476,7 @@ public class PolicyDetailViewModel extends MasterPage {
             loadSubgovpolicychecklistitems();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovpolicyevaluations")
     public void onSelectSubgovpolicyevaluationsTab() {
@@ -468,7 +484,7 @@ public class PolicyDetailViewModel extends MasterPage {
             loadSubgovpolicyevaluations();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovpolicyrules")
     public void onSelectSubgovpolicyrulesTab() {
@@ -476,7 +492,7 @@ public class PolicyDetailViewModel extends MasterPage {
             loadSubgovpolicyrules();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -502,7 +518,7 @@ public class PolicyDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -510,13 +526,13 @@ public class PolicyDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentPolicy = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableEnforcementlevels != null) {
                 availableEnforcementlevels.clear();
@@ -530,7 +546,7 @@ public class PolicyDetailViewModel extends MasterPage {
                 availableStatuss.clear();
                 availableStatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subgovpolicyauditlogs != null) {
                 subgovpolicyauditlogs.clear();
@@ -552,15 +568,15 @@ public class PolicyDetailViewModel extends MasterPage {
                 subgovpolicyrules = null;
             }
             subgovpolicyrulesLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

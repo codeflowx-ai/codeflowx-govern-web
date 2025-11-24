@@ -8,6 +8,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.suinsit.nocode.web.MasterBeanUI;
 import codeflowx.nocode.persist.*;
 import com.codeflowx.govern.entity.analytics.AnalyticsReport;
+import com.codeflowx.govern.service.analytics.AnalyticsReportService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +34,7 @@ import org.springframework.core.env.Environment;
 public class AnalyticsReportViewModel extends MasterBeanUI {
     
     @WireVariable
-    private BusinessService businessService;
+    private AnalyticsReportService analyticsReportService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -43,9 +45,9 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
     protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     
@@ -182,11 +184,11 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
     @NotifyChange({"selectedReport", "showDialog", "isEditing"})
     public void editReport(@BindingParam("item") AnalyticsReport report) {
         try {
-            selectedReport = businessService.findById(AnalyticsReport.class, report.getIdxanalyticsreport());
+            selectedReport = analyticsReportService.findById(report.getIdxanalyticsreport());
             isEditing = true;
             showDialog = true;
             log.debug("Editando reporte: ID={}", report.getIdxanalyticsreport());
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando reporte para edición", e);
         }
     }
@@ -197,13 +199,13 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
         try {
             if (selectedReport != null) {
                 log.debug("Guardando reporte: {}", selectedReport.getAnlreportname());
-                businessService.save(selectedReport);
+                selectedReport = analyticsReportService.create(selectedReport);
                 log.info("Reporte guardado exitosamente: ID={}", selectedReport.getIdxanalyticsreport());
                 showDialog = false;
                 selectedReport = null;
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error guardando reporte", e);
         }
     }
@@ -214,11 +216,11 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
         try {
             if (report != null) {
                 log.debug("Eliminando reporte: ID={}, Nombre={}", report.getIdxanalyticsreport(), report.getAnlreportname());
-                businessService.removeFromID(report);
+                analyticsReportService.deleteById(report.getIdxanalyticsreport());
                 log.info("Reporte eliminado exitosamente: ID={}", report.getIdxanalyticsreport());
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error eliminando reporte", e);
         }
     }
@@ -227,10 +229,10 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
     @NotifyChange({"selectedReport", "showDataDialog"})
     public void viewReportData(@BindingParam("item") AnalyticsReport report) {
         try {
-            selectedReport = businessService.findById(AnalyticsReport.class, report.getIdxanalyticsreport());
+            selectedReport = analyticsReportService.findById(report.getIdxanalyticsreport());
             showDataDialog = true;
             log.debug("Visualizando datos del reporte: ID={}", report.getIdxanalyticsreport());
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando datos del reporte", e);
         }
     }

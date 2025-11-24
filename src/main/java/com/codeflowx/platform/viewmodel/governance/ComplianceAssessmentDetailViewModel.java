@@ -33,6 +33,10 @@ import com.codeflowx.framework.validators.UniqueValidator;
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
 import com.codeflowx.govern.entity.governance.ComplianceFinding;
 import com.codeflowx.govern.entity.governance.ComplianceRequirement;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
+import com.codeflowx.govern.service.governance.ComplianceFindingService;
+import com.codeflowx.govern.service.governance.ComplianceRequirementService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -54,99 +58,105 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class ComplianceAssessmentDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private ComplianceFindingService complianceFindingService;
+    @WireVariable
+    private ComplianceRequirementService complianceRequirementService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para procedimientos almacenados y auditoría
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long id;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private ComplianceAssessment currentComplianceAssessment;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalAssessmentname = null;
     private String originalAssessorname = null;
     private String originalAssessoremail = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableComplianceframeworks = new ArrayList<>();
     private List<String> availableStatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<ComplianceFinding> subgovcompliancefindings = new ArrayList<>();
     private List<ComplianceRequirement> subgovcompliancerequirements = new ArrayList<>();
     private boolean subgovcompliancefindingsLoaded = false;
     private boolean subgovcompliancerequirementsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         if (dataParam != null) {
             id = Long.parseLong(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ComplianceAssessmentDetailViewModel - mode: {}, id: {}", mode, id);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && id != null) {
@@ -157,11 +167,11 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
-        unique = new UniqueValidator(currentComplianceAssessment, businessService);
+        unique = new UniqueValidator(currentComplianceAssessment, businessService); // Mantener businessService para validación
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentComplianceAssessment = new ComplianceAssessment();
@@ -170,39 +180,39 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
         loadComplianceframeworks();
         loadStatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
-            currentComplianceAssessment = businessService.findById(ComplianceAssessment.class, id);
-            
+
+            currentComplianceAssessment = complianceAssessmentService.findById(id);
+
             if (currentComplianceAssessment == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentComplianceAssessment.getAssessmentname();
         loadComplianceframeworks();
         loadStatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalAssessmentname = currentComplianceAssessment.getAssessmentname();
             originalAssessorname = currentComplianceAssessment.getAssessorname();
             originalAssessoremail = currentComplianceAssessment.getAssessoremail();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "GOVCOMPLIANCEASSESSMENTS", id, "Consulta: " + currentComplianceAssessment.getAssessmentname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -211,55 +221,55 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentComplianceAssessment.getIdxcomplianceassessment() == null;
-            
+
             if (isNew) {
-                businessService.save(currentComplianceAssessment);
+                currentComplianceAssessment = complianceAssessmentService.create(currentComplianceAssessment);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "GOVCOMPLIANCEASSESSMENTS", currentComplianceAssessment.getIdxcomplianceassessment(), 
+                logActivity("CREACION", "GOVCOMPLIANCEASSESSMENTS", currentComplianceAssessment.getIdxcomplianceassessment(),
                     "Creado: " + currentComplianceAssessment.getAssessmentname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentComplianceAssessment);
+                currentComplianceAssessment = complianceAssessmentService.update(currentComplianceAssessment);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "GOVCOMPLIANCEASSESSMENTS", currentComplianceAssessment.getIdxcomplianceassessment(), 
+                logActivity("EDICION", "GOVCOMPLIANCEASSESSMENTS", currentComplianceAssessment.getIdxcomplianceassessment(),
                     "Actualizado: " + currentComplianceAssessment.getAssessmentname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentComplianceAssessment.getAssessmentname() == null || currentComplianceAssessment.getAssessmentname().trim().isEmpty()) {
             errors.append("- Assessment Name\n");
         }
@@ -302,16 +312,16 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
         if (currentComplianceAssessment.getUpdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -320,21 +330,21 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/governance/governance-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadComplianceframeworks() {
         // TODO: Cargar valores desde configuración o BD
         availableComplianceframeworks.add("OPTION_1");
         availableComplianceframeworks.add("OPTION_2");
         availableComplianceframeworks.add("OPTION_3");
     }
-    
+
     private void loadStatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableStatuss.add("OPTION_1");
         availableStatuss.add("OPTION_2");
         availableStatuss.add("OPTION_3");
     }
-    
+
     private void loadSubgovcompliancefindings() {
         try {
             if (currentComplianceAssessment != null && currentComplianceAssessment.getIdxcomplianceassessment() != null) {
@@ -342,25 +352,25 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "assessment");
                 criteria.setValues(new Object[]{currentComplianceAssessment.getIdxcomplianceassessment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ComplianceFinding> result = businessService.findAllEntity(ComplianceFinding.class, collectionParams, criterias);
+
+                PageResult<ComplianceFinding> result = complianceFindingService.findAll(collectionParams, criterias);
                 subgovcompliancefindings = result != null ? result.getContent() : new ArrayList<>();
                 subgovcompliancefindingsLoaded = true;
                 log.debug("Cargados {} subgovcompliancefindings", subgovcompliancefindings.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovcompliancefindings", e);
             subgovcompliancefindings = new ArrayList<>();
         }
     }
-    
+
     private void loadSubgovcompliancerequirements() {
         try {
             if (currentComplianceAssessment != null && currentComplianceAssessment.getIdxcomplianceassessment() != null) {
@@ -368,25 +378,25 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "assessment");
                 criteria.setValues(new Object[]{currentComplianceAssessment.getIdxcomplianceassessment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ComplianceRequirement> result = businessService.findAllEntity(ComplianceRequirement.class, collectionParams, criterias);
+
+                PageResult<ComplianceRequirement> result = complianceRequirementService.findAll(collectionParams, criterias);
                 subgovcompliancerequirements = result != null ? result.getContent() : new ArrayList<>();
                 subgovcompliancerequirementsLoaded = true;
                 log.debug("Cargados {} subgovcompliancerequirements", subgovcompliancerequirements.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subgovcompliancerequirements", e);
             subgovcompliancerequirements = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovcompliancefindings")
     public void onSelectSubgovcompliancefindingsTab() {
@@ -394,7 +404,7 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             loadSubgovcompliancefindings();
         }
     }
-    
+
     @Command
     @NotifyChange("subgovcompliancerequirements")
     public void onSelectSubgovcompliancerequirementsTab() {
@@ -402,7 +412,7 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             loadSubgovcompliancerequirements();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -428,7 +438,7 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -436,13 +446,13 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentComplianceAssessment = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableComplianceframeworks != null) {
                 availableComplianceframeworks.clear();
@@ -452,7 +462,7 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
                 availableStatuss.clear();
                 availableStatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subgovcompliancefindings != null) {
                 subgovcompliancefindings.clear();
@@ -464,15 +474,15 @@ public class ComplianceAssessmentDetailViewModel extends MasterPage {
                 subgovcompliancerequirements = null;
             }
             subgovcompliancerequirementsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

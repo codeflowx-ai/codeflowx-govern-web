@@ -33,6 +33,9 @@ import com.codeflowx.govern.entity.notifications.Notification;
 import com.codeflowx.govern.entity.notifications.NotificationLog;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.notifications.NotificationService;
+import com.codeflowx.govern.service.notifications.NotificationLogService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -54,96 +57,102 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class NotificationDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private NotificationService notificationService;
+
+    @WireVariable
+    private NotificationLogService notificationLogService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxnotification;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Notification currentNotification;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
-    
+
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableNtfnotificationtypes = new ArrayList<>();
     private List<String> availableNtfnotificationprioritys = new ArrayList<>();
     private List<String> availableNtfnotificationstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<NotificationLog> subntflogs = new ArrayList<>();
     private boolean subntflogsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxnotification = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando NotificationDetailViewModel - mode: {}, idxnotification: {}", mode, idxnotification);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxnotification != null) {
@@ -154,11 +163,11 @@ public class NotificationDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentNotification, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentNotification = new Notification();
@@ -168,37 +177,44 @@ public class NotificationDetailViewModel extends MasterPage {
         loadNtfnotificationprioritys();
         loadNtfnotificationstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentNotification = businessService.findById(Notification.class, id);
-            
+            currentNotification = notificationService.findById(id);
+
             if (currentNotification == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentNotification.getNtfnotificationtitle();
         loadNtfnotificationtypes();
         loadNtfnotificationprioritys();
         loadNtfnotificationstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "NTFNOTIFICATIONS", id, "Consulta: " + currentNotification.getNtfnotificationtitle());
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         } catch (Exception e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
@@ -208,55 +224,59 @@ public class NotificationDetailViewModel extends MasterPage {
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentNotification.getIdxnotification() == null;
-            
+
             if (isNew) {
-                businessService.save(currentNotification);
+                currentNotification = notificationService.create(currentNotification);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "NTFNOTIFICATIONS", currentNotification.getIdxnotification(), 
+                logActivity("CREACION", "NTFNOTIFICATIONS", currentNotification.getIdxnotification(),
                     "Creado: " + currentNotification.getNtfnotificationtitle());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentNotification);
+                currentNotification = notificationService.update(currentNotification);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "NTFNOTIFICATIONS", currentNotification.getIdxnotification(), 
+                logActivity("EDICION", "NTFNOTIFICATIONS", currentNotification.getIdxnotification(),
                     "Actualizado: " + currentNotification.getNtfnotificationtitle());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
-            
+
+        } catch (GovernanceServiceException e) {
+            log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
         } catch (Exception e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentNotification.getNtfnotificationtitle() == null || currentNotification.getNtfnotificationtitle().trim().isEmpty()) {
             errors.append("- Ntfnotificationtitle\n");
         }
@@ -284,16 +304,16 @@ public class NotificationDetailViewModel extends MasterPage {
         if (currentNotification.getNtfnotificationcreatedat() == null) {
             errors.append("- Ntfnotificationcreatedat\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -302,28 +322,28 @@ public class NotificationDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/notifications/notifications-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadNtfnotificationtypes() {
         // TODO: Cargar valores desde configuración o BD
         availableNtfnotificationtypes.add("OPTION_1");
         availableNtfnotificationtypes.add("OPTION_2");
         availableNtfnotificationtypes.add("OPTION_3");
     }
-    
+
     private void loadNtfnotificationprioritys() {
         // TODO: Cargar valores desde configuración o BD
         availableNtfnotificationprioritys.add("OPTION_1");
         availableNtfnotificationprioritys.add("OPTION_2");
         availableNtfnotificationprioritys.add("OPTION_3");
     }
-    
+
     private void loadNtfnotificationstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableNtfnotificationstatuss.add("OPTION_1");
         availableNtfnotificationstatuss.add("OPTION_2");
         availableNtfnotificationstatuss.add("OPTION_3");
     }
-    
+
     private void loadSubntflogs() {
         try {
             if (currentNotification != null && currentNotification.getIdxnotification() != null) {
@@ -331,25 +351,28 @@ public class NotificationDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "notification");
                 criteria.setValues(new Object[]{currentNotification.getIdxnotification()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<NotificationLog> result = businessService.findAllEntity(NotificationLog.class, collectionParams, criterias);
+
+                PageResult<NotificationLog> result = notificationLogService.findAll(collectionParams, criterias);
                 subntflogs = result != null ? result.getContent() : new ArrayList<>();
                 subntflogsLoaded = true;
                 log.debug("Cargados {} subntflogs", subntflogs.size());
             }
+        } catch (GovernanceServiceException e) {
+            log.error("Error al cargar subntflogs", e);
+            subntflogs = new ArrayList<>();
         } catch (Exception e) {
             log.error("Error al cargar subntflogs", e);
             subntflogs = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subntflogs")
     public void onSelectSubntflogsTab() {
@@ -357,7 +380,7 @@ public class NotificationDetailViewModel extends MasterPage {
             loadSubntflogs();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -383,7 +406,7 @@ public class NotificationDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -391,13 +414,13 @@ public class NotificationDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentNotification = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableNtfnotificationtypes != null) {
                 availableNtfnotificationtypes.clear();
@@ -411,22 +434,22 @@ public class NotificationDetailViewModel extends MasterPage {
                 availableNtfnotificationstatuss.clear();
                 availableNtfnotificationstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subntflogs != null) {
                 subntflogs.clear();
                 subntflogs = null;
             }
             subntflogsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

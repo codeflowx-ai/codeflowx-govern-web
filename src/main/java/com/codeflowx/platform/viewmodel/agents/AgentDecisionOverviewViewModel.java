@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentDecision;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentDecisionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentDecisionService agentDecisionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -127,10 +132,7 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentDecision.class,
-                pageParams,
-                criterias
+            pageResult = agentDecisionService.findAll(pageParams, criterias
             );
             
             if (pageResult != null && pageResult.getContent() != null) {
@@ -256,7 +258,7 @@ public class AgentDecisionOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentDecision.class, itemId);
+                            agentDecisionService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTDECISIONS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();

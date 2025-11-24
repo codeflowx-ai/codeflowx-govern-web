@@ -30,6 +30,8 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.prompts.Prompt;
+import com.codeflowx.govern.service.prompts.PromptService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -59,6 +61,8 @@ public class PromptOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    @WireVariable
+    private PromptService promptService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -128,11 +132,7 @@ public class PromptOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                Prompt.class,
-                pageParams,
-                criterias
-            );
+            pageResult = promptService.findAll(pageParams, criterias);
             
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
@@ -150,8 +150,13 @@ public class PromptOverviewViewModel extends MasterPage {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
+            Messagebox.show("Error al cargar datos: " + e.getMessage(), 
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            filteredItems = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar datos", e);
             Messagebox.show("Error al cargar datos: " + e.getMessage(), 
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredItems = new ArrayList<>();
@@ -263,14 +268,18 @@ public class PromptOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(Prompt.class, itemId);
+                            promptService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "PRMPROMPTS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();
                             Messagebox.show("Registro eliminado correctamente", 
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar ID={}", itemId, e);
+                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                                "Error", Messagebox.OK, Messagebox.ERROR);
+                        } catch (Exception e) {
+                            log.error("Error inesperado al eliminar ID={}", itemId, e);
                             Messagebox.show("Error al eliminar: " + e.getMessage(), 
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }

@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentTransparency;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentTransparencyService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentTransparencyService agentTransparencyService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -128,10 +133,7 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentTransparency.class,
-                pageParams,
-                criterias
+            pageResult = agentTransparencyService.findAll(pageParams, criterias
             );
             
             if (pageResult != null && pageResult.getContent() != null) {
@@ -264,7 +266,7 @@ public class AgentTransparencyOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentTransparency.class, itemId);
+                            agentTransparencyService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTTRANSPARENCY", itemId, "Eliminado registro ID: " + itemId);
                             loadData();

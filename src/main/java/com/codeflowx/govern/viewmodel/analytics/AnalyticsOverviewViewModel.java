@@ -15,6 +15,9 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.views.analytics.AnalyticsOverview;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.analytics.AnalyticsOverviewService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import lombok.Getter;
@@ -31,7 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 public class AnalyticsOverviewViewModel extends MasterBeanUI {
     
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+    @WireVariable
+    private AnalyticsOverviewService analyticsOverviewService;
 
     @WireVariable
     public Environment environment;
@@ -55,7 +60,7 @@ public class AnalyticsOverviewViewModel extends MasterBeanUI {
     public void loadOverviewData() {
         try {
             log.debug("Cargando vista general de analytics");
-            List<AnalyticsOverview> overviews = businessService.findAllView(AnalyticsOverview.class);
+            List<AnalyticsOverview> overviews = analyticsOverviewService.findAll();
             
             if (overviews != null && !overviews.isEmpty()) {
                 AnalyticsOverview overview = overviews.get(0);
@@ -71,7 +76,7 @@ public class AnalyticsOverviewViewModel extends MasterBeanUI {
                 log.info("Vista general cargada - Total: {}, Activos: {}, Score: {}", 
                          totalItems, activeItems, avgScore);
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando vista general de analytics", e);
         }
     }

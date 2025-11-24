@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.platform.PlatformLicense;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.PlatformLicenseService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class PlatformLicenseDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private PlatformLicenseService platformLicenseService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -166,7 +171,7 @@ public class PlatformLicenseDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentPlatformLicense = businessService.findById(PlatformLicense.class, id);
+            currentPlatformLicense = platformLicenseService.findById(id);
             
             if (currentPlatformLicense == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -189,7 +194,7 @@ public class PlatformLicenseDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "PLATFORMLICENSES", id, "Consulta: " + currentPlatformLicense.getIdxplatformlicense());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -213,14 +218,14 @@ public class PlatformLicenseDetailViewModel extends MasterPage {
             boolean isNew = currentPlatformLicense.getIdxplatformlicense() == null;
             
             if (isNew) {
-                businessService.save(currentPlatformLicense);
+                currentPlatformLicense = platformLicenseService.create(currentPlatformLicense);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "PLATFORMLICENSES", currentPlatformLicense.getIdxplatformlicense(), 
                     "Creado: " + currentPlatformLicense.getIdxplatformlicense());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentPlatformLicense);
+                currentPlatformLicense = platformLicenseService.update(currentPlatformLicense);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "PLATFORMLICENSES", currentPlatformLicense.getIdxplatformlicense(), 
                     "Actualizado: " + currentPlatformLicense.getIdxplatformlicense());
@@ -233,7 +238,7 @@ public class PlatformLicenseDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);

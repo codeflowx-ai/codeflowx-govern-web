@@ -3,6 +3,8 @@ package com.codeflowx.govern.viewmodel.governance;
 import com.codeflowx.govern.business.governance.AIObjectivesBusinessService;
 import com.codeflowx.govern.business.governance.AIObjectivesBusinessService.AIObjectivesReport;
 import com.codeflowx.govern.entity.governance.AIObjective;
+import com.codeflowx.govern.service.governance.AIObjectiveService;
+import com.codeflowx.govern.service.models.ModelService;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -49,10 +51,12 @@ public class AIObjectivesViewModel extends MasterPage {
     private static final long serialVersionUID = 1L;
 
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
 
     @WireVariable
     private AIObjectivesBusinessService objectivesBusinessService;
+    @WireVariable
+    private AIObjectiveService aIObjectiveService;
 
     @WireVariable
     public Environment environment;
@@ -83,9 +87,9 @@ public class AIObjectivesViewModel extends MasterPage {
     private final List<String> frequencies = List.of("MONTHLY", "QUARTERLY", "ANNUAL");
 
     protected void initDao() {
-        if (businessService == null && environment != null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     @Override
@@ -317,7 +321,7 @@ public class AIObjectivesViewModel extends MasterPage {
         report = null;
         formObjective = null;
         selectedObjective = null;
-        businessService = null;
+        aIObjectiveService = null;
         objectivesBusinessService = null;
     }
 }

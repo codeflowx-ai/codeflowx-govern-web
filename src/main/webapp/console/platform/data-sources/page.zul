@@ -2,14 +2,14 @@
 <zk xmlns="http://www.zkoss.org/2005/zul">
     <vlayout vflex="1" apply="org.zkoss.bind.BindComposer"
         viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.datasources.DataSourceOverviewViewModel')">
-        
+
         <!-- Header -->
         <hlayout sclass="page-header">
             <vlayout hflex="1">
                 <label value="Data Sources" sclass="page-title"/>
                 <label value="Gestión centralizada de fuentes de datos" sclass="page-subtitle"/>
             </vlayout>
-            <button label="Nueva Fuente de Datos" iconSclass="z-icon-plus" 
+            <button label="Nueva Fuente de Datos" iconSclass="z-icon-plus"
                     onClick="@command('showCreateDialog')" sclass="btn btn-primary"/>
         </hlayout>
 
@@ -35,15 +35,15 @@
 
         <!-- Filters -->
         <hlayout spacing="10px" sclass="mb-3">
-            <textbox placeholder="Buscar por nombre..." value="@bind(vm.searchTerm)" 
+            <textbox placeholder="Buscar por nombre..." value="@bind(vm.searchTerm)"
                      instant="true" sclass="form-control" style="width: 300px;"/>
-            <combobox placeholder="Tipo" selectedItem="@bind(vm.filterType)" 
+            <combobox placeholder="Tipo" selectedItem="@bind(vm.filterType)"
                       model="@load(vm.availableTypes)" sclass="form-control" style="width: 200px;">
                 <template name="model">
                     <comboitem label="@load(each)"/>
                 </template>
             </combobox>
-            <combobox placeholder="Estado" selectedItem="@bind(vm.filterStatus)" 
+            <combobox placeholder="Estado" selectedItem="@bind(vm.filterStatus)"
                       model="@load(vm.availableStatuses)" sclass="form-control" style="width: 200px;">
                 <template name="model">
                     <comboitem label="@load(each)"/>
@@ -67,40 +67,39 @@
                     <label value="@load(each.dsname)" sclass="fw-bold"/>
                     <label value="@load(each.dstype)">
                         <attribute name="sclass">
-                            badge 
-                            @load(each.dstype eq 'API' ? 'badge-info' : 
-                                 each.dstype eq 'DATABASE' ? 'badge-primary' : 
+                            badge
+                            @load(each.dstype eq 'API' ? 'badge-info' :
+                                 each.dstype eq 'DATABASE' ? 'badge-primary' :
                                  each.dstype eq 'UPLOAD_DOCUMENTS' ? 'badge-success' : 'badge-warning')
                         </attribute>
                     </label>
                     <label value="@load(each.dsstatus)">
                         <attribute name="sclass">
-                            badge 
-                            @load(each.dsstatus eq 'ACTIVE' ? 'badge-success' : 
-                                 each.dsstatus eq 'SYNCING' ? 'badge-warning' : 
+                            badge
+                            @load(each.dsstatus eq 'ACTIVE' ? 'badge-success' :
+                                 each.dsstatus eq 'SYNCING' ? 'badge-warning' :
                                  each.dsstatus eq 'INACTIVE' ? 'badge-secondary' : 'badge-danger')
                         </attribute>
                     </label>
                     <label value="@load(each.dslastsyncat) @converter('formatedDate', format='dd/MM/yyyy HH:mm')"/>
                     <label value="@load(each.dsdocumentcount)"/>
                     <hlayout spacing="5px">
-                        <button iconSclass="z-icon-eye" tooltiptext="Ver Detalles" 
+                        <button iconSclass="z-icon-eye" tooltiptext="Ver Detalles"
                                 onClick="@command('viewDetails', item=each)" sclass="btn btn-sm btn-info"/>
-                        <button iconSclass="z-icon-edit" tooltiptext="Editar" 
+                        <button iconSclass="z-icon-edit" tooltiptext="Editar"
                                 onClick="@command('editDataSource', item=each)" sclass="btn btn-sm btn-primary"/>
-                        <button iconSclass="z-icon-sync" tooltiptext="Sincronizar" 
+                        <button iconSclass="z-icon-sync" tooltiptext="Sincronizar"
                                 onClick="@command('syncDataSource', item=each)" sclass="btn btn-sm btn-success"/>
-                        <button iconSclass="z-icon-trash" tooltiptext="Eliminar" 
-                                onClick="@command('deleteItem', item=each)" sclass="btn btn-sm btn-danger"/>
+                        <button iconSclass="z-icon-trash" tooltiptext="Eliminar"
+                                onClick="@command('deleteDataSource', item=each)" sclass="btn btn-sm btn-danger"/>
                     </hlayout>
                 </row>
             </template>
         </grid>
 
         <!-- Pagination -->
-        <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+        <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)"
                 activePage="@bind(vm.activePage)" onPaging="@command('changePage')"/>
 
     </vlayout>
 </zk>
-

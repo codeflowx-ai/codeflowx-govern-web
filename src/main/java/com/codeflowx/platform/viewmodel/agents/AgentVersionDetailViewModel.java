@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentVersion;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentVersionDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentVersionService agentVersionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -170,7 +175,7 @@ public class AgentVersionDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentVersion = businessService.findById(AgentVersion.class, id);
+            currentAgentVersion = agentVersionService.findById(id);
             
             if (currentAgentVersion == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -217,14 +222,14 @@ public class AgentVersionDetailViewModel extends MasterPage {
             boolean isNew = currentAgentVersion.getIdxagentversion() == null;
             
             if (isNew) {
-                businessService.save(currentAgentVersion);
+                currentAgentVersion = agentVersionService.create(currentAgentVersion);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTVERSIONS", currentAgentVersion.getIdxagentversion(), 
                     "Creado: " + currentAgentVersion.getAgtdescription());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentVersion);
+                currentAgentVersion = agentVersionService.update(currentAgentVersion);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTVERSIONS", currentAgentVersion.getIdxagentversion(), 
                     "Actualizado: " + currentAgentVersion.getAgtdescription());

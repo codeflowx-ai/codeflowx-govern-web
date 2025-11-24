@@ -36,6 +36,7 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.validators.UniqueValidator;
 import com.codeflowx.govern.entity.evaluation.ModelBiasAnalysis;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.evaluation.ModelPerformance;
 import com.codeflowx.govern.entity.functions.models.CalculateDrift;
 import com.codeflowx.govern.entity.functions.models.ValidateModel;
@@ -44,6 +45,11 @@ import com.codeflowx.govern.entity.models.ModelArtifact;
 import com.codeflowx.govern.entity.models.ModelProvider;
 import com.codeflowx.govern.entity.models.ModelVersion;
 import com.codeflowx.govern.entity.procedures.models.CreateModelVersion;
+import com.codeflowx.govern.service.models.ModelProviderService;
+import com.codeflowx.govern.service.models.ModelArtifactService;
+import com.codeflowx.govern.service.models.ModelVersionService;
+import com.codeflowx.govern.service.evaluation.ModelPerformanceService;
+import com.codeflowx.govern.service.evaluation.ModelBiasAnalysisService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -84,7 +90,17 @@ public class ModelsDetailViewModel extends MasterPage {
     private static final String IDDESKTOP = "contenedor";
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+    @WireVariable
+    private ModelVersionService modelVersionService;
+    @WireVariable
+    private ModelArtifactService modelArtifactService;
+    @WireVariable
+    private ModelProviderService modelProviderService;
+    @WireVariable
+    private ModelPerformanceService modelPerformanceService;
+    @WireVariable
+    private ModelBiasAnalysisService modelBiasAnalysisService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -100,9 +116,8 @@ public class ModelsDetailViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
     
     @Override
@@ -194,7 +209,7 @@ public class ModelsDetailViewModel extends MasterPage {
         try {
             log.debug("Cargando modelo ID={}", id);
             
-            currentModel = businessService.findById(Model.class, id);
+            currentModel = modelService.findById(id);
             
             if (currentModel == null) {
                 log.error("Modelo no encontrado: ID={}", id);
@@ -238,10 +253,7 @@ public class ModelsDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("modstatus", "ACTIVE");
             
-            PageResult<ModelProvider> result = businessService.findAllEntity(
-                ModelProvider.class,
-                params,
-                filters
+            PageResult<ModelProvider> result = modelProviderService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -336,7 +348,7 @@ public class ModelsDetailViewModel extends MasterPage {
             // Guardar
             if (currentModel.getIdxmodel() == null) {
                 // Nuevo
-                businessService.save(currentModel);
+                currentModel = modelService.create(currentModel);
                 log.info("Modelo creado: ID={}, nombre={}", 
                     currentModel.getIdxmodel(), currentModel.getModname());
                 Messagebox.show(Labels.getLabel("models.success.created"), 
@@ -345,7 +357,7 @@ public class ModelsDetailViewModel extends MasterPage {
                 // Actualizar
                 currentModel.setModupdatedat(new Timestamp(System.currentTimeMillis()));
                 currentModel.setModupdatedby("system"); // TODO: Usuario actual
-                businessService.update(currentModel);
+                currentModel = modelService.update(currentModel);
                 log.info("Modelo actualizado: ID={}, nombre={}", 
                     currentModel.getIdxmodel(), currentModel.getModname());
                 Messagebox.show(Labels.getLabel("models.success.updated"), 
@@ -517,14 +529,12 @@ public class ModelsDetailViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idmodmodels0", currentModel.getIdxmodel());
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "idmodmodels0");
+            criteria.setValues(new Object[]{currentModel.getIdxmodel()});
+            criterias.addCriteria(criteria);
             
-            PageResult<ModelVersion> result = businessService.findAllEntity(
-                ModelVersion.class,
-                params,
-                filters
-            );
+            PageResult<ModelVersion> result = modelVersionService.findAll(params, criterias);
             
             if (result != null && result.getContent() != null) {
                 modelVersions = result.getContent();
@@ -557,14 +567,12 @@ public class ModelsDetailViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idmodmodels0", currentModel.getIdxmodel());
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "idmodmodels0");
+            criteria.setValues(new Object[]{currentModel.getIdxmodel()});
+            criterias.addCriteria(criteria);
             
-            PageResult<ModelArtifact> result = businessService.findAllEntity(
-                ModelArtifact.class,
-                params,
-                filters
-            );
+            PageResult<ModelArtifact> result = modelArtifactService.findAll(params, criterias);
             
             if (result != null && result.getContent() != null) {
                 modelArtifacts = result.getContent();
@@ -597,14 +605,12 @@ public class ModelsDetailViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idmodmodels0", currentModel.getIdxmodel());
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "idmodmodels0");
+            criteria.setValues(new Object[]{currentModel.getIdxmodel()});
+            criterias.addCriteria(criteria);
             
-            PageResult<ModelPerformance> result = businessService.findAllEntity(
-                ModelPerformance.class,
-                params,
-                filters
-            );
+            PageResult<ModelPerformance> result = modelPerformanceService.findAll(params, criterias);
             
             if (result != null && result.getContent() != null) {
                 performanceMetrics = result.getContent();
@@ -640,14 +646,12 @@ public class ModelsDetailViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            Map<String, Object> filters = new HashMap<>();
-            filters.put("idmodmodels0", currentModel.getIdxmodel());
+            Criterias criterias = new Criterias();
+            Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "idmodmodels0");
+            criteria.setValues(new Object[]{currentModel.getIdxmodel()});
+            criterias.addCriteria(criteria);
             
-            PageResult<ModelBiasAnalysis> result = businessService.findAllEntity(
-                ModelBiasAnalysis.class,
-                params,
-                filters
-            );
+            PageResult<ModelBiasAnalysis> result = modelBiasAnalysisService.findAll(params, criterias);
             
             if (result != null && result.getContent() != null) {
                 biasAnalysis = result.getContent();
@@ -745,8 +749,8 @@ public class ModelsDetailViewModel extends MasterPage {
                 biasAnalysis = null;
             }
             
-            // Limpiar BusinessService
-            businessService = null;
+            // Limpiar Service
+            modelService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

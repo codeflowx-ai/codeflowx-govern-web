@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.serving.ModelMetrics;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.serving.ModelMetricsService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -53,94 +55,97 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class ModelMetricsDetailViewModel extends MasterPage {
-    
+
+    @WireVariable
+    private ModelMetricsService modelMetricsService;
+
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxmodelmetrics;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private ModelMetrics currentModelMetrics;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalSrvmetricname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableSrvmetrictypes = new ArrayList<>();
     private List<String> availableSrvmetricperiods = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxmodelmetrics = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ModelMetricsDetailViewModel - mode: {}, idxmodelmetrics: {}", mode, idxmodelmetrics);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxmodelmetrics != null) {
@@ -151,11 +156,11 @@ public class ModelMetricsDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentModelMetrics, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentModelMetrics = new ModelMetrics();
@@ -164,38 +169,38 @@ public class ModelMetricsDetailViewModel extends MasterPage {
         loadSrvmetrictypes();
         loadSrvmetricperiods();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentModelMetrics = businessService.findById(ModelMetrics.class, id);
-            
+            currentModelMetrics = modelMetricsService.findById(id);
+
             if (currentModelMetrics == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentModelMetrics.getSrvmetricname();
         loadSrvmetrictypes();
         loadSrvmetricperiods();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalSrvmetricname = currentModelMetrics.getSrvmetricname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "SRVMODELMETRICS", id, "Consulta: " + currentModelMetrics.getSrvmetricname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -204,55 +209,55 @@ public class ModelMetricsDetailViewModel extends MasterPage {
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentModelMetrics.getIdxmodelmetrics() == null;
-            
+
             if (isNew) {
-                businessService.save(currentModelMetrics);
+                currentModelMetrics = modelMetricsService.create(currentModelMetrics);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "SRVMODELMETRICS", currentModelMetrics.getIdxmodelmetrics(), 
+                logActivity("CREACION", "SRVMODELMETRICS", currentModelMetrics.getIdxmodelmetrics(),
                     "Creado: " + currentModelMetrics.getSrvmetricname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentModelMetrics);
+                currentModelMetrics = modelMetricsService.update(currentModelMetrics);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "SRVMODELMETRICS", currentModelMetrics.getIdxmodelmetrics(), 
+                logActivity("EDICION", "SRVMODELMETRICS", currentModelMetrics.getIdxmodelmetrics(),
                     "Actualizado: " + currentModelMetrics.getSrvmetricname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentModelMetrics.getSrvmetricname() == null || currentModelMetrics.getSrvmetricname().trim().isEmpty()) {
             errors.append("- Srvmetricname\n");
         }
@@ -274,16 +279,16 @@ public class ModelMetricsDetailViewModel extends MasterPage {
         if (currentModelMetrics.getSrvmetriccreatedat() == null) {
             errors.append("- Srvmetriccreatedat\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -292,21 +297,21 @@ public class ModelMetricsDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/serving/serving-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadSrvmetrictypes() {
         // TODO: Cargar valores desde configuración o BD
         availableSrvmetrictypes.add("OPTION_1");
         availableSrvmetrictypes.add("OPTION_2");
         availableSrvmetrictypes.add("OPTION_3");
     }
-    
+
     private void loadSrvmetricperiods() {
         // TODO: Cargar valores desde configuración o BD
         availableSrvmetricperiods.add("OPTION_1");
         availableSrvmetricperiods.add("OPTION_2");
         availableSrvmetricperiods.add("OPTION_3");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -332,7 +337,7 @@ public class ModelMetricsDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -340,13 +345,13 @@ public class ModelMetricsDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentModelMetrics = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableSrvmetrictypes != null) {
                 availableSrvmetrictypes.clear();
@@ -356,17 +361,17 @@ public class ModelMetricsDetailViewModel extends MasterPage {
                 availableSrvmetricperiods.clear();
                 availableSrvmetricperiods = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

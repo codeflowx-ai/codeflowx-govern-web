@@ -32,9 +32,13 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.govern.entity.agents.Agent;
+import com.codeflowx.govern.service.governance.PolicyService;
 // AgentTask no existe, usar AgentWorkflow
 import com.codeflowx.govern.entity.agents.AgentWorkflow;
 import com.codeflowx.govern.entity.governance.PolicyAuditLog;
+import com.codeflowx.govern.service.agents.AgentWorkflowService;
+import com.codeflowx.govern.service.agents.AgentService;
+import com.codeflowx.govern.service.governance.PolicyAuditLogService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -62,7 +66,13 @@ public class AgentDecisionsLogViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private PolicyService policyService;
+    @WireVariable
+    private PolicyAuditLogService policyAuditLogService;
+    @WireVariable
+    private AgentService agentService;
+    @WireVariable
+    private AgentWorkflowService agentWorkflowService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -78,9 +88,9 @@ public class AgentDecisionsLogViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -156,10 +166,7 @@ public class AgentDecisionsLogViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            PageResult<Agent> result = businessService.findAllEntity(
-                Agent.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<Agent> result = agentService.findAll(pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
@@ -194,10 +201,7 @@ public class AgentDecisionsLogViewModel extends MasterPage {
                 criterias.addCriteria(criteria);
             }
             
-            PageResult<AgentWorkflow> result = businessService.findAllEntity(
-                AgentWorkflow.class, 
-                pageParams, 
-                criterias
+            PageResult<AgentWorkflow> result = agentWorkflowService.findAll(pageParams, criterias
             );
             
             if (result != null && result.getContent() != null) {
@@ -227,10 +231,7 @@ public class AgentDecisionsLogViewModel extends MasterPage {
                 criterias.addCriteria(criteria);
             }
             
-            PageResult<AgentWorkflow> result = businessService.findAllEntity(
-                AgentWorkflow.class, 
-                pageParams, 
-                criterias
+            PageResult<AgentWorkflow> result = agentWorkflowService.findAll(pageParams, criterias
             );
             
             if (result != null && result.getContent() != null) {
@@ -253,10 +254,7 @@ public class AgentDecisionsLogViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            PageResult<PolicyAuditLog> result = businessService.findAllEntity(
-                PolicyAuditLog.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<PolicyAuditLog> result = policyAuditLogService.findAll(pageParams, new Criterias()
             );
             
             if (result != null && result.getContent() != null) {
@@ -365,7 +363,7 @@ public class AgentDecisionsLogViewModel extends MasterPage {
             activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
             activityLog.setAplicacion(ctxBean.getApplicationName());
             activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
+            activityLog = policyService.create(activityLog);
         } catch (Exception e) {
             log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
         }
@@ -396,7 +394,10 @@ public class AgentDecisionsLogViewModel extends MasterPage {
             
             selectedTask = null;
             pageParams = null;
-            businessService = null;
+            policyService = null;
+            policyAuditLogService = null;
+            agentService = null;
+            agentWorkflowService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

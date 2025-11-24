@@ -36,8 +36,13 @@ import com.codeflowx.govern.entity.governance.Policy;
 import com.codeflowx.govern.entity.governance.PolicyEvaluation;
 import com.codeflowx.govern.entity.governance.PolicyRule;
 import com.codeflowx.govern.entity.governance.PolicyViolation;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.procedures.governance.EvaluatePolicy;
 import com.codeflowx.govern.entity.procedures.governance.RunComplianceCheck;
+import com.codeflowx.govern.service.governance.PolicyViolationService;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
+import com.codeflowx.govern.service.governance.PolicyEvaluationService;
+import com.codeflowx.govern.service.governance.PolicyRuleService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -68,15 +73,24 @@ public class GovernanceDetailViewModel extends MasterPage {
     private static final long serialVersionUID = 1L;
 
     // ========== Servicios y contexto Spring ==========
+    @WireVariable private PolicyService policyService;
     @WireVariable private BusinessService businessService;
+    @WireVariable
+    private PolicyRuleService policyRuleService;
+    @WireVariable
+    private PolicyEvaluationService policyEvaluationService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private PolicyViolationService policyViolationService; // Mantener para cargar relaciones
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
 
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // Los Services se inyectan automáticamente mediante @WireVariable
+    }
     }
 
     @Override
@@ -162,7 +176,7 @@ public class GovernanceDetailViewModel extends MasterPage {
         try {
             log.debug("Cargando política ID={}", id);
 
-            currentPolicy = businessService.findById(Policy.class, id);
+            currentPolicy = policyService.findById(id);
 
             if (currentPolicy == null) {
                 log.error("Política no encontrada: ID={}", id);
@@ -260,10 +274,7 @@ public class GovernanceDetailViewModel extends MasterPage {
             criteria.setValueEnd(currentPolicy.getIdxpolicy());
             criterias.addCriteria(criteria);
 
-            PageResult<PolicyRule> result = businessService.findAllEntity(
-                PolicyRule.class,
-                params,
-                criterias
+            PageResult<PolicyRule> result = policyRuleService.findAll(params, criterias
             );
 
             if (result != null && result.getContent() != null) {
@@ -298,10 +309,7 @@ public class GovernanceDetailViewModel extends MasterPage {
             criteria.setValueEnd(currentPolicy.getIdxpolicy());
             criterias.addCriteria(criteria);
 
-            PageResult<PolicyEvaluation> result = businessService.findAllEntity(
-                PolicyEvaluation.class,
-                params,
-                criterias
+            PageResult<PolicyEvaluation> result = policyEvaluationService.findAll(params, criterias
             );
 
             if (result != null && result.getContent() != null) {
@@ -336,10 +344,7 @@ public class GovernanceDetailViewModel extends MasterPage {
             criteria.setValueEnd(currentPolicy.getName());
             criterias.addCriteria(criteria);
 
-            PageResult<PolicyViolation> result = businessService.findAllEntity(
-                PolicyViolation.class,
-                params,
-                criterias
+            PageResult<PolicyViolation> result = policyViolationService.findAll(params, criterias
             );
 
             if (result != null && result.getContent() != null) {
@@ -369,10 +374,7 @@ public class GovernanceDetailViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
 
-            PageResult<ComplianceAssessment> result = businessService.findAllEntity(
-                ComplianceAssessment.class,
-                params,
-                new Criterias()
+            PageResult<ComplianceAssessment> result = complianceAssessmentService.findAll(params, new Criterias()
             );
 
             if (result != null && result.getContent() != null) {
@@ -424,14 +426,13 @@ public class GovernanceDetailViewModel extends MasterPage {
             }
 
             if (currentPolicy.getIdxpolicy() == null) {
-                businessService.save(currentPolicy);
+                currentPolicy = policyService.create(currentPolicy);
                 log.info("Política creada exitosamente: ID={}, nombre={}",
                     currentPolicy.getIdxpolicy(), currentPolicy.getName());
                 Messagebox.show(Labels.getLabel("governance.success.created"),
                     Labels.getLabel("governance.success.title"), Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                currentPolicy.setUpdatedat(new Timestamp(System.currentTimeMillis()));
-                businessService.update(currentPolicy);
+                currentPolicy = policyService.update(currentPolicy);
                 log.info("Política actualizada exitosamente: ID={}, nombre={}",
                     currentPolicy.getIdxpolicy(), currentPolicy.getName());
                 Messagebox.show(Labels.getLabel("governance.success.updated"),
@@ -622,7 +623,11 @@ public class GovernanceDetailViewModel extends MasterPage {
         log.debug("Limpiando recursos del ViewModel");
         
         // Limpiar todas las referencias para facilitar GC
-        businessService = null;
+        policyService = null;
+            policyRuleService = null;
+            policyEvaluationService = null;
+            complianceAssessmentService = null;
+            policyViolationService = null;
         
         log.debug("Recursos limpiados exitosamente");
     }

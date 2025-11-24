@@ -30,11 +30,19 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.views.serving.DeploymentStatus;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.views.serving.EndpointAnalytics;
 import com.codeflowx.govern.entity.views.serving.ServingCostBreakdown;
 import com.codeflowx.govern.entity.views.serving.ServingErrorAnalysis;
 import com.codeflowx.govern.entity.views.serving.ServingPerformanceDashboard;
 import com.codeflowx.govern.entity.views.serving.ServingSlaCompliance;
+import com.codeflowx.govern.service.serving.ServingPerformanceDashboardService;
+import com.codeflowx.govern.service.serving.DeploymentStatusService;
+import com.codeflowx.govern.service.serving.EndpointAnalyticsService;
+import com.codeflowx.govern.service.serving.ServingSlaComplianceService;
+import com.codeflowx.govern.service.serving.ServingErrorAnalysisService;
+import com.codeflowx.govern.service.serving.ServingCostBreakdownService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -56,25 +64,41 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
-    
-    
+    private ModelService modelService;
+
+    @WireVariable
+    private ServingPerformanceDashboardService servingPerformanceDashboardService;
+
+    @WireVariable
+    private DeploymentStatusService deploymentStatusService;
+
+    @WireVariable
+    private EndpointAnalyticsService endpointAnalyticsService;
+
+    @WireVariable
+    private ServingSlaComplianceService servingSlaComplianceService;
+
+    @WireVariable
+    private ServingErrorAnalysisService servingErrorAnalysisService;
+
+    @WireVariable
+    private ServingCostBreakdownService servingCostBreakdownService;
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
-    
+
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // Los servicios se inyectan automáticamente mediante @WireVariable
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -82,7 +106,7 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
 
     // ========== Paginación ==========
     private PageParams pageParams;
-    
+
     // ========== Datos del Dashboard ==========
     private ServingPerformanceDashboard performanceDashboard;
     private List<DeploymentStatus> deploymentStatuses = new ArrayList<>();
@@ -90,7 +114,7 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
     private List<ServingSlaCompliance> slaCompliances = new ArrayList<>();
     private List<ServingErrorAnalysis> errorAnalyses = new ArrayList<>();
     private List<ServingCostBreakdown> costBreakdowns = new ArrayList<>();
-    
+
     // ========== KPIs ==========
     private Long totalEndpoints = 0L;
     private Long activeEndpoints = 0L;
@@ -100,16 +124,16 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
     private Integer slaCompliance = 100;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
         initializePageParams();
-        
+
         log.info("Inicializando ServingDashboardViewModel");
-        
+
         loadPerformanceDashboard();
         loadDeploymentStatuses();
         loadEndpointAnalytics();
@@ -118,7 +142,7 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
         loadCostBreakdowns();
         calculateKPIs();
     }
-    
+
     private void initializePageParams() {
         pageParams = PageParams.builder()
                 .maxRows(20)
@@ -129,128 +153,128 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
                 .build();
     }
 
-    
+
 
     // ========== Carga de Datos ==========
-    
+
     private void loadPerformanceDashboard() {
         try {
             log.debug("Cargando dashboard de performance");
-            
-            PageResult<ServingPerformanceDashboard> result = businessService.findAllView(
-                ServingPerformanceDashboard.class, pageParams, new Criterias()
+
+            PageResult<ServingPerformanceDashboard> result = servingPerformanceDashboardService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 performanceDashboard = result.getContent().get(0);
                 log.info("Dashboard de performance cargado correctamente");
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar dashboard de performance", e);
         }
     }
-    
+
     private void loadDeploymentStatuses() {
         try {
             log.debug("Cargando estados de deployment");
-            
-            PageResult<DeploymentStatus> result = businessService.findAllView(
-                DeploymentStatus.class, pageParams, new Criterias()
+
+            PageResult<DeploymentStatus> result = deploymentStatusService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null) {
                 deploymentStatuses = result.getContent();
                 log.info("Cargados {} estados de deployment", deploymentStatuses.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar estados de deployment", e);
         }
     }
-    
+
     private void loadEndpointAnalytics() {
         try {
             log.debug("Cargando analytics de endpoints");
-            
-            PageResult<EndpointAnalytics> result = businessService.findAllView(
-                EndpointAnalytics.class, pageParams, new Criterias()
+
+            PageResult<EndpointAnalytics> result = endpointAnalyticsService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null) {
                 endpointAnalytics = result.getContent();
                 log.info("Cargados {} analytics de endpoints", endpointAnalytics.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar analytics de endpoints", e);
         }
     }
-    
+
     private void loadSlaCompliances() {
         try {
             log.debug("Cargando SLA compliances");
-            
-            PageResult<ServingSlaCompliance> result = businessService.findAllView(
-                ServingSlaCompliance.class, pageParams, new Criterias()
+
+            PageResult<ServingSlaCompliance> result = servingSlaComplianceService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null) {
                 slaCompliances = result.getContent();
                 log.info("Cargados {} SLA compliances", slaCompliances.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar SLA compliances", e);
         }
     }
-    
+
     private void loadErrorAnalyses() {
         try {
             log.debug("Cargando análisis de errores");
-            
-            PageResult<ServingErrorAnalysis> result = businessService.findAllView(
-                ServingErrorAnalysis.class, pageParams, new Criterias()
+
+            PageResult<ServingErrorAnalysis> result = servingErrorAnalysisService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null) {
                 errorAnalyses = result.getContent();
                 log.info("Cargados {} análisis de errores", errorAnalyses.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar análisis de errores", e);
         }
     }
-    
+
     private void loadCostBreakdowns() {
         try {
             log.debug("Cargando breakdowns de costos");
-            
-            PageResult<ServingCostBreakdown> result = businessService.findAllView(
-                ServingCostBreakdown.class, pageParams, new Criterias()
+
+            PageResult<ServingCostBreakdown> result = servingCostBreakdownService.findAll(
+                pageParams, new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null) {
                 costBreakdowns = result.getContent();
                 log.info("Cargados {} breakdowns de costos", costBreakdowns.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar breakdowns de costos", e);
         }
     }
-    
+
     private void calculateKPIs() {
         try {
             log.debug("Calculando KPIs de serving");
-            
+
             if (performanceDashboard != null) {
                 totalEndpoints = performanceDashboard.getTotalItems() != null ? performanceDashboard.getTotalItems() : 0L;
                 // activeItems es String, no Long - parsear si es necesario
-                activeEndpoints = performanceDashboard.getActiveItems() != null ? 
+                activeEndpoints = performanceDashboard.getActiveItems() != null ?
                     parseLong(performanceDashboard.getActiveItems()) : 0L;
             }
-            
+
             totalRequests = endpointAnalytics.stream()
                 .filter(e -> e.getTotalItems() != null)
                 .mapToLong(e -> e.getTotalItems())
                 .sum();
-            
+
             if (!endpointAnalytics.isEmpty()) {
                 Long totalLatency = endpointAnalytics.stream()
                     .filter(e -> e.getTotalItems() != null)
@@ -259,7 +283,7 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
                 avgLatency = BigDecimal.valueOf(totalLatency)
                     .divide(BigDecimal.valueOf(endpointAnalytics.size()), 2, RoundingMode.HALF_UP);
             }
-            
+
             if (!errorAnalyses.isEmpty()) {
                 Long totalErrors = errorAnalyses.stream()
                     .filter(e -> e.getTotalItems() != null)
@@ -270,21 +294,21 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
                         .setScale(2, RoundingMode.HALF_UP);
                 }
             }
-            
+
             if (!slaCompliances.isEmpty()) {
                 Long compliantCount = slaCompliances.stream()
                     .filter(s -> s.getTotalItems() != null && s.getTotalItems() > 0)
                     .count();
                 slaCompliance = (int) ((compliantCount * 100.0) / slaCompliances.size());
             }
-            
-            log.info("KPIs calculados - Endpoints: {}, Requests: {}, Error Rate: {}%", 
+
+            log.info("KPIs calculados - Endpoints: {}, Requests: {}, Error Rate: {}%",
                 totalEndpoints, totalRequests, errorRate);
         } catch (Exception e) {
             log.error("Error al calcular KPIs", e);
         }
     }
-    
+
     private Long parseLong(String value) {
         try {
             return value != null && !value.trim().isEmpty() ? Long.parseLong(value.trim()) : 0L;
@@ -295,7 +319,7 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
     }
 
     // ========== Comandos ==========
-    
+
     @Command
     @NotifyChange("*")
     public void refreshDashboard() {
@@ -308,18 +332,18 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
             loadErrorAnalyses();
             loadCostBreakdowns();
             calculateKPIs();
-            
-            Messagebox.show("Dashboard actualizado correctamente", "Éxito", 
+
+            Messagebox.show("Dashboard actualizado correctamente", "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
         } catch (Exception e) {
             log.error("Error al refrescar dashboard", e);
-            Messagebox.show("Error al refrescar dashboard: " + e.getMessage(), "Error", 
+            Messagebox.show("Error al refrescar dashboard: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
 
     // ========== Getters ==========
-    
+
     public ServingPerformanceDashboard getPerformanceDashboard() {
         return performanceDashboard;
     }
@@ -369,46 +393,43 @@ public class ServingDashboardViewModel extends MasterPage implements Serializabl
     }
 
     // ========== Cleanup ==========
-    
+
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
         try {
             performanceDashboard = null;
-            
+
             if (deploymentStatuses != null) {
                 deploymentStatuses.clear();
                 deploymentStatuses = null;
             }
-            
+
             if (endpointAnalytics != null) {
                 endpointAnalytics.clear();
                 endpointAnalytics = null;
             }
-            
+
             if (slaCompliances != null) {
                 slaCompliances.clear();
                 slaCompliances = null;
             }
-            
+
             if (errorAnalyses != null) {
                 errorAnalyses.clear();
                 errorAnalyses = null;
             }
-            
+
             if (costBreakdowns != null) {
                 costBreakdowns.clear();
                 costBreakdowns = null;
             }
-            
+
             pageParams = null;
-            businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());
         }
     }
 }
-
-

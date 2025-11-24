@@ -1,10 +1,10 @@
 <?page title="Routing Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
-    
+
     <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundRoutingViewModel')"
          class="content-wrapper" style="min-height: 100vh; background: #f8f9fa;">
-        
+
         <!-- Header -->
         <n:div class="card border-0 shadow-sm mb-4">
             <n:div class="card-body p-4">
@@ -15,7 +15,7 @@
                         </n:h4>
                         <n:p class="text-muted mb-0">Enruta automáticamente consultas al modelo o agente más apropiado</n:p>
                     </n:div>
-                    <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+                    <button label="Nueva Sesión" iconSclass="fas fa-plus"
                             sclass="btn btn-danger"
                             onClick="@command('newSession')"/>
                 </n:div>
@@ -35,18 +35,18 @@
                     <n:div class="card-body p-4">
                         <n:div class="mb-3">
                             <label class="form-label fw-semibold">Consulta / Prompt</label>
-                            <textbox multiline="true" rows="6" 
+                            <textbox multiline="true" rows="6"
                                     value="@bind(vm.inputQuery)"
                                     sclass="form-control"
                                     placeholder="Escribe tu consulta aquí y el sistema la enrutará al modelo o agente más apropiado..."/>
                         </n:div>
 
                         <n:div class="d-flex gap-3 mb-4">
-                            <button label="Analizar y Enrutar" iconSclass="fas fa-play" 
+                            <button label="Analizar y Enrutar" iconSclass="fas fa-play"
                                     sclass="btn btn-danger btn-lg flex-grow-1"
                                     disabled="@load(empty vm.inputQuery)"
                                     onClick="@command('analyzeAndRoute')"/>
-                            <button label="Limpiar" iconSclass="fas fa-eraser" 
+                            <button label="Limpiar" iconSclass="fas fa-eraser"
                                     sclass="btn btn-outline-secondary"
                                     onClick="@command('clear')"/>
                         </n:div>
@@ -56,7 +56,7 @@
                             <n:h6 class="fw-bold mb-3">
                                 <n:i class="fas fa-check-circle text-success me-2"></n:i>Resultado del Routing
                             </n:h6>
-                            
+
                             <n:div class="row g-3 mb-3">
                                 <n:div class="col-md-6">
                                     <n:p class="small text-muted mb-1">Modelo Seleccionado</n:p>
@@ -77,9 +77,9 @@
                             <n:div class="mb-3">
                                 <n:p class="small text-muted mb-1">Confianza del Routing</n:p>
                                 <n:div class="progress" style="height: 25px;">
-                                    <n:div class="progress-bar bg-success" role="progressbar" 
+                                    <n:div class="progress-bar bg-success" role="progressbar"
                                          style="width: ${vm.routingResult.routingconfidence}%"
-                                         aria-valuenow="${vm.routingResult.routingconfidence}" 
+                                         aria-valuenow="${vm.routingResult.routingconfidence}"
                                          aria-valuemin="0" aria-valuemax="100">
                                         <label value="@load(vm.routingResult.routingconfidence)"/>%
                                     </n:div>
@@ -102,10 +102,10 @@
 
                             <n:div class="d-flex justify-content-between align-items-center">
                                 <n:small class="text-muted">
-                                    Tiempo: <label value="@load(vm.routingResult.routingprocessingtime)"/>ms · 
+                                    Tiempo: <label value="@load(vm.routingResult.routingprocessingtime)"/>ms ·
                                     Costo: $<label value="@load(vm.routingResult.routingcost) @converter('formattedNumber', format='0.0000')"/>
                                 </n:small>
-                                <button label="Ver Alternativas" iconSclass="fas fa-list" 
+                                <button label="Ver Alternativas" iconSclass="fas fa-list"
                                         sclass="btn btn-sm btn-outline-primary"
                                         onClick="@command('showAlternatives')"/>
                             </n:div>
@@ -164,7 +164,7 @@
                         <n:i class="fas fa-history me-2"></n:i>Historial de Routings
                     </n:h6>
                     <n:div class="d-flex gap-2">
-                        <combobox placeholder="Filtrar por estado..." 
+                        <combobox placeholder="Filtrar por estado..."
                                  model="@load(vm.availableStatuses)"
                                  selectedItem="@bind(vm.filterStatus)"
                                  sclass="form-control form-control-sm" style="width: 200px;"
@@ -190,7 +190,7 @@
                     </columns>
                     <template name="model">
                         <row>
-                            <label value="@load(each.routinginput)" 
+                            <label value="@load(each.routinginput)"
                                    style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"/>
                             <label value="@load(each.routingselectedmodel)"/>
                             <label value="@load(each.routingselectedagent)"/>
@@ -216,14 +216,14 @@
                                         onClick="@command('rerun', routing=each)"/>
                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                         sclass="btn btn-sm btn-outline-danger"
-                                        onClick="@command('deleteItem', routing=each)"/>
+                                        onClick="@command('deleteRouting', routing=each)"/>
                             </n:div>
                         </row>
                     </template>
                 </grid>
             </n:div>
             <n:div class="card-footer bg-white border-0 p-3" if="${vm.totalSize > vm.pageSize}">
-                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)"
                         activePage="@bind(vm.activePage)" onPaging="@command('changePage')"
                         sclass="pagination pagination-sm justify-content-end mb-0"/>
             </n:div>

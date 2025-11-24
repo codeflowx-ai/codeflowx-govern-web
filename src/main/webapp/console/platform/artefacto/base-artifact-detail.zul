@@ -20,7 +20,7 @@
 					</h:p>
 				</h:div>
 			</h:div>
-			
+
 			<h:div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
 				<h:div class="card">
 					<h:div class="card-header">
@@ -28,7 +28,7 @@
 							<h:div class="flex-grow-1">
 								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
 									onClick="@command('cancelEdit')"
-									sclass="waves-effect waves-light" 
+									sclass="waves-effect waves-light"
 									tooltiptext="Volver">
 								</a>
 							</h:div>
@@ -43,7 +43,7 @@
 							</h:div>
 						</h:div>
 					</h:div><!--header-->
-					
+
 					<h:div class="card-body">
 						<h:div class="row">
 							<!-- Formulario Principal -->
@@ -255,9 +255,9 @@
 									<h:div class="card-body">
 										<tabbox>
 											<tabs>
-												<tab label="Subcatartifactdependencies" onSelect="@command('onSelectArtifactDependencyTab')" />
-												<tab label="Subcatartifactdependencies By Targetartifact" onSelect="@command('onSelectArtifactDependencyTab')" />
-												<tab label="Subcatartifactversions" onSelect="@command('onSelectArtifactVersionTab')" />
+												<tab label="Subcatartifactdependencies" onSelect="@command('onSelectSubcatartifactdependenciesTab')" />
+												<tab label="Subcatartifactdependencies By Targetartifact" onSelect="@command('onSelectSubcatartifactdependenciesByTargetartifactTab')" />
+												<tab label="Subcatartifactversions" onSelect="@command('onSelectSubcatartifactversionsTab')" />
 											</tabs>
 											<tabpanels>
 												<!-- Panel: Subcatartifactdependencies -->
@@ -267,38 +267,40 @@
 															<label value="Subcatartifactdependencies"/>
 														</h:h5>
 														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalArtifactDependencys)"/> 
+															<label value="@load(vm.subcatartifactdependencies.size())"/>
 															<label value="registros"/>
 														</h:span>
 													</h:div>
-													
+
 													<h:div class="table-responsive">
 														<h:table class="table table-hover table-sm">
 															<h:thead class="table-light">
 																<h:tr>
 																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
+																	<h:th><label value="Source Artifact ID"/></h:th>
+																	<h:th><label value="Target Artifact ID"/></h:th>
+																	<h:th><label value="Tipo"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
 																</h:tr>
 															</h:thead>
 															<h:tbody>
 																<forEach items="@load(vm.subcatartifactdependencies)" var="item">
 																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td><label value="@load(item.idxartifactdependency)"/></h:td>
+																		<h:td><label value="@load(item.catdepsourceartifactid)"/></h:td>
+																		<h:td><label value="@load(item.catdeptargetartifactid)"/></h:td>
 																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
+																			<h:span class="badge bg-info">
+																				<label value="@load(item.catdeptype)"/>
 																			</h:span>
 																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																		<h:td><label value="@load(item.catdepdescription)"/></h:td>
 																	</h:tr>
 																</forEach>
 															</h:tbody>
 														</h:table>
 													</h:div>
-													
+
 													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subcatartifactdependencies)">
 														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
 														<h:p class="mt-2">
@@ -313,38 +315,40 @@
 															<label value="Subcatartifactdependencies By Targetartifact"/>
 														</h:h5>
 														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalArtifactDependencys)"/> 
+															<label value="@load(vm.subcatartifactdependenciesByTargetartifact.size())"/>
 															<label value="registros"/>
 														</h:span>
 													</h:div>
-													
+
 													<h:div class="table-responsive">
 														<h:table class="table table-hover table-sm">
 															<h:thead class="table-light">
 																<h:tr>
 																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
+																	<h:th><label value="Source Artifact ID"/></h:th>
+																	<h:th><label value="Target Artifact ID"/></h:th>
+																	<h:th><label value="Tipo"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
 																</h:tr>
 															</h:thead>
 															<h:tbody>
 																<forEach items="@load(vm.subcatartifactdependenciesByTargetartifact)" var="item">
 																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td><label value="@load(item.idxartifactdependency)"/></h:td>
+																		<h:td><label value="@load(item.catdepsourceartifactid)"/></h:td>
+																		<h:td><label value="@load(item.catdeptargetartifactid)"/></h:td>
 																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
+																			<h:span class="badge bg-info">
+																				<label value="@load(item.catdeptype)"/>
 																			</h:span>
 																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																		<h:td><label value="@load(item.catdepdescription)"/></h:td>
 																	</h:tr>
 																</forEach>
 															</h:tbody>
 														</h:table>
 													</h:div>
-													
+
 													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subcatartifactdependenciesByTargetartifact)">
 														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
 														<h:p class="mt-2">
@@ -359,38 +363,40 @@
 															<label value="Subcatartifactversions"/>
 														</h:h5>
 														<h:span class="badge bg-primary">
-															<label value="@load(vm.totalArtifactVersions)"/> 
+															<label value="@load(vm.subcatartifactversions.size())"/>
 															<label value="registros"/>
 														</h:span>
 													</h:div>
-													
+
 													<h:div class="table-responsive">
 														<h:table class="table table-hover table-sm">
 															<h:thead class="table-light">
 																<h:tr>
 																	<h:th><label value="ID"/></h:th>
-																	<h:th><label value="Nombre"/></h:th>
-																	<h:th><label value="Estado"/></h:th>
-																	<h:th><label value="Fecha"/></h:th>
+																	<h:th><label value="Artifact ID"/></h:th>
+																	<h:th><label value="Número de Versión"/></h:th>
+																	<h:th><label value="Descripción"/></h:th>
+																	<h:th><label value="URI"/></h:th>
 																</h:tr>
 															</h:thead>
 															<h:tbody>
 																<forEach items="@load(vm.subcatartifactversions)" var="item">
 																	<h:tr>
-																		<h:td><label value="@load(item.id)"/></h:td>
-																		<h:td><label value="@load(item.name)"/></h:td>
+																		<h:td><label value="@load(item.idxartifactversion)"/></h:td>
+																		<h:td><label value="@load(item.catverartifactid)"/></h:td>
 																		<h:td>
-																			<h:span class="badge bg-success">
-																				<label value="@load(item.status)"/>
+																			<h:span class="badge bg-primary">
+																				<label value="@load(item.catverversionnumber)"/>
 																			</h:span>
 																		</h:td>
-																		<h:td><label value="@load(item.createdAt)"/></h:td>
+																		<h:td><label value="@load(item.catverdescription)"/></h:td>
+																		<h:td><label value="@load(item.catveruri)"/></h:td>
 																	</h:tr>
 																</forEach>
 															</h:tbody>
 														</h:table>
 													</h:div>
-													
+
 													<h:div class="text-center text-muted py-3" visible="@load(empty vm.subcatartifactversions)">
 														<h:i class="fas fa-inbox" style="font-size: 48px;"></h:i>
 														<h:p class="mt-2">

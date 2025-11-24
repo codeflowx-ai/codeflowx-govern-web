@@ -32,6 +32,8 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.agents.AgentApproval;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.agents.AgentApprovalService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,6 +58,9 @@ public class AgentApprovalDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentApprovalService agentApprovalService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -177,7 +182,7 @@ public class AgentApprovalDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentApproval = businessService.findById(AgentApproval.class, id);
+            currentAgentApproval = agentApprovalService.findById(id);
             
             if (currentAgentApproval == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -204,8 +209,15 @@ public class AgentApprovalDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "AGTAGENTAPPROVALS", id, "Consulta: " + currentAgentApproval.getAgtapprovername());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -228,14 +240,14 @@ public class AgentApprovalDetailViewModel extends MasterPage {
             boolean isNew = currentAgentApproval.getIdxagentapproval() == null;
             
             if (isNew) {
-                businessService.save(currentAgentApproval);
+                currentAgentApproval = agentApprovalService.create(currentAgentApproval);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTAPPROVALS", currentAgentApproval.getIdxagentapproval(), 
                     "Creado: " + currentAgentApproval.getAgtapprovername());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentApproval);
+                currentAgentApproval = agentApprovalService.update(currentAgentApproval);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTAPPROVALS", currentAgentApproval.getIdxagentapproval(), 
                     "Actualizado: " + currentAgentApproval.getAgtapprovername());
@@ -248,8 +260,12 @@ public class AgentApprovalDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/agents/agents-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }

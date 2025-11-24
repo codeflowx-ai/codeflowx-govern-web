@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentCommunication;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentCommunicationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentCommunicationDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentCommunicationService agentCommunicationService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -176,7 +181,7 @@ public class AgentCommunicationDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentCommunication = businessService.findById(AgentCommunication.class, id);
+            currentAgentCommunication = agentCommunicationService.findById(id);
             
             if (currentAgentCommunication == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -226,14 +231,14 @@ public class AgentCommunicationDetailViewModel extends MasterPage {
             boolean isNew = currentAgentCommunication.getIdxagentcommunication() == null;
             
             if (isNew) {
-                businessService.save(currentAgentCommunication);
+                currentAgentCommunication = agentCommunicationService.create(currentAgentCommunication);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTCOMMUNICATIONS", currentAgentCommunication.getIdxagentcommunication(), 
                     "Creado: " + currentAgentCommunication.getIdxagentcommunication());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentCommunication);
+                currentAgentCommunication = agentCommunicationService.update(currentAgentCommunication);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTCOMMUNICATIONS", currentAgentCommunication.getIdxagentcommunication(), 
                     "Actualizado: " + currentAgentCommunication.getIdxagentcommunication());

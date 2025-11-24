@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentCompliance;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentComplianceService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentComplianceDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentComplianceService agentComplianceService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -177,7 +182,7 @@ public class AgentComplianceDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentCompliance = businessService.findById(AgentCompliance.class, id);
+            currentAgentCompliance = agentComplianceService.findById(id);
             
             if (currentAgentCompliance == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -228,14 +233,14 @@ public class AgentComplianceDetailViewModel extends MasterPage {
             boolean isNew = currentAgentCompliance.getIdxagentcompliance() == null;
             
             if (isNew) {
-                businessService.save(currentAgentCompliance);
+                currentAgentCompliance = agentComplianceService.create(currentAgentCompliance);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTCOMPLIANCE", currentAgentCompliance.getIdxagentcompliance(), 
                     "Creado: " + currentAgentCompliance.getAgtassessorname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentCompliance);
+                currentAgentCompliance = agentComplianceService.update(currentAgentCompliance);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTCOMPLIANCE", currentAgentCompliance.getIdxagentcompliance(), 
                     "Actualizado: " + currentAgentCompliance.getAgtassessorname());

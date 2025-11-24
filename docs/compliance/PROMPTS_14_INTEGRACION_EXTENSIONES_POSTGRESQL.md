@@ -73,139 +73,95 @@ ORDER BY table_name;
 
 ---
 
-### PROMPT 14.2: Crear Tabla cor_auditlog con Hash Chain
+### PROMPT 14.2: Fortalecer `IMLIMMUTABLELOGS` con Hash Chain (tabla real)
 
-**Objetivo:** Implementar logs inmutables EU AI Act Art. 19 usando pgcrypto.
-
-**SQL:**
+> Corrección 2025-11-16: en lugar de crear `cor_auditlog`, reutilizamos la tabla existente `IMLIMMUTABLELOGS` (ver `ImmutableLog.java`). Sólo añadimos triggers/extensiones sobre sus columnas reales (`IMLACTION`, `IMLENTITYTYPE`, etc.).
 
 ```sql
--- Tabla audit logs con hash chain automático
-CREATE TABLE cor_auditlog (
-    idxauditlog BIGSERIAL PRIMARY KEY,
-    iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
-    
-    -- Datos del evento
-    action VARCHAR(50) NOT NULL,  -- 'CREATE', 'UPDATE', 'DELETE', 'APPROVE', 'DEPLOY'
-    entity VARCHAR(100) NOT NULL,  -- 'MODEL', 'DEPLOYMENT', 'EVALUATION', etc.
-    entityid BIGINT,
-    userid BIGINT,
-    timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-    payload JSONB,
-    
-    -- Contexto
-    ip_address INET,
-    user_agent TEXT,
-    session_id VARCHAR(100),
-    
-    -- Hash chain (Art. 19 - inmutabilidad criptográfica)
-    previous_hash VARCHAR(64),
-    current_hash VARCHAR(64),
-    
-    -- Metadata
-    createdat TIMESTAMP NOT NULL DEFAULT NOW(),
-    
-    -- Índices
-    INDEX idx_auditlog_timestamp (timestamp DESC),
-    INDEX idx_auditlog_entity (entity, entityid),
-    INDEX idx_auditlog_user (userid),
-    INDEX idx_auditlog_action (action),
-    INDEX idx_auditlog_hash (current_hash)
-);
+-- Estructura (ya existe) para referencia
+\d+ IMLIMMUTABLELOGS;
 
--- Función: Calcular hash automáticamente
-CREATE OR REPLACE FUNCTION calculate_audit_hash()
+-- Función: calcular hash automáticamente usando columnas reales
+CREATE OR REPLACE FUNCTION iml_calculate_hash()
 RETURNS TRIGGER AS $$
 DECLARE
     last_hash VARCHAR(64);
     hash_input TEXT;
 BEGIN
-    -- Obtener hash del último registro
-    SELECT current_hash INTO last_hash
-    FROM cor_auditlog
-    ORDER BY idxauditlog DESC
+    SELECT IMLCURRENTHASH INTO last_hash
+    FROM IMLIMMUTABLELOGS
+    ORDER BY IDXIMMUTABLELOG DESC
     LIMIT 1;
-    
-    -- Si es el primer registro
+
     IF last_hash IS NULL THEN
         last_hash := 'GENESIS_BLOCK_CODEFLOWX_GOVERN';
     END IF;
-    
-    NEW.previous_hash := last_hash;
-    
-    -- Calcular hash actual (SHA256)
-    hash_input := COALESCE(last_hash, '') ||
-                  NEW.action ||
-                  NEW.entity ||
-                  COALESCE(NEW.entityid::TEXT, '') ||
-                  COALESCE(NEW.userid::TEXT, '') ||
-                  NEW.timestamp::TEXT ||
-                  COALESCE(NEW.payload::TEXT, '');
-    
-    NEW.current_hash := encode(
-        digest(hash_input, 'sha256'),
-        'hex'
-    );
-    
+
+    NEW.IMLPREVIOUSHASH := last_hash;
+
+    hash_input :=
+        last_hash ||
+        NEW.IMLACTION ||
+        NEW.IMLENTITYTYPE ||
+        COALESCE(NEW.IMLENTITYID::TEXT, '') ||
+        COALESCE(NEW.IMLUSERID::TEXT, '') ||
+        NEW.IMLTIMESTAMP::TEXT ||
+        COALESCE(NEW.IMLDATA::TEXT, '');
+
+    NEW.IMLCURRENTHASH := encode(digest(hash_input, 'sha256'), 'hex');
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Trigger: Aplicar antes de INSERT
-CREATE TRIGGER trg_audit_hash_chain
-    BEFORE INSERT ON cor_auditlog
+CREATE TRIGGER trg_iml_hash_chain
+    BEFORE INSERT ON IMLIMMUTABLELOGS
     FOR EACH ROW
-    EXECUTE FUNCTION calculate_audit_hash();
+    EXECUTE FUNCTION iml_calculate_hash();
 
--- Trigger: PREVENIR UPDATE/DELETE (inmutabilidad Art. 19)
-CREATE OR REPLACE FUNCTION prevent_audit_modification()
+-- Triggers para prevenir UPDATE/DELETE sobre los logs reales
+CREATE OR REPLACE FUNCTION iml_prevent_mutations()
 RETURNS TRIGGER AS $$
 BEGIN
-    RAISE EXCEPTION 'Audit logs are immutable per EU AI Act Art. 19. Attempted action: %, Entity: %, ID: %',
-        TG_OP, OLD.entity, OLD.idxauditlog;
+    RAISE EXCEPTION 'IML logs are immutable per EU AI Act Art. 19. Attempted action: %, ID: %',
+        TG_OP,
+        COALESCE(OLD.IDXIMMUTABLELOG::TEXT, NEW.IDXIMMUTABLELOG::TEXT);
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trg_prevent_audit_update
-    BEFORE UPDATE ON cor_auditlog
+CREATE TRIGGER trg_iml_no_update
+    BEFORE UPDATE ON IMLIMMUTABLELOGS
     FOR EACH ROW
-    EXECUTE FUNCTION prevent_audit_modification();
+    EXECUTE FUNCTION iml_prevent_mutations();
 
-CREATE TRIGGER trg_prevent_audit_delete
-    BEFORE DELETE ON cor_auditlog
+CREATE TRIGGER trg_iml_no_delete
+    BEFORE DELETE ON IMLIMMUTABLELOGS
     FOR EACH ROW
-    EXECUTE FUNCTION prevent_audit_modification();
+    EXECUTE FUNCTION iml_prevent_mutations();
 
--- Convertir a hypertable TimescaleDB (series temporales)
-SELECT create_hypertable('cor_auditlog', 'timestamp', if_not_exists => TRUE);
-
--- Política retención: 10 años (Art. 19 + Art. 15)
-SELECT add_retention_policy('cor_auditlog', INTERVAL '10 years', if_not_exists => TRUE);
-
--- Compresión datos > 90 días
-SELECT add_compression_policy('cor_auditlog', INTERVAL '90 days', if_not_exists => TRUE);
+-- TimescaleDB sobre la columna real IMLTIMESTAMP
+SELECT create_hypertable('IMLIMMUTABLELOGS', 'IMLTIMESTAMP', if_not_exists => TRUE);
+SELECT add_retention_policy('IMLIMMUTABLELOGS', INTERVAL '10 years', if_not_exists => TRUE);
+SELECT add_compression_policy('IMLIMMUTABLELOGS', INTERVAL '90 days', if_not_exists => TRUE);
 ```
 
-**Validación:**
-```sql
--- Test 1: Insertar log
-INSERT INTO cor_auditlog (action, entity, entityid, userid, payload)
-VALUES ('CREATE', 'MODEL', 123, 1, '{"modelname": "test_model"}'::jsonb);
+**Validación (columnas reales):**
 
--- Test 2: Verificar hash chain
+```sql
+INSERT INTO IMLIMMUTABLELOGS (IMLACTION, IMLENTITYTYPE, IMLENTITYID, IMLUSERID, IMLDATA)
+VALUES ('CREATE', 'MODEL', 123, 1, '{"MODNAME": "test_model"}');
+
 SELECT 
-    idxauditlog,
-    action,
-    entity,
-    LEFT(previous_hash, 8) || '...' AS prev_hash,
-    LEFT(current_hash, 8) || '...' AS curr_hash
-FROM cor_auditlog
-ORDER BY idxauditlog DESC
+    IDXIMMUTABLELOG,
+    IMLACTION,
+    IMLENTITYTYPE,
+    LEFT(IMLPREVIOUSHASH, 8) || '...' AS prev_hash,
+    LEFT(IMLCURRENTHASH, 8) || '...' AS curr_hash
+FROM IMLIMMUTABLELOGS
+ORDER BY IDXIMMUTABLELOG DESC
 LIMIT 5;
 
--- Test 3: Intentar modificar (debe fallar)
-UPDATE cor_auditlog SET action = 'MODIFIED' WHERE idxauditlog = 1;
--- ERROR: Audit logs are immutable per EU AI Act Art. 19
+UPDATE IMLIMMUTABLELOGS SET IMLACTION = 'MODIFIED' WHERE IDXIMMUTABLELOG = 1;
+-- ERROR esperado: IML logs are immutable per EU AI Act Art. 19
 ```
 
 ---
@@ -243,7 +199,7 @@ RETURNS TABLE (
             previous_hash,
             current_hash,
             LAG(current_hash) OVER (ORDER BY idxauditlog) AS expected_previous_hash
-        FROM cor_auditlog
+        FROM IMLIMMUTABLELOGS
         WHERE (start_id IS NULL OR idxauditlog >= start_id)
           AND (end_id IS NULL OR idxauditlog <= end_id)
         ORDER BY idxauditlog
@@ -343,19 +299,19 @@ public void verifyAuditIntegrity() {
 
 ## GRUPO 2: Implementar Linaje Modelos con ltree (Art. 53 GPAI)
 
-### PROMPT 14.4: Crear Tabla cor_model_lineage
+### PROMPT 14.4: Crear Tabla MODMODELLINEAGE
 
 **Objetivo:** Implementar linaje jerárquico para GPAI (Art. 53).
 
 **SQL:**
 
 ```sql
-CREATE TABLE cor_model_lineage (
+CREATE TABLE MODMODELLINEAGE (
     idxlineage BIGSERIAL PRIMARY KEY,
     iduuid UUID NOT NULL DEFAULT uuid_generate_v4() UNIQUE,
     
     -- Referencia al modelo
-    idxmodel BIGINT NOT NULL REFERENCES cor_model(idxmodel) ON DELETE CASCADE,
+    idxmodel BIGINT NOT NULL REFERENCES MODMODELS(idxmodel) ON DELETE CASCADE,
     
     -- Ruta jerárquica (CRITICAL!)
     lineage_path ltree NOT NULL UNIQUE,
@@ -365,7 +321,7 @@ CREATE TABLE cor_model_lineage (
     -- 'BASE', 'FINETUNE', 'ADAPTER', 'MERGE', 'QUANTIZATION', 'PRUNING'
     
     -- Padre en el linaje
-    parent_idxmodel BIGINT REFERENCES cor_model(idxmodel),
+    parent_idxmodel BIGINT REFERENCES MODMODELS(idxmodel),
     parent_lineage_path ltree,
     
     -- Metadata modificación
@@ -411,7 +367,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF NEW.parent_idxmodel IS NOT NULL THEN
         SELECT lineage_path INTO NEW.parent_lineage_path
-        FROM cor_model_lineage
+        FROM MODMODELLINEAGE
         WHERE idxmodel = NEW.parent_idxmodel;
     END IF;
     RETURN NEW;
@@ -419,7 +375,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_populate_parent_lineage
-    BEFORE INSERT OR UPDATE ON cor_model_lineage
+    BEFORE INSERT OR UPDATE ON MODMODELLINEAGE
     FOR EACH ROW
     WHEN (NEW.parent_idxmodel IS NOT NULL)
     EXECUTE FUNCTION populate_parent_lineage();
@@ -445,7 +401,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trg_validate_lineage_path
-    BEFORE INSERT OR UPDATE ON cor_model_lineage
+    BEFORE INSERT OR UPDATE ON MODMODELLINEAGE
     FOR EACH ROW
     EXECUTE FUNCTION validate_lineage_path();
 ```
@@ -454,11 +410,11 @@ CREATE TRIGGER trg_validate_lineage_path
 
 ```sql
 -- Ejemplo 1: Modelo base
-INSERT INTO cor_model_lineage (idxmodel, lineage_path, modification_type, substantial)
+INSERT INTO MODMODELLINEAGE (idxmodel, lineage_path, modification_type, substantial)
 VALUES (123, 'llama3_70b', 'BASE', true);
 
 -- Ejemplo 2: Fine-tune
-INSERT INTO cor_model_lineage (
+INSERT INTO MODMODELLINEAGE (
     idxmodel, 
     lineage_path, 
     parent_idxmodel, 
@@ -478,7 +434,7 @@ VALUES (
 );
 
 -- Ejemplo 3: Adapter (no sustancial)
-INSERT INTO cor_model_lineage (
+INSERT INTO MODMODELLINEAGE (
     idxmodel, 
     lineage_path, 
     parent_idxmodel, 
@@ -496,7 +452,7 @@ VALUES (
 );
 
 -- Ejemplo 4: Merge (sustancial)
-INSERT INTO cor_model_lineage (
+INSERT INTO MODMODELLINEAGE (
     idxmodel, 
     lineage_path, 
     parent_idxmodel, 
@@ -522,7 +478,7 @@ SELECT
     modification_type,
     substantial,
     modification_date::DATE
-FROM cor_model_lineage
+FROM MODMODELLINEAGE
 WHERE lineage_path <@ 'llama3_70b'
 ORDER BY lineage_path;
 ```
@@ -541,7 +497,7 @@ CREATE OR REPLACE VIEW v_model_lineage_tree AS
 SELECT
     l.idxlineage,
     l.idxmodel,
-    m.modelname,
+    m.MODNAME,
     l.lineage_path,
     ltree2text(l.lineage_path) AS path_text,
     nlevel(l.lineage_path) AS depth,
@@ -553,21 +509,21 @@ SELECT
     l.parameter_change_pct,
     l.performance_delta,
     l.requires_gpai_assessment,
-    m.modeltype,
+    m.MODTYPE,
     m.riskclassification,
     m.gpaiclassification,
     pm.idxmodel AS parent_idxmodel,
-    pm.modelname AS parent_modelname
-FROM cor_model_lineage l
-JOIN cor_model m ON l.idxmodel = m.idxmodel
-LEFT JOIN cor_model_lineage pl ON l.parent_idxmodel = pl.idxmodel
-LEFT JOIN cor_model pm ON pl.idxmodel = pm.idxmodel;
+    pm.MODNAME AS parent_MODNAME
+FROM MODMODELLINEAGE l
+JOIN MODMODELS m ON l.idxmodel = m.idxmodel
+LEFT JOIN MODMODELLINEAGE pl ON l.parent_idxmodel = pl.idxmodel
+LEFT JOIN MODMODELS pm ON pl.idxmodel = pm.idxmodel;
 
 -- Función: Obtener ancestros (path completo hasta base)
 CREATE OR REPLACE FUNCTION get_model_ancestry(model_id BIGINT)
 RETURNS TABLE (
     idxmodel BIGINT,
-    modelname VARCHAR,
+    MODNAME VARCHAR,
     depth INT,
     modification_type VARCHAR,
     substantial BOOLEAN,
@@ -575,16 +531,16 @@ RETURNS TABLE (
 ) AS $$
     SELECT 
         l.idxmodel,
-        m.modelname,
+        m.MODNAME,
         nlevel(l.lineage_path) AS depth,
         l.modification_type,
         l.substantial,
         l.lineage_path
-    FROM cor_model_lineage l
-    JOIN cor_model m ON l.idxmodel = m.idxmodel
+    FROM MODMODELLINEAGE l
+    JOIN MODMODELS m ON l.idxmodel = m.idxmodel
     WHERE l.lineage_path @> (
         SELECT lineage_path 
-        FROM cor_model_lineage 
+        FROM MODMODELLINEAGE 
         WHERE idxmodel = model_id
     )
     ORDER BY nlevel(l.lineage_path);
@@ -594,7 +550,7 @@ $$ LANGUAGE SQL STABLE;
 CREATE OR REPLACE FUNCTION get_model_descendants(model_id BIGINT)
 RETURNS TABLE (
     idxmodel BIGINT,
-    modelname VARCHAR,
+    MODNAME VARCHAR,
     depth INT,
     modification_type VARCHAR,
     substantial BOOLEAN,
@@ -602,16 +558,16 @@ RETURNS TABLE (
 ) AS $$
     SELECT 
         l.idxmodel,
-        m.modelname,
+        m.MODNAME,
         nlevel(l.lineage_path) AS depth,
         l.modification_type,
         l.substantial,
         l.lineage_path
-    FROM cor_model_lineage l
-    JOIN cor_model m ON l.idxmodel = m.idxmodel
+    FROM MODMODELLINEAGE l
+    JOIN MODMODELS m ON l.idxmodel = m.idxmodel
     WHERE l.lineage_path <@ (
         SELECT lineage_path 
-        FROM cor_model_lineage 
+        FROM MODMODELLINEAGE 
         WHERE idxmodel = model_id
     )
     AND l.idxmodel != model_id
@@ -622,7 +578,7 @@ $$ LANGUAGE SQL STABLE;
 CREATE OR REPLACE VIEW v_model_impact_analysis AS
 SELECT
     base.idxmodel AS base_idxmodel,
-    base.modelname AS base_modelname,
+    base.MODNAME AS base_MODNAME,
     base.lineage_path,
     
     -- Descendientes directos
@@ -642,19 +598,19 @@ SELECT
     
     -- En producción
     COUNT(DISTINCT d.idxdeployment) AS active_deployments
-FROM cor_model_lineage base
-JOIN cor_model m ON base.idxmodel = m.idxmodel
-LEFT JOIN cor_model_lineage desc 
+FROM MODMODELLINEAGE base
+JOIN MODMODELS m ON base.idxmodel = m.idxmodel
+LEFT JOIN MODMODELLINEAGE desc 
     ON desc.lineage_path <@ base.lineage_path 
     AND desc.idxmodel != base.idxmodel
-LEFT JOIN cor_deployment d ON desc.idxmodel = d.idxmodel AND d.status = 'ACTIVE'
-GROUP BY base.idxmodel, base.modelname, base.lineage_path;
+LEFT JOIN srvdeployment d ON desc.idxmodel = d.idxmodel AND d.status = 'ACTIVE'
+GROUP BY base.idxmodel, base.MODNAME, base.lineage_path;
 
 -- Vista: Compliance GPAI Art. 53
 CREATE OR REPLACE VIEW v_gpai_compliance_art53 AS
 SELECT
     l.idxlineage,
-    m.modelname,
+    m.MODNAME,
     m.gpaiclassification,
     l.lineage_path,
     l.modification_type,
@@ -675,12 +631,12 @@ SELECT
         THEN 'COMPLIANT'
         ELSE 'MISSING_DOCUMENTATION'
     END AS compliance_status
-FROM cor_model_lineage l
-JOIN cor_model m ON l.idxmodel = m.idxmodel
+FROM MODMODELLINEAGE l
+JOIN MODMODELS m ON l.idxmodel = m.idxmodel
 LEFT JOIN cor_technicaldoc td ON m.idxmodel = td.idxmodel
 WHERE m.gpaiclassification IN ('GPAI_SYSTEMIC', 'GPAI_STANDARD')
   AND l.modification_type != 'BASE'
-GROUP BY l.idxlineage, m.modelname, m.gpaiclassification, l.lineage_path,
+GROUP BY l.idxlineage, m.MODNAME, m.gpaiclassification, l.lineage_path,
          l.modification_type, l.modification_date, l.substantial, l.requires_gpai_assessment;
 ```
 
@@ -692,7 +648,7 @@ GROUP BY l.idxlineage, m.modelname, m.gpaiclassification, l.lineage_path,
 public void loadModelLineage(@BindingParam("modelId") Long modelId) {
     String sql = """
         SELECT 
-            REPEAT('  ', depth - 1) || '└─ ' || modelname AS tree_display,
+            REPEAT('  ', depth - 1) || '└─ ' || MODNAME AS tree_display,
             modification_type,
             substantial,
             modification_date::DATE AS mod_date,
@@ -776,9 +732,9 @@ SELECT create_hypertable(
 SELECT add_retention_policy('cor_predictionlog', INTERVAL '6 months', if_not_exists => TRUE);
 SELECT add_compression_policy('cor_predictionlog', INTERVAL '7 days', if_not_exists => TRUE);
 
--- 5. cor_auditlog (ya creado en PROMPT 14.2, confirmar políticas)
-SELECT add_retention_policy('cor_auditlog', INTERVAL '10 years', if_not_exists => TRUE);
-SELECT add_compression_policy('cor_auditlog', INTERVAL '90 days', if_not_exists => TRUE);
+-- 5. IMLIMMUTABLELOGS (ya creado en PROMPT 14.2, confirmar políticas)
+SELECT add_retention_policy('IMLIMMUTABLELOGS', INTERVAL '10 years', if_not_exists => TRUE);
+SELECT add_compression_policy('IMLIMMUTABLELOGS', INTERVAL '90 days', if_not_exists => TRUE);
 ```
 
 **Verificación:**
@@ -819,13 +775,13 @@ public void loadDailyMetrics() {
     String sql = """
         SELECT 
             day::DATE,
-            modelname,
+            MODNAME,
             ROUND(avg_accuracy::NUMERIC, 4) AS accuracy,
             eval_count,
             meets_accuracy_threshold
         FROM mv_model_daily_metrics
         WHERE day >= CURRENT_DATE - INTERVAL '30 days'
-        ORDER BY day DESC, modelname
+        ORDER BY day DESC, MODNAME
         LIMIT 100
         """;
     
@@ -844,30 +800,30 @@ public void loadDailyMetrics() {
 **SQL:**
 
 ```sql
--- 1. rag_chunks (si no existe ya)
-ALTER TABLE rag_chunks 
+-- 1. RAGCHUNKS (si no existe ya)
+ALTER TABLE RAGCHUNKS 
 ADD COLUMN IF NOT EXISTS embedding vector(1536);  -- OpenAI ada-002
 
 -- Índice HNSW (rápido, preciso)
 CREATE INDEX IF NOT EXISTS idx_chunks_embedding_hnsw 
-ON rag_chunks 
+ON RAGCHUNKS 
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
--- 2. gov_prompt (detectar duplicados)
-ALTER TABLE gov_prompt 
+-- 2. PRMPROMPTS (detectar duplicados)
+ALTER TABLE PRMPROMPTS 
 ADD COLUMN IF NOT EXISTS embedding vector(1536);
 
 CREATE INDEX IF NOT EXISTS idx_prompt_embedding_hnsw 
-ON gov_prompt 
+ON PRMPROMPTS 
 USING hnsw (embedding vector_cosine_ops);
 
--- 3. cor_model (clustering capacidades)
-ALTER TABLE cor_model 
+-- 3. MODMODELS (clustering capacidades)
+ALTER TABLE MODMODELS 
 ADD COLUMN IF NOT EXISTS capabilities_embedding vector(384);  -- MiniLM
 
 CREATE INDEX IF NOT EXISTS idx_model_capabilities_hnsw 
-ON cor_model 
+ON MODMODELS 
 USING hnsw (capabilities_embedding vector_cosine_ops);
 ```
 
@@ -888,14 +844,14 @@ Ver `/docs/arquitectura/POSTGRESQL_QUERIES_VISTAS_OPTIMIZADAS.md` sección "Bús
 ```sql
 -- 1. Modelos
 CREATE INDEX IF NOT EXISTS idx_model_name_trgm 
-ON cor_model USING gin (modelname gin_trgm_ops);
+ON MODMODELS USING gin (MODNAME gin_trgm_ops);
 
 CREATE INDEX IF NOT EXISTS idx_model_desc_trgm 
-ON cor_model USING gin (modeldescription gin_trgm_ops);
+ON MODMODELS USING gin (MODDESCRIPTION gin_trgm_ops);
 
 -- 2. Prompts
 CREATE INDEX IF NOT EXISTS idx_prompt_text_trgm 
-ON gov_prompt USING gin (prompttext gin_trgm_ops);
+ON PRMPROMPTS USING gin (prompttext gin_trgm_ops);
 
 -- 3. Usuarios
 CREATE INDEX IF NOT EXISTS idx_user_name_trgm 
@@ -922,44 +878,44 @@ Ver `/docs/arquitectura/POSTGRESQL_QUERIES_VISTAS_OPTIMIZADAS.md` sección "Bús
 
 ```sql
 -- 1. Hyperparámetros modelos
-ALTER TABLE cor_model 
+ALTER TABLE MODMODELS 
 ADD COLUMN IF NOT EXISTS hyperparameters hstore;
 
 CREATE INDEX IF NOT EXISTS idx_model_hyperparams 
-ON cor_model USING gin (hyperparameters);
+ON MODMODELS USING gin (hyperparameters);
 
 -- 2. Metadata evaluaciones
-ALTER TABLE cor_evaluation 
+ALTER TABLE GOVMODELEVALUATIONS 
 ADD COLUMN IF NOT EXISTS metadata hstore;
 
 CREATE INDEX IF NOT EXISTS idx_eval_metadata 
-ON cor_evaluation USING gin (metadata);
+ON GOVMODELEVALUATIONS USING gin (metadata);
 
 -- 3. Configuración deployments
-ALTER TABLE cor_deployment 
+ALTER TABLE srvdeployment 
 ADD COLUMN IF NOT EXISTS config hstore;
 
 CREATE INDEX IF NOT EXISTS idx_deployment_config 
-ON cor_deployment USING gin (config);
+ON srvdeployment USING gin (config);
 ```
 
 **Ejemplos uso:**
 
 ```sql
 -- Insertar hyperparámetros
-UPDATE cor_model 
+UPDATE MODMODELS 
 SET hyperparameters = 'learning_rate=>0.0001, batch_size=>32, epochs=>5, optimizer=>AdamW'::hstore
 WHERE idxmodel = 123;
 
 -- Query por hyperparámetro específico
-SELECT modelname, hyperparameters->'learning_rate' AS lr
-FROM cor_model
+SELECT MODNAME, hyperparameters->'learning_rate' AS lr
+FROM MODMODELS
 WHERE hyperparameters ? 'learning_rate'
   AND (hyperparameters->'learning_rate')::FLOAT < 0.001;
 
 -- Buscar modelos con configuración específica
-SELECT modelname
-FROM cor_model
+SELECT MODNAME
+FROM MODMODELS
 WHERE hyperparameters @> 'optimizer=>AdamW, epochs=>5'::hstore;
 ```
 
@@ -976,11 +932,11 @@ WHERE hyperparameters @> 'optimizer=>AdamW, epochs=>5'::hstore;
 ```sql
 -- 1. Búsqueda modelos por tipo + nombre fuzzy
 CREATE INDEX idx_model_type_name_gin 
-ON cor_model USING gin (modeltype, modelname gin_trgm_ops);
+ON MODMODELS USING gin (MODTYPE, MODNAME gin_trgm_ops);
 
 -- 2. Audit logs por entity + timestamp
 CREATE INDEX idx_audit_entity_timestamp_gist 
-ON cor_auditlog USING gist (entity, timestamp);
+ON IMLIMMUTABLELOGS USING gist (entity, timestamp);
 
 -- 3. Evaluaciones por modelo + fecha
 CREATE INDEX idx_eval_model_date_gist 
@@ -988,7 +944,7 @@ ON eval_modelmetrics USING gist (idxmodel, createdat);
 
 -- 4. Prompts por tipo + embedding
 CREATE INDEX idx_prompt_type_embedding_gin 
-ON gov_prompt USING gin (prompttype, embedding vector_cosine_ops);
+ON PRMPROMPTS USING gin (prompttype, embedding vector_cosine_ops);
 ```
 
 ---
@@ -1016,7 +972,7 @@ RETURNS TEXT AS $$
 $$ LANGUAGE SQL IMMUTABLE;
 
 -- Uso: Logs con datos personales
-INSERT INTO cor_auditlog (action, entity, payload)
+INSERT INTO IMLIMMUTABLELOGS (action, entity, payload)
 VALUES ('LOGIN', 'USER', jsonb_build_object('email', pseudonymize('user@example.com')));
 
 -- 3. Calcular similitud texto (wrapper pg_trgm)
@@ -1062,7 +1018,7 @@ CREATE TABLE govgovernanceevents (
     govoutputtext TEXT,
     govoutputmetadata JSONB,           -- tokens, confidence, latency
     govmodelprovider VARCHAR(50),
-    govmodelname VARCHAR(80),
+    govMODNAME VARCHAR(80),
     govtemperature NUMERIC(4,3),
     govriskflags JSONB,                -- array de flags PII, BIAS, SENSITIVE_TOPIC
     govstatus VARCHAR(20) NOT NULL DEFAULT 'PENDING',
@@ -1314,7 +1270,7 @@ SELECT
 FROM (
     SELECT *, 
            (current_hash = encode(digest(COALESCE(previous_hash,'GENESIS_BLOCK_CODEFLOWX_GOVERN')||action||entity||timestamp::TEXT, 'sha256'), 'hex')) AS is_valid
-    FROM cor_auditlog
+    FROM IMLIMMUTABLELOGS
     LIMIT 100
 ) t;
 
@@ -1324,7 +1280,7 @@ SELECT
     COUNT(DISTINCT idxmodel) AS unique_models,
     MAX(nlevel(lineage_path)) AS max_depth,
     COUNT(*) FILTER (WHERE substantial) AS substantial_modifications
-FROM cor_model_lineage;
+FROM MODMODELLINEAGE;
 
 -- 9. Estadísticas storage
 SELECT 
@@ -1336,8 +1292,8 @@ SELECT
 FROM pg_tables
 WHERE schemaname = 'public'
   AND tablename IN (
-      'cor_auditlog', 'cor_model_lineage', 'eval_modelmetrics', 
-      'eval_biasmetrics', 'rag_chunks', 'gov_prompt'
+      'IMLIMMUTABLELOGS', 'MODMODELLINEAGE', 'eval_modelmetrics', 
+      'eval_biasmetrics', 'RAGCHUNKS', 'PRMPROMPTS'
   )
 ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
@@ -1348,7 +1304,7 @@ SELECT
     ROUND(mean_exec_time::NUMERIC, 2) AS avg_ms,
     ROUND(total_exec_time::NUMERIC, 2) AS total_ms
 FROM pg_stat_statements
-WHERE query LIKE '%cor_model%' OR query LIKE '%eval_%'
+WHERE query LIKE '%MODMODELS%' OR query LIKE '%eval_%'
 ORDER BY mean_exec_time DESC
 LIMIT 10;
 ```

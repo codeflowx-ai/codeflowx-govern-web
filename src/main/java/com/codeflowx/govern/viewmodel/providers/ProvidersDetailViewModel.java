@@ -32,8 +32,11 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.models.ModelProvider;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.models.ProviderCredential;
+import com.codeflowx.govern.service.models.ProviderCredentialService;
+import com.codeflowx.govern.service.models.ModelProviderService;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -69,7 +72,11 @@ public class ProvidersDetailViewModel extends MasterPage {
     
     // ========== Servicios y contexto Spring ==========
     @WireVariable
-    private BusinessService businessService;
+    private ModelService modelService;
+    @WireVariable
+    private ModelProviderService modelProviderService;
+    @WireVariable
+    private ProviderCredentialService providerCredentialService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -85,9 +92,9 @@ public class ProvidersDetailViewModel extends MasterPage {
     
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -167,7 +174,7 @@ public class ProvidersDetailViewModel extends MasterPage {
         try {
             log.debug("Cargando proveedor ID={}", id);
             
-            currentProvider = businessService.findById(ModelProvider.class, id);
+            currentProvider = modelProviderService.findById(id);
             
             if (currentProvider == null) {
                 log.error("Proveedor no encontrado: ID={}", id);
@@ -235,10 +242,7 @@ public class ProvidersDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("idmodprovider", currentProvider.getIdxmodelprovider());
             
-            PageResult<Model> result = businessService.findAllEntity(
-                Model.class,
-                params,
-                filters
+            PageResult<Model> result = modelService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -271,10 +275,7 @@ public class ProvidersDetailViewModel extends MasterPage {
             Map<String, Object> filters = new HashMap<>();
             filters.put("idmodprovider", currentProvider.getIdxmodelprovider());
             
-            PageResult<ProviderCredential> result = businessService.findAllEntity(
-                ProviderCredential.class,
-                params,
-                filters
+            PageResult<ProviderCredential> result = providerCredentialService.findAll(params, filters
             );
             
             if (result != null && result.getContent() != null) {
@@ -314,14 +315,14 @@ public class ProvidersDetailViewModel extends MasterPage {
             }
             
             if (currentProvider.getIdxmodelprovider() == null) {
-                businessService.save(currentProvider);
+                currentProvider = modelService.create(currentProvider);
                 log.info("Proveedor creado exitosamente: ID={}, nombre={}",
                     currentProvider.getIdxmodelprovider(), currentProvider.getModname());
                 Messagebox.show("Proveedor creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
                 currentProvider.setModupdatedat(new Timestamp(System.currentTimeMillis()));
-                businessService.update(currentProvider);
+                currentProvider = modelService.update(currentProvider);
                 log.info("Proveedor actualizado exitosamente: ID={}, nombre={}",
                     currentProvider.getIdxmodelprovider(), currentProvider.getModname());
                 Messagebox.show("Proveedor actualizado exitosamente",
@@ -396,7 +397,9 @@ public class ProvidersDetailViewModel extends MasterPage {
             }
             
             // Limpiar BusinessService
-            businessService = null;
+            modelService = null;
+            modelProviderService = null;
+            providerCredentialService = null;
             
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

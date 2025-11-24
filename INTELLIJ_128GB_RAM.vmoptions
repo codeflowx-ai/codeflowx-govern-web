@@ -1,0 +1,35 @@
+# Configuración de IntelliJ IDEA optimizada para 32GB RAM en WSL
+# Copia este contenido a: Help → Edit Custom VM Options...
+
+# Memoria del heap (16GB es suficiente para proyectos grandes con 32GB WSL)
+-Xms4096m
+-Xmx16384m
+
+# Code cache (2GB para proyectos grandes)
+-XX:ReservedCodeCacheSize=2048m
+
+# Garbage Collector (G1 es mejor para aplicaciones grandes)
+-XX:+UseG1GC
+-XX:MaxGCPauseMillis=200
+-XX:ParallelGCThreads=6
+-XX:ConcGCThreads=3
+
+# Optimizaciones generales
+-XX:SoftRefLRUPolicyMSPerMB=50
+-XX:CICompilerCount=6
+-ea
+-Dsun.io.useCanonCaches=false
+-Djava.net.preferIPv4Stack=true
+-Djdk.http.auth.tunneling.disabledSchemes=""
+-XX:+HeapDumpOnOutOfMemoryError
+-XX:-UseBiasedLocking
+-Djdk.attach.allowAttachSelf=true
+-Dkotlinx.coroutines.debug=off
+-Djdk.module.illegalAccess.silent=true
+
+# Optimizaciones adicionales
+-XX:+UseStringDeduplication
+-XX:+OptimizeStringConcat
+-XX:+UnlockExperimentalVMOptions
+-XX:+UseCGroupMemoryLimitForHeap
+

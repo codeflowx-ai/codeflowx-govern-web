@@ -14,6 +14,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundVoice;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.govern.service.models.ModelService;
+import com.codeflowx.govern.service.playground.PlaygroundSessionService;
+import com.codeflowx.govern.service.playground.PlaygroundVoiceService;
 import com.codeflowx.platform.service.BaseFront;
 import com.codeflowx.platform.service.BaseFront.Criteria;
 import com.codeflowx.platform.service.BaseFront.Criterias;
@@ -21,9 +25,19 @@ import com.codeflowx.platform.service.BaseFront.Evaluation;
 import com.codeflowx.platform.service.BaseFront.Operation;
 
 import lombok.extern.slf4j.Slf4j;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
 public class PlaygroundVoiceViewModel extends BaseFront {
+
+    @WireVariable
+    private ModelService modelService;
+    
+    @WireVariable
+    private PlaygroundSessionService playgroundSessionService;
+    
+    @WireVariable
+    private PlaygroundVoiceService playgroundVoiceService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundVoice> voiceHistory = new ArrayList<>();
@@ -67,8 +81,8 @@ public class PlaygroundVoiceViewModel extends BaseFront {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria("modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            availableModels = businessService.find(Model.class, criterias);
-        } catch (Exception e) {
+            availableModels = modelService.findAll(criterias);
+        } catch (GovernanceServiceException e) {
             log.error("Error loading models", e);
         }
     }
@@ -81,8 +95,8 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             currentSession.setSessionstatus("ACTIVE");
             currentSession.setSessioncreatedby(getUserName());
             currentSession.setSessioncreatedat(new Timestamp(System.currentTimeMillis()));
-            businessService.save(currentSession);
-        } catch (Exception e) {
+            currentSession = playgroundSessionService.create(currentSession);
+        } catch (GovernanceServiceException e) {
             log.error("Error creating session", e);
         }
     }
@@ -126,7 +140,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setVoiceduration(15);
             voice.setVoicecost(new BigDecimal("0.015"));
             
-            businessService.save(voice);
+            voice = playgroundVoiceService.create(voice);
             
             generatedAudioUrl = voice.getVoiceaudiourl();
             audioDuration = voice.getVoiceduration();
@@ -135,7 +149,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             loadVoiceHistory();
             logActivity("PLAYGROUND_VOICE", "GENERATE_SPEECH", null, "Audio generado");
             Messagebox.show("Audio generado correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error generating speech", e);
             Messagebox.show("Error al generar audio: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -166,7 +180,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setVoiceprocessingtime(2500);
             voice.setVoicecost(new BigDecimal("0.006"));
             
-            businessService.save(voice);
+            voice = playgroundVoiceService.create(voice);
             
             transcriptionText = voice.getVoicetext();
             processingTime = voice.getVoiceprocessingtime();
@@ -175,7 +189,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             loadVoiceHistory();
             logActivity("PLAYGROUND_VOICE", "TRANSCRIBE", null, "Audio transcrito");
             Messagebox.show("Audio transcrito correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error transcribing audio", e);
             Messagebox.show("Error al transcribir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
@@ -212,9 +226,9 @@ public class PlaygroundVoiceViewModel extends BaseFront {
     @NotifyChange({"voiceHistory"})
     public void deleteVoice(PlaygroundVoice voice) {
         try {
-            businessService.removeFromID(PlaygroundVoice.class, voice.getIdxplaygroundvoice());
+            playgroundVoiceService.deleteById(voice.getIdxplaygroundvoice());
             loadVoiceHistory();
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error deleting voice", e);
         }
     }

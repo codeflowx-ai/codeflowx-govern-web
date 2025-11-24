@@ -30,9 +30,13 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.ComplianceAssessment;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.governance.PolicyEvaluation;
 import com.codeflowx.govern.entity.core.User;
 import com.codeflowx.govern.entity.procedures.governance.RequestHumanReview;
+import com.codeflowx.govern.service.governance.ComplianceAssessmentService;
+import com.codeflowx.govern.service.governance.PolicyEvaluationService;
+import com.codeflowx.govern.service.core.UserService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -58,15 +62,21 @@ public class EthicsCommitteeViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private PolicyService policyService;
+    @WireVariable
+    private PolicyEvaluationService policyEvaluationService;
+    @WireVariable
+    private ComplianceAssessmentService complianceAssessmentService;
+    @WireVariable
+    private UserService userService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
     
     @Override
@@ -109,28 +119,21 @@ public class EthicsCommitteeViewModel extends MasterPage {
             criteria1.setValueEnd("PENDING_REVIEW");
             criterias1.addCriteria(criteria1);
             
-            PageResult<ComplianceAssessment> result1 = businessService.findAllEntity(
-                ComplianceAssessment.class, 
-                pageParams, 
-                criterias1
+            PageResult<ComplianceAssessment> result1 = complianceAssessmentService.findAll(pageParams, criterias1
             );
             if (result1 != null && result1.getContent() != null) {
                 pendingReviewsList = result1.getContent();
             }
             
             // Cargar todas las evaluaciones
-            PageResult<PolicyEvaluation> result2 = businessService.findAllEntity(
-                PolicyEvaluation.class, 
-                pageParams, 
-                new Criterias()
+            PageResult<PolicyEvaluation> result2 = policyEvaluationService.findAll(pageParams, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 evaluationsList = result2.getContent();
             }
             
             // Cargar miembros del comité (usuarios con rol AI_GOVERNANCE_ADMIN)
-            PageResult<User> result3 = businessService.findAllEntity(
-                User.class, 
+            PageResult<User> result3 = userService.findAll(
                 PageParams.builder().maxRows(100).pageActual(1).rowActual(0).build(), 
                 new Criterias()
             );
@@ -207,7 +210,9 @@ public class EthicsCommitteeViewModel extends MasterPage {
             committeeMembers.clear(); 
             committeeMembers = null; 
         }
-        businessService = null;
+        policyService = null;
+            policyEvaluationService = null;
+            complianceAssessmentService = null;
     }
 }
 

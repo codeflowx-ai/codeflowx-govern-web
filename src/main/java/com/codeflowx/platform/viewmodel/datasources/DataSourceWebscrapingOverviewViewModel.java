@@ -19,7 +19,10 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
-import com.codeflowx.govern.entity.datasources.DataSourceWebscraping;
+import com.codeflowx.govern.entity.datasources.DataSourceWebScraping;
+import com.codeflowx.govern.service.datasources.DataSourceWebScrapingService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -39,59 +42,62 @@ import lombok.extern.slf4j.Slf4j;
 public class DataSourceWebscrapingOverviewViewModel extends BaseFront<DataSourceWebscrapingOverviewViewModel> {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
+    @WireVariable
+    private DataSourceWebScrapingService dataSourceWebScrapingService;
+
     private PageParams pageParams;
-    private PageResult<DataSourceWebscraping> pageResult;
+    private PageResult<DataSourceWebScraping> pageResult;
     private String searchText = "";
     private String filterStatus = "";
-    private List<DataSourceWebscraping> webscrapingList = new ArrayList<>();
+    private List<DataSourceWebScraping> webscrapingList = new ArrayList<>();
     private int totalWebscrapings = 0;
     private int activeWebscrapings = 0;
     private int runningWebscrapings = 0;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder().maxRows(20).pageActual(1).rowActual(0).build();
         loadData();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadData() {
         try {
             Criterias criterias = buildCriterias();
-            pageResult = businessService.findAllEntity(DataSourceWebscraping.class, pageParams, criterias);
-            
+            pageResult = dataSourceWebScrapingService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 webscrapingList = pageResult.getContent();
                 totalWebscrapings = pageResult.getTotalRows();
-                
-                logActivity("BUSCAR", "DATASOURCEWEBSCRAPINGS", null, 
+
+                logActivity("BUSCAR", "DATASOURCEWEBSCRAPINGS", null,
                     "Búsqueda: " + webscrapingList.size() + " resultados");
             } else {
                 webscrapingList = new ArrayList<>();
                 totalWebscrapings = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar web scrapings", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadMetrics() {
         activeWebscrapings = (int) webscrapingList.stream().filter(ws -> "ACTIVE".equals(ws.getWsstatus())).count();
         runningWebscrapings = (int) webscrapingList.stream().filter(ws -> "RUNNING".equals(ws.getWsstatus())).count();
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
@@ -102,34 +108,34 @@ public class DataSourceWebscrapingOverviewViewModel extends BaseFront<DataSource
         }
         return criterias;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshWebscrapings() {
         loadData();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
-    public void deleteWebscraping(@BindingParam("ws") DataSourceWebscraping ws) {
+    public void deleteWebscraping(@BindingParam("ws") DataSourceWebScraping ws) {
         Messagebox.show("¿Eliminar web scraping: " + ws.getWsname() + "?",
             "Confirmar", Messagebox.OK | Messagebox.CANCEL, Messagebox.QUESTION,
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(ws);
-                        logActivity("ELIMINAR", "DATASOURCEWEBSCRAPINGS", ws.getIdxdatasourcewebscraping(), 
+                        dataSourceWebScrapingService.deleteById(ws.getIdxdatasourcewebscraping());
+                        logActivity("ELIMINAR", "DATASOURCEWEBSCRAPINGS", ws.getIdxdatasourcewebscraping(),
                             "Web scraping eliminado: " + ws.getWsname());
                         loadData();
                         loadMetrics();
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al eliminar", e);
                     }
                 }
             });
     }
-    
+
     public String getWsStatusColor(String status) {
         if (status == null) return "secondary";
         switch (status) {
@@ -139,19 +145,19 @@ public class DataSourceWebscrapingOverviewViewModel extends BaseFront<DataSource
             default: return "secondary";
         }
     }
-    
+
     public String formatDate(Timestamp ts) {
         return ts != null ? new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(ts) : "-";
     }
-    
+
     @Destroy
     public void destroy() {
-        if (webscrapingList != null) { 
-            webscrapingList.clear(); 
-            webscrapingList = null; 
+        if (webscrapingList != null) {
+            webscrapingList.clear();
+            webscrapingList = null;
         }
         pageResult = null;
         pageParams = null;
-        businessService = null;
+        dataSourceWebScrapingService = null;
     }
 }

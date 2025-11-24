@@ -30,6 +30,8 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.rag.RagVersion;
+import com.codeflowx.govern.service.rag.RagVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -53,92 +55,95 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class RagVersionDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private RagVersionService ragVersionService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxragversion;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private RagVersion currentRagVersion;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
-    
+
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableRagvstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxragversion = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando RagVersionDetailViewModel - mode: {}, idxragversion: {}", mode, idxragversion);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxragversion != null) {
@@ -149,11 +154,11 @@ public class RagVersionDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentRagVersion, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentRagVersion = new RagVersion();
@@ -161,36 +166,36 @@ public class RagVersionDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadRagvstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentRagVersion = businessService.findById(RagVersion.class, id);
-            
+            currentRagVersion = ragVersionService.findById(id);
+
             if (currentRagVersion == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentRagVersion.getRagvversionnumber();
             loadRagvstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "RAGVERSIONS", id, "Consulta: " + currentRagVersion.getRagvversionnumber());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -199,55 +204,55 @@ public class RagVersionDetailViewModel extends MasterPage {
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentRagVersion.getIdxragversion() == null;
-            
+
             if (isNew) {
-                businessService.save(currentRagVersion);
+                ragVersionService.create(currentRagVersion);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "RAGVERSIONS", currentRagVersion.getIdxragversion(), 
+                logActivity("CREACION", "RAGVERSIONS", currentRagVersion.getIdxragversion(),
                     "Creado: " + currentRagVersion.getRagvversionnumber());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentRagVersion);
+                ragVersionService.update(currentRagVersion);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "RAGVERSIONS", currentRagVersion.getIdxragversion(), 
+                logActivity("EDICION", "RAGVERSIONS", currentRagVersion.getIdxragversion(),
                     "Actualizado: " + currentRagVersion.getRagvversionnumber());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentRagVersion.getRagvversionnumber() == null || currentRagVersion.getRagvversionnumber().trim().isEmpty()) {
             errors.append("- Version Number\n");
         }
@@ -260,16 +265,16 @@ public class RagVersionDetailViewModel extends MasterPage {
         if (currentRagVersion.getRagvcreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -278,7 +283,7 @@ public class RagVersionDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadRagvstatuss() {
         // Cargar estados de versión RAG
         availableRagvstatuss.add("ACTIVE");
@@ -286,7 +291,7 @@ public class RagVersionDetailViewModel extends MasterPage {
         availableRagvstatuss.add("FAILED");
         availableRagvstatuss.add("ARCHIVED");
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -312,7 +317,7 @@ public class RagVersionDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -320,29 +325,29 @@ public class RagVersionDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentRagVersion = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableRagvstatuss != null) {
                 availableRagvstatuss.clear();
                 availableRagvstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

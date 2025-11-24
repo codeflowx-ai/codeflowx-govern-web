@@ -1,0 +1,236 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<!-- ViewModel binding - OVERVIEW (solo búsqueda/listado) -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.rag.RagClientPoliciesOverviewViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div><!-- Titulo pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-shield-halved me-2"></h:i>
+						<label value="Políticas de Cliente RAG" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de políticas de validación RAG por cliente" />
+					</h:p>
+				</div>
+			</div>
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<div class="flex-grow-1"></div>
+							<div class="flex-shrink-0">
+								<div class="hstack text-nowrap gap-2 d-flex">
+									<a iconSclass="fa-duotone fa-solid fa-plus label-icon align-middle fs-16 me-2"
+										class="waves-effect waves-light"
+										onClick="@command('createRagClientPolicy')"
+										label="Nueva Política">
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="col-lg-12 s-bot">
+				<!-- Métricas Resumen -->
+				<h:div class="row g-3 mb-4">
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Total Políticas</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.totalPolicies)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Habilitadas</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.enabledPolicies)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Deshabilitadas</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.disabledPolicies)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="col-md-3">
+						<h:div class="card shadow-sm border-0"
+							style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; border-radius: 12px;">
+							<h:div class="card-body p-4">
+								<h:p class="mb-2" style="font-size: 14px; opacity: 0.9;">Clientes</h:p>
+								<h:h2 class="mb-1" style="font-size: 42px; font-weight: bold;">
+									<label value="@load(vm.totalClients)" />
+								</h:h2>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</div>
+			<div class="section filters">
+				<div class="search-bar">
+					<!-- Búsqueda por texto -->
+					<textbox value="@bind(vm.searchTerm)"
+						placeholder="Buscar por nombre de política..."
+						class="form-control" onOK="@command('applyFilters')" />
+					<!-- Filtro por Tipo -->
+					<combobox placeholder="Tipo de Política"
+						selectedItem="@bind(vm.selectedPolicyType)"
+						onChange="@command('applyFilters')">
+						<template name="model" var="option">
+							<comboitem label="@load(option.label)" value="@load(option.value)" />
+						</template>
+						<comboitem label="Todas" value="" />
+						<comboitem label="Tono" value="TONE" />
+						<comboitem label="Contenido" value="CONTENT" />
+						<comboitem label="Ética" value="ETHICS" />
+						<comboitem label="Valores" value="VALUES" />
+						<comboitem label="Idioma" value="LANGUAGE" />
+					</combobox>
+					<!-- Filtro por Estado -->
+					<combobox placeholder="Estado"
+						selectedItem="@bind(vm.selectedEnabled)"
+						onChange="@command('applyFilters')">
+						<comboitem label="Todos" value="" />
+						<comboitem label="Habilitadas" value="true" />
+						<comboitem label="Deshabilitadas" value="false" />
+					</combobox>
+				</div>
+				<div class="filter-icons">
+					<a tooltiptext="Buscar"
+						iconSclass="fa-duotone fa-magnifying-glass-waveform"
+						onClick="@command('applyFilters')" />
+					<a tooltiptext="Limpiar"
+						iconSclass="fa-duotone fa-broom-wide"
+						onClick="@command('clearFilters')" />
+				</div>
+			</div>
+			<div class="col-xxl-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<div id="divTemplate" sclass="col-lg-12">
+							<!-- listado -->
+							<grid model="@load(vm.policiesList)"
+								style="overflow:auto;">
+								<columns sizable="true"
+									columnsgroup="false" columnshide="false">
+									<column label="ID" align="center"
+										sort="auto" width="5%" />
+
+									<column sclass="text-capitalize"
+										label="Nombre" align="center"
+										width="25%" />
+
+									<column sclass="text-capitalize"
+										label="Cliente ID" align="center"
+										width="10%" />
+
+									<column sclass="text-capitalize"
+										label="Tipo" align="center" width="12%" />
+
+									<column sclass="text-capitalize"
+										label="Score Mínimo" align="center"
+										width="10%" />
+
+									<column sclass="text-capitalize"
+										label="Peso" align="center"
+										width="8%" />
+
+									<column sclass="text-capitalize"
+										label="Habilitada" align="center"
+										width="10%" />
+
+									<column sclass="text-capitalize"
+										label="Creada" align="center"
+										width="10%" />
+
+									<column label="Acciones"
+										align="center" width="10%" />
+								</columns>
+
+								<template name="model" var="policy">
+									<row style="text-align:right;cursor:pointer;"
+										onClick="@command('viewRagClientPolicyDetails', policyId=policy.idxragclientpolicy)">
+										<label value="@load(policy.idxragclientpolicy)" />
+
+										<label value="@load(policy.rcppolicyname)" />
+
+										<label value="@load(policy.rcpclientid)" />
+
+										<h:span class="badge bg-secondary">
+											<label value="@load(policy.rcppolicytype)" />
+										</h:span>
+
+										<label value="@load(policy.rcpminscore)"
+											sclass="badge bg-info" />
+
+										<label value="@load(policy.rcpweight)"
+											sclass="badge bg-primary" />
+
+										<label value="@load(policy.rcpenabled ? 'Sí' : 'No')"
+											sclass="badge ${policy.rcpenabled ? 'bg-success' : 'bg-secondary'}" />
+
+										<label value="@load(policy.rcpcreatedat)" />
+
+										<cell align="center" class="d-flex">
+											<div class="edit">
+												<a onClick="@command('viewRagClientPolicyDetails', policyId=policy.idxragclientpolicy)"
+													iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+													sclass="waves-effect waves-success"
+													tooltiptext="Editar política" />
+											</div>
+											<div class="delete">
+												<a onClick="@command('deleteRagClientPolicy', policyId=policy.idxragclientpolicy)"
+													iconSclass="fa-light fa-nfc-trash fa-xl"
+													sclass="waves-effect waves-danger"
+													tooltiptext="Eliminar política" />
+											</div>
+										</cell>
+									</row>
+								</template>
+								<foot>
+									<footer span="3" align="right">
+										<paging id="topagin"
+											pageSize="@load(vm.pageParams.maxRows)" 
+											totalSize="@load(vm.pageResult.totalRows)"
+											activePage="@load(vm.pageParams.pageActual - 1)"
+											onPaging="@command('onPaging', event=event)"
+											mold="os" width="100%" />
+									</footer>
+									<footer span="4" align="left"></footer>
+									<footer></footer>
+								</foot>
+							</grid>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div><!--end col-->
+	</idspace>
+</zk>
+

@@ -30,7 +30,10 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.governance.PolicyAuditLog;
+import com.codeflowx.govern.service.governance.PolicyService;
 import com.codeflowx.govern.entity.governance.PolicyEvaluation;
+import com.codeflowx.govern.service.governance.PolicyAuditLogService;
+import com.codeflowx.govern.service.governance.PolicyEvaluationService;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -56,15 +59,20 @@ public class AnalyticsAccountabilityViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private PolicyService policyService;
+    @WireVariable
+    private PolicyEvaluationService policyEvaluationService;
+    @WireVariable
+    private PolicyAuditLogService policyAuditLogService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
     
     @Override
@@ -107,10 +115,7 @@ public class AnalyticsAccountabilityViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            PageResult<PolicyAuditLog> result1 = businessService.findAllEntity(
-                PolicyAuditLog.class, 
-                pageParams1, 
-                new Criterias()
+            PageResult<PolicyAuditLog> result1 = policyAuditLogService.findAll(pageParams1, new Criterias()
             );
             if (result1 != null && result1.getContent() != null) {
                 auditLogsList = result1.getContent();
@@ -123,10 +128,7 @@ public class AnalyticsAccountabilityViewModel extends MasterPage {
                 .rowActual(0)
                 .build();
             
-            PageResult<PolicyEvaluation> result2 = businessService.findAllEntity(
-                PolicyEvaluation.class, 
-                pageParams2, 
-                new Criterias()
+            PageResult<PolicyEvaluation> result2 = policyEvaluationService.findAll(pageParams2, new Criterias()
             );
             if (result2 != null && result2.getContent() != null) {
                 evaluationsList = result2.getContent();
@@ -181,10 +183,7 @@ public class AnalyticsAccountabilityViewModel extends MasterPage {
             criteria.setValueEnd(action);
             criterias.addCriteria(criteria);
             
-            PageResult<PolicyAuditLog> result = businessService.findAllEntity(
-                PolicyAuditLog.class, 
-                pageParams, 
-                criterias
+            PageResult<PolicyAuditLog> result = policyAuditLogService.findAll(pageParams, criterias
             );
             if (result != null && result.getContent() != null) {
                 auditLogsList = result.getContent();
@@ -205,7 +204,9 @@ public class AnalyticsAccountabilityViewModel extends MasterPage {
             evaluationsList.clear(); 
             evaluationsList = null; 
         }
-        businessService = null;
+        policyService = null;
+            policyEvaluationService = null;
+            policyAuditLogService = null;
     }
 }
 

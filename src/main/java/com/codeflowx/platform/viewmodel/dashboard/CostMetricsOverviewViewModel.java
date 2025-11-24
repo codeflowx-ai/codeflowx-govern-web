@@ -31,6 +31,8 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.dashboard.CostMetrics;
 import com.codeflowx.admin.Ssoractividad;
+import com.codeflowx.govern.service.dashboard.CostMetricsService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -56,148 +58,148 @@ public class CostMetricsOverviewViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private CostMetricsService costMetricsService;
+
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Los servicios se inyectan automáticamente mediante @WireVariable
+        // Mantener businessService solo para logActivity
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<CostMetrics> pageResult;
-    
+
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
     private String dshcosttypeFilter = "ALL";
     private String dshperiodFilter = "ALL";
-    
+
     // ========== Datos ==========
     private List<CostMetrics> filteredItems = new ArrayList<>();
-    
+
     // ========== Métricas globales ==========
     private int totalItems = 0;
     private long activeItems = 0L;
     private long pendingApproval = 0L;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadData() {
         try {
             log.debug("Cargando datos - Página: {}", pageParams.getPageActual());
-            
+
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllEntity(
-                CostMetrics.class,
-                pageParams,
-                criterias
-            );
-            
+
+            // Usar servicio dedicado
+            pageResult = costMetricsService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
                 totalItems = pageResult.getTotalRows();
-                
+
                 loadGlobalMetrics();
-                
+
                 // Auditar búsqueda
-                logActivity("BUSCAR", "DSHCOSTMETRICS", null, 
+                logActivity("BUSCAR", "DSHCOSTMETRICS", null,
                     "Búsqueda: " + filteredItems.size() + " resultados (término: '" + searchTerm + "')");
-                
-                log.info("Cargados {} items de {} totales", 
+
+                log.info("Cargados {} items de {} totales",
                     filteredItems.size(), totalItems);
             } else {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
-            Messagebox.show("Error al cargar datos: " + e.getMessage(), 
+            Messagebox.show("Error al cargar datos: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredItems = new ArrayList<>();
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.LIKE, "dshcostcategory");
             criteria.setValues(new Object[]{searchTerm.trim()});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(statusFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "status");
             criteria.setValues(new Object[]{statusFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(dshcosttypeFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "dshcosttype");
             criteria.setValues(new Object[]{dshcosttypeFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(dshperiodFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "dshperiod");
             criteria.setValues(new Object[]{dshperiodFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         return criterias;
     }
-    
+
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales");
             // TODO: Implementar carga de métricas desde vistas SQL cuando estén disponibles
-            // Ejemplo: List<CostMetricsMetricsSummary> metrics = businessService.findAllView(CostMetricsMetricsSummary.class);
+            // Cuando exista CostMetricsMetricsSummaryService:
+            // List<CostMetricsMetricsSummary> metrics = costMetricsMetricsSummaryService.findAll();
             log.debug("Métricas globales pendientes de implementación");
         } catch (Exception e) {
             log.error("Error al cargar métricas globales", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
@@ -205,7 +207,7 @@ public class CostMetricsOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearFilters() {
@@ -217,7 +219,7 @@ public class CostMetricsOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void onPaging(@BindingParam("event") PagingEvent event) {
@@ -226,44 +228,45 @@ public class CostMetricsOverviewViewModel extends MasterPage {
         pageParams.setRowActual(pageIndex * pageParams.getMaxRows());
         loadData();
     }
-    
+
     @Command
     public void registerItem() {
         log.info("Navegando a creación");
         Map<String, Object> params = new HashMap<>();
         params.put("action", Action.NEW);
-        appendPage("plataforma/dashboard/dashboard-detail.zul", page.getFellow(IDDESKTOP), params);
+        appendPage("plataforma/dashboard/cost-metrics-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     public void viewItemDetails(@BindingParam("itemId") Long itemId) {
         log.info("Navegando a detalle ID={}", itemId);
         Map<String, Object> params = new HashMap<>();
         params.put("dataParam", itemId);
         params.put("action", Action.LOAD);
-        appendPage("plataforma/dashboard/dashboard-detail.zul", page.getFellow(IDDESKTOP), params);
+        appendPage("plataforma/dashboard/cost-metrics-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteItem(@BindingParam("itemId") Long itemId) {
         try {
-            Messagebox.show("¿Está seguro de eliminar este registro?", 
-                "Confirmar eliminación", 
-                Messagebox.YES | Messagebox.NO, 
+            Messagebox.show("¿Está seguro de eliminar este registro?",
+                "Confirmar eliminación",
+                Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(CostMetrics.class, itemId);
+                            // Usar servicio dedicado
+                            costMetricsService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "DSHCOSTMETRICS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();
-                            Messagebox.show("Registro eliminado correctamente", 
+                            Messagebox.show("Registro eliminado correctamente",
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar ID={}", itemId, e);
-                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                            Messagebox.show("Error al eliminar: " + e.getMessage(),
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }
                     }
@@ -273,7 +276,7 @@ public class CostMetricsOverviewViewModel extends MasterPage {
             log.error("Error en diálogo de eliminación", e);
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -299,7 +302,7 @@ public class CostMetricsOverviewViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -307,14 +310,14 @@ public class CostMetricsOverviewViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar lista filtrada
             if (filteredItems != null) {
                 filteredItems.clear();
                 filteredItems = null;
             }
-            
+
             // Limpiar PageResult
             if (pageResult != null) {
                 if (pageResult.getContent() != null) {
@@ -322,13 +325,13 @@ public class CostMetricsOverviewViewModel extends MasterPage {
                 }
                 pageResult = null;
             }
-            
+
             // Limpiar PageParams
             pageParams = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

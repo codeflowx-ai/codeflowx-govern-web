@@ -23,6 +23,9 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.domainingestion.Domain;
+import com.codeflowx.govern.service.domainingestion.DomainService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -64,6 +67,9 @@ public class DomainIngestionWizardViewModel extends BaseFront<DomainIngestionWiz
 	private String privacyLevel;
 	private Integer dataRetentionYears = 1;
 	private boolean complianceChecks = true;
+
+	@WireVariable
+	private DomainService domainService;
 
 	// Advanced features
 	private boolean ragEnabled = false;
@@ -185,19 +191,19 @@ public class DomainIngestionWizardViewModel extends BaseFront<DomainIngestionWiz
 			domain.setDintrainingenabled(trainingEnabled);
 			domain.setDinautoingestion(autoIngestion);
 			domain.setDinqualitythreshold(qualityThreshold);
-			domain.setDinretentiondays(retentionDays);
-			domain.setDinlastupdate(new Timestamp(System.currentTimeMillis()));
+		domain.setDinretentiondays(retentionDays);
+		domain.setDinlastupdate(new Timestamp(System.currentTimeMillis()));
 
-			businessService.save(domain);
+		Domain saved = domainService.create(domain);
 
-			logActivity("CREAR", "DOMAINS", domain.getIdxdomain(), "Dominio creado: " + domain.getDindomainname());
+		logActivity("CREAR", "DOMAINS", saved.getIdxdomain(), "Dominio creado: " + saved.getDindomainname());
 
-			Messagebox.show("Dominio creado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-			clear();
-		} catch (Exception e) {
-			log.error("Error al crear dominio", e);
-			Messagebox.show("Error al crear dominio: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
-		}
+		Messagebox.show("Dominio creado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+		clear();
+	} catch (GovernanceServiceException e) {
+		log.error("Error al crear dominio", e);
+		Messagebox.show("Error al crear dominio: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
+	}
 	}
 
 	private boolean validateStep(int step) {
@@ -273,7 +279,7 @@ public class DomainIngestionWizardViewModel extends BaseFront<DomainIngestionWiz
 		stepsList = null;
 		templatesList = null;
 		selectedDataSources = null;
-		businessService = null;
+		domainService = null;
 	}
 
 	// Inner DTOs (UI)

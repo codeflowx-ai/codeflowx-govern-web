@@ -34,6 +34,11 @@ import com.codeflowx.govern.entity.training.Experiment;
 import com.codeflowx.govern.entity.training.ExperimentLineage;
 import com.codeflowx.govern.entity.training.HPOExperiment;
 import com.codeflowx.govern.entity.training.Run;
+import com.codeflowx.govern.service.training.ExperimentService;
+import com.codeflowx.govern.service.training.ExperimentLineageService;
+import com.codeflowx.govern.service.training.HPOExperimentService;
+import com.codeflowx.govern.service.training.RunService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -57,59 +62,67 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class ExperimentDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private ExperimentService experimentService;
+    @WireVariable
+    private ExperimentLineageService experimentLineageService;
+    @WireVariable
+    private HPOExperimentService hpoExperimentService;
+    @WireVariable
+    private RunService runService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxexperiment;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private Experiment currentExperiment;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalTrnname = null;
-    
+
     // ========== Listas para combos (FK) ==========
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     private List<String> selectedTrntags = new ArrayList<>();
     private String newTrntag = "";
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<ExperimentLineage> subtrnexperimentlineage = new ArrayList<>();
     private List<HPOExperiment> subtrnhpoexperiments = new ArrayList<>();
@@ -117,40 +130,40 @@ public class ExperimentDetailViewModel extends MasterPage {
     private boolean subtrnexperimentlineageLoaded = false;
     private boolean subtrnhpoexperimentsLoaded = false;
     private boolean subtrnrunsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxexperiment = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ExperimentDetailViewModel - mode: {}, idxexperiment: {}", mode, idxexperiment);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxexperiment != null) {
@@ -161,48 +174,48 @@ public class ExperimentDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentExperiment, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentExperiment = new Experiment();
         editing = false;
         pageTitle = "Crear Nuevo";
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentExperiment = businessService.findById(Experiment.class, id);
-            
+            currentExperiment = experimentService.findById(id);
+
             if (currentExperiment == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentExperiment.getTrnname();
-            
+
             // Cargar tags/roles existentes desde JSON
             selectedTrntags = convertJsonToList(currentExperiment.getTrntags());
-            
+
             // Guardar valores originales para validación de unicidad
             originalTrnname = currentExperiment.getTrnname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "TRNEXPERIMENTS", id, "Consulta: " + currentExperiment.getTrnname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -211,55 +224,55 @@ public class ExperimentDetailViewModel extends MasterPage {
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentExperiment.getIdxexperiment() == null;
-            
+
             if (isNew) {
-                businessService.save(currentExperiment);
+                currentExperiment = experimentService.create(currentExperiment);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "TRNEXPERIMENTS", currentExperiment.getIdxexperiment(), 
+                logActivity("CREACION", "TRNEXPERIMENTS", currentExperiment.getIdxexperiment(),
                     "Creado: " + currentExperiment.getTrnname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentExperiment);
+                currentExperiment = experimentService.update(currentExperiment);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "TRNEXPERIMENTS", currentExperiment.getIdxexperiment(), 
+                logActivity("EDICION", "TRNEXPERIMENTS", currentExperiment.getIdxexperiment(),
                     "Actualizado: " + currentExperiment.getTrnname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentExperiment.getTrnname() == null || currentExperiment.getTrnname().trim().isEmpty()) {
             errors.append("- Name\n");
         }
@@ -284,16 +297,16 @@ public class ExperimentDetailViewModel extends MasterPage {
         if (currentExperiment.getTrnupdatedat() == null) {
             errors.append("- Updated At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -302,7 +315,7 @@ public class ExperimentDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     @NotifyChange("{'selectedTrntags', 'currentExperiment'}")
     public void addTrntag() {
@@ -313,7 +326,7 @@ public class ExperimentDetailViewModel extends MasterPage {
             currentExperiment.setTrntags(convertListToJson(selectedTrntags));
         }
     }
-    
+
     @Command
     @NotifyChange("{'selectedTrntags', 'currentExperiment'}")
     public void removeTrntag(@BindingParam("tag") String tag) {
@@ -321,7 +334,7 @@ public class ExperimentDetailViewModel extends MasterPage {
         // Convertir lista a JSON y actualizar en currentExperiment
         currentExperiment.setTrntags(convertListToJson(selectedTrntags));
     }
-    
+
     private String convertListToJson(List<String> list) {
         if (list == null || list.isEmpty()) {
             return "[]";
@@ -334,7 +347,7 @@ public class ExperimentDetailViewModel extends MasterPage {
         json.append("]");
         return json.toString();
     }
-    
+
     private List<String> convertJsonToList(String json) {
         List<String> result = new ArrayList<>();
         if (json == null || json.trim().isEmpty() || json.equals("[]")) {
@@ -349,7 +362,7 @@ public class ExperimentDetailViewModel extends MasterPage {
         }
         return result;
     }
-    
+
     private void loadSubtrnexperimentlineage() {
         try {
             if (currentExperiment != null && currentExperiment.getIdxexperiment() != null) {
@@ -357,25 +370,25 @@ public class ExperimentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "experiment");
                 criteria.setValues(new Object[]{currentExperiment.getIdxexperiment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ExperimentLineage> result = businessService.findAllEntity(ExperimentLineage.class, collectionParams, criterias);
+
+                PageResult<ExperimentLineage> result = experimentLineageService.findAll(collectionParams, criterias);
                 subtrnexperimentlineage = result != null ? result.getContent() : new ArrayList<>();
                 subtrnexperimentlineageLoaded = true;
                 log.debug("Cargados {} subtrnexperimentlineage", subtrnexperimentlineage.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnexperimentlineage", e);
             subtrnexperimentlineage = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnhpoexperiments() {
         try {
             if (currentExperiment != null && currentExperiment.getIdxexperiment() != null) {
@@ -383,25 +396,25 @@ public class ExperimentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "experiment");
                 criteria.setValues(new Object[]{currentExperiment.getIdxexperiment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<HPOExperiment> result = businessService.findAllEntity(HPOExperiment.class, collectionParams, criterias);
+
+                PageResult<HPOExperiment> result = hpoExperimentService.findAll(collectionParams, criterias);
                 subtrnhpoexperiments = result != null ? result.getContent() : new ArrayList<>();
                 subtrnhpoexperimentsLoaded = true;
                 log.debug("Cargados {} subtrnhpoexperiments", subtrnhpoexperiments.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnhpoexperiments", e);
             subtrnhpoexperiments = new ArrayList<>();
         }
     }
-    
+
     private void loadSubtrnruns() {
         try {
             if (currentExperiment != null && currentExperiment.getIdxexperiment() != null) {
@@ -409,25 +422,25 @@ public class ExperimentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "experiment");
                 criteria.setValues(new Object[]{currentExperiment.getIdxexperiment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<Run> result = businessService.findAllEntity(Run.class, collectionParams, criterias);
+
+                PageResult<Run> result = runService.findAll(collectionParams, criterias);
                 subtrnruns = result != null ? result.getContent() : new ArrayList<>();
                 subtrnrunsLoaded = true;
                 log.debug("Cargados {} subtrnruns", subtrnruns.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnruns", e);
             subtrnruns = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnexperimentlineage")
     public void onSelectSubtrnexperimentlineageTab() {
@@ -435,7 +448,7 @@ public class ExperimentDetailViewModel extends MasterPage {
             loadSubtrnexperimentlineage();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnhpoexperiments")
     public void onSelectSubtrnhpoexperimentsTab() {
@@ -443,7 +456,7 @@ public class ExperimentDetailViewModel extends MasterPage {
             loadSubtrnhpoexperiments();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnruns")
     public void onSelectSubtrnrunsTab() {
@@ -451,7 +464,7 @@ public class ExperimentDetailViewModel extends MasterPage {
             loadSubtrnruns();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -477,7 +490,7 @@ public class ExperimentDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -485,15 +498,15 @@ public class ExperimentDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentExperiment = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
-            
+
             // Limpiar colecciones @OneToMany
             if (subtrnexperimentlineage != null) {
                 subtrnexperimentlineage.clear();
@@ -510,20 +523,20 @@ public class ExperimentDetailViewModel extends MasterPage {
                 subtrnruns = null;
             }
             subtrnrunsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
             if (selectedTrntags != null) {
                 selectedTrntags.clear();
                 selectedTrntags = null;
             }
             newTrntag = null;
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

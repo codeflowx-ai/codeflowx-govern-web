@@ -1,0 +1,209 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<idspace id="apiDetail"
+		viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.datasources.DataSourceApiViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<h:div class="row">
+			<div>
+				<!-- Header Section -->
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-plug label-icon align-middle fs-16 me-2"></h:i>
+						<label value="Gestión de APIs de Data Sources" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Crear y gestionar APIs de fuentes de datos" />
+					</h:p>
+				</h:div>
+			</h:div>
+
+			<h:div class="col-lg-12 col-xlg-12 col-md-12 s-bot">
+				<h:div class="card">
+					<!-- Card Header con Acciones -->
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1">
+								<h:h5 class="mb-0">
+									<label value="@load(vm.selectedApi != null ? (vm.selectedApi.getIdxdatasourceapi() != null ? 'Editar API' : 'Nueva API') : 'Lista de APIs')" />
+								</h:h5>
+							</h:div>
+							<h:div class="flex-shrink-0">
+								<h:div class="hstack text-nowrap gap-2 d-flex">
+									<a class="waves-effect waves-light btn btn-sm btn-primary"
+										onClick="@command('createNew')"
+										visible="@load(vm.selectedApi == null)"
+										tooltiptext="Nueva API">
+										<h:i class="fa-duotone fa-solid fa-plus me-1"></h:i>
+										<label value="Nueva API" />
+									</a>
+									<a class="waves-effect waves-light btn btn-sm btn-success"
+										onClick="@command('save')"
+										visible="@load(vm.selectedApi != null)"
+										tooltiptext="Guardar">
+										<h:i class="fa-duotone fa-solid fa-save me-1"></h:i>
+										<label value="Guardar" />
+									</a>
+									<a class="waves-effect waves-light btn btn-sm btn-secondary"
+										onClick="@command('cancel')"
+										visible="@load(vm.selectedApi != null)"
+										tooltiptext="Cancelar">
+										<h:i class="fa-duotone fa-solid fa-times me-1"></h:i>
+										<label value="Cancelar" />
+									</a>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="card-body">
+						<!-- Formulario de Creación/Edición -->
+						<h:div class="row" visible="@load(vm.selectedApi != null)">
+							<h:div class="col-lg-12">
+								<h:div class="card default shadow-sm mb-3">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-info-circle me-2"></h:i>
+											<label value="Información de la API" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Nombre de la API *" /></h:label>
+												<textbox value="@bind(vm.selectedApi.apiname)"
+													class="form-control"
+													placeholder="Ingrese el nombre de la API" />
+											</h:div>
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Endpoint *" /></h:label>
+												<textbox value="@bind(vm.selectedApi.apiendpoint)"
+													class="form-control"
+													placeholder="https://api.example.com/endpoint" />
+											</h:div>
+										</h:div>
+
+										<h:div class="row mb-3">
+											<h:div class="col-md-4">
+												<h:label class="form-label"><label value="Método HTTP" /></h:label>
+												<combobox value="@bind(vm.selectedApi.apimethod)"
+													model="@load(vm.availableMethods)"
+													class="form-control">
+													<template name="model">
+														<comboitem label="@load(each)" value="@load(each)" />
+													</template>
+												</combobox>
+											</h:div>
+											<h:div class="col-md-4">
+												<h:label class="form-label"><label value="Tipo de Respuesta" /></h:label>
+												<combobox value="@bind(vm.selectedApi.apiresponsetype)"
+													model="@load(vm.availableResponseTypes)"
+													class="form-control">
+													<template name="model">
+														<comboitem label="@load(each)" value="@load(each)" />
+													</template>
+												</combobox>
+											</h:div>
+											<h:div class="col-md-4">
+												<h:label class="form-label"><label value="Estado" /></h:label>
+												<combobox value="@bind(vm.selectedApi.apistatus)"
+													model="@load(vm.availableStatuses)"
+													class="form-control">
+													<template name="model">
+														<comboitem label="@load(each)" value="@load(each)" />
+													</template>
+												</combobox>
+											</h:div>
+										</h:div>
+
+										<h:div class="row mb-3">
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Timeout (ms)" /></h:label>
+												<intbox value="@bind(vm.selectedApi.apitimeout)"
+													class="form-control"
+													constraint="no negative" />
+											</h:div>
+											<h:div class="col-md-6">
+												<h:label class="form-label"><label value="Headers (JSON)" /></h:label>
+												<textbox value="@bind(vm.selectedApi.apiheaders)"
+													class="form-control"
+													multiline="true" rows="3"
+													placeholder='{"Authorization": "Bearer token"}' />
+											</h:div>
+										</h:div>
+
+										<h:div class="row">
+											<h:div class="col-md-12">
+												<h:label class="form-label"><label value="Descripción" /></h:label>
+												<textbox value="@bind(vm.selectedApi.apidescription)"
+													class="form-control"
+													multiline="true" rows="3"
+													placeholder="Descripción de la API" />
+											</h:div>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+
+						<!-- Lista de APIs -->
+						<h:div class="row" visible="@load(vm.selectedApi == null)">
+							<h:div class="col-lg-12">
+								<h:div class="card default shadow-sm">
+									<h:div class="card-header bg-light">
+										<h:h5 class="mb-0">
+											<h:i class="fa-duotone fa-solid fa-list me-2"></h:i>
+											<label value="APIs Configuradas" />
+										</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<grid model="@load(vm.apiList)" style="overflow:auto;">
+											<columns sizable="true">
+												<column label="Nombre" width="20%" />
+												<column label="Endpoint" width="30%" />
+												<column label="Método" width="10%" />
+												<column label="Estado" width="10%" />
+												<column label="Última Prueba" width="15%" />
+												<column label="Acciones" width="15%" align="center" />
+											</columns>
+											<template name="model" var="api">
+												<row>
+													<label value="@load(api.apiname)" />
+													<label value="@load(api.apiendpoint)" />
+													<label value="@load(api.apimethod)"
+														sclass="badge bg-info" />
+													<label value="@load(api.apistatus)"
+														sclass="badge ${api.apistatus eq 'ACTIVE' ? 'bg-success' : (api.apistatus eq 'INACTIVE' ? 'bg-secondary' : 'bg-danger')}" />
+													<label value="@load(api.apilasttestat)" />
+													<cell align="center" class="d-flex">
+														<a onClick="@command('edit', api=api)"
+															iconSclass="fa-duotone fa-solid fa-pen-to-square fs-2x"
+															sclass="waves-effect waves-success me-2"
+															tooltiptext="Editar" />
+														<a onClick="@command('testConnection', api=api)"
+															iconSclass="fa-duotone fa-solid fa-vial fs-2x"
+															sclass="waves-effect waves-warning me-2"
+															tooltiptext="Probar Conexión" />
+														<a onClick="@command('delete', api=api)"
+															iconSclass="fa-light fa-nfc-trash fa-xl"
+															sclass="waves-effect waves-danger"
+															tooltiptext="Eliminar" />
+													</cell>
+												</row>
+											</template>
+										</grid>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

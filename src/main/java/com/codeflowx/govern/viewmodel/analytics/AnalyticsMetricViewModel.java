@@ -26,6 +26,8 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.codeflowx.govern.entity.analytics.AnalyticsMetric;
+import com.codeflowx.govern.service.analytics.AnalyticsMetricService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.PageParams;
@@ -44,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AnalyticsMetricViewModel extends MasterPage {
     
     @WireVariable
-    private BusinessService businessService;
+    private AnalyticsMetricService analyticsMetricService;
     @Autowired
     protected IEntityLocal dao;
     @WireVariable
@@ -57,9 +59,9 @@ public class AnalyticsMetricViewModel extends MasterPage {
     protected DataSource ds;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
+    }
     }
 
     
@@ -198,11 +200,11 @@ public class AnalyticsMetricViewModel extends MasterPage {
     @NotifyChange({"selectedMetric", "showDialog", "isEditing"})
     public void editMetric(@BindingParam("item") AnalyticsMetric metric) {
         try {
-            selectedMetric = businessService.findById(AnalyticsMetric.class, metric.getIdxanalyticsmetric());
+            selectedMetric = analyticsMetricService.findById(metric.getIdxanalyticsmetric());
             isEditing = true;
             showDialog = true;
             log.debug("Editando métrica: ID={}", metric.getIdxanalyticsmetric());
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error cargando métrica para edición", e);
         }
     }
@@ -213,13 +215,13 @@ public class AnalyticsMetricViewModel extends MasterPage {
         try {
             if (selectedMetric != null) {
                 log.debug("Guardando métrica: {}", selectedMetric.getAnlmetricname());
-                businessService.save(selectedMetric);
+                selectedMetric = analyticsMetricService.create(selectedMetric);
                 log.info("Métrica guardada exitosamente: ID={}", selectedMetric.getIdxanalyticsmetric());
                 showDialog = false;
                 selectedMetric = null;
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error guardando métrica", e);
         }
     }
@@ -230,11 +232,11 @@ public class AnalyticsMetricViewModel extends MasterPage {
         try {
             if (metric != null) {
                 log.debug("Eliminando métrica: ID={}, Nombre={}", metric.getIdxanalyticsmetric(), metric.getAnlmetricname());
-                businessService.removeFromID(metric);
+                analyticsMetricService.deleteById(metric.getIdxanalyticsmetric());
                 log.info("Métrica eliminada exitosamente: ID={}", metric.getIdxanalyticsmetric());
                 loadData();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error eliminando métrica", e);
         }
     }

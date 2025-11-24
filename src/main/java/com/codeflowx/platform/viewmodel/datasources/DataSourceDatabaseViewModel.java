@@ -18,6 +18,9 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.datasources.DataSourceDatabase;
+import com.codeflowx.govern.service.datasources.DataSourceDatabaseService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Evaluation;
@@ -39,10 +42,13 @@ import lombok.extern.slf4j.Slf4j;
 public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseViewModel> {
 
     private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
+    @WireVariable
+    private DataSourceDatabaseService dataSourceDatabaseService;
+
     // ========== Datos del formulario ==========
     private String dbName;
     private String dbDescription;
@@ -55,72 +61,68 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
     private String dbConnectionString;
     private String dbConfiguration = "{}";
     private String dbStatus = "ACTIVE";
-    
+
     // ========== Test Results ==========
     private boolean testResultVisible = false;
     private String testResultType = "info";
     private String testResultIcon = "info-circle";
     private String testResultMessage;
     private String testResultDetails;
-    
+
     // ========== Lista de Bases de Datos ==========
     private List<DataSourceDatabase> dbSourcesList = new ArrayList<>();
     private PageParams pageParams;
     private PageResult<DataSourceDatabase> pageResult;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadDbSources();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadDbSources() {
         try {
-            pageResult = businessService.findAllEntity(
-                DataSourceDatabase.class,
-                pageParams,
-                new Criterias()
-            );
-            
+            pageResult = dataSourceDatabaseService.findAll(pageParams);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 dbSourcesList = pageResult.getContent();
             } else {
                 dbSourcesList = new ArrayList<>();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar DB sources", e);
-            Messagebox.show("Error al cargar bases de datos: " + e.getMessage(), 
+            Messagebox.show("Error al cargar bases de datos: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void createDatabaseDataSource() {
         clearForm();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveDatabaseDataSource() {
         try {
             if (dbName == null || dbName.trim().isEmpty()) {
-                Messagebox.show("El nombre de la base de datos es requerido", 
+                Messagebox.show("El nombre de la base de datos es requerido",
                     "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             DataSourceDatabase dbSource = new DataSourceDatabase();
             dbSource.setDbname(dbName);
             dbSource.setDbdescription(dbDescription);
@@ -134,26 +136,26 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             dbSource.setDbconfiguration(dbConfiguration);
             dbSource.setDbstatus(dbStatus);
             dbSource.setDbcreatedat(new Timestamp(System.currentTimeMillis()));
-            
-            businessService.save(dbSource);
-            
+
+            dataSourceDatabaseService.create(dbSource);
+
             // Auditar creación
-            logActivity("CREAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(), 
+            logActivity("CREAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(),
                 "Base de datos creada: " + dbSource.getDbname());
-            
+
             clearForm();
             loadDbSources();
-            
-            Messagebox.show("Base de datos guardada exitosamente", 
+
+            Messagebox.show("Base de datos guardada exitosamente",
                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar DB source", e);
-            Messagebox.show("Error al guardar base de datos: " + e.getMessage(), 
+            Messagebox.show("Error al guardar base de datos: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void testDbConnection() {
@@ -164,7 +166,7 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             testResultIcon = "exclamation-triangle";
             testResultMessage = "Funcionalidad de test en desarrollo. Requiere integración con leka-server.";
             testResultDetails = "Host: " + dbHost + ":" + dbPort + "\nDatabase: " + dbSchema;
-            
+
             log.info("Test DB connection: {}:{}", dbHost, dbPort);
         } catch (Exception e) {
             log.error("Error al testear DB", e);
@@ -175,34 +177,34 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             testResultDetails = e.getMessage();
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void listDbTables() {
         // TODO: Implementar integración con leka-server para listar tablas
-        Messagebox.show("Funcionalidad de listado de tablas en desarrollo. Requiere integración con leka-server.", 
+        Messagebox.show("Funcionalidad de listado de tablas en desarrollo. Requiere integración con leka-server.",
             "Info", Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void validateDbConfig() {
         try {
             testResultVisible = true;
             List<String> errors = new ArrayList<>();
-            
+
             if (dbName == null || dbName.trim().isEmpty()) {
                 errors.add("Nombre de base de datos requerido");
             }
-            
+
             if (dbHost == null || dbHost.trim().isEmpty()) {
                 errors.add("Host requerido");
             }
-            
+
             if (dbPort == null || dbPort <= 0) {
                 errors.add("Puerto inválido");
             }
-            
+
             if (errors.isEmpty()) {
                 testResultType = "success";
                 testResultIcon = "check-circle";
@@ -218,30 +220,30 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             log.error("Error al validar configuración", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void cancelDbConfig() {
         clearForm();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void updateDbFields() {
         // Se actualiza automáticamente
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshDbSources() {
         loadDbSources();
     }
-    
+
     @Command
     public void viewDbSource(@BindingParam("db") DataSourceDatabase dbSource) {
         log.info("Ver DB source: {}", dbSource.getDbname());
     }
-    
+
     @Command
     @NotifyChange("*")
     public void editDbSource(@BindingParam("db") DataSourceDatabase dbSource) {
@@ -257,14 +259,14 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
         dbConfiguration = dbSource.getDbconfiguration();
         dbStatus = dbSource.getDbstatus();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void testDbSource(@BindingParam("db") DataSourceDatabase dbSource) {
-        Messagebox.show("Testeando base de datos: " + dbSource.getDbname(), 
+        Messagebox.show("Testeando base de datos: " + dbSource.getDbname(),
             "Info", Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteDbSource(@BindingParam("db") DataSourceDatabase dbSource) {
@@ -273,24 +275,24 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(dbSource);
-                        
+                        dataSourceDatabaseService.deleteById(dbSource.getIdxdatasourcedatabase());
+
                         // Auditar eliminación
-                        logActivity("ELIMINAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(), 
+                        logActivity("ELIMINAR", "DATASOURCEDATABASES", dbSource.getIdxdatasourcedatabase(),
                             "Base de datos eliminada: " + dbSource.getDbname());
-                        
+
                         loadDbSources();
-                        Messagebox.show("Base de datos eliminada exitosamente", 
+                        Messagebox.show("Base de datos eliminada exitosamente",
                             "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al eliminar DB source", e);
-                        Messagebox.show("Error al eliminar base de datos: " + e.getMessage(), 
+                        Messagebox.show("Error al eliminar base de datos: " + e.getMessage(),
                             "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     private void clearForm() {
         dbName = null;
         dbDescription = null;
@@ -305,7 +307,7 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
         dbStatus = "ACTIVE";
         testResultVisible = false;
     }
-    
+
     public String getDbStatusColor(String status) {
         if (status == null) return "secondary";
         switch (status) {
@@ -316,20 +318,20 @@ public class DataSourceDatabaseViewModel extends BaseFront<DataSourceDatabaseVie
             default: return "secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
-        if (dbSourcesList != null) { 
-            dbSourcesList.clear(); 
-            dbSourcesList = null; 
+        if (dbSourcesList != null) {
+            dbSourcesList.clear();
+            dbSourcesList = null;
         }
         pageResult = null;
         pageParams = null;
-        businessService = null;
+        dataSourceDatabaseService = null;
     }
 }

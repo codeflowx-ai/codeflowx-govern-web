@@ -34,6 +34,10 @@ import com.codeflowx.govern.entity.platform.UpdateInstallation;
 import com.codeflowx.govern.entity.platform.UpdateSchedule;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
+import com.codeflowx.govern.service.platform.PlatformUpdateService;
+import com.codeflowx.govern.service.platform.UpdateInstallationService;
+import com.codeflowx.govern.service.platform.UpdateScheduleService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -58,6 +62,15 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private PlatformUpdateService platformUpdateService;
+    
+    @WireVariable
+    private UpdateInstallationService updateInstallationService;
+    
+    @WireVariable
+    private UpdateScheduleService updateScheduleService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -171,7 +184,7 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentPlatformUpdate = businessService.findById(PlatformUpdate.class, id);
+            currentPlatformUpdate = platformUpdateService.findById(id);
             
             if (currentPlatformUpdate == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -193,7 +206,7 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
             // Auditar carga de registro
             logActivity("CONSULTA", "PLATFORMUPDATES", id, "Consulta: " + currentPlatformUpdate.getIdxplatformupdate());
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -217,14 +230,14 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
             boolean isNew = currentPlatformUpdate.getIdxplatformupdate() == null;
             
             if (isNew) {
-                businessService.save(currentPlatformUpdate);
+                currentPlatformUpdate = platformUpdateService.create(currentPlatformUpdate);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "PLATFORMUPDATES", currentPlatformUpdate.getIdxplatformupdate(), 
                     "Creado: " + currentPlatformUpdate.getIdxplatformupdate());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentPlatformUpdate);
+                currentPlatformUpdate = platformUpdateService.update(currentPlatformUpdate);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "PLATFORMUPDATES", currentPlatformUpdate.getIdxplatformupdate(), 
                     "Actualizado: " + currentPlatformUpdate.getIdxplatformupdate());
@@ -237,7 +250,7 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/platform/platform-overview.zul", page.getFellow(IDDESKTOP), params);
             
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -294,12 +307,12 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
                     .rowActual(0)
                     .build();
                 
-                PageResult<UpdateInstallation> result = businessService.findAllEntity(UpdateInstallation.class, collectionParams, criterias);
+                PageResult<UpdateInstallation> result = updateInstallationService.findAll(collectionParams, criterias);
                 subupdateinstallations = result != null ? result.getContent() : new ArrayList<>();
                 subupdateinstallationsLoaded = true;
                 log.debug("Cargados {} subupdateinstallations", subupdateinstallations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subupdateinstallations", e);
             subupdateinstallations = new ArrayList<>();
         }
@@ -320,12 +333,12 @@ public class PlatformUpdateDetailViewModel extends MasterPage {
                     .rowActual(0)
                     .build();
                 
-                PageResult<UpdateSchedule> result = businessService.findAllEntity(UpdateSchedule.class, collectionParams, criterias);
+                PageResult<UpdateSchedule> result = updateScheduleService.findAll(collectionParams, criterias);
                 subupdateschedules = result != null ? result.getContent() : new ArrayList<>();
                 subupdateschedulesLoaded = true;
                 log.debug("Cargados {} subupdateschedules", subupdateschedules.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subupdateschedules", e);
             subupdateschedules = new ArrayList<>();
         }

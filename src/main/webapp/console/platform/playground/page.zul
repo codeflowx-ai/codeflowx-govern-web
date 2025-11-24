@@ -1,10 +1,10 @@
 <?page title="Playground - CodeflowX Govern" contentType="text/html;charset=UTF-8"?>
 <zk xmlns:n="native">
     <style src="/theme/console/css/console-custom.css"/>
-    
+
     <n:div viewModel="@id('vm') @init('com.codeflowx.platform.viewmodel.playground.PlaygroundOverviewViewModel')"
          class="content-wrapper" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh;">
-        
+
         <!-- Header -->
         <n:div class="d-flex justify-content-between align-items-center mb-4" style="padding: 2rem;">
             <div>
@@ -13,7 +13,7 @@
                 </n:h2>
                 <n:p class="text-white-50 mb-0">Experimenta con diferentes capacidades de IA</n:p>
             </n:div>
-            <button label="Nueva Sesión" iconSclass="fas fa-plus" 
+            <button label="Nueva Sesión" iconSclass="fas fa-plus"
                     sclass="btn btn-light btn-lg shadow-sm"
                     onClick="@command('createSession')"/>
         </n:div>
@@ -110,7 +110,7 @@
                         <n:p class="text-muted mb-3">
                             Conversa con modelos de lenguaje avanzados. Experimenta con diferentes parámetros y contextos.
                         </n:p>
-                        <button label="Abrir Chat" iconSclass="fas fa-arrow-right" 
+                        <button label="Abrir Chat" iconSclass="fas fa-arrow-right"
                                 sclass="btn btn-primary"
                                 onClick="@command('openChat')"/>
                     </n:div>
@@ -128,7 +128,7 @@
                         <n:p class="text-muted mb-3">
                             Crea imágenes a partir de descripciones textuales. Experimenta con estilos y calidades.
                         </n:p>
-                        <button label="Generar Imágenes" iconSclass="fas fa-arrow-right" 
+                        <button label="Generar Imágenes" iconSclass="fas fa-arrow-right"
                                 sclass="btn btn-success"
                                 onClick="@command('openImage')"/>
                     </n:div>
@@ -146,7 +146,7 @@
                         <n:p class="text-muted mb-3">
                             Convierte texto a voz y voz a texto. Experimenta con diferentes voces e idiomas.
                         </n:p>
-                        <button label="Abrir Voz" iconSclass="fas fa-arrow-right" 
+                        <button label="Abrir Voz" iconSclass="fas fa-arrow-right"
                                 sclass="btn btn-info"
                                 onClick="@command('openVoice')"/>
                     </n:div>
@@ -164,7 +164,7 @@
                         <n:p class="text-muted mb-3">
                             Traduce textos entre múltiples idiomas. Evalúa calidad y precisión de traducciones.
                         </n:p>
-                        <button label="Traducir" iconSclass="fas fa-arrow-right" 
+                        <button label="Traducir" iconSclass="fas fa-arrow-right"
                                 sclass="btn btn-warning"
                                 onClick="@command('openTranslation')"/>
                     </n:div>
@@ -182,7 +182,7 @@
                         <n:p class="text-muted mb-3">
                             Enruta automáticamente consultas al modelo o agente más apropiado según el contexto.
                         </n:p>
-                        <button label="Probar Routing" iconSclass="fas fa-arrow-right" 
+                        <button label="Probar Routing" iconSclass="fas fa-arrow-right"
                                 sclass="btn btn-danger"
                                 onClick="@command('openRouting')"/>
                     </n:div>
@@ -245,9 +245,9 @@
                                 <n:span if="${each.sessionstatus eq 'ERROR'}" class="badge bg-danger">Error</n:span>
                             </label>
                             <label value="@load(each.messagecount)" style="text-align: center;"/>
-                            <label value="@load(each.tokensused) @converter('formattedNumber', format='###,###')" 
+                            <label value="@load(each.tokensused) @converter('formattedNumber', format='###,###')"
                                    style="text-align: center;"/>
-                            <label value="@load(each.cost) @converter('formattedNumber', format='$###,##0.00')" 
+                            <label value="@load(each.cost) @converter('formattedNumber', format='$###,##0.00')"
                                    style="text-align: right;"/>
                             <label value="@load(each.sessionlastaccessat) @converter('formattedDate', format='dd/MM/yyyy HH:mm')"/>
                             <n:div class="btn-group btn-group-sm">
@@ -256,14 +256,14 @@
                                         onClick="@command('viewSession', session=each)"/>
                                 <button iconSclass="fas fa-trash" tooltiptext="Eliminar"
                                         sclass="btn btn-sm btn-outline-danger"
-                                        onClick="@command('deleteItem', session=each)"/>
+                                        onClick="@command('deleteSession', session=each)"/>
                             </n:div>
                         </row>
                     </template>
                 </grid>
             </n:div>
             <n:div class="card-footer bg-white border-0 p-3" if="${vm.totalSize > vm.pageSize}">
-                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)" 
+                <paging pageSize="@load(vm.pageSize)" totalSize="@load(vm.totalSize)"
                         activePage="@bind(vm.activePage)" onPaging="@command('changePage')"
                         sclass="pagination pagination-sm justify-content-end mb-0"/>
             </n:div>

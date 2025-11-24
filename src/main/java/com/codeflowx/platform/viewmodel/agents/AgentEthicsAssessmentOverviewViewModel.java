@@ -32,6 +32,8 @@ import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentEthicsAssessment;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentEthicsAssessmentService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -59,6 +61,9 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentEthicsAssessmentService agentEthicsAssessmentService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -128,10 +133,7 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentEthicsAssessment.class,
-                pageParams,
-                criterias
+            pageResult = agentEthicsAssessmentService.findAll(pageParams, criterias
             );
             
             if (pageResult != null && pageResult.getContent() != null) {
@@ -264,7 +266,7 @@ public class AgentEthicsAssessmentOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentEthicsAssessment.class, itemId);
+                            agentEthicsAssessmentService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTETHICSASSESSMENTS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();

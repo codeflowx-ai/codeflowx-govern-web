@@ -31,6 +31,8 @@ import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.agents.AgentAlert;
 import com.codeflowx.admin.Ssoractividad;
+import com.codeflowx.govern.service.agents.AgentAlertService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -59,6 +61,9 @@ public class AgentAlertOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentAlertService agentAlertService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -130,11 +135,7 @@ public class AgentAlertOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllEntity(
-                AgentAlert.class,
-                pageParams,
-                criterias
-            );
+            pageResult = agentAlertService.findAll(pageParams, criterias);
             
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
@@ -152,8 +153,13 @@ public class AgentAlertOverviewViewModel extends MasterPage {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
+            Messagebox.show("Error al cargar datos: " + e.getMessage(), 
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            filteredItems = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar datos", e);
             Messagebox.show("Error al cargar datos: " + e.getMessage(), 
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredItems = new ArrayList<>();
@@ -279,14 +285,18 @@ public class AgentAlertOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(AgentAlert.class, itemId);
+                            agentAlertService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "AGTAGENTALERTS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();
                             Messagebox.show("Registro eliminado correctamente", 
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar ID={}", itemId, e);
+                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                                "Error", Messagebox.OK, Messagebox.ERROR);
+                        } catch (Exception e) {
+                            log.error("Error inesperado al eliminar ID={}", itemId, e);
                             Messagebox.show("Error al eliminar: " + e.getMessage(), 
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }

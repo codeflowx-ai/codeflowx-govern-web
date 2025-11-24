@@ -33,6 +33,8 @@ import com.codeflowx.govern.entity.agents.AgentDecision;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
+import com.codeflowx.govern.service.agents.AgentDecisionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -56,6 +58,9 @@ public class AgentDecisionDetailViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    
+    @WireVariable
+    private AgentDecisionService agentDecisionService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -172,7 +177,7 @@ public class AgentDecisionDetailViewModel extends MasterPage {
             log.debug("Cargando registro ID={}", id);
             
             // findById siempre recibe Long id (el PK)
-            currentAgentDecision = businessService.findById(AgentDecision.class, id);
+            currentAgentDecision = agentDecisionService.findById(id);
             
             if (currentAgentDecision == null) {
                 log.error("Registro no encontrado: ID={}", id);
@@ -220,14 +225,14 @@ public class AgentDecisionDetailViewModel extends MasterPage {
             boolean isNew = currentAgentDecision.getIdxagentdecision() == null;
             
             if (isNew) {
-                businessService.save(currentAgentDecision);
+                currentAgentDecision = agentDecisionService.create(currentAgentDecision);
                 log.info("Registro creado exitosamente");
                 logActivity("CREACION", "AGTAGENTDECISIONS", currentAgentDecision.getIdxagentdecision(), 
                     "Creado: " + currentAgentDecision.getIdxagentdecision());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentAgentDecision);
+                currentAgentDecision = agentDecisionService.update(currentAgentDecision);
                 log.info("Registro actualizado exitosamente");
                 logActivity("EDICION", "AGTAGENTDECISIONS", currentAgentDecision.getIdxagentdecision(), 
                     "Actualizado: " + currentAgentDecision.getIdxagentdecision());

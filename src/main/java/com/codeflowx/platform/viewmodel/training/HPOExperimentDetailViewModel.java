@@ -31,6 +31,9 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.training.HPOExperiment;
 import com.codeflowx.govern.entity.training.HPOTrial;
+import com.codeflowx.govern.service.training.HPOExperimentService;
+import com.codeflowx.govern.service.training.HPOTrialService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -54,95 +57,99 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class HPOExperimentDetailViewModel extends MasterPage {
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private HPOExperimentService hpoExperimentService;
+    @WireVariable
+    private HPOTrialService hpoTrialService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para logActivity y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxhpoexperiment;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private HPOExperiment currentHPOExperiment;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalTrnname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableTrnstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<HPOTrial> subtrnhpotrials = new ArrayList<>();
     private boolean subtrnhpotrialsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxhpoexperiment = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando HPOExperimentDetailViewModel - mode: {}, idxhpoexperiment: {}", mode, idxhpoexperiment);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxhpoexperiment != null) {
@@ -153,11 +160,11 @@ public class HPOExperimentDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentHPOExperiment, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentHPOExperiment = new HPOExperiment();
@@ -165,37 +172,37 @@ public class HPOExperimentDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadTrnstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentHPOExperiment = businessService.findById(HPOExperiment.class, id);
-            
+            currentHPOExperiment = hpoExperimentService.findById(id);
+
             if (currentHPOExperiment == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentHPOExperiment.getTrnname();
         loadTrnstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalTrnname = currentHPOExperiment.getTrnname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "TRNHPOEXPERIMENTS", id, "Consulta: " + currentHPOExperiment.getTrnname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -204,55 +211,55 @@ public class HPOExperimentDetailViewModel extends MasterPage {
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentHPOExperiment.getIdxhpoexperiment() == null;
-            
+
             if (isNew) {
-                businessService.save(currentHPOExperiment);
+                currentHPOExperiment = hpoExperimentService.create(currentHPOExperiment);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "TRNHPOEXPERIMENTS", currentHPOExperiment.getIdxhpoexperiment(), 
+                logActivity("CREACION", "TRNHPOEXPERIMENTS", currentHPOExperiment.getIdxhpoexperiment(),
                     "Creado: " + currentHPOExperiment.getTrnname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentHPOExperiment);
+                currentHPOExperiment = hpoExperimentService.update(currentHPOExperiment);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "TRNHPOEXPERIMENTS", currentHPOExperiment.getIdxhpoexperiment(), 
+                logActivity("EDICION", "TRNHPOEXPERIMENTS", currentHPOExperiment.getIdxhpoexperiment(),
                     "Actualizado: " + currentHPOExperiment.getTrnname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentHPOExperiment.getTrnname() == null || currentHPOExperiment.getTrnname().trim().isEmpty()) {
             errors.append("- Name\n");
         }
@@ -295,16 +302,16 @@ public class HPOExperimentDetailViewModel extends MasterPage {
         if (currentHPOExperiment.getTrncreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -313,14 +320,14 @@ public class HPOExperimentDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/training/training-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadTrnstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableTrnstatuss.add("OPTION_1");
         availableTrnstatuss.add("OPTION_2");
         availableTrnstatuss.add("OPTION_3");
     }
-    
+
     private void loadSubtrnhpotrials() {
         try {
             if (currentHPOExperiment != null && currentHPOExperiment.getIdxhpoexperiment() != null) {
@@ -328,25 +335,25 @@ public class HPOExperimentDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "hpoExperiment");
                 criteria.setValues(new Object[]{currentHPOExperiment.getIdxhpoexperiment()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<HPOTrial> result = businessService.findAllEntity(HPOTrial.class, collectionParams, criterias);
+
+                PageResult<HPOTrial> result = hpoTrialService.findAll(collectionParams, criterias);
                 subtrnhpotrials = result != null ? result.getContent() : new ArrayList<>();
                 subtrnhpotrialsLoaded = true;
                 log.debug("Cargados {} subtrnhpotrials", subtrnhpotrials.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subtrnhpotrials", e);
             subtrnhpotrials = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subtrnhpotrials")
     public void onSelectSubtrnhpotrialsTab() {
@@ -354,7 +361,7 @@ public class HPOExperimentDetailViewModel extends MasterPage {
             loadSubtrnhpotrials();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -380,7 +387,7 @@ public class HPOExperimentDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -388,34 +395,34 @@ public class HPOExperimentDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentHPOExperiment = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableTrnstatuss != null) {
                 availableTrnstatuss.clear();
                 availableTrnstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subtrnhpotrials != null) {
                 subtrnhpotrials.clear();
                 subtrnhpotrials = null;
             }
             subtrnhpotrialsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

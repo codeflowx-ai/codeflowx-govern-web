@@ -13,6 +13,9 @@ import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.domainingestion.Domain;
+import com.codeflowx.govern.service.domainingestion.DomainService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
@@ -30,54 +33,57 @@ import lombok.extern.slf4j.Slf4j;
 @Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
 public class DomainManagementViewModel extends BaseFront<DomainManagementViewModel> {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
     private PageParams pageParams;
     private PageResult<Domain> pageResult;
-    
+
+    @WireVariable
+    private DomainService domainService;
+
     private String searchText = "";
     private String filterIndustry = "";
     private String filterStatus = "";
-    
+
     private List<Domain> domainsList = new ArrayList<>();
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(50)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadDomains();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadDomains() {
         try {
             Criterias criterias = buildCriterias();
-            pageResult = businessService.findAllEntity(Domain.class, pageParams, criterias);
-            
+            pageResult = domainService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 domainsList = pageResult.getContent();
                 logActivity("BUSCAR", "DOMAINS", null, "Gestión: " + domainsList.size() + " dominios");
             } else {
                 domainsList = new ArrayList<>();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar dominios", e);
             Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
         if (searchText != null && !searchText.trim().isEmpty()) {
@@ -91,39 +97,45 @@ public class DomainManagementViewModel extends BaseFront<DomainManagementViewMod
         }
         return criterias;
     }
-    
+
     @Command
     @NotifyChange("*")
     public void searchDomains() {
         pageParams.setPageActual(1);
         loadDomains();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
         pageParams.setPageActual(1);
         loadDomains();
     }
-    
+
     @Command
     public void createNewDomain() {
         // TODO: Navegar a wizard
         log.info("Crear nuevo dominio");
     }
-    
+
     @Command
     public void viewDomainDetail(@BindingParam("domain") Domain domain) {
         logActivity("VER", "DOMAINS", domain.getIdxdomain(), "Detalle: " + domain.getDindomainname());
         log.info("Ver detalle dominio: {}", domain.getDindomainname());
     }
-    
+
     @Command
     public void editDomain(@BindingParam("domain") Domain domain) {
         logActivity("EDITAR", "DOMAINS", domain.getIdxdomain(), "Edición: " + domain.getDindomainname());
         log.info("Editar dominio: {}", domain.getDindomainname());
     }
-    
+
+    @Command
+    @NotifyChange("*")
+    public void deleteItem(@BindingParam("domain") Domain domain) {
+        deleteDomain(domain);
+    }
+
     @Command
     @NotifyChange("*")
     public void deleteDomain(@BindingParam("domain") Domain domain) {
@@ -132,19 +144,19 @@ public class DomainManagementViewModel extends BaseFront<DomainManagementViewMod
             event -> {
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
-                        businessService.removeFromID(domain);
-                        logActivity("ELIMINAR", "DOMAINS", domain.getIdxdomain(), 
+                        domainService.deleteById(domain.getIdxdomain());
+                        logActivity("ELIMINAR", "DOMAINS", domain.getIdxdomain(),
                             "Dominio eliminado: " + domain.getDindomainname());
                         loadDomains();
                         Messagebox.show("Dominio eliminado", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                    } catch (Exception e) {
+                    } catch (GovernanceServiceException e) {
                         log.error("Error al eliminar", e);
                         Messagebox.show("Error: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
                     }
                 }
             });
     }
-    
+
     public String translateStatus(String status) {
         if (status == null) return "N/A";
         switch (status) {
@@ -155,7 +167,7 @@ public class DomainManagementViewModel extends BaseFront<DomainManagementViewMod
             default: return status;
         }
     }
-    
+
     public String getStatusColor(String status) {
         if (status == null) return "badge bg-secondary";
         switch (status) {
@@ -166,12 +178,12 @@ public class DomainManagementViewModel extends BaseFront<DomainManagementViewMod
             default: return "badge bg-secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
         if (domainsList != null) {
@@ -180,7 +192,6 @@ public class DomainManagementViewModel extends BaseFront<DomainManagementViewMod
         }
         pageResult = null;
         pageParams = null;
-        businessService = null;
+        domainService = null;
     }
 }
-

@@ -30,9 +30,12 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
 import com.codeflowx.govern.entity.evaluation.BiasAnalysis;
+import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.entity.evaluation.BiasDetection;
+import com.codeflowx.govern.service.evaluation.BiasAnalysisService;
+import com.codeflowx.govern.service.evaluation.BiasDetectionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 
-import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -55,15 +58,19 @@ public class AnalyticsBiasViewModel extends MasterPage {
 
     private static final long serialVersionUID = 1L;
     
-    @WireVariable private BusinessService businessService;
+    @WireVariable
+    private ModelService modelService;
+    @WireVariable
+    private BiasAnalysisService biasAnalysisService;
+    @WireVariable
+    private BiasDetectionService biasDetectionService;
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
     
     protected void initDao() {
-        if (businessService == null) {
-            businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
-        }
+        // Ya no es necesario inicializar BusinessService manualmente
+        // El Service se inyecta automáticamente mediante @WireVariable
     }
     
     @Override
@@ -90,38 +97,30 @@ public class AnalyticsBiasViewModel extends MasterPage {
     
     private void loadData() {
         try {
-            // TABLE - usar findAllEntity
+            // TABLE - usar servicio dedicado
             PageParams pageParams1 = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
             
-            PageResult<BiasAnalysis> result1 = businessService.findAllEntity(
-                BiasAnalysis.class, 
-                pageParams1, 
-                new Criterias()
-            );
+            PageResult<BiasAnalysis> result1 = biasAnalysisService.findAll(pageParams1);
             if (result1 != null && result1.getContent() != null) {
                 biasAnalysisList = result1.getContent();
             }
             
-            // TABLE - usar findAllEntity
+            // TABLE - usar servicio dedicado
             PageParams pageParams2 = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
             
-            PageResult<BiasDetection> result2 = businessService.findAllEntity(
-                BiasDetection.class, 
-                pageParams2, 
-                new Criterias()
-            );
+            PageResult<BiasDetection> result2 = biasDetectionService.findAll(pageParams2);
             if (result2 != null && result2.getContent() != null) {
                 detections = result2.getContent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
         }
     }
@@ -155,7 +154,6 @@ public class AnalyticsBiasViewModel extends MasterPage {
     public void destroy() {
         if (biasAnalysisList != null) { biasAnalysisList.clear(); biasAnalysisList = null; }
         if (detections != null) { detections.clear(); detections = null; }
-        businessService = null;
     }
 }
 

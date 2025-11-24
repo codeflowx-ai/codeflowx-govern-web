@@ -32,6 +32,10 @@ import org.zkoss.zul.Messagebox;
 import com.codeflowx.govern.entity.rag.RagSystem;
 import com.codeflowx.govern.entity.rag.RagDataSource;
 import com.codeflowx.govern.entity.rag.RagVersion;
+import com.codeflowx.govern.service.rag.RagSystemService;
+import com.codeflowx.govern.service.rag.RagDataSourceService;
+import com.codeflowx.govern.service.rag.RagVersionService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -55,99 +59,108 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 public class RagSystemDetailViewModel extends MasterPage {
-    
+
     @WireVariable
     private BusinessService businessService;
-    
+
+    @WireVariable
+    private RagSystemService ragSystemService;
+
+    @WireVariable
+    private RagDataSourceService ragDataSourceService;
+
+    @WireVariable
+    private RagVersionService ragVersionService;
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxragsystem;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private RagSystem currentRagSystem;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalRagsystemname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableRagtypes = new ArrayList<>();
     private List<String> availableRagstatuss = new ArrayList<>();
     private List<String> availableRaggovernancestatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<RagDataSource> subragragdatasources = new ArrayList<>();
     private List<RagVersion> subragragversions = new ArrayList<>();
     private boolean subragragdatasourcesLoaded = false;
     private boolean subragragversionsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxragsystem = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando RagSystemDetailViewModel - mode: {}, idxragsystem: {}", mode, idxragsystem);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxragsystem != null) {
@@ -158,11 +171,11 @@ public class RagSystemDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentRagSystem, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentRagSystem = new RagSystem();
@@ -172,39 +185,39 @@ public class RagSystemDetailViewModel extends MasterPage {
         loadRagstatuss();
         loadRaggovernancestatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentRagSystem = businessService.findById(RagSystem.class, id);
-            
+            currentRagSystem = ragSystemService.findById(id);
+
             if (currentRagSystem == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentRagSystem.getRagsystemname();
             loadRagtypes();
             loadRagstatuss();
             loadRaggovernancestatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalRagsystemname = currentRagSystem.getRagsystemname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "RAGSYSTEMS", id, "Consulta: " + currentRagSystem.getRagsystemname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
@@ -213,55 +226,55 @@ public class RagSystemDetailViewModel extends MasterPage {
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentRagSystem.getIdxragsystem() == null;
-            
+
             if (isNew) {
-                businessService.save(currentRagSystem);
+                ragSystemService.create(currentRagSystem);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
+                logActivity("CREACION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(),
                     "Creado: " + currentRagSystem.getRagsystemname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentRagSystem);
+                ragSystemService.update(currentRagSystem);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(), 
+                logActivity("EDICION", "RAGSYSTEMS", currentRagSystem.getIdxragsystem(),
                     "Actualizado: " + currentRagSystem.getRagsystemname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentRagSystem.getRagsystemname() == null || currentRagSystem.getRagsystemname().trim().isEmpty()) {
             errors.append("- System Name\n");
         }
@@ -286,16 +299,16 @@ public class RagSystemDetailViewModel extends MasterPage {
         if (currentRagSystem.getRagcreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -304,7 +317,7 @@ public class RagSystemDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/rag/rag-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadRagtypes() {
         // Cargar tipos de sistema RAG
         availableRagtypes.add("KNOWLEDGE_BASE");
@@ -312,7 +325,7 @@ public class RagSystemDetailViewModel extends MasterPage {
         availableRagtypes.add("CODE_ASSISTANT");
         availableRagtypes.add("SUPPORT");
     }
-    
+
     private void loadRagstatuss() {
         // Cargar estados de sistema RAG
         availableRagstatuss.add("ACTIVE");
@@ -320,14 +333,14 @@ public class RagSystemDetailViewModel extends MasterPage {
         availableRagstatuss.add("DRAFT");
         availableRagstatuss.add("ARCHIVED");
     }
-    
+
     private void loadRaggovernancestatuss() {
         // Cargar estados de gobierno
         availableRaggovernancestatuss.add("APPROVED");
         availableRaggovernancestatuss.add("REJECTED");
         availableRaggovernancestatuss.add("PENDING");
     }
-    
+
     private void loadSubragragdatasources() {
         try {
             if (currentRagSystem != null && currentRagSystem.getIdxragsystem() != null) {
@@ -335,25 +348,25 @@ public class RagSystemDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragSystem");
                 criteria.setValues(new Object[]{currentRagSystem.getIdxragsystem()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<RagDataSource> result = businessService.findAllEntity(RagDataSource.class, collectionParams, criterias);
+
+                PageResult<RagDataSource> result = ragDataSourceService.findAll(collectionParams, criterias);
                 subragragdatasources = result != null ? result.getContent() : new ArrayList<>();
                 subragragdatasourcesLoaded = true;
                 log.debug("Cargados {} subragragdatasources", subragragdatasources.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subragragdatasources", e);
             subragragdatasources = new ArrayList<>();
         }
     }
-    
+
     private void loadSubragragversions() {
         try {
             if (currentRagSystem != null && currentRagSystem.getIdxragsystem() != null) {
@@ -361,25 +374,25 @@ public class RagSystemDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "ragSystem");
                 criteria.setValues(new Object[]{currentRagSystem.getIdxragsystem()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<RagVersion> result = businessService.findAllEntity(RagVersion.class, collectionParams, criterias);
+
+                PageResult<RagVersion> result = ragVersionService.findAll(collectionParams, criterias);
                 subragragversions = result != null ? result.getContent() : new ArrayList<>();
                 subragragversionsLoaded = true;
                 log.debug("Cargados {} subragragversions", subragragversions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar subragragversions", e);
             subragragversions = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("subragragdatasources")
     public void onSelectSubragragdatasourcesTab() {
@@ -387,7 +400,7 @@ public class RagSystemDetailViewModel extends MasterPage {
             loadSubragragdatasources();
         }
     }
-    
+
     @Command
     @NotifyChange("subragragversions")
     public void onSelectSubragragversionsTab() {
@@ -395,7 +408,7 @@ public class RagSystemDetailViewModel extends MasterPage {
             loadSubragragversions();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -421,7 +434,7 @@ public class RagSystemDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -429,13 +442,13 @@ public class RagSystemDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentRagSystem = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableRagtypes != null) {
                 availableRagtypes.clear();
@@ -449,7 +462,7 @@ public class RagSystemDetailViewModel extends MasterPage {
                 availableRaggovernancestatuss.clear();
                 availableRaggovernancestatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (subragragdatasources != null) {
                 subragragdatasources.clear();
@@ -461,15 +474,15 @@ public class RagSystemDetailViewModel extends MasterPage {
                 subragragversions = null;
             }
             subragragversionsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
+
             // Limpiar BusinessService
             businessService = null;
-            
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

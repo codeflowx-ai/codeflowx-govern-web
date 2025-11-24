@@ -29,6 +29,8 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.event.PagingEvent;
 import com.codeflowx.govern.entity.views.prompts.PromptCostAnalysis;
+import com.codeflowx.govern.service.prompts.PromptCostAnalysisService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import codeflowx.nocode.persist.BusinessService;
 import codeflowx.nocode.persist.Criteria;
@@ -58,6 +60,8 @@ public class PromptCostAnalysisOverviewViewModel extends MasterPage {
     
     @WireVariable
     private BusinessService businessService;
+    @WireVariable
+    private PromptCostAnalysisService promptCostAnalysisService;
     
     @Autowired
     protected IEntityLocal dao;
@@ -127,11 +131,7 @@ public class PromptCostAnalysisOverviewViewModel extends MasterPage {
             
             Criterias criterias = buildCriterias();
             
-            pageResult = businessService.findAllView(
-                PromptCostAnalysis.class,
-                pageParams,
-                criterias
-            );
+            pageResult = promptCostAnalysisService.findAll(pageParams, criterias);
             
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
@@ -149,8 +149,13 @@ public class PromptCostAnalysisOverviewViewModel extends MasterPage {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
+            Messagebox.show("Error al cargar datos: " + e.getMessage(), 
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            filteredItems = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar datos", e);
             Messagebox.show("Error al cargar datos: " + e.getMessage(), 
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredItems = new ArrayList<>();
@@ -262,12 +267,11 @@ public class PromptCostAnalysisOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(PromptCostAnalysis.class, itemId);
-                            log.info("Registro eliminado: ID={}", itemId);
-                            logActivity("BORRAR", "V_PROMPT_COST_ANALYSIS", itemId, "Eliminado registro ID: " + itemId);
-                            loadData();
-                            Messagebox.show("Registro eliminado correctamente", 
-                                "Éxito", Messagebox.OK, Messagebox.INFORMATION);
+                            // Nota: PromptCostAnalysis es una vista de solo lectura, no se puede eliminar
+                            // Si se necesita eliminar, debe hacerse sobre la entidad base correspondiente
+                            log.warn("Intento de eliminar vista de solo lectura PromptCostAnalysis ID={}", itemId);
+                            Messagebox.show("No se puede eliminar un registro de una vista de solo lectura", 
+                                "Error", Messagebox.OK, Messagebox.ERROR);
                         } catch (Exception e) {
                             log.error("Error al eliminar ID={}", itemId, e);
                             Messagebox.show("Error al eliminar: " + e.getMessage(), 
