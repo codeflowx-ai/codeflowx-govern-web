@@ -205,9 +205,13 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                     Messagebox.OK, Messagebox.EXCLAMATION);
                 initNewAgent();
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar agente", e);
             Messagebox.show("Error al cargar agente: " + e.getMessage(), "Error",
+                Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar agente", e);
+            Messagebox.show("Error inesperado al cargar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -236,8 +240,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 agentVersions = result.getContent();
                 log.info("Cargadas {} versiones", agentVersions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar versiones", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar versiones", e);
         }
     }
 
@@ -264,8 +270,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 agentDeployments = result.getContent();
                 log.info("Cargados {} deployments", agentDeployments.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar deployments", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar deployments", e);
         }
     }
 
@@ -292,8 +300,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 agentTools = result.getContent();
                 log.info("Cargadas {} tools", agentTools.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar tools", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar tools", e);
         }
     }
 
@@ -320,8 +330,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 agentWorkflows = result.getContent();
                 log.info("Cargados {} workflows", agentWorkflows.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar workflows", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar workflows", e);
         }
     }
 
@@ -355,8 +367,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                     lastHealthCheck = latest.getAgtcreatedat();
                 }
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar health checks", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar health checks", e);
         }
     }
 
@@ -383,8 +397,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 monitoringData = result.getContent();
                 log.info("Cargados {} registros de monitoreo", monitoringData.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos de monitoreo", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar datos de monitoreo", e);
         }
     }
 
@@ -411,8 +427,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 collaborations = result.getContent();
                 log.info("Cargadas {} colaboraciones", collaborations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar colaboraciones", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar colaboraciones", e);
         }
     }
 
@@ -439,8 +457,10 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
                 recentDecisions = result.getContent();
                 log.info("Cargadas {} decisiones", recentDecisions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar decisiones", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar decisiones", e);
         }
     }
 
@@ -558,9 +578,13 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
 
                 log.info("Agente guardado exitosamente: {}", currentAgent.getIdxagent());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar agente", e);
             Messagebox.show("Error al guardar agente: " + e.getMessage(), "Error",
+                Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar agente", e);
+            Messagebox.show("Error inesperado al guardar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -630,9 +654,13 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
 
             Messagebox.show("Health check completado: " + currentHealthStatus, "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al ejecutar health check", e);
             Messagebox.show("Error al ejecutar health check: " + e.getMessage(), "Error",
+                Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al ejecutar health check", e);
+            Messagebox.show("Error inesperado al ejecutar health check: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -667,9 +695,13 @@ public class AgentsDetailViewModel extends BaseFront<AgentsDetailViewModel> impl
 
             Messagebox.show("Agente desplegado correctamente en " + environment, "Éxito",
                 Messagebox.OK, Messagebox.INFORMATION);
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al desplegar agente", e);
             Messagebox.show("Error al desplegar agente: " + e.getMessage(), "Error",
+                Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al desplegar agente", e);
+            Messagebox.show("Error inesperado al desplegar agente: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }

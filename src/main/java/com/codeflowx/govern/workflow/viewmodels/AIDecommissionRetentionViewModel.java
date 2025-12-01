@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -7,7 +8,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class AIDecommissionRetentionViewModel extends MasterPage {
+public class AIDecommissionRetentionViewModel extends BaseFront<AIDecommissionRetentionViewModel>{
 
     private static final long serialVersionUID = 1L;
 

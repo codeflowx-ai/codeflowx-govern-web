@@ -1,10 +1,11 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -36,35 +37,35 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class BiasUrgentDecisionViewModel extends MasterPage {
+public class BiasUrgentDecisionViewModel extends BaseFront<BiasUrgentDecisionViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -73,10 +74,10 @@ public class BiasUrgentDecisionViewModel extends MasterPage {
     // ========== Servicios Flowable ==========
     @WireVariable
     private TaskService taskService;
-    
+
     @WireVariable
     private RuntimeService runtimeService;
-    
+
     // ========== Datos ==========
     private String taskId;
     private String processInstanceId;
@@ -84,39 +85,39 @@ public class BiasUrgentDecisionViewModel extends MasterPage {
     private Double disparateImpact;
     private String selectedDecision;
     private String justification;
-    
+
     private boolean mockMode = false;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         log.info("🚀 Inicializando BiasUrgentDecisionViewModel");
-        
+
         java.util.Map<String, String[]> params = Executions.getCurrent().getParameterMap();
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         taskId = Executions.getCurrent().getParameter("taskId");
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         processInstanceId = task.getProcessInstanceId();
         modelName = (String) runtimeService.getVariable(processInstanceId, "modelName");
         disparateImpact = (Double) runtimeService.getVariable(processInstanceId, "disparateImpact");
     }
-    
+
     private void loadMockData() {
         this.taskId = "mock-bias-urgent-001";
         this.processInstanceId = "mock-bias-urgent-process-001";
@@ -130,12 +131,12 @@ public class BiasUrgentDecisionViewModel extends MasterPage {
         if (mockMode) {
             log.info("🎭 Mock mode: Simulando confirm - decision={}", selectedDecision);
             logActivity("MOCK_BIAS_URGENT", "BiasUrgent", null, "Simulación: " + selectedDecision);
-            Messagebox.show("✅ [DEMO] Decisión urgente confirmada: " + selectedDecision, "Demo Mode", 
+            Messagebox.show("✅ [DEMO] Decisión urgente confirmada: " + selectedDecision, "Demo Mode",
                 Messagebox.OK, Messagebox.INFORMATION,
                 e -> Executions.sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
             return;
         }
-        
+
         runtimeService.setVariable(processInstanceId, "urgentDecision", selectedDecision);
         runtimeService.setVariable(processInstanceId, "biasUrgentJustification", justification);
         taskService.complete(taskId);
@@ -148,23 +149,8 @@ public class BiasUrgentDecisionViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/governance/reports/effectiveness.zul";
         Executions.sendRedirect(redirect);
     }
-    
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
+
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {
         businessService = null;

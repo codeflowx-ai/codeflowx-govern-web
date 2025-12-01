@@ -1,0 +1,201 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<!-- ViewModel binding -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ComplianceReportViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<!-- Título pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-file-certificate me-2"></h:i>
+						Reporte Ejecutivo de Compliance
+					</h:h2>
+					<h:p class="text-muted">
+						Documentación automática y reporte final de cumplimiento AI Act
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Opciones de Generación -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Opciones de Reporte</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-4">
+								<label class="form-label">Tipo de Reporte</label>
+								<combobox
+									selectedItem="@bind(vm.reportType)"
+									class="form-control">
+									<comboitem label="Completo" value="FULL" />
+									<comboitem label="Ejecutivo" value="EXECUTIVE" />
+									<comboitem label="Técnico" value="TECHNICAL" />
+									<comboitem label="Auditoría" value="AUDIT" />
+								</combobox>
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">Período</label>
+								<combobox
+									selectedItem="@bind(vm.reportPeriod)"
+									class="form-control">
+									<comboitem label="Últimos 7 días" value="LAST_7_DAYS" />
+									<comboitem label="Últimos 30 días" value="LAST_30_DAYS" />
+									<comboitem label="Últimos 90 días" value="LAST_90_DAYS" />
+									<comboitem label="Personalizado" value="CUSTOM" />
+								</combobox>
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">&nbsp;</label>
+								<div class="hstack gap-2">
+									<button
+										label="Generar Reporte"
+										onClick="@command('generateReport')"
+										class="btn btn-primary"
+										disabled="@load(vm.reportGenerated)" />
+									<button
+										label="Refrescar"
+										onClick="@command('refreshReport')"
+										class="btn btn-secondary" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Reporte Generado -->
+			<div class="col-lg-12 s-bot" visible="@load(vm.reportGenerated)">
+				<!-- Resumen del Reporte -->
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">@load(vm.report.title)</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3 mb-4">
+							<div class="col-md-3">
+								<div class="card bg-light">
+									<div class="card-body">
+										<h:h6 class="text-muted mb-2">Sistemas Totales</h:h6>
+										<h:h3 class="mb-0">@load(vm.report.totalSystems)</h:h3>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card bg-light">
+									<div class="card-body">
+										<h:h6 class="text-muted mb-2">Alto Riesgo</h:h6>
+										<h:h3 class="mb-0 text-warning">@load(vm.report.highRiskSystems)</h:h3>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card bg-light">
+									<div class="card-body">
+										<h:h6 class="text-muted mb-2">FRIA Completadas</h:h6>
+										<h:h3 class="mb-0 text-success">@load(vm.report.friaCompleted)</h:h3>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-3">
+								<div class="card bg-light">
+									<div class="card-body">
+										<h:h6 class="text-muted mb-2">Score Compliance</h:h6>
+										<h:h3 class="mb-0">@load(vm.report.complianceScore)%</h:h3>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-4">
+							<h:h5>Resumen Ejecutivo</h:h5>
+							<textbox value="@load(vm.report.executiveSummary)" readonly="true"
+								multiline="true" rows="5" class="form-control" />
+						</div>
+
+						<div class="mb-3">
+							<button
+								label="Exportar a PDF"
+								onClick="@command('exportToPdf')"
+								class="btn btn-primary" />
+						</div>
+					</div>
+				</div>
+
+				<!-- Evidencias -->
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Evidencias</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.evidences)" class="table table-hover">
+							<listhead>
+								<listheader label="Tipo" width="150px" />
+								<listheader label="Título" />
+								<listheader label="Estado" width="120px" />
+								<listheader label="Fecha" width="150px" />
+								<listheader label="Acción" width="100px" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.type)" />
+									<listcell label="@load(each.title)" />
+									<listcell>
+										<span class="badge bg-@load(each.status == 'COMPLETED' or each.status == 'REGISTERED' or each.status == 'SIGNED' ? 'success' : 'warning')">
+											@load(each.status)
+										</span>
+									</listcell>
+									<listcell label="@load(each.timestamp)" />
+									<listcell>
+										<button
+											label="Ver"
+											onClick="@command('viewEvidence', evidence=each)"
+											class="btn btn-sm btn-primary" />
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+
+				<!-- Conclusiones -->
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Conclusiones</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.conclusions)" class="table table-hover">
+							<listhead>
+								<listheader label="Categoría" width="150px" />
+								<listheader label="Título" />
+								<listheader label="Estado" width="100px" />
+								<listheader label="Descripción" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.category)" />
+									<listcell label="@load(each.title)" />
+									<listcell>
+										<span class="badge bg-@load(each.status == 'POSITIVE' ? 'success' : each.status == 'NEGATIVE' ? 'danger' : 'secondary')">
+											@load(each.status)
+										</span>
+									</listcell>
+									<listcell label="@load(each.description)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.projects;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,7 +25,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ProjectAIInventoryViewModel {
+public class ProjectAIInventoryViewModel extends BaseFront<ProjectAIInventoryViewModel> {
 
     private static final List<String> AI_SYSTEM_TYPES =
             Collections.unmodifiableList(Arrays.asList("MODEL", "AGENT", "RAG", "PROMPT", "HYBRID"));

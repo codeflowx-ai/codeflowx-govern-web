@@ -1,0 +1,93 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml">
+
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.workflow.viewmodels.CategorizeAndDocumentViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row">
+			<div>
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-tags me-2"></h:i>
+						Categorize and Document Incident
+					</h:h2>
+					<h:p class="text-muted">
+						Categorize and document normal incident (non-serious)
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Incident Info -->
+			<div class="col-lg-12 s-bot">
+				<div class="card border-info">
+					<div class="card-header bg-info text-white">
+						<h:h5 class="card-title mb-0">ℹ️ NORMAL INCIDENT</h:h5>
+					</div>
+					<div class="card-body">
+						<h:p class="mb-0"><strong>Severity:</strong>
+							<h:span class="badge bg-info"><label value="@load(vm.severity)" /></h:span>
+						</h:p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Incident Category -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Incident Category *</h:h5>
+						<combobox width="100%" value="@bind(vm.incidentCategory)">
+							<comboitem label="Performance Issue" value="PERFORMANCE_ISSUE" />
+							<comboitem label="Data Quality" value="DATA_QUALITY" />
+							<comboitem label="User Experience" value="USER_EXPERIENCE" />
+							<comboitem label="System Error" value="SYSTEM_ERROR" />
+							<comboitem label="Configuration Issue" value="CONFIGURATION_ISSUE" />
+							<comboitem label="Other" value="OTHER" />
+						</combobox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Incident Description -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Incident Description *</h:h5>
+						<textbox rows="5" width="100%" value="@bind(vm.incidentDescription)"
+						         placeholder="Describe the incident, when it occurred, and its impact..." />
+					</div>
+				</div>
+			</div>
+
+			<!-- Priority -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<h:h5 class="mb-2">Priority</h:h5>
+						<combobox width="100%" value="@bind(vm.incidentPriority)">
+							<comboitem label="Low" value="LOW" />
+							<comboitem label="Medium" value="MEDIUM" selected="true" />
+							<comboitem label="High" value="HIGH" />
+						</combobox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Submit Button -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-body">
+						<button label="Submit Categorization"
+						        iconSclass="fa fa-check"
+						        zclass="btn btn-primary btn-lg"
+						        onClick="@command('submitCategorization')" />
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>

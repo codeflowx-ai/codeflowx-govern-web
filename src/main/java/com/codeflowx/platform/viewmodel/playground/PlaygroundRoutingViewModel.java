@@ -13,6 +13,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.agents.Agent;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundRouting;
@@ -22,17 +23,16 @@ import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.service.playground.PlaygroundRoutingService;
 import com.codeflowx.govern.service.playground.PlaygroundSessionService;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
+
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
-public class PlaygroundRoutingViewModel extends BaseFront {
+public class PlaygroundRoutingViewModel extends BaseFront<PlaygroundRoutingViewModel> {
 
     @WireVariable
     private ModelService modelService;
@@ -64,7 +64,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_ROUTING", "ACCESS", null, "Usuario accedió a Routing Playground");
+        logActivity("ACCESS", "PLAYGROUND_ROUTING", null, "Usuario accedió a Routing Playground");
         loadAvailableModels();
         loadAvailableAgents();
         loadOrCreateSession();
@@ -73,7 +73,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_ROUTING", "LEAVE", null, "Usuario salió de Routing Playground");
+        logActivity("LEAVE", "PLAYGROUND_ROUTING", null, "Usuario salió de Routing Playground");
     }
 
     private void loadAvailableModels() {
@@ -161,13 +161,13 @@ public class PlaygroundRoutingViewModel extends BaseFront {
 
             // Simulate alternatives
             routing.setRoutingalternatives("{\"alternatives\": [{\"model\": \"gpt-4\", \"confidence\": 88.1}, {\"model\": \"claude-3\", \"confidence\": 85.7}]}");
-            
+
             routing = playgroundRoutingService.create(routing);
-            
+
             routingResult = routing;
             loadRoutings();
-            
-            logActivity("PLAYGROUND_ROUTING", "ANALYZE", null, "Consulta enrutada");
+
+            logActivity("ANALYZE", "PLAYGROUND_ROUTING", null, "Consulta enrutada");
             Messagebox.show("Routing completado exitosamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (GovernanceServiceException e) {
             log.error("Error routing query", e);
@@ -180,7 +180,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     public void clear() {
         inputQuery = "";
         routingResult = null;
-        logActivity("PLAYGROUND_ROUTING", "CLEAR", null, "Campos limpiados");
+        logActivity("CLEAR", "PLAYGROUND_ROUTING", null, "Campos limpiados");
     }
 
     @Command
@@ -195,7 +195,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     public void viewRouting(PlaygroundRouting routing) {
         routingResult = routing;
         inputQuery = routing.getRoutinginput();
-        logActivity("PLAYGROUND_ROUTING", "VIEW", null, "Viendo detalles de routing");
+        logActivity("VIEW", "PLAYGROUND_ROUTING", null, "Viendo detalles de routing");
     }
 
     @Command
@@ -214,7 +214,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
                 routingResult = null;
             }
             loadRoutings();
-            logActivity("PLAYGROUND_ROUTING", "DELETE", null, "Routing eliminado");
+            logActivity("DELETE", "PLAYGROUND_ROUTING", null, "Routing eliminado");
         } catch (GovernanceServiceException e) {
             log.error("Error deleting routing", e);
         }
@@ -235,7 +235,7 @@ public class PlaygroundRoutingViewModel extends BaseFront {
     @Command
     @NotifyChange({"routingHistory"})
     public void changePage() {
-        logActivity("PLAYGROUND_ROUTING", "PAGE_CHANGE", "Cambio a página: " + activePage);
+        logActivity("PAGE_CHANGE", "PLAYGROUND_ROUTING", null, "Cambio a página: " + activePage);
     }
 
     @Command

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class DefineAdapterParametersViewModel extends MasterPage {
+public class DefineAdapterParametersViewModel extends BaseFront<DefineAdapterParametersViewModel>{
 
     private static final long serialVersionUID = 1L;
 

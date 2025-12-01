@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.incident;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
@@ -31,50 +32,49 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class VerifyIncidentResolutionViewModel extends MasterPage {
+public class VerifyIncidentResolutionViewModel extends BaseFront<VerifyIncidentResolutionViewModel>{
 
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private TaskService taskService;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
-    }
-    
+
     @Override
     public void setBeans(Object bean) {}
 
     private String taskId;
     private String incidentTitle = "";
     private Integer correctiveActionsCount = 0;
-    
+
     // Verification fields
     private Boolean issueResolved = false;
     private Boolean noRecurrence = false;
     private String verificationNotes = "";
     private String resolutionEvidence = "";
-    
+
     @Init
     public void init(@QueryParam("taskId") String taskId) {
         this.taskId = taskId;
         loadTaskData();
     }
-    
+
     private void loadTaskData() {
         try {
             if (taskService != null && taskId != null) {
@@ -89,13 +89,13 @@ public class VerifyIncidentResolutionViewModel extends MasterPage {
     @NotifyChange("*")
     public void confirmResolution() {
         log.info("User decision: Confirm Resolution - taskId: {}", taskId);
-        
+
         if (!issueResolved || !noRecurrence) {
-            Messagebox.show("Please confirm both checkboxes to verify resolution", 
+            Messagebox.show("Please confirm both checkboxes to verify resolution",
                           "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             if (taskService != null && taskId != null) {
                 java.util.Map<String, Object> variables = new java.util.HashMap<>();
@@ -104,10 +104,10 @@ public class VerifyIncidentResolutionViewModel extends MasterPage {
                 variables.put("resolutionEvidence", resolutionEvidence);
                 variables.put("verifiedBy", ctxBean.getUser().getUsuname());
                 variables.put("verificationDate", System.currentTimeMillis());
-                
+
                 taskService.complete(taskId, variables);
-                
-                Messagebox.show("Incident marked as RESOLVED and will be closed", 
+
+                Messagebox.show("Incident marked as RESOLVED and will be closed",
                               "Success", Messagebox.OK, Messagebox.INFORMATION);
             }
         } catch (Exception e) {
@@ -120,10 +120,10 @@ public class VerifyIncidentResolutionViewModel extends MasterPage {
     @NotifyChange("*")
     public void escalateIncident() {
         log.info("User decision: Escalate - taskId: {}", taskId);
-        
+
         Messagebox.show("This will escalate the incident and create a new corrective action cycle. Continue?",
-                       "Confirm Escalation", 
-                       Messagebox.YES | Messagebox.NO, 
+                       "Confirm Escalation",
+                       Messagebox.YES | Messagebox.NO,
                        Messagebox.QUESTION,
                        event -> {
                            if (event.getName().equals("onYes")) {
@@ -133,10 +133,10 @@ public class VerifyIncidentResolutionViewModel extends MasterPage {
                                        variables.put("incidentResolved", false);
                                        variables.put("verificationNotes", verificationNotes);
                                        variables.put("escalatedBy", ctxBean.getUser().getUsuname());
-                                       
+
                                        taskService.complete(taskId, variables);
-                                       
-                                       Messagebox.show("Incident ESCALATED - new corrective actions required", 
+
+                                       Messagebox.show("Incident ESCALATED - new corrective actions required",
                                                      "Info", Messagebox.OK, Messagebox.WARNING);
                                    }
                                } catch (Exception e) {
@@ -147,4 +147,3 @@ public class VerifyIncidentResolutionViewModel extends MasterPage {
                        });
     }
 }
-

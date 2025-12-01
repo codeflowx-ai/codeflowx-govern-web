@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -44,7 +45,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ComplianceAssessmentViewModel extends MasterPage {
+public class ComplianceAssessmentViewModel extends BaseFront<ComplianceAssessmentViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";

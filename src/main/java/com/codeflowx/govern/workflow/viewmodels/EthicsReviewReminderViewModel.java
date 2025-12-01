@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,31 +37,31 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: Ethics Review Reminder
- * 
+ *
  * BPMN Process: ethics-review-v1
  * User Task: ethicsReviewReminderTask
  * Candidate Groups: ethics-committee
  * Triggered by: Timer Boundary Event (PT72H - después de 72 horas)
- * 
+ *
  * Funcionalidad:
  * - Recordatorio de revisión ética pendiente después de 72h
  * - Mostrar estado actual de la revisión
  * - Decidir: PROCEED_REVIEW (continuar), POSTPONE (posponer), CANCEL (cancelar)
  * - Justificar decisión de postponer o cancelar
- * 
+ *
  * Input Variables (desde proceso BPMN):
  * - systemId: Long
  * - systemName: String
  * - pendingSinceDays: Integer - Días pendiente
  * - reviewPriority: String
- * 
+ *
  * Output Variables (al completar task):
  * - reminder_decision: String - 'proceed', 'postpone', 'cancel'
  * - reminder_notes: String
  * - postpone_days: Integer (si aplica)
  * - decided_by: String
  * - decision_time: Timestamp
- * 
+ *
  * Modo MOCK:
  * - URL: /workflow/ethics-review-reminder.zul?taskId=mock-13&mock=true
  * - Datos simulados: Revisión ética pendiente 3 días, prioridad media
@@ -70,34 +71,34 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class EthicsReviewReminderViewModel extends MasterPage {
+public class EthicsReviewReminderViewModel extends BaseFront<EthicsReviewReminderViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -126,23 +127,23 @@ public class EthicsReviewReminderViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
-        
-        
+
+
+
         log.info("🚀 Inicializando EthicsReviewReminderViewModel - MOCK MODE: {}", mockMode);
-        
+
         if (mockMode) {
             loadMockData();
         } else {
             loadRealData();
         }
     }
-    
+
     private void loadMockData() {
         taskId = Executions.getCurrent().getParameter("taskId");
         systemName = "Sistema IA Evaluación Desempeño";
@@ -150,7 +151,7 @@ public class EthicsReviewReminderViewModel extends MasterPage {
         reviewPriority = "MEDIUM";
         log.info("✅ Datos MOCK cargados - Reminder de revisión ética");
     }
-    
+
     private void loadRealData() {
         try {
             taskId = Executions.getCurrent().getParameter("taskId");
@@ -167,12 +168,12 @@ public class EthicsReviewReminderViewModel extends MasterPage {
     @Command
     public void confirm() {
         if (mockMode) {
-            Messagebox.show("✅ DEMO: Decisión confirmada\n\nSistema: " + systemName + "\nDecisión: " + selectedDecision + "\n\n(Modo MOCK)", 
+            Messagebox.show("✅ DEMO: Decisión confirmada\n\nSistema: " + systemName + "\nDecisión: " + selectedDecision + "\n\n(Modo MOCK)",
                 "Demo", Messagebox.OK, Messagebox.INFORMATION,
                 e -> Executions.sendRedirect("/workflow/task-inbox.zul?mock=true"));
             return;
         }
-        
+
         runtimeService.setVariable(processInstanceId, "reminder_decision", selectedDecision);
         runtimeService.setVariable(processInstanceId, "reminder_notes", notes);
         if ("POSTPONE".equals(selectedDecision)) {
@@ -188,23 +189,8 @@ public class EthicsReviewReminderViewModel extends MasterPage {
     public void cancel() {
         Executions.sendRedirect(mockMode ? "/workflow/task-inbox.zul?mock=true" : "/console/govern/ethics-dashboard.zul");
     }
-    
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
+
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {
         businessService = null;

@@ -28,7 +28,7 @@ import codeflowx.nocode.persist.Criterias;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DataSourceOverviewViewModel extends BaseFront {
+public class DataSourceOverviewViewModel extends BaseFront<DataSourceOverviewViewModel> {
 
     @WireVariable
     private DataSourceService dataSourceService;

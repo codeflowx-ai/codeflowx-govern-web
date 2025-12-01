@@ -1,11 +1,12 @@
 package com.codeflowx.govern.viewmodel.analytics;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.suinsit.nocode.web.MasterBeanUI;
+import com.codeflowx.framework.zkoss.BaseFront;
 import codeflowx.nocode.persist.*;
 import com.codeflowx.govern.entity.analytics.AnalyticsReport;
 import com.codeflowx.govern.service.analytics.AnalyticsReportService;
@@ -31,8 +32,8 @@ import org.springframework.core.env.Environment;
 @Getter
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class AnalyticsReportViewModel extends MasterBeanUI {
-    
+public class AnalyticsReportViewModel extends BaseFront<AnalyticsReportViewModel>{
+
     @WireVariable
     private AnalyticsReportService analyticsReportService;
     @Autowired
@@ -43,14 +44,14 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
     protected GenericApplicationContext contexto;
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
     }
 
-    
+
     private PageResult<AnalyticsReport> pageResult;
     private PageParams pageParams;
     private String searchTerm = "";
@@ -60,42 +61,42 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
     private boolean showDialog = false;
     private boolean showDataDialog = false;
     private boolean isEditing = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadData();
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void loadData() {
         try {
-            log.debug("Cargando reportes - Página: {}, SearchTerm: '{}', Type: '{}', Status: '{}'", 
+            log.debug("Cargando reportes - Página: {}, SearchTerm: '{}', Type: '{}', Status: '{}'",
                      pageParams.getPageActual(), searchTerm, filterType, filterStatus);
-            
+
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 // Búsqueda por nombre o descripción
                 String sql = "SELECT * FROM ANLANALYTICSREPORTS WHERE " +
                             "UPPER(ANLREPORTNAME) LIKE :search OR " +
                             "UPPER(ANLREPORTDESCRIPTION) LIKE :search";
-                
+
                 if (!"all".equals(filterType)) {
                     sql += " AND ANLREPORTTYPE = :type";
                 }
                 if (!"all".equals(filterStatus)) {
                     sql += " AND ANLSTATUS = :status";
                 }
-                
+
                 Map<String, Object> params = new HashMap<>();
                 params.put("search", "%" + searchTerm.toUpperCase() + "%");
                 if (!"all".equals(filterType)) {
@@ -104,13 +105,13 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
                 if (!"all".equals(filterStatus)) {
                     params.put("status", filterStatus);
                 }
-                
+
                 pageResult = businessService.findByParams(AnalyticsReport.class, sql, params, pageParams);
             } else if (!"all".equals(filterType) || !"all".equals(filterStatus)) {
                 // Filtros sin búsqueda
                 StringBuilder sql = new StringBuilder("SELECT * FROM ANLANALYTICSREPORTS WHERE 1=1");
                 Map<String, Object> params = new HashMap<>();
-                
+
                 if (!"all".equals(filterType)) {
                     sql.append(" AND ANLREPORTTYPE = :type");
                     params.put("type", filterType);
@@ -119,7 +120,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
                     sql.append(" AND ANLSTATUS = :status");
                     params.put("status", filterStatus);
                 }
-                
+
                 sql.append(" ORDER BY ANLCREATEDAT DESC");
                 pageResult = businessService.findByParams(AnalyticsReport.class, sql.toString(), params, pageParams);
             } else {
@@ -127,20 +128,20 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
                 String sqlAll = "SELECT * FROM ANLANALYTICSREPORTS ORDER BY ANLCREATEDAT DESC";
                 pageResult = businessService.findByParams(AnalyticsReport.class, sqlAll, null, pageParams);
             }
-            
+
             log.debug("Reportes cargados: {}", pageResult != null && pageResult.getContent() != null ? pageResult.getContent().size() : 0);
         } catch (Exception e) {
             log.error("Error cargando reportes de analytics", e);
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void search() {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearSearch() {
@@ -150,7 +151,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void nextPage() {
@@ -160,7 +161,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             loadData();
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void previousPage() {
@@ -170,7 +171,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             loadData();
         }
     }
-    
+
     @Command
     @NotifyChange({"selectedReport", "showDialog", "isEditing"})
     public void newReport() {
@@ -179,7 +180,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
         showDialog = true;
         log.debug("Abriendo formulario para nuevo reporte");
     }
-    
+
     @Command
     @NotifyChange({"selectedReport", "showDialog", "isEditing"})
     public void editReport(@BindingParam("item") AnalyticsReport report) {
@@ -192,7 +193,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             log.error("Error cargando reporte para edición", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"pageResult", "showDialog", "selectedReport"})
     public void saveReport() {
@@ -209,7 +210,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             log.error("Error guardando reporte", e);
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void deleteReport(@BindingParam("item") AnalyticsReport report) {
@@ -224,7 +225,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             log.error("Error eliminando reporte", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"selectedReport", "showDataDialog"})
     public void viewReportData(@BindingParam("item") AnalyticsReport report) {
@@ -236,7 +237,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             log.error("Error cargando datos del reporte", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"pageResult"})
     public void regenerateReport(@BindingParam("item") AnalyticsReport report) {
@@ -252,7 +253,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             log.error("Error regenerando reporte", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"showDialog", "selectedReport"})
     public void cancelEdit() {
@@ -260,21 +261,21 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
         showDialog = false;
         log.debug("Cancelando edición");
     }
-    
+
     @Command
     @NotifyChange({"showDataDialog", "selectedReport"})
     public void closeDataDialog() {
         showDataDialog = false;
         log.debug("Cerrando visor de datos");
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void refresh() {
         log.debug("Refrescando lista de reportes");
         loadData();
     }
-    
+
     // Métodos auxiliares
     public String getReportStatusBadge(String status) {
         if (status == null) return "secondary";
@@ -286,7 +287,7 @@ public class AnalyticsReportViewModel extends MasterBeanUI {
             default: return "secondary";
         }
     }
-    
+
     public String truncateDescription(String description) {
         if (description == null) return "";
         return description.length() > 100 ? description.substring(0, 100) + "..." : description;

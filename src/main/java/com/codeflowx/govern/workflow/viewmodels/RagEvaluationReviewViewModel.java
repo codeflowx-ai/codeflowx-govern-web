@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -38,20 +39,20 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: RAG Evaluation Review
- * 
+ *
  * Proceso BPMN: 06_RAG_EVALUATION (rag-evaluation-v1)
  * User Task: ragReviewTask
  * Candidate Groups: ai-governance-team, data-engineers
- * 
+ *
  * Funcionalidad:
  * Permite revisar los resultados de evaluación de un sistema RAG (Retrieval-Augmented Generation).
  * Evalúa contexto, relevancia, precisión de recuperación y calidad de generación.
- * 
+ *
  * Input Variables:
  * - rag_evaluation_id: Long
  * - rag_system_name: String
  * - overall_score: Double
- * 
+ *
  * Output Variables:
  * - decision: "approve" | "reject" | "retest"
  * - notes: String
@@ -61,34 +62,34 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class RagEvaluationReviewViewModel extends MasterPage {
+public class RagEvaluationReviewViewModel extends BaseFront<RagEvaluationReviewViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -104,10 +105,10 @@ public class RagEvaluationReviewViewModel extends MasterPage {
     private String processInstanceId;
     private String decision;
     private String notes;
-    
+
     // Mock mode
     private boolean mockMode = false;
-    
+
     // Mock data
     private String ragSystemName;
     private Long ragEvaluationId;
@@ -121,22 +122,22 @@ public class RagEvaluationReviewViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        
+
         // Detectar mock mode
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         if (params.containsKey("taskId")) {
             this.taskId = params.get("taskId")[0];
             loadTaskData();
@@ -148,15 +149,15 @@ public class RagEvaluationReviewViewModel extends MasterPage {
             org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .taskId(taskId).singleResult();
             this.processInstanceId = task.getProcessInstanceId();
-            
+
             Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
             this.ragSystemName = (String) variables.get("rag_system_name");
             this.ragEvaluationId = (Long) variables.get("rag_evaluation_id");
-            
+
             log.info("✅ Task data loaded: taskId={}", taskId);
         } catch (Exception e) {
             log.error("❌ Error cargando task data", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -168,27 +169,27 @@ public class RagEvaluationReviewViewModel extends MasterPage {
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando submit - decision={}", decision);
                 logActivity("MOCK_SUBMIT_RAG_EVAL", "RagEvaluation", ragEvaluationId, "Simulación de decisión: " + decision);
-                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode", 
+                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode",
                     Messagebox.OK, Messagebox.INFORMATION,
                     event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
                 return;
             }
-            
+
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("decision", decision);
             taskVariables.put("notes", notes);
-            
+
             taskService.complete(taskId, taskVariables);
-            
+
             logActivity("SUBMIT_RAG_EVAL", "RagEvaluation", ragEvaluationId, "Decisión: " + decision);
-            
-            Messagebox.show("Decision submitted", "Success", 
+
+            Messagebox.show("Decision submitted", "Success",
                 Messagebox.OK, Messagebox.INFORMATION,
                 event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul"));
-                
+
         } catch (Exception e) {
             log.error("❌ Error submitting", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -198,7 +199,7 @@ public class RagEvaluationReviewViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/plataforma/workflow/my-tasks.zul";
         Executions.getCurrent().sendRedirect(redirect);
     }
-    
+
     /**
      * Mock data para demos
      */
@@ -211,29 +212,14 @@ public class RagEvaluationReviewViewModel extends MasterPage {
         this.contextRelevance = 0.92;
         this.answerAccuracy = 0.85;
         this.retrievalPrecision = 0.87;
-        
+
         log.info("🎭 Mock data loaded for RAG Evaluation Review");
     }
-    
+
     /**
      * Registra actividad del usuario
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
     @Destroy
     public void destroy() {
         businessService = null;

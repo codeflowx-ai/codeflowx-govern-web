@@ -1,25 +1,25 @@
 # INCIDENCIAS Y RECOMENDACIONES - AUDITORÍA 005: EVALUACIÓN RAG
 
-**Fecha:** 2025-01-27  
-**Última Actualización:** 2025-01-XX (INC-005-002 mejorado con servicios avanzados en leka-llm-evaluation)  
-**Auditoría de Referencia:** AUDITORIA_005_EVALUACION_RAG.md  
-**Clasificación:** Incidencias y Recomendaciones Prioritarias  
+**Fecha:** 2025-01-27
+**Última Actualización:** 2025-01-XX (INC-005-002 mejorado con servicios avanzados en leka-llm-evaluation)
+**Auditoría de Referencia:** AUDITORIA_005_EVALUACION_RAG.md
+**Clasificación:** Incidencias y Recomendaciones Prioritarias
 **Estado:** ✅ **TODAS LAS INCIDENCIAS RESUELTAS (10/10)**
 
 ---
 
 ## INCIDENCIAS CRÍTICAS (P0)
 
-**⚠️ NOTA:** La incidencia INC-005-001 (Almacenamiento Inmutable) ha sido **RESUELTA**.  
-**Solución Implementada:** Se utiliza la tabla general **IMLIMMUTABLELOGS** para todos los logs inmutables según EU AI Act Art. 17.  
+**⚠️ NOTA:** La incidencia INC-005-001 (Almacenamiento Inmutable) ha sido **RESUELTA**.
+**Solución Implementada:** Se utiliza la tabla general **IMLIMMUTABLELOGS** para todos los logs inmutables según EU AI Act Art. 17.
 **Referencia:** Ver sección 6.2 del documento `AUDITORIA_005_EVALUACION_RAG.md` para detalles completos de la implementación.
 
 ---
 
 ### INC-005-002: Detección Insuficiente de Hallucinaciones
-**Severidad:** CRÍTICA  
-**Prioridad:** P0  
-**Categoría:** Calidad y Seguridad  
+**Severidad:** CRÍTICA
+**Prioridad:** P0
+**Categoría:** Calidad y Seguridad
 **Estado:** ✅ **RESUELTO** - 2025-01-27 (Actualizado: 2025-01-XX)
 
 **Descripción:**
@@ -66,16 +66,33 @@ El sistema actual detecta alucinaciones de forma básica mediante verificación 
 - Endpoints documentados en Swagger UI: `http://localhost:8002/api/docs`
 - Cliente Java disponible en `codeflowx.govern.nocode.client`
 
-**Referencia:** 
+**Integración Backend Java (Actualizado: 2025-11-25):**
+
+✅ **BusinessService Java Implementado:**
+- **`HallucinationDetectionService`** (`com.codeflowx.govern.business.rag.HallucinationDetectionService`)
+- Integración completa con `AIGovernanceClient.llmEvaluation().detectAdvancedHallucination()`
+- Usa modelos Java: `AdvancedHallucinationDetectionRequest`, `AdvancedHallucinationDetectionResponse`
+- Fallback básico implementado cuando el microservicio no está disponible
+- Método `validateFactualAccuracy()` para validación de precisión factual
+
+**Métodos Disponibles:**
+- `detectHallucinations(String text, List<String> context, String query)` - Detección principal
+- `validateFactualAccuracy(String text, List<String> context)` - Validación de precisión
+
+**Ubicación:**
+- `/eclipse-workspace/nocode.service/codeflowx.govern.business/src/main/java/com/codeflowx/govern/business/rag/HallucinationDetectionService.java`
+
+**Referencia:**
 - Ver `IMPLEMENTACION_INC-005-002_INC-010-012.md` en `leka-llm-evaluation` para detalles completos
 - Ver `MEJORAS_INCIDENCIAS_005.md` sección INC-005-002 para implementación anterior en leka-rag-evaluation
+- Cliente Java: `LLMEvaluationClient.detectAdvancedHallucination()` en `codeflowx.govern.nocode.client`
 
 ---
 
 ### INC-005-003: Validación Proactiva de Políticas del Cliente
-**Severidad:** CRÍTICA  
-**Prioridad:** P0  
-**Categoría:** Cumplimiento y Gobernanza  
+**Severidad:** CRÍTICA
+**Prioridad:** P0
+**Categoría:** Cumplimiento y Gobernanza
 **Estado:** ✅ **RESUELTO** - 2025-01-27 (Actualizado: 2025-01-XX)
 
 **Descripción:**
@@ -126,7 +143,7 @@ La validación de alineación con políticas del cliente se realiza después de 
 **EU AI Act Compliance:**
 - Artículo 15 (Transparencia) - Validación proactiva de políticas
 
-**Referencia:** 
+**Referencia:**
 - Ver prompt `INC-005-003_validacion_proactiva_politicas_microservice.md` para detalles completos
 - Ver `MEJORAS_INCIDENCIAS_005.md` sección INC-005-003 para implementación anterior en leka-rag-evaluation
 
@@ -135,9 +152,9 @@ La validación de alineación con políticas del cliente se realiza después de 
 ## INCIDENCIAS ALTAS (P1)
 
 ### INC-005-004: Falta de Métricas Estandarizadas RAG
-**Severidad:** ALTA  
-**Prioridad:** P1  
-**Categoría:** Calidad y Evaluación  
+**Severidad:** ALTA
+**Prioridad:** P1
+**Categoría:** Calidad y Evaluación
 **Estado:** ✅ **RESUELTO** - 2025-01-27
 
 **Descripción:**
@@ -166,9 +183,9 @@ Aunque existen métricas básicas (precision, recall, BLEU, ROUGE), falta una su
 ---
 
 ### INC-005-005: No Evaluación de Sesgo en Embeddings
-**Severidad:** ALTA  
-**Prioridad:** P1  
-**Categoría:** Ética y Sesgo  
+**Severidad:** ALTA
+**Prioridad:** P1
+**Categoría:** Ética y Sesgo
 **Estado:** ✅ **RESUELTO** - 2025-01-27
 
 **Descripción:**
@@ -194,9 +211,9 @@ No existe evaluación sistemática de sesgos en los embeddings generados. Los em
 ---
 
 ### INC-005-006: Detección Post-Generación de Errores de Grounding
-**Severidad:** ALTA  
-**Prioridad:** P1  
-**Categoría:** Calidad  
+**Severidad:** ALTA
+**Prioridad:** P1
+**Categoría:** Calidad
 **Estado:** ✅ **RESUELTO** - 2025-01-27
 
 **Descripción:**
@@ -225,9 +242,9 @@ Los errores de grounding se detectan después de generar la respuesta, no durant
 ## INCIDENCIAS MEDIAS (P2)
 
 ### INC-005-010: Proceso BPMN de Evaluación RAG Incompleto
-**Severidad:** MEDIA  
-**Prioridad:** P2  
-**Categoría:** Integración y Gobernanza  
+**Severidad:** MEDIA
+**Prioridad:** P2
+**Categoría:** Integración y Gobernanza
 **Estado:** ✅ **RESUELTO** - 2025-01-27
 
 **Descripción:**
@@ -279,9 +296,9 @@ El proceso BPMN `rag-evaluation-v1.bpmn` estaba documentado pero tenía gaps de 
 ---
 
 ### INC-005-007: Falta de Evaluación de Calidad de Chunks
-**Severidad:** MEDIA  
-**Prioridad:** P2  
-**Categoría:** Calidad  
+**Severidad:** MEDIA
+**Prioridad:** P2
+**Categoría:** Calidad
 **Estado:** ✅ **RESUELTO** - 2025-01-27
 
 **Descripción:**
@@ -305,17 +322,17 @@ No se evalúa la coherencia semántica de chunks ni se detecta si chunks rompen 
 ---
 
 ### INC-005-008: Falta de Validación de Ética y Valores
-**⚠️ NOTA:** Esta incidencia ha sido **RESUELTA** mediante uso de la entidad existente.  
-**Solución Implementada:** Se utiliza la entidad general **EthicsReview** (tabla `ETHETHICSREVIEWS`) del módulo de gobierno para validaciones éticas de RAG.  
-**Uso:** Crear `EthicsReview` con `ETHENTITYTYPE = 'RAG'` o `'RAG_RESPONSE'` y `ETHENTITYID` apuntando al sistema/respuesta RAG específica.  
+**⚠️ NOTA:** Esta incidencia ha sido **RESUELTA** mediante uso de la entidad existente.
+**Solución Implementada:** Se utiliza la entidad general **EthicsReview** (tabla `ETHETHICSREVIEWS`) del módulo de gobierno para validaciones éticas de RAG.
+**Uso:** Crear `EthicsReview` con `ETHENTITYTYPE = 'RAG'` o `'RAG_RESPONSE'` y `ETHENTITYID` apuntando al sistema/respuesta RAG específica.
 **Referencia:** Ver entidad `com.codeflowx.govern.entity.governance.EthicsReview` y documento `COMPARACION_ETICA_RAG.md` para detalles.
 
 ---
 
 ### INC-005-009: Falta de Proceso de Mejora Continua
-**Severidad:** MEDIA  
-**Prioridad:** P2  
-**Categoría:** Operaciones  
+**Severidad:** MEDIA
+**Prioridad:** P2
+**Categoría:** Operaciones
 **Estado:** ✅ **RESUELTO** - 2025-01-27 (Actualizado: 2025-01-21 con workflow BPMN)
 
 **Descripción:**
@@ -374,7 +391,7 @@ No existe pipeline sistemático de A/B testing, retroalimentación de usuarios y
 - Integrado con `AgentMonitoringClient` para A/B testing y feedback
 - Clientes disponibles en `codeflowx.govern.nocode.client`
 
-**Referencia:** 
+**Referencia:**
 - Ver `MEJORAS_INCIDENCIAS_005.md` sección INC-005-009 para detalles del microservicio Python
 - Ver prompt: `docs/compliance/gaps/prompts/bpmn/INC-005-009_mejora_continua_workflow.md` para detalles del workflow BPMN
 
@@ -395,9 +412,9 @@ No existe pipeline sistemático de A/B testing, retroalimentación de usuarios y
 | ~~INC-005-009~~ | ~~MEDIA~~ | ~~P2~~ | ~~Operaciones~~ | ~~180 días~~ | ✅ **RESUELTO** - 2025-01-27 - Sistema de mejora continua |
 | ~~INC-005-010~~ | ~~MEDIA~~ | ~~P2~~ | ~~Integración~~ | ~~180 días~~ | ✅ **RESUELTO** - 2025-01-27 - Proceso BPMN completo |
 
-**Total Incidencias:** 10 (10 resueltas, 0 pendientes) ✅  
-**Críticas (P0):** 3 resueltas (INC-005-001, INC-005-002, INC-005-003) ✅  
-**Altas (P1):** 3 resueltas (INC-005-004, INC-005-005, INC-005-006) ✅  
+**Total Incidencias:** 10 (10 resueltas, 0 pendientes) ✅
+**Críticas (P0):** 3 resueltas (INC-005-001, INC-005-002, INC-005-003) ✅
+**Altas (P1):** 3 resueltas (INC-005-004, INC-005-005, INC-005-006) ✅
 **Medias (P2):** 4 resueltas (INC-005-007, INC-005-008, INC-005-009, INC-005-010) ✅
 
 ---
@@ -419,10 +436,10 @@ No existe pipeline sistemático de A/B testing, retroalimentación de usuarios y
 - ✅ ~~Validación de ética y valores~~ - **COMPLETADO** (Usa EthicsReview)
 - ✅ ~~Proceso de mejora continua~~ - **COMPLETADO** (2025-01-27)
 
-**Estado General:** ✅ **10 DE 10 INCIDENCIAS RESUELTAS (100%)**  
-**Fecha de Finalización:** 2025-01-27  
-**Pendiente:** Ninguna - Todas las incidencias han sido resueltas ✅  
-**Referencia de Implementación:** Ver `MEJORAS_INCIDENCIAS_005.md` y `MEJORAS_PLACEHOLDERS_BENCHMARKING.md`  
+**Estado General:** ✅ **10 DE 10 INCIDENCIAS RESUELTAS (100%)**
+**Fecha de Finalización:** 2025-01-27
+**Pendiente:** Ninguna - Todas las incidencias han sido resueltas ✅
+**Referencia de Implementación:** Ver `MEJORAS_INCIDENCIAS_005.md` y `MEJORAS_PLACEHOLDERS_BENCHMARKING.md`
 **Referencia BPMN:** Ver `docs/compliance/bpmn/aios/rag-evaluation/` y `codeflowx.govern.workflow.lib/src/main/resources/processes/aios/rag-evaluation-v1.bpmn`
 
 **Cliente Java RAG Implementado:**
@@ -442,4 +459,3 @@ No existe pipeline sistemático de A/B testing, retroalimentación de usuarios y
 ---
 
 *Documento generado automáticamente por Sistema de Auditoría CodeflowX*
-

@@ -1,0 +1,457 @@
+# Model Context Protocol (MCP) - Integración CodeflowX
+# Versión: 1.0.0
+# Fecha: 2025-01-XX
+# Basado en: Anthropic Model Context Protocol (MCP)
+# Referencia: https://docs.anthropic.com/mcp
+
+version: "1.0.0"
+name: "CodeflowX MCP Server"
+description: "Servidor MCP que expone funcionalidades de CodeflowX AI OS como herramientas MCP para agentes de IA (Claude, ChatGPT, etc.)"
+
+# Protocolo MCP (Anthropic)
+# MCP es un protocolo cliente/servidor basado en JSON-RPC que permite
+# que agentes de IA se conecten con herramientas y fuentes de datos externas.
+#
+# Arquitectura:
+#   AI Agent (Claude, ChatGPT) → MCP Client → MCP Server (CodeflowX) → Backend
+#
+# CodeflowX expone sus funcionalidades como herramientas MCP:
+#   - register_agent: Registrar agentes externos
+#   - send_telemetry: Enviar telemetría
+#   - policy_check: Verificar políticas
+#   - memory_get/set: Gestión de memoria
+#   - supervisor_status: Estado del supervisor
+
+# Integración con AioComponent
+integration:
+  extends: "AioComponent"
+  type: "MCP_SERVER"
+  protocol: "JSON-RPC 2.0"
+  transport: ["stdio", "http", "websocket"]
+  metadata_schema:
+    hooks:
+      type: array
+      items:
+        type: string
+        enum: ["onOnboard", "preInvoke", "postInvoke", "onPolicyViolation", "onTelemetry"]
+    endpoints:
+      type: object
+      properties:
+        onOnboard:
+          type: string
+          format: uri
+        preInvoke:
+          type: string
+          format: uri
+        postInvoke:
+          type: string
+          format: uri
+        onPolicyViolation:
+          type: string
+          format: uri
+        onTelemetry:
+          type: string
+          format: uri
+    version:
+      type: string
+      pattern: "^\\d+\\.\\d+\\.\\d+$"
+
+# Hooks Estándar
+hooks:
+  onOnboard:
+    description: "Hook ejecutado cuando se registra un componente en CodeflowX"
+    trigger: "POST /api/v1/aios/components/register"
+    payload:
+      type: object
+      required:
+        - component_uuid
+        - component_type
+        - metadata
+      properties:
+        component_uuid:
+          type: string
+          format: uuid
+          description: "UUID del componente registrado"
+        component_type:
+          type: string
+          enum: ["MODEL", "AGENT", "PROMPT", "DATASET", "PIPELINE", "SERVICE", "MCP"]
+          description: "Tipo de componente"
+        metadata:
+          type: object
+          description: "Metadatos del componente"
+          properties:
+            name:
+              type: string
+            namespace:
+              type: string
+            version:
+              type: string
+            capabilities:
+              type: array
+              items:
+                type: string
+        workspace_uuid:
+          type: string
+          format: uuid
+          description: "UUID del workspace"
+        project_uuid:
+          type: string
+          format: uuid
+          description: "UUID del proyecto (opcional)"
+    returns:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        metadata:
+          type: object
+          description: "Metadatos adicionales a agregar al componente"
+    timeout_seconds: 30
+    retryable: true
+
+  preInvoke:
+    description: "Hook ejecutado antes de invocar modelo/agente para validación o transformación"
+    trigger: "Antes de ejecutar invocación de componente"
+    payload:
+      type: object
+      required:
+        - component_uuid
+        - prompt
+        - context
+      properties:
+        component_uuid:
+          type: string
+          format: uuid
+          description: "UUID del componente a invocar"
+        prompt:
+          type: string
+          description: "Prompt o input a procesar"
+        context:
+          type: object
+          description: "Contexto de la invocación"
+          properties:
+            user_id:
+              type: string
+            workspace_uuid:
+              type: string
+              format: uuid
+            session_id:
+              type: string
+            metadata:
+              type: object
+        invocation_type:
+          type: string
+          enum: ["SYNC", "ASYNC", "STREAM"]
+          default: "SYNC"
+    returns:
+      type: object
+      required:
+        - allowed
+      properties:
+        allowed:
+          type: boolean
+          description: "Si la invocación está permitida"
+        reason:
+          type: string
+          description: "Razón de la decisión"
+        transformed_prompt:
+          type: string
+          description: "Prompt transformado (opcional)"
+        additional_context:
+          type: object
+          description: "Contexto adicional a agregar"
+        metadata:
+          type: object
+          description: "Metadatos adicionales"
+    timeout_seconds: 5
+    retryable: false
+    blocking: true
+    notes: |
+      Si allowed=false, la invocación se bloquea.
+      Si se proporciona transformed_prompt, se usa en lugar del original.
+
+  postInvoke:
+    description: "Hook ejecutado después de invocar modelo/agente para procesamiento de respuesta"
+    trigger: "Después de ejecutar invocación de componente"
+    payload:
+      type: object
+      required:
+        - component_uuid
+        - response
+        - metrics
+      properties:
+        component_uuid:
+          type: string
+          format: uuid
+        response:
+          type: string
+          description: "Respuesta generada por el componente"
+        original_prompt:
+          type: string
+          description: "Prompt original"
+        metrics:
+          type: object
+          properties:
+            latency_ms:
+              type: integer
+            tokens_used:
+              type: integer
+            cost_usd:
+              type: number
+            model_version:
+              type: string
+        context:
+          type: object
+          description: "Contexto de la invocación"
+    returns:
+      type: object
+      properties:
+        transformed_response:
+          type: string
+          description: "Respuesta transformada (opcional)"
+        metadata:
+          type: object
+          description: "Metadatos adicionales"
+        should_log:
+          type: boolean
+          default: true
+          description: "Si se debe registrar en ImmutableLog"
+    timeout_seconds: 10
+    retryable: true
+    blocking: false
+    notes: |
+      Si se proporciona transformed_response, se usa en lugar de la original.
+      No bloquea la respuesta al usuario.
+
+  onPolicyViolation:
+    description: "Hook ejecutado cuando se detecta violación de política"
+    trigger: "Policy Engine detecta violación"
+    payload:
+      type: object
+      required:
+        - component_uuid
+        - violation_type
+        - severity
+        - details
+      properties:
+        component_uuid:
+          type: string
+          format: uuid
+        violation_type:
+          type: string
+          enum: ["BIAS", "TOXICITY", "PRIVACY", "SECURITY", "COMPLIANCE", "CUSTOM"]
+        severity:
+          type: string
+          enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+        details:
+          type: object
+          properties:
+            policy_id:
+              type: string
+            policy_name:
+              type: string
+            violation_message:
+              type: string
+            detected_at:
+              type: string
+              format: date-time
+            context:
+              type: object
+        action_taken:
+          type: string
+          enum: ["BLOCK", "WARN", "LOG", "CUSTOM"]
+    returns:
+      type: object
+      properties:
+        should_block:
+          type: boolean
+          description: "Si se debe bloquear la operación"
+        custom_action:
+          type: string
+          description: "Acción personalizada a ejecutar"
+        notification:
+          type: object
+          properties:
+            send_email:
+              type: boolean
+            send_slack:
+              type: boolean
+            recipients:
+              type: array
+              items:
+                type: string
+        metadata:
+          type: object
+    timeout_seconds: 5
+    retryable: false
+    blocking: true
+    notes: |
+      Si should_block=true, la operación se bloquea inmediatamente.
+      Se ejecuta antes de registrar en ImmutableLog.
+
+  onTelemetry:
+    description: "Hook ejecutado para procesar o enriquecer telemetría antes de almacenar"
+    trigger: "Antes de almacenar telemetría"
+    payload:
+      type: object
+      required:
+        - component_uuid
+        - event_type
+        - metrics
+      properties:
+        component_uuid:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum: ["AGENT_INVOCATION", "AGENT_ERROR", "AGENT_COMPLETION", "AGENT_TIMEOUT", "CUSTOM"]
+        metrics:
+          type: object
+          properties:
+            latency_ms:
+              type: integer
+            tokens_used:
+              type: integer
+            cost_usd:
+              type: number
+            success:
+              type: boolean
+            error_message:
+              type: string
+        context:
+          type: object
+        timestamp:
+          type: string
+          format: date-time
+    returns:
+      type: object
+      properties:
+        enriched_metrics:
+          type: object
+          description: "Métricas enriquecidas"
+        additional_tags:
+          type: array
+          items:
+            type: string
+          description: "Tags adicionales para categorización"
+        should_store:
+          type: boolean
+          default: true
+          description: "Si se debe almacenar la telemetría"
+        metadata:
+          type: object
+    timeout_seconds: 2
+    retryable: true
+    blocking: false
+    notes: |
+      No bloquea el flujo principal.
+      Útil para agregar contexto adicional o filtrar telemetría.
+
+# Configuración de MCP
+configuration:
+  authentication:
+    type: "API_KEY"
+    header: "X-MCP-API-Key"
+    description: "API key para autenticar llamadas a hooks"
+
+  timeout_default: 30
+  retry_default: true
+  max_retries: 3
+
+  webhook_security:
+    signature_header: "X-MCP-Signature"
+    algorithm: "HMAC-SHA256"
+    description: "Firma HMAC para validar origen de webhooks"
+
+# Ejemplo de AioComponent con MCP
+example:
+  aiocomponentname: "MCP Customer Service Validator"
+  aiocomponentnamespace: "mcp"
+  aiocomponentcode: "customer-service-validator"
+  aiocomponenttype: "MCP"
+  aiocomponentversion: "1.0.0"
+  aiocomponentmetadata: |
+    {
+      "hooks": ["preInvoke", "postInvoke", "onPolicyViolation"],
+      "endpoints": {
+        "preInvoke": "https://partner.com/mcp/pre-invoke",
+        "postInvoke": "https://partner.com/mcp/post-invoke",
+        "onPolicyViolation": "https://partner.com/mcp/policy-violation"
+      },
+      "version": "1.0.0"
+    }
+  aiocomponentsettings: |
+    {
+      "api_key": "mcp_sk_...",
+      "timeout_seconds": 5,
+      "retry_on_failure": true
+    }
+
+# Tipos de Plugin
+plugin_types:
+  hooks_only:
+    description: "Plugin simple - Solo implementa hooks MCP"
+    capabilities:
+      - "Implementar hooks (preInvoke, postInvoke, etc.)"
+      - "Validar/transformar prompts y respuestas"
+    limitations:
+      - "NO puede añadir procesos BPMN"
+      - "NO puede añadir pantallas ZKoss"
+      - "NO puede añadir reglas Drools"
+    use_case: "Validación simple, filtrado de contenido, transformación de prompts"
+
+  full_extension:
+    description: "Plugin completo - Procesos + Pantallas + Reglas + Hooks"
+    capabilities:
+      - "Implementar hooks MCP"
+      - "Añadir procesos BPMN completos"
+      - "Añadir pantallas ZKoss (ZUL + ViewModels)"
+      - "Añadir reglas Drools (.drl)"
+      - "Incluir Java Delegates"
+      - "Incluir Facts para Drools"
+    requirements:
+      - "Firma digital obligatoria"
+      - "Revisión de código"
+      - "Whitelist de partners"
+      - "Sandbox estricto"
+    use_case: "Extensión completa del sistema con workflows, UI y reglas de negocio"
+    status: "PROPUESTO - No implementado aún"
+
+# Casos de Uso
+use_cases:
+  - name: "Validación de Prompts"
+    description: "Validar y transformar prompts antes de invocar modelo"
+    hooks: ["preInvoke"]
+
+  - name: "Filtrado de Respuestas"
+    description: "Filtrar o transformar respuestas antes de devolver al usuario"
+    hooks: ["postInvoke"]
+
+  - name: "Detección de Violaciones"
+    description: "Acciones personalizadas cuando se detectan violaciones"
+    hooks: ["onPolicyViolation"]
+
+  - name: "Enriquecimiento de Telemetría"
+    description: "Agregar contexto adicional a telemetría"
+    hooks: ["onTelemetry"]
+
+  - name: "Onboarding Personalizado"
+    description: "Procesamiento personalizado al registrar componentes"
+    hooks: ["onOnboard"]
+
+# Compatibilidad
+compatibility:
+  min_codeflowx_version: "1.0.0"
+  supported_languages:
+    - "python"
+    - "typescript"
+    - "java"
+
+  integration_points:
+    - "AioComponent"
+    - "AioMarketplaceEntry"
+    - "Policy Engine"
+    - "ImmutableLog"
+    - "Telemetry Service"

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.core;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class SystemHealthViewModel extends MasterPage {
+public class SystemHealthViewModel extends BaseFront<SystemHealthViewModel>{
     
     @WireVariable
     private SystemHealthOverviewService systemHealthOverviewService;

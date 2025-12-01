@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.analytics;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -11,7 +12,7 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -54,10 +55,10 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class AnalyticsBiasViewModel extends MasterPage {
+public class AnalyticsBiasViewModel extends BaseFront<AnalyticsBiasViewModel>{
 
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private ModelService modelService;
     @WireVariable
@@ -67,12 +68,12 @@ public class AnalyticsBiasViewModel extends MasterPage {
     @WireVariable public Environment environment;
     @WireVariable("context") protected GenericApplicationContext contexto;
     @WireVariable("ctxBean") protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
-    
+
     @Override
     public void setBeans(Object bean) {}
 
@@ -89,12 +90,12 @@ public class AnalyticsBiasViewModel extends MasterPage {
         super.doAfterCompose(view);
         initDao();
         pageParams = PageParams.builder().maxRows(20).pageActual(1).rowActual(0).ascending(false).sortField("createdat").build();
-        
+
         log.info("Inicializando AnalyticsBiasViewModel");
         loadData();
         calculateKPIs();
     }
-    
+
     private void loadData() {
         try {
             // TABLE - usar servicio dedicado
@@ -103,19 +104,19 @@ public class AnalyticsBiasViewModel extends MasterPage {
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             PageResult<BiasAnalysis> result1 = biasAnalysisService.findAll(pageParams1);
             if (result1 != null && result1.getContent() != null) {
                 biasAnalysisList = result1.getContent();
             }
-            
+
             // TABLE - usar servicio dedicado
             PageParams pageParams2 = PageParams.builder()
                 .maxRows(20)
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             PageResult<BiasDetection> result2 = biasDetectionService.findAll(pageParams2);
             if (result2 != null && result2.getContent() != null) {
                 detections = result2.getContent();
@@ -124,14 +125,14 @@ public class AnalyticsBiasViewModel extends MasterPage {
             log.error("Error al cargar datos", e);
         }
     }
-    
+
     private void calculateKPIs() {
         totalAnalysis = (long) biasAnalysisList.size();
         // Contar análisis con score alto (>0.7) como posibles sesgos detectados
         detectedBiases = biasAnalysisList.stream()
             .filter(b -> b.getOverallbiasscore() != null && b.getOverallbiasscore().compareTo(new BigDecimal("0.7")) > 0)
             .count();
-        
+
         // Calcular score promedio
         if (!biasAnalysisList.isEmpty()) {
             BigDecimal totalScore = biasAnalysisList.stream()
@@ -141,7 +142,7 @@ public class AnalyticsBiasViewModel extends MasterPage {
             avgBiasScore = totalScore.divide(new BigDecimal(biasAnalysisList.size()), 2, RoundingMode.HALF_UP);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshData() {
@@ -149,11 +150,10 @@ public class AnalyticsBiasViewModel extends MasterPage {
         calculateKPIs();
         Messagebox.show("Datos actualizados", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     @Destroy
     public void destroy() {
         if (biasAnalysisList != null) { biasAnalysisList.clear(); biasAnalysisList = null; }
         if (detections != null) { detections.clear(); detections = null; }
     }
 }
-

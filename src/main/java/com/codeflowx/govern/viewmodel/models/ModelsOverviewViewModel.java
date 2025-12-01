@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
@@ -81,7 +82,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ModelsOverviewViewModel extends MasterPage {
+public class ModelsOverviewViewModel extends BaseFront<ModelsOverviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
@@ -441,19 +442,7 @@ public class ModelsOverviewViewModel extends MasterPage {
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-    	Ssoractividad log = new Ssoractividad();
-    	log.setUsername(getUser().getUsername());
-    	log.setAccion(action);
-    	log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-    	log.setModulo(model);
-    	log.setIdtupla(pk.intValue());
-    	log.setAplicacion(ctxBean.getApplicationName());
-    	log.setValuetupla(mensaje);
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo X  	log.setValuetupla(mensaje);
     	log = modelService.create(log);
  	}
 

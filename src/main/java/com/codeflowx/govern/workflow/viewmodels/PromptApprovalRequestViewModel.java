@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -49,35 +50,35 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class PromptApprovalRequestViewModel extends MasterPage {
+public class PromptApprovalRequestViewModel extends BaseFront<PromptApprovalRequestViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -93,34 +94,34 @@ public class PromptApprovalRequestViewModel extends MasterPage {
     private String approvalType;
     private String requestReason;
     private String promptPreview;
-    
+
     private boolean mockMode = false;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         log.info("🚀 Inicializando PromptApprovalRequestViewModel");
-        
+
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         try {
             loadAvailablePrompts();
-            
+
         } catch (Exception e) {
             log.error("Error inicializando PromptApprovalRequestViewModel", e);
             showError("Error al inicializar el formulario: " + e.getMessage());
@@ -135,12 +136,12 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             // Cargar prompts usando SQL nativo
             String sql = "SELECT * FROM PRMPROMPTS WHERE PRMAPPROVALSTATUS IS NULL OR PRMAPPROVALSTATUS IN ('DRAFT', 'PENDING') LIMIT 100";
             List<Prompt> prompts = businessService.findByParams(Prompt.class, sql, null);
-            
+
             if (prompts != null) {
                 availablePrompts = prompts;
                 log.info("Cargados {} prompts disponibles", availablePrompts.size());
             }
-            
+
         } catch (Exception e) {
             log.error("Error cargando prompts disponibles", e);
             showError("Error cargando prompts: " + e.getMessage());
@@ -161,8 +162,8 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             } else {
                 promptPreview = content;
             }
-            
-            log.info("Prompt seleccionado: {} (ID: {})", 
+
+            log.info("Prompt seleccionado: {} (ID: {})",
                      selectedPrompt.getPrmname(), selectedPrompt.getIdxprompt());
         }
     }
@@ -177,7 +178,7 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             if (!validateForm()) {
                 return;
             }
-            
+
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando submitRequest");
                 logActivity("MOCK_PROMPT_REQUEST", "PromptApproval", null, "Simulación solicitud aprobación");
@@ -194,7 +195,7 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             approval.setPrmrequestreason(requestReason);
             approval.setPrmcreatedby(getUserId());
             approval.setPrmcreatedat(Timestamp.valueOf(LocalDateTime.now()));
-            
+
             businessService.save(approval);
             log.info("PromptApproval creado con ID: {}", approval.getIdxpromptapproval());
 
@@ -227,7 +228,7 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             );
 
             // 4. Registrar actividad
-            logActivity("CREACION", "PRMPROMPTAPPROVALS", approval.getIdxpromptapproval(), 
+            logActivity("CREACION", "PRMPROMPTAPPROVALS", approval.getIdxpromptapproval(),
                        "Solicitud de aprobación de prompt: " + selectedPrompt.getPrmname());
 
         } catch (Exception e) {
@@ -235,7 +236,7 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             Messagebox.show("Error al enviar la solicitud: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     private void loadMockData() {
         log.info("🎭 Mock data loaded for Prompt Approval Request");
     }
@@ -307,27 +308,11 @@ public class PromptApprovalRequestViewModel extends MasterPage {
             return "System User";
         }
     }
-    
+
     /**
      * Registra la actividad del usuario en el sistema de auditoría
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
-        }
-    }
-    
+
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {
         if (availablePrompts != null) { availablePrompts.clear(); availablePrompts = null; }
@@ -336,5 +321,3 @@ public class PromptApprovalRequestViewModel extends MasterPage {
         businessService = null;
     }
 }
-
-

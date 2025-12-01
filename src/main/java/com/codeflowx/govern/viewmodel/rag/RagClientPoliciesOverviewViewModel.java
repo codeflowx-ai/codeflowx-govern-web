@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.rag;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,12 +44,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class RagClientPoliciesOverviewViewModel extends MasterPage {
-    
+public class RagClientPoliciesOverviewViewModel extends BaseFront<RagClientPoliciesOverviewViewModel>{
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
     private RagClientPolicyService ragClientPolicyService;
 
@@ -70,7 +72,7 @@ public class RagClientPoliciesOverviewViewModel extends MasterPage {
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<RagClientPolicy> pageResult;
-    
+
     // ========== Métricas globales ==========
     private Long totalPolicies = 0L;
     private Long enabledPolicies = 0L;
@@ -132,30 +134,30 @@ public class RagClientPoliciesOverviewViewModel extends MasterPage {
     @NotifyChange({"policiesList", "pageResult", "totalPolicies", "enabledPolicies", "disabledPolicies"})
     public void loadData() {
         try {
-            log.info("Cargando políticas de cliente RAG - Página: {}, MaxRows: {}", 
+            log.info("Cargando políticas de cliente RAG - Página: {}, MaxRows: {}",
                 pageParams.getPageActual(), pageParams.getMaxRows());
-            
+
             Criterias criterias = buildCriterias();
             pageResult = ragClientPolicyService.findAll(pageParams, criterias);
-            
+
             policiesList = pageResult != null ? pageResult.getContent() : new ArrayList<>();
-            
+
             if (pageResult != null) {
                 totalPolicies = (long) pageResult.getTotalRows();
             }
-            
+
             // Calcular métricas
             enabledPolicies = policiesList.stream()
                 .filter(p -> p.getRcpenabled() != null && p.getRcpenabled())
                 .count();
             disabledPolicies = totalPolicies - enabledPolicies;
-            
-            log.info("Cargadas {} políticas de cliente RAG de {} totales", 
+
+            log.info("Cargadas {} políticas de cliente RAG de {} totales",
                 policiesList.size(), totalPolicies);
-                
+
         } catch (Exception e) {
             log.error("Error al cargar políticas de cliente RAG", e);
-            Messagebox.show(Labels.getLabel("common.error.load"), 
+            Messagebox.show(Labels.getLabel("common.error.load"),
                 Labels.getLabel("common.error.title"),
                 Messagebox.OK, Messagebox.ERROR);
             policiesList = new ArrayList<>();
@@ -213,14 +215,14 @@ public class RagClientPoliciesOverviewViewModel extends MasterPage {
     @Command
     @NotifyChange({"policiesList", "pageResult"})
     public void applyFilters() {
-        log.info("Aplicando filtros - Tipo: {}, Habilitado: {}, Cliente: {}", 
+        log.info("Aplicando filtros - Tipo: {}, Habilitado: {}, Cliente: {}",
             selectedPolicyType, selectedEnabled, selectedClientId);
         pageParams.setPageActual(1); // Reset a primera página
         loadData();
     }
 
     @Command
-    @NotifyChange({"searchTerm", "selectedPolicyType", "selectedEnabled", "selectedClientId", 
+    @NotifyChange({"searchTerm", "selectedPolicyType", "selectedEnabled", "selectedClientId",
                    "policiesList", "pageResult"})
     public void clearFilters() {
         log.info("Limpiando filtros");
@@ -321,4 +323,3 @@ public class RagClientPoliciesOverviewViewModel extends MasterPage {
         // TODO Auto-generated method stub
     }
 }
-

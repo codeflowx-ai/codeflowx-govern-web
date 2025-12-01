@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -55,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class DashboardViewModel extends MasterPage {
+public class DashboardViewModel extends BaseFront<DashboardViewModel>{
 
     private static final long serialVersionUID = 1L;
 

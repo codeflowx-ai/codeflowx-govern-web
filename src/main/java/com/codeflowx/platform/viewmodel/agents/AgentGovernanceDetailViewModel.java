@@ -10,7 +10,6 @@ import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.web.annotation.Action;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -35,6 +34,7 @@ import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
 import com.codeflowx.govern.service.agents.AgentGovernanceService;
 import com.codeflowx.govern.service.exception.GovernanceServiceException;
+import com.codeflowx.framework.zkoss.BaseFront;
 import codeflowx.nocode.persist.Criteria;
 import codeflowx.nocode.persist.Criterias;
 import codeflowx.nocode.persist.Evaluation;
@@ -54,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class AgentGovernanceDetailViewModel extends MasterPage {
+public class AgentGovernanceDetailViewModel extends BaseFront<AgentGovernanceDetailViewModel> {
     
     @WireVariable
     private BusinessService businessService;
@@ -353,22 +353,6 @@ public class AgentGovernanceDetailViewModel extends MasterPage {
      * @throws DaoException
      * @throws UiException
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
-        }
-    }
     
     /**
      * Libera recursos y limpia referencias para ayudar al GC

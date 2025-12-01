@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.infrastructure;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -67,7 +68,7 @@ import org.zkoss.bind.annotation.Destroy;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class InfrastructureDetailViewModel extends MasterPage {
+public class InfrastructureDetailViewModel extends BaseFront<InfrastructureDetailViewModel>{
 
     private static final long serialVersionUID = 1L;
     

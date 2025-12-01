@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.analytics;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -53,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class AnalyticsFairnessViewModel extends MasterPage {
+public class AnalyticsFairnessViewModel extends BaseFront<AnalyticsFairnessViewModel>{
 
     private static final long serialVersionUID = 1L;
     

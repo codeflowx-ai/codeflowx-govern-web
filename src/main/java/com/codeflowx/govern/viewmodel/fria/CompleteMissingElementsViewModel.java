@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.fria;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class CompleteMissingElementsViewModel extends MasterPage {
+public class CompleteMissingElementsViewModel extends BaseFront<CompleteMissingElementsViewModel>{
 
     private static final long serialVersionUID = 1L;
     

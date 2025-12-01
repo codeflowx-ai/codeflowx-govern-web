@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ModelLineageTreeViewModel extends MasterPage {
+public class ModelLineageTreeViewModel extends BaseFront<ModelLineageTreeViewModel>{
 
     private static final long serialVersionUID = 1L;
 

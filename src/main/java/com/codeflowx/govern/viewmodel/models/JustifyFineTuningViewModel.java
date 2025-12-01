@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class JustifyFineTuningViewModel extends MasterPage {
+public class JustifyFineTuningViewModel extends BaseFront<JustifyFineTuningViewModel>{
 
     private static final long serialVersionUID = 1L;
 

@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodels.playground.documents;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ import java.util.*;
  */
 @Slf4j
 @VariableResolver(DelegatingVariableResolver.class)
-public class StatisticsDashboardViewModel {
+public class StatisticsDashboardViewModel extends BaseFront<StatisticsDashboardViewModel> {
 
     @WireVariable
     private RestTemplate restTemplate;

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @VariableResolver(DelegatingVariableResolver.class)
-public class SectorDashboardViewModel extends MasterPage {
+public class SectorDashboardViewModel extends BaseFront<SectorDashboardViewModel>{
 
     private static final long serialVersionUID = 1L;
 

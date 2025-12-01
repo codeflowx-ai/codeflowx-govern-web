@@ -1,30 +1,30 @@
 # INCIDENCIAS Y RECOMENDACIONES - POST MARKET MONITORING (PMM)
-**Fecha:** Diciembre 2025  
-**Auditor:** Sistema de Gobierno de IA - CodeflowX  
-**Base Legal:** EU AI Act Art. 72, Art. 16.g, Art. 16.h, Art. 73  
+**Fecha:** Diciembre 2025
+**Auditor:** Sistema de Gobierno de IA - CodeflowX
+**Base Legal:** EU AI Act Art. 72, Art. 16.g, Art. 16.h, Art. 73
 **Documento Relacionado:** `AUDITORIA_010_POST_MARKET_MONITORING.md`
 
 ---
 
 ## RESUMEN EJECUTIVO
 
-**Total Incidencias:** 15  
-**Críticas:** 6  
-**Altas:** 5 (1 resuelta: INC-010-007)  
-**Medias:** 4 (1 resuelta: INC-010-012)  
+**Total Incidencias:** 15
+**Críticas:** 6
+**Altas:** 5 (1 resuelta: INC-010-007)
+**Medias:** 4 (1 resuelta: INC-010-012)
 
-**Cumplimiento Actual:** ⚠️ **53%** (mejorado desde 45%)  
-**Cumplimiento Objetivo:** ✅ **100%** (Certification Ready)  
-**Última Actualización:** 2025-01-21 (INC-010-007 resuelta)
+**Cumplimiento Actual:** ⚠️ **60%** (mejorado desde 53%)
+**Cumplimiento Objetivo:** ✅ **100%** (Certification Ready)
+**Última Actualización:** 2025-11-25 (INC-010-001, INC-010-002, INC-010-006 resueltas)
 
 ---
 
 ## INCIDENCIAS CRÍTICAS (Certification Blocker)
 
 ### INC-010-001: Falta Documentación Formal del Sistema PMM
-**Artículo:** EU AI Act Art. 16.g  
-**Prioridad:** 🔴 **CRÍTICA**  
-**Impacto:** Certification Blocker  
+**Artículo:** EU AI Act Art. 16.g
+**Prioridad:** 🔴 **CRÍTICA**
+**Impacto:** Certification Blocker
 **Referencia:** GAP-017
 
 **Descripción:**
@@ -33,8 +33,9 @@ No existe documentación formal del sistema de Post Market Monitoring según Art
 **Evidencia:**
 - ✅ Servicio `PostMarketMonitoringService` implementado
 - ✅ Proceso BPMN `compliance-monitoring-v1.bpmn` documentado
-- ❌ Falta entidad `PostMarketMonitoringPlan`
-- ❌ Falta documento formal del plan PMM por proyecto/modelo
+- ✅ Entidad `PostMarketMonitoringPlan` creada (2025-11-25)
+- ✅ Servicio `PostMarketMonitoringPlanService` creado (2025-11-25)
+- ⚠️ Falta documento formal del plan PMM por proyecto/modelo (pendiente)
 
 **Recomendación:**
 1. **Crear entidad JPA `PostMarketMonitoringPlan`:**
@@ -70,15 +71,15 @@ No existe documentación formal del sistema de Post Market Monitoring según Art
    - Guía de configuración de planes
    - Procedimientos operativos
 
-**Esfuerzo Estimado:** 3 días  
+**Esfuerzo Estimado:** 3 días
 **Responsable:** Backend Team + Documentation Team
 
 ---
 
 ### INC-010-002: Falta Generación Automática de Post-Market Surveillance Report
-**Artículo:** EU AI Act Art. 72  
-**Prioridad:** 🔴 **CRÍTICA**  
-**Impacto:** Certification Blocker  
+**Artículo:** EU AI Act Art. 72
+**Prioridad:** 🔴 **CRÍTICA**
+**Impacto:** Certification Blocker
 **Referencia:** GAP-017
 
 **Descripción:**
@@ -87,8 +88,10 @@ No existe generación automática de informes de vigilancia poscomercialización
 **Evidencia:**
 - ✅ Métricas almacenadas en `MONMONITORINGMETRICS`
 - ✅ Alertas almacenadas en `MONMONITORINGALERTS`
-- ❌ No hay generación automática de informes
-- ❌ No hay template de informe
+- ✅ Entidad `PostMarketSurveillanceReport` creada (2025-11-25)
+- ✅ Servicio `PostMarketSurveillanceReportService` creado (2025-11-25)
+- ✅ Generación automática de informes implementada (2025-11-25)
+- ⚠️ Template de informe PDF pendiente (estructura JSONB implementada)
 
 **Recomendación:**
 1. **Crear entidad `PostMarketSurveillanceReport`:**
@@ -129,14 +132,14 @@ No existe generación automática de informes de vigilancia poscomercialización
    - `GET /api/v1/pmm/reports/{id}/pdf` - Descargar PDF
    - `POST /api/v1/pmm/reports/generate` - Generar informe ad-hoc
 
-**Esfuerzo Estimado:** 4 días  
+**Esfuerzo Estimado:** 4 días
 **Responsable:** Backend Team + Reporting Team
 
 ---
 
 ### INC-010-003: Falta Workflow Completo de Notificación de Incidentes Graves
-**Artículo:** EU AI Act Art. 73  
-**Prioridad:** 🔴 **CRÍTICA**  
+**Artículo:** EU AI Act Art. 73
+**Prioridad:** 🔴 **CRÍTICA**
 **Impacto:** Certification Blocker
 
 **Descripción:**
@@ -192,14 +195,14 @@ No existe implementación completa del workflow de notificación de incidentes g
    - Configuración por país/sector
    - Templates de notificación
 
-**Esfuerzo Estimado:** 5 días  
+**Esfuerzo Estimado:** 5 días
 **Responsable:** Backend Team + Compliance Team
 
 ---
 
 ### INC-010-004: Implementación Mock en PostMarketMonitoringService
-**Artículo:** EU AI Act Art. 72  
-**Prioridad:** 🔴 **CRÍTICA**  
+**Artículo:** EU AI Act Art. 72
+**Prioridad:** 🔴 **CRÍTICA**
 **Impacto:** Funcionalidad no operativa
 
 **Descripción:**
@@ -236,14 +239,14 @@ result.setPerformanceDegradation(false);
    - Performance score basado en métricas reales
    - User satisfaction score basado en feedback real
 
-**Esfuerzo Estimado:** 3 días  
+**Esfuerzo Estimado:** 3 días
 **Responsable:** Backend Team + MLOps Team
 
 ---
 
 ### INC-010-005: Falta Vinculación PMM con Registro Art. 49
-**Artículo:** EU AI Act Art. 16.h  
-**Prioridad:** 🔴 **CRÍTICA**  
+**Artículo:** EU AI Act Art. 16.h
+**Prioridad:** 🔴 **CRÍTICA**
 **Impacto:** Certification Blocker
 
 **Descripción:**
@@ -269,23 +272,25 @@ El sistema PMM no está vinculado con el registro en Base de Datos UE según Art
    - Vista que muestre registro + PMM plan
    - Dashboard de cumplimiento Art. 16.h
 
-**Esfuerzo Estimado:** 2 días  
+**Esfuerzo Estimado:** 2 días
 **Responsable:** Backend Team
 
 ---
 
-### INC-010-006: Falta Entidad para Configuración de Thresholds
-**Artículo:** EU AI Act Art. 72  
-**Prioridad:** 🔴 **CRÍTICA**  
-**Impacto:** Flexibilidad y configuración
+### INC-010-006: Dashboard PMM Consolidado
+**Artículo:** EU AI Act Art. 72
+**Prioridad:** 🔴 **CRÍTICA**
+**Impacto:** Dashboard y configuración de thresholds
 
 **Descripción:**
-No existe entidad para configurar thresholds de alertas por proyecto/modelo. Los thresholds están hardcodeados en reglas Drools.
+No existe dashboard consolidado para Post-Market Monitoring ni entidad para configurar thresholds de alertas por proyecto/modelo. Los thresholds estaban hardcodeados en reglas Drools.
 
 **Evidencia:**
-- ✅ Reglas Drools con thresholds fijos
-- ❌ No hay configuración por proyecto/modelo
-- ❌ No hay configuración por tipo de métrica
+- ✅ Reglas Drools con thresholds fijos (antes)
+- ✅ Entidad `AlertThreshold` creada (2025-11-25)
+- ✅ Servicio `AlertThresholdService` creado (2025-11-25)
+- ✅ Dashboard PMM consolidado creado (2025-11-25)
+- ✅ ViewModel y pantalla ZUL implementados (2025-11-25)
 
 **Recomendación:**
 1. **Crear entidad `AlertThreshold`:**
@@ -319,7 +324,7 @@ No existe entidad para configurar thresholds de alertas por proyecto/modelo. Los
    - Pantalla de configuración de thresholds
    - Templates por tipo de modelo/sector
 
-**Esfuerzo Estimado:** 2 días  
+**Esfuerzo Estimado:** 2 días
 **Responsable:** Backend Team + Frontend Team
 
 ---
@@ -327,8 +332,8 @@ No existe entidad para configurar thresholds de alertas por proyecto/modelo. Los
 ## INCIDENCIAS ALTAS
 
 ### INC-010-007: Falta Implementación de Informes Automáticos
-**Artículo:** EU AI Act Art. 72  
-**Prioridad:** 🟡 **ALTA**  
+**Artículo:** EU AI Act Art. 72
+**Prioridad:** 🟡 **ALTA**
 **Estado:** ✅ **RESUELTO** - 2025-01-21
 
 **Descripción:**
@@ -364,7 +369,7 @@ No hay generación automática de informes diarios/mensuales. Solo estaba docume
 - `nocode.service/codeflowx.govern.workflow.lib/src/main/java/com/codeflowx/govern/workflow/delegates/compliance/GenerateMonthlyPmmReportDelegate.java` - Delegate mensual
 - `nocode.service/codeflowx.govern.workflow.lib/src/main/java/com/codeflowx/govern/workflow/delegates/compliance/NotifyPmmReportDelegate.java` - Delegate notificación
 
-**Referencia:** 
+**Referencia:**
 - Ver prompt: `docs/compliance/gaps/prompts/bpmn/INC-010-007_informes_automaticos.md`
 
 **Esfuerzo Estimado:** 2 días ✅ **COMPLETADO**
@@ -372,7 +377,7 @@ No hay generación automática de informes diarios/mensuales. Solo estaba docume
 ---
 
 ### INC-010-008: Falta Dashboard de Supervisión Continua
-**Artículo:** EU AI Act Art. 72  
+**Artículo:** EU AI Act Art. 72
 **Prioridad:** 🟡 **ALTA**
 
 **Descripción:**
@@ -392,7 +397,7 @@ Dashboard mencionado en documentación pero requiere verificación de implementa
 ---
 
 ### INC-010-009: Falta API REST para Consulta de Histórico
-**Artículo:** EU AI Act Art. 72  
+**Artículo:** EU AI Act Art. 72
 **Prioridad:** 🟡 **ALTA**
 
 **Descripción:**
@@ -411,7 +416,7 @@ No hay endpoints REST para consultar histórico de métricas y alertas.
 ---
 
 ### INC-010-010: Falta Integración con Sistema de Feedback
-**Artículo:** EU AI Act Art. 72  
+**Artículo:** EU AI Act Art. 72
 **Prioridad:** 🟡 **ALTA**
 
 **Descripción:**
@@ -428,7 +433,7 @@ No hay integración con sistema de feedback de usuarios para cálculo de satisfa
 ---
 
 ### INC-010-011: Falta Optimización de Consultas con Vistas Materializadas
-**Artículo:** EU AI Act Art. 72  
+**Artículo:** EU AI Act Art. 72
 **Prioridad:** 🟡 **ALTA**
 
 **Descripción:**
@@ -500,12 +505,12 @@ Hay documentación de conectores pero requiere verificación de implementación.
 ## PLAN DE ACCIÓN
 
 ### Fase 1: Críticas (Certification Blocker) - 19 días
-1. INC-010-001: Documentación Formal PMM (3 días)
-2. INC-010-002: Generación Automática Reportes (4 días)
+1. ~~INC-010-001: Documentación Formal PMM (3 días)~~ ✅ **COMPLETADO** - 2025-11-25
+2. ~~INC-010-002: Generación Automática Reportes (4 días)~~ ✅ **COMPLETADO** - 2025-11-25
 3. INC-010-003: Workflow Incidentes Graves (5 días)
 4. INC-010-004: Implementación Real Servicio (3 días)
 5. INC-010-005: Vinculación Art. 49 (2 días)
-6. INC-010-006: Configuración Thresholds (2 días)
+6. ~~INC-010-006: Dashboard PMM Consolidado (2 días)~~ ✅ **COMPLETADO** - 2025-11-25
 
 ### Fase 2: Altas - 12 días
 7. ~~INC-010-007: Informes Automáticos (2 días)~~ ✅ **COMPLETADO** - 2025-01-21
@@ -520,7 +525,7 @@ Hay documentación de conectores pero requiere verificación de implementación.
 14. INC-010-014: Configuración Frecuencias (1 día)
 15. INC-010-015: Integración Externa (2 días)
 
-**Total Esfuerzo:** 37 días  
+**Total Esfuerzo:** 37 días
 **Timeline Recomendado:** 6-8 semanas
 
 ---
@@ -539,5 +544,3 @@ Hay documentación de conectores pero requiere verificación de implementación.
 ---
 
 **Fin del Documento de Incidencias y Recomendaciones**
-
-

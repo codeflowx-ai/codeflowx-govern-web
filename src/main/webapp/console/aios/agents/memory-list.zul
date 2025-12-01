@@ -1,0 +1,108 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="aios"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.aios.AgentMemoryListViewModel')"
+		validationMessages="@id('vmsgs')">
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-database label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="Memorias del Agente" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Gestión de memorias cifradas del agente" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+		</h:div>
+
+		<!-- Filtros -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div class="row">
+							<h:div class="col-md-4">
+								<label value="Namespace:" />
+								<combobox value="@bind(vm.selectedNamespace)"
+									onChange="@command('applyFilters')">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="CONVERSATION" value="CONVERSATION" />
+									<comboitem label="CONTEXT" value="CONTEXT" />
+									<comboitem label="KNOWLEDGE" value="KNOWLEDGE" />
+									<comboitem label="TEMPORARY" value="TEMPORARY" />
+									<comboitem label="PERSISTENT" value="PERSISTENT" />
+								</combobox>
+							</h:div>
+							<h:div class="col-md-6">
+								<label value="Buscar por clave:" />
+								<textbox value="@bind(vm.searchKey)"
+									onOK="@command('applyFilters')"
+									placeholder="Clave de memoria..." />
+							</h:div>
+							<h:div class="col-md-2">
+								<button label="Volver"
+									onClick="@command('backToAgentList')"
+									class="btn btn-secondary mt-4" />
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Tabla de Memorias -->
+		<h:div class="row">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Listado de Memorias</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<grid model="@load(vm.memoryRows)"
+							emptyMessage="No hay memorias disponibles"
+							style="width: 100%;">
+							<columns>
+								<column label="Namespace" width="150px" />
+								<column label="Clave" width="200px" />
+								<column label="Versión" width="80px" />
+								<column label="Tamaño" width="100px" />
+								<column label="Creado" width="180px" />
+								<column label="Expira" width="180px" />
+								<column label="Acciones" width="300px" />
+							</columns>
+							<template name="model">
+								<row>
+									<label value="@load(each.namespace)" />
+									<label value="@load(each.key)" />
+									<label value="@load(each.version)" />
+									<label value="@load(each.size)" />
+									<label value="@load(each.createdAt)" />
+									<label value="@load(each.expiresAt)" />
+									<h:div>
+										<button label="Ver Contenido"
+											onClick="@command('viewDecryptedContent', namespace=each.namespace, key=each.key)"
+											class="btn btn-sm btn-primary"
+											tooltiptext="Requiere rol AIOS_ADMIN" />
+										<button label="Comparar Versiones"
+											onClick="@command('compareVersions', namespace=each.namespace, key=each.key)"
+											class="btn btn-sm btn-info" />
+										<button label="Borrar"
+											onClick="@command('deleteVersion', namespace=each.namespace, key=each.key)"
+											class="btn btn-sm btn-danger" />
+									</h:div>
+								</row>
+							</template>
+						</grid>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

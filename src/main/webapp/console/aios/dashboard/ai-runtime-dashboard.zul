@@ -1,0 +1,158 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="aios"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.aios.AiRuntimeDashboardViewModel')"
+		validationMessages="@id('vmsgs')">
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-chart-line label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="Dashboard Runtime AI OS" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Vista general del runtime de agentes" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+		</h:div>
+
+		<!-- KPIs Cards -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #0B2A4A; color: white;">
+					<h:div class="card-body text-center">
+						<h:h5 class="card-title">Agentes Activos</h:h5>
+						<h:h2>@load(vm.activeAgents)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #dc3545; color: white;">
+					<h:div class="card-body text-center">
+						<h:h5 class="card-title">Loops Detectados</h:h5>
+						<h:h2>@load(vm.totalLoopsDetected)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #ffc107; color: black;">
+					<h:div class="card-body text-center">
+						<h:h5 class="card-title">Violaciones (24h)</h:h5>
+						<h:h2>@load(vm.policyViolations24h)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #007BFF; color: white;">
+					<h:div class="card-body text-center">
+						<h:h5 class="card-title">Memorias</h:h5>
+						<h:h2>@load(vm.totalMemories)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #28a745; color: white;">
+					<h:div class="card-body text-center">
+						<h:h5 class="card-title">Alertas BPMN</h:h5>
+						<h:h2>@load(vm.bpmnAlertsToday)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-2 col-md-4">
+				<h:div class="card" style="background-color: #6c757d; color: white;">
+					<h:div class="card-body text-center">
+						<button label="Actualizar"
+							onClick="@command('loadDashboardData')"
+							class="btn btn-light btn-sm mt-3" />
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Gráficas -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-6">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Actividad por Hora (Telemetría)</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<!-- TODO: Integrar ZK Charts para gráfica de línea -->
+						<h:p class="text-muted">Gráfica de línea: actividad por hora</h:p>
+						<h:div id="hourlyActivityChart" style="height: 300px;">
+							<!-- ZK Charts se integrará aquí -->
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-6">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Agentes por Estado</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<!-- TODO: Integrar ZK Charts para gráfica de barras -->
+						<h:p class="text-muted">Gráfica de barras: agentes por estado</h:p>
+						<h:div id="agentsByStateChart" style="height: 300px;">
+							<!-- ZK Charts se integrará aquí -->
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<h:div class="row mb-3">
+			<h:div class="col-lg-6">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Distribución de Riesgos</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<!-- TODO: Integrar ZK Charts para gráfica de pie -->
+						<h:p class="text-muted">Gráfica de pie: riesgos HIGH/LIMITED/MINIMAL</h:p>
+						<h:div id="risksChart" style="height: 300px;">
+							<!-- ZK Charts se integrará aquí -->
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Últimos Eventos -->
+		<h:div class="row">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Últimos Eventos (10)</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<grid model="@load(vm.recentEvents)"
+							emptyMessage="No hay eventos recientes"
+							style="width: 100%;">
+							<columns>
+								<column label="Timestamp" width="180px" />
+								<column label="Tipo" width="150px" />
+								<column label="Agente ID" width="200px" />
+								<column label="Descripción" />
+							</columns>
+							<template name="model">
+								<row>
+									<label value="@load(each.timestamp)" />
+									<label value="@load(each.type)" />
+									<label value="@load(each.agentId)" />
+									<label value="@load(each.description)" />
+								</row>
+							</template>
+						</grid>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

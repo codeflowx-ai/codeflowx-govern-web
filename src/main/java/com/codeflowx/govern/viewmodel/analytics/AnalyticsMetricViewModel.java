@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.analytics;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -43,8 +44,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class AnalyticsMetricViewModel extends MasterPage {
-    
+public class AnalyticsMetricViewModel extends BaseFront<AnalyticsMetricViewModel>{
+
     @WireVariable
     private AnalyticsMetricService analyticsMetricService;
     @Autowired
@@ -57,14 +58,14 @@ public class AnalyticsMetricViewModel extends MasterPage {
     protected Context ctxBean;
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
     }
 
-    
+
     private PageResult<AnalyticsMetric> pageResult ;
     private PageParams pageParams;
     private String searchTerm = "";
@@ -73,40 +74,40 @@ public class AnalyticsMetricViewModel extends MasterPage {
     private AnalyticsMetric selectedMetric;
     private boolean showDialog = false;
     private boolean isEditing = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadData();
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void loadData() {
         try {
-            log.debug("Cargando métricas - Página: {}, SearchTerm: '{}', Type: '{}', Status: '{}'", 
+            log.debug("Cargando métricas - Página: {}, SearchTerm: '{}', Type: '{}', Status: '{}'",
                      pageParams.getPageActual(), searchTerm, filterType, filterStatus);
-            
+
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
                 // Búsqueda por nombre
                 String sql = "SELECT * FROM ANLANALYTICSMETRICS WHERE UPPER(ANLMETRICNAME) LIKE :search";
-                
+
                 if (!"all".equals(filterType)) {
                     sql += " AND ANLMETRICTYPE = :type";
                 }
                 if (!"all".equals(filterStatus)) {
                     sql += " AND ANLSTATUS = :status";
                 }
-                
+
                 Map<String, Object> params = new HashMap<>();
                 params.put("search", "%" + searchTerm.toUpperCase() + "%");
                 if (!"all".equals(filterType)) {
@@ -115,13 +116,13 @@ public class AnalyticsMetricViewModel extends MasterPage {
                 if (!"all".equals(filterStatus)) {
                     params.put("status", filterStatus);
                 }
-                
+
                 pageResult = businessService.findByParams(AnalyticsMetric.class, sql, params, pageParams);
             } else if (!"all".equals(filterType) || !"all".equals(filterStatus)) {
                 // Filtros sin búsqueda
                 StringBuilder sql = new StringBuilder("SELECT * FROM ANLANALYTICSMETRICS WHERE 1=1");
                 Map<String, Object> params = new HashMap<>();
-                
+
                 if (!"all".equals(filterType)) {
                     sql.append(" AND ANLMETRICTYPE = :type");
                     params.put("type", filterType);
@@ -130,7 +131,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
                     sql.append(" AND ANLSTATUS = :status");
                     params.put("status", filterStatus);
                 }
-                
+
                 sql.append(" ORDER BY ANLCREATEDAT DESC");
                 pageResult = businessService.findByParams(AnalyticsMetric.class, sql.toString(), params, pageParams);
             } else {
@@ -138,20 +139,20 @@ public class AnalyticsMetricViewModel extends MasterPage {
                 String sqlAll = "SELECT * FROM ANLANALYTICSMETRICS ORDER BY ANLCREATEDAT DESC";
                 pageResult = businessService.findByParams(AnalyticsMetric.class, sqlAll, null, pageParams);
             }
-            
+
             log.debug("Métricas cargadas: {}", pageResult != null && pageResult.getContent() != null ? pageResult.getContent().size() : 0);
         } catch (Exception e) {
             log.error("Error cargando métricas de analytics", e);
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void search() {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearSearch() {
@@ -161,7 +162,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void nextPage() {
@@ -176,7 +177,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
             loadData();
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void previousPage() {
@@ -186,7 +187,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
             loadData();
         }
     }
-    
+
     @Command
     @NotifyChange({"selectedMetric", "showDialog", "isEditing"})
     public void newMetric() {
@@ -195,7 +196,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
         showDialog = true;
         log.debug("Abriendo formulario para nueva métrica");
     }
-    
+
     @Command
     @NotifyChange({"selectedMetric", "showDialog", "isEditing"})
     public void editMetric(@BindingParam("item") AnalyticsMetric metric) {
@@ -208,7 +209,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
             log.error("Error cargando métrica para edición", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"pageResult", "showDialog", "selectedMetric"})
     public void saveMetric() {
@@ -225,7 +226,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
             log.error("Error guardando métrica", e);
         }
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void deleteMetric(@BindingParam("item") AnalyticsMetric metric) {
@@ -240,7 +241,7 @@ public class AnalyticsMetricViewModel extends MasterPage {
             log.error("Error eliminando métrica", e);
         }
     }
-    
+
     @Command
     @NotifyChange({"showDialog", "selectedMetric"})
     public void cancelEdit() {
@@ -248,14 +249,14 @@ public class AnalyticsMetricViewModel extends MasterPage {
         showDialog = false;
         log.debug("Cancelando edición");
     }
-    
+
     @Command
     @NotifyChange("pageResult")
     public void refresh() {
         log.debug("Refrescando lista de métricas");
         loadData();
     }
-    
+
     // Métodos auxiliares para visualización
     public String getMetricStatusBadge(String status) {
         if (status == null) return "secondary";
@@ -266,10 +267,10 @@ public class AnalyticsMetricViewModel extends MasterPage {
             default: return "secondary";
         }
     }
-    
+
     public boolean isThresholdExceeded(AnalyticsMetric metric) {
         if (metric == null || metric.getAnlmetricvalue() == null) return false;
-        
+
         BigDecimal value = metric.getAnlmetricvalue();
         if (metric.getAnlthresholdmax() != null && value.compareTo(metric.getAnlthresholdmax()) > 0) {
             return true;

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.prompts;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +10,6 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -54,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class PromptApprovalWorkflowViewModel extends MasterPage {
+public class PromptApprovalWorkflowViewModel extends BaseFront<PromptApprovalWorkflowViewModel>{
 
     private static final long serialVersionUID = 1L;
     

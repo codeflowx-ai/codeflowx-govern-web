@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.evaluation.rag;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,7 +24,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.govern.service.rag.RAGEvaluationService;
+import com.codeflowx.govern.business.rag.RAGEvaluationService;
 import com.codeflowx.governance.client.model.RAGFullPipelineResponse;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel para Overview de Evaluaciones RAG
- * 
+ *
  * Pantalla: platform/evaluation/rag-evaluation/overview.zul
  * Propósito: Listar todas las evaluaciones RAG realizadas con filtros y búsqueda
  */
@@ -42,11 +43,11 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class RAGEvaluationOverviewViewModel extends MasterPage {
-    
+public class RAGEvaluationOverviewViewModel extends BaseFront<RAGEvaluationOverviewViewModel>{
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
     private BusinessService businessService;
 
@@ -138,17 +139,17 @@ public class RAGEvaluationOverviewViewModel extends MasterPage {
     public void loadData() {
         try {
             log.info("Cargando evaluaciones RAG - Página: {}", pageParams.getPageActual());
-            
+
             // TODO: Cargar desde base de datos cuando esté implementado
             // Por ahora lista vacía
             evaluationsList = new ArrayList<>();
             totalEvaluations = 0L;
-            
+
             log.info("Cargadas {} evaluaciones RAG", evaluationsList.size());
-                
+
         } catch (Exception e) {
             log.error("Error al cargar evaluaciones RAG", e);
-            Messagebox.show(Labels.getLabel("common.error.load"), 
+            Messagebox.show(Labels.getLabel("common.error.load"),
                 Labels.getLabel("common.error.title"),
                 Messagebox.OK, Messagebox.ERROR);
             evaluationsList = new ArrayList<>();
@@ -156,7 +157,7 @@ public class RAGEvaluationOverviewViewModel extends MasterPage {
     }
 
     @Command
-    @NotifyChange({"totalEvaluations", "lowRiskEvaluations", "mediumRiskEvaluations", 
+    @NotifyChange({"totalEvaluations", "lowRiskEvaluations", "mediumRiskEvaluations",
                    "highRiskEvaluations", "criticalRiskEvaluations", "averageScore"})
     public void loadMetrics() {
         try {
@@ -172,7 +173,7 @@ public class RAGEvaluationOverviewViewModel extends MasterPage {
     @Command
     @NotifyChange({"evaluationsList", "pageResult"})
     public void applyFilters() {
-        log.info("Aplicando filtros - Risk Level: {}, Grade: {}, Score: {}-{}", 
+        log.info("Aplicando filtros - Risk Level: {}, Grade: {}, Score: {}-{}",
             selectedRiskLevel, selectedGrade, minScore, maxScore);
         pageParams.setPageActual(1);
         loadData();
@@ -243,9 +244,9 @@ public class RAGEvaluationOverviewViewModel extends MasterPage {
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
     }
-    
+
     // ========== Clase interna para items de evaluación ==========
-    
+
     @Getter
     @Setter
     public static class RAGEvaluationItem {
@@ -260,4 +261,3 @@ public class RAGEvaluationOverviewViewModel extends MasterPage {
         private java.util.Date createdAt;
     }
 }
-

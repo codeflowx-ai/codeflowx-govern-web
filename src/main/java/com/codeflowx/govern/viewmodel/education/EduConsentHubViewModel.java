@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.education;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class EduConsentHubViewModel extends MasterPage {
+public class EduConsentHubViewModel extends BaseFront<EduConsentHubViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String PROCESS_KEY = "edu_consent_hub";

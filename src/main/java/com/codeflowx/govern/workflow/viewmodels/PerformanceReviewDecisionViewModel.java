@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -39,20 +40,20 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: Performance Review Decision (URGENTE - Timer 30min)
- * 
+ *
  * Proceso BPMN: 11_PERFORMANCE_DEGRADATION (performance-degradation-v1)
  * User Task: performanceReviewDecisionTask
  * Candidate Groups: ml-ops, platform-admins
- * 
+ *
  * Funcionalidad:
  * Decisión urgente cuando se detecta degradación crítica de performance.
  * Timer de 30 minutos para tomar acción inmediata.
- * 
+ *
  * Input Variables:
  * - modelName: String
  * - avgLatency, avgThroughput, avgErrorRate: Double
  * - severity: String
- * 
+ *
  * Output Variables:
  * - reviewDecision: "emergency_rollback" | "scale_now" | "monitor" | "accept_risk"
  * - performanceReviewJustification: String
@@ -62,43 +63,43 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class PerformanceReviewDecisionViewModel extends MasterPage {
+public class PerformanceReviewDecisionViewModel extends BaseFront<PerformanceReviewDecisionViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
     }
 
-    @WireVariable 
+    @WireVariable
     private TaskService taskService;
-    
-    @WireVariable 
+
+    @WireVariable
     private RuntimeService runtimeService;
 
     private String taskId;
@@ -110,7 +111,7 @@ public class PerformanceReviewDecisionViewModel extends MasterPage {
     private String severity;
     private String selectedDecision;
     private String justification;
-    
+
     // Mock mode
     private boolean mockMode = false;
 
@@ -119,21 +120,21 @@ public class PerformanceReviewDecisionViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        
+
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         try {
             taskId = Executions.getCurrent().getParameter("taskId");
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
@@ -163,16 +164,16 @@ public class PerformanceReviewDecisionViewModel extends MasterPage {
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando confirmDecision - decision={}", selectedDecision);
                 logActivity("MOCK_CONFIRM_PERF_DECISION", "PerformanceReview", null, "Simulación de decisión: " + selectedDecision);
-                Messagebox.show("✅ [DEMO] Decisión confirmada: " + selectedDecision, "Demo Mode", 
+                Messagebox.show("✅ [DEMO] Decisión confirmada: " + selectedDecision, "Demo Mode",
                     Messagebox.OK, Messagebox.INFORMATION,
                     event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
                 return;
             }
-            
+
             runtimeService.setVariable(processInstanceId, "reviewDecision", selectedDecision);
             runtimeService.setVariable(processInstanceId, "performanceReviewJustification", justification);
             taskService.complete(taskId);
-            
+
             logActivity("CONFIRM_PERF_DECISION", "PerformanceReview", null, "Decisión: " + selectedDecision);
 
             log.info("✅ Decisión urgente confirmada: {}", selectedDecision);
@@ -190,7 +191,7 @@ public class PerformanceReviewDecisionViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/plataforma/workflow/my-tasks.zul";
         Executions.getCurrent().sendRedirect(redirect);
     }
-    
+
     /**
      * Mock data para demos
      */
@@ -202,29 +203,14 @@ public class PerformanceReviewDecisionViewModel extends MasterPage {
         this.avgThroughput = 38.0;
         this.avgErrorRate = 5.8;
         this.severity = "CRITICAL";
-        
+
         log.info("🎭 Mock data loaded for Performance Review Decision");
     }
-    
+
     /**
      * Registra actividad del usuario
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
     @Destroy
     public void destroy() {
         businessService = null;

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
@@ -48,13 +48,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 @Setter
+@Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class RagSystemsOverviewViewModel extends MasterPage {
-    
+public class RagSystemsOverviewViewModel extends BaseFront<RagSystemsOverviewViewModel> {
+
     private static final long serialVersionUID = 1L;
 
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
     private ModelService modelService;
 
@@ -82,7 +83,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
     private PageParams pageParams;
     private PageResult<RagOverview> pageResult;
     // ========== Paginación ==========
-    
+
     // ========== Métricas globales ==========
     private Long totalRagSystems = 0L;
     private Long activeRagSystems = 0L;
@@ -118,7 +119,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 .ascending(false)
                 .sortField("ragcreatedat")
                 .build();
-        
+
     }
 
     private void initializeFilterOptions() {
@@ -156,20 +157,20 @@ public class RagSystemsOverviewViewModel extends MasterPage {
     @NotifyChange({"ragSystems", "pageResult"})
     public void loadData() {
         try {
-            log.info("Cargando sistemas RAG - Página: {}, MaxRows: {}", 
+            log.info("Cargando sistemas RAG - Página: {}, MaxRows: {}",
                 pageParams.getPageActual(), pageParams.getMaxRows());
-            
+
             Criterias criterias = buildCriterias();
             pageResult = ragOverviewService.findAll(pageParams, criterias);
-            
+
             ragSystems = pageResult != null ? pageResult.getContent() : new ArrayList<>();
-            
-            log.info("Cargados {} sistemas RAG de {} totales", 
+
+            log.info("Cargados {} sistemas RAG de {} totales",
                 ragSystems.size(), pageResult != null ? pageResult.getTotalRows() : 0);
-                
+
         } catch (GovernanceServiceException e) {
             log.error("Error al cargar sistemas RAG", e);
-            Messagebox.show(Labels.getLabel("common.error.load"), 
+            Messagebox.show(Labels.getLabel("common.error.load"),
                 Labels.getLabel("common.error.title"),
                 Messagebox.OK, Messagebox.ERROR);
             ragSystems = new ArrayList<>();
@@ -211,7 +212,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
     }
 
     @Command
-    @NotifyChange({"totalRagSystems", "activeRagSystems", "draftRagSystems", "pendingApproval", 
+    @NotifyChange({"totalRagSystems", "activeRagSystems", "draftRagSystems", "pendingApproval",
                    "approvedRagSystems", "totalDatasources", "totalDocuments"})
     public void loadMetrics() {
         try {
@@ -220,12 +221,12 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 .pageActual(1)
                 .rowActual(0)
                 .build();
-            
+
             PageResult<RagMetricsSummary> result = ragMetricsSummaryService.findAll(
-                metricsParams, 
+                metricsParams,
                 new Criterias()
             );
-            
+
             if (result != null && result.getContent() != null && !result.getContent().isEmpty()) {
                 RagMetricsSummary metrics = result.getContent().get(0);
                 totalRagSystems = metrics.getTotalRagSystems() != null ? metrics.getTotalRagSystems() : 0L;
@@ -235,8 +236,8 @@ public class RagSystemsOverviewViewModel extends MasterPage {
                 approvedRagSystems = metrics.getApprovedRagSystems() != null ? metrics.getApprovedRagSystems() : 0L;
                 totalDatasources = metrics.getTotalDatasourcesAll() != null ? metrics.getTotalDatasourcesAll() : 0L;
                 totalDocuments = metrics.getTotalDocumentsIndexed() != null ? metrics.getTotalDocumentsIndexed() : 0L;
-                
-                log.info("Métricas RAG cargadas - Total: {}, Activos: {}, Borradores: {}", 
+
+                log.info("Métricas RAG cargadas - Total: {}, Activos: {}, Borradores: {}",
                     totalRagSystems, activeRagSystems, draftRagSystems);
             }
         } catch (GovernanceServiceException e) {
@@ -249,14 +250,14 @@ public class RagSystemsOverviewViewModel extends MasterPage {
     @Command
     @NotifyChange({"ragSystems", "pageResult"})
     public void applyFilters() {
-        log.info("Aplicando filtros - Estado: {}, Tipo: {}, Aprobación: {}", 
+        log.info("Aplicando filtros - Estado: {}, Tipo: {}, Aprobación: {}",
             selectedStatus, selectedType, selectedApprovalStatus);
         pageParams.setPageActual(1); // Reset a primera página
         loadData();
     }
 
     @Command
-    @NotifyChange({"searchTerm", "selectedStatus", "selectedType", "selectedApprovalStatus", 
+    @NotifyChange({"searchTerm", "selectedStatus", "selectedType", "selectedApprovalStatus",
                    "ragSystems", "pageResult"})
     public void clearFilters() {
         log.info("Limpiando filtros");
@@ -308,7 +309,7 @@ public class RagSystemsOverviewViewModel extends MasterPage {
         appendPage("gobierno/rag/rag-systems-detail.zul", page.getFellow(IDDESKTOP), params);
     }
 
-    
+
 
     // ========== Acciones de contexto ==========
 
@@ -351,7 +352,6 @@ public class RagSystemsOverviewViewModel extends MasterPage {
 	@Override
 	public void setBeans(Object bean) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
-

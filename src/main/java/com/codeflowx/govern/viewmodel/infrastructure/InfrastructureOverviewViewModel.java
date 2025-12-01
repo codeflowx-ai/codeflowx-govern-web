@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.infrastructure;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -45,7 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class InfrastructureOverviewViewModel extends MasterPage {
+public class InfrastructureOverviewViewModel extends BaseFront<InfrastructureOverviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";

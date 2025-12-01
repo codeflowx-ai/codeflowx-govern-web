@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.monitoring;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +9,6 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ import codeflowx.nocode.persist.PageResult;
  * ViewModel para el Dashboard de Monitoring
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class MonitoringDashboardViewModel extends MasterPage implements Serializable {
+public class MonitoringDashboardViewModel extends BaseFront<MonitoringDashboardViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(MonitoringDashboardViewModel.class);

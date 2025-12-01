@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.training;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -11,7 +12,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericApplicationContext;
@@ -74,7 +74,7 @@ import codeflowx.nocode.persist.PageResult;
  * - Governance y compliance
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ExperimentsDetailViewModel extends MasterPage implements Serializable {
+public class ExperimentsDetailViewModel extends BaseFront<ExperimentsDetailViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(ExperimentsDetailViewModel.class);

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
@@ -31,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ApproveConformityAssessmentViewModel extends MasterPage {
+public class ApproveConformityAssessmentViewModel extends BaseFront<ApproveConformityAssessmentViewModel>{
 
     private static final long serialVersionUID = 1L;
     

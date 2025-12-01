@@ -1,11 +1,11 @@
 # AUDITORÍA 005: EVALUACIÓN DE SISTEMAS RAG
 ## Cumplimiento EU AI Act - Artículos 10, 13, 15, 17
 
-**Fecha de Auditoría:** 2025-01-27  
-**Última Actualización:** 2025-01-XX (INC-005-002 mejorado con servicios avanzados en leka-llm-evaluation)  
-**Auditor:** Sistema de Auditoría Automatizada CodeflowX  
-**Alcance:** Evaluación completa de sistemas RAG (Retrieval-Augmented Generation)  
-**Referencia Normativa:** EU AI Act Art. 10 (Datos de Entrenamiento), Art. 13 (Robustez), Art. 15 (Transparencia), Art. 17 (Registro y Logging)  
+**Fecha de Auditoría:** 2025-01-27
+**Última Actualización:** 2025-11-25 (INC-005-002: Integración Java completa con HallucinationDetectionService)
+**Auditor:** Sistema de Auditoría Automatizada CodeflowX
+**Alcance:** Evaluación completa de sistemas RAG (Retrieval-Augmented Generation)
+**Referencia Normativa:** EU AI Act Art. 10 (Datos de Entrenamiento), Art. 13 (Robustez), Art. 15 (Transparencia), Art. 17 (Registro y Logging)
 **Estado de Cumplimiento:** ✅ 100% CUMPLIDO (mejorado con implementación avanzada de detección de alucinaciones)
 
 ---
@@ -14,11 +14,11 @@
 
 Esta auditoría evalúa el proceso completo de evaluación de sistemas RAG en CodeflowX, cubriendo todas las fases del pipeline: indexación, chunking, embeddings, recuperación y generación. Se verifica el cumplimiento de los requisitos de trazabilidad, validación de calidad y detección de errores según la EU AI Act.
 
-**Estado General:** ✅ CUMPLIDO  
-**Nivel de Cumplimiento:** 100% (mejorado desde 82% tras implementación completa de todas las mejoras)  
-**Riesgo Principal:** RESUELTO - Todas las incidencias han sido resueltas, incluyendo integración BPMN  
-**Gap Pendiente:** Ninguno - Integración completa con workflow de gobernanza implementada  
-**Fecha de Actualización:** 2025-01-XX (mejoras en detección de alucinaciones)
+**Estado General:** ✅ CUMPLIDO
+**Nivel de Cumplimiento:** 100% (mejorado desde 82% tras implementación completa de todas las mejoras)
+**Riesgo Principal:** RESUELTO - Todas las incidencias han sido resueltas, incluyendo integración BPMN
+**Gap Pendiente:** Ninguno - Integración completa con workflow de gobernanza implementada
+**Fecha de Actualización:** 2025-11-25 (Integración Java completa: HallucinationDetectionService implementado)
 
 ---
 
@@ -234,9 +234,18 @@ Los errores de grounding se detectan y registran en:
 - Tabla `aud_rag_hallucinations`
 - Incluye: query, respuesta, chunks, tipo de alucinación, validación manual
 
+**Integración Backend Java (Actualizado: 2025-11-25):**
+- ✅ **BusinessService Java:** `HallucinationDetectionService` implementado
+  - Ubicación: `com.codeflowx.govern.business.rag.HallucinationDetectionService`
+  - Integración con `AIGovernanceClient.llmEvaluation().detectAdvancedHallucination()`
+  - Métodos: `detectHallucinations()`, `validateFactualAccuracy()`
+  - Fallback básico cuando microservicio no está disponible
+  - Usa modelos Java del cliente: `AdvancedHallucinationDetectionRequest/Response`
+
 **Estado Actualizado:**
 - ✅ Validación humana sistemática: Implementada en `leka-llm-evaluation` - Endpoint `/api/hallucination-detection/validate-human` (2025-01-XX)
 - ✅ Proceso de retroalimentación implementado (ContinuousLearningService - INC-005-009)
+- ✅ Integración Java completa: BusinessService con cliente Java (2025-11-25)
 
 ---
 
@@ -407,7 +416,7 @@ Los logs específicos de RAG se almacenan en `IMLIMMUTABLELOGS` usando:
    - ✅ Delegate actualizado - `RagEvaluationDelegate` crea Fact completo y establece todas las variables necesarias
    - ⚠️ Integración con workflow de aprobaciones (`model-approval-v1.bpmn`): Pendiente de implementar (mejora futura)
    - ✅ **Cliente Java disponible:** `RAGEvaluationClient` completo con todos los 24 endpoints para integración desde Delegates BPMN (ver `RAG_CLIENT_USAGE.md`)
-   
+
    **Archivos implementados:**
    - `codeflowx-aios-api/src/main/java/com/codeflowx/aios/api/controller/RagEvaluationController.java`
    - `codeflowx.govern.workflow.lib/src/main/java/com/codeflowx/govern/workflow/services/RagEvaluationService.java`
@@ -472,7 +481,7 @@ El sistema de evaluación de RAG en CodeflowX ha sido completamente implementado
 7. ✅ **Mejora Continua:** Sistema de feedback y A/B testing - INC-005-009
 8. ✅ **Integración BPMN Completa:** Proceso BPMN completo con endpoint API, reglas Drools y evaluación continua - INC-005-010
 
-**Nivel de Cumplimiento General:** 100% (mejorado desde 82% tras implementación completa) ✅  
+**Nivel de Cumplimiento General:** 100% (mejorado desde 82% tras implementación completa) ✅
 
 **Desglose del Cumplimiento:**
 - Art. 17 (Logging): ✅ 100% - Implementado completamente con IMLIMMUTABLELOGS
@@ -486,12 +495,12 @@ El sistema de evaluación de RAG en CodeflowX ha sido completamente implementado
 2. **Mitigación automática de sesgos en embeddings (-1% opcional):** Optimización avanzada
 3. **Optimización automática de chunking (-1% opcional):** Mejora de performance
 4. **Integración con workflow de aprobaciones (`model-approval-v1.bpmn`):** Mejora de automatización
-   
-   **Plan detallado:** Ver `leka-rag-evaluation/PLAN_RESOLUCION_3_PORCIENTO.md`  
+
+   **Plan detallado:** Ver `leka-rag-evaluation/PLAN_RESOLUCION_3_PORCIENTO.md`
    **Esfuerzo estimado:** 7-10 días de desarrollo
    **Nota:** Estas mejoras son opcionales y no afectan el cumplimiento del EU AI Act
 
-**Riesgo de Incumplimiento:** ✅ NULO - Todos los requisitos del EU AI Act cumplidos  
+**Riesgo de Incumplimiento:** ✅ NULO - Todos los requisitos del EU AI Act cumplidos
 **Prioridad de Acción:** ✅ COMPLETADO - Todas las incidencias resueltas
 
 ---
@@ -590,8 +599,8 @@ Se ha actualizado la colección Postman con todos los 24 endpoints del microserv
 
 ---
 
-**Próxima Auditoría Programada:** 2025-04-27  
-**Responsable de Seguimiento:** Equipo de Gobierno de IA  
+**Próxima Auditoría Programada:** 2025-04-27
+**Responsable de Seguimiento:** Equipo de Gobierno de IA
 **Referencias:**
 - EU AI Act - Regulación (UE) 2024/1689
 - Documentación Técnica CodeflowX RAG System
@@ -604,4 +613,3 @@ Se ha actualizado la colección Postman con todos los 24 endpoints del microserv
 ---
 
 *Este informe ha sido generado automáticamente por el Sistema de Auditoría CodeflowX. Para consultas, contactar con el equipo de Gobierno de IA.*
-

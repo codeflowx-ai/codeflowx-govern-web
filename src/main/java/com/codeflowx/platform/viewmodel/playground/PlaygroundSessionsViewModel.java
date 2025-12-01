@@ -26,39 +26,39 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 @VariableResolver(DelegatingVariableResolver.class)
 public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsViewModel> {
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private PlaygroundSessionService playgroundSessionService;
-    
+
     @Override
     public void setBeans(Object bean) {}
-    
+
     private List<PlaygroundSession> sessionsList = new ArrayList<>();
     private PageParams pageParams;
     private PageResult<PlaygroundSession> pageResult;
-    
+
     // Métricas
     private int activeSessions = 0;
     private long totalTokens = 0L;
     private java.math.BigDecimal totalCost = java.math.BigDecimal.ZERO;
     private int totalViolations = 0;
     private int complianceRate = 100;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         pageParams = PageParams.builder()
             .maxRows(50)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadSessions();
         loadMetrics();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadSessions() {
@@ -66,16 +66,16 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             pageResult = playgroundSessionService.findAll(pageParams, new Criterias());
             if (pageResult != null && pageResult.getContent() != null) {
                 sessionsList = pageResult.getContent();
-                
+
                 // Auditar búsqueda
-                logActivity("BUSCAR", "PLAYGROUNDSESSIONS", null, 
+                logActivity("BUSCAR", "PLAYGROUNDSESSIONS", null,
                     "Búsqueda: " + sessionsList.size() + " sesiones");
             }
         } catch (GovernanceServiceException e) {
             log.error("Error al cargar sesiones", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadMetrics() {
@@ -83,19 +83,19 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             activeSessions = (int) sessionsList.stream()
                 .filter(s -> "ACTIVE".equals(s.getSessionstatus()))
                 .count();
-            
+
             totalTokens = sessionsList.stream()
                 .mapToLong(s -> s.getTokensused() != null ? s.getTokensused() : 0L)
                 .sum();
-            
+
             totalCost = sessionsList.stream()
                 .map(s -> s.getCost() != null ? s.getCost() : java.math.BigDecimal.ZERO)
                 .reduce(java.math.BigDecimal.ZERO, java.math.BigDecimal::add);
-            
+
             long compliantSessions = sessionsList.stream()
                 .filter(s -> "COMPLIANT".equals(s.getCompliancestatus()))
                 .count();
-            
+
             if (!sessionsList.isEmpty()) {
                 complianceRate = (int) ((compliantSessions * 100) / sessionsList.size());
             }
@@ -103,51 +103,51 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             log.error("Error al cargar métricas", e);
         }
     }
-    
+
     @Command
     public void createSession() {
-        Messagebox.show("Select session type to create", "New Session", 
+        Messagebox.show("Select session type to create", "New Session",
             Messagebox.OK, Messagebox.INFORMATION);
     }
-    
+
     @Command
     public void openChat() {
         Executions.sendRedirect("/playground/chat/page.zul");
     }
-    
+
     @Command
     public void openImage() {
         Executions.sendRedirect("/playground/image/page.zul");
     }
-    
+
     @Command
     public void openVoice() {
         Executions.sendRedirect("/playground/voice/page.zul");
     }
-    
+
     @Command
     public void openTranslation() {
         Executions.sendRedirect("/playground/translation/page.zul");
     }
-    
+
     @Command
     public void openRouting() {
         Executions.sendRedirect("/playground/routing/page.zul");
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refreshSessions() {
         loadSessions();
         loadMetrics();
     }
-    
+
     @Command
     public void openSession(@BindingParam("session") PlaygroundSession session) {
         String url = "/playground/" + session.getSessiontype().toLowerCase() + "/page.zul?sessionId=" + session.getIdxplaygroundsession();
         Executions.sendRedirect(url);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteSession(@BindingParam("session") PlaygroundSession session) {
@@ -157,11 +157,11 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
                 if (Messagebox.ON_OK.equals(event.getName())) {
                     try {
                         playgroundSessionService.deleteById(session.getIdxplaygroundsession());
-                        
+
                         // Auditar eliminación
-                        logActivity("ELIMINAR", "PLAYGROUNDSESSIONS", session.getIdxplaygroundsession(), 
+                        logActivity("ELIMINAR", "PLAYGROUNDSESSIONS", session.getIdxplaygroundsession(),
                             "Sesión eliminada: " + session.getSessionname());
-                        
+
                         loadSessions();
                         loadMetrics();
                     } catch (GovernanceServiceException e) {
@@ -170,7 +170,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
                 }
             });
     }
-    
+
     public String getStatusColor(String status) {
         if (status == null) return "secondary";
         switch (status) {
@@ -180,7 +180,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             default: return "secondary";
         }
     }
-    
+
     public String getComplianceColor(String status) {
         if (status == null) return "secondary";
         switch (status) {
@@ -190,7 +190,7 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             default: return "secondary";
         }
     }
-    
+
     public String getRiskColor(String risk) {
         if (risk == null) return "secondary";
         switch (risk) {
@@ -201,20 +201,19 @@ public class PlaygroundSessionsViewModel extends BaseFront<PlaygroundSessionsVie
             default: return "secondary";
         }
     }
-    
+
     public String formatDate(Timestamp timestamp) {
         if (timestamp == null) return "-";
         return new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm").format(timestamp);
     }
-    
+
     @Destroy
     public void destroy() {
-        if (sessionsList != null) { 
-            sessionsList.clear(); 
-            sessionsList = null; 
+        if (sessionsList != null) {
+            sessionsList.clear();
+            sessionsList = null;
         }
         pageResult = null;
         pageParams = null;
-        businessService = null;
     }
 }

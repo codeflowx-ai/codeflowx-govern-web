@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.governance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -22,7 +23,7 @@ import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class AIMSPerformanceViewModel {
+public class AIMSPerformanceViewModel extends BaseFront<AIMSPerformanceViewModel> {
 
     @PersistenceContext
     private EntityManager entityManager;

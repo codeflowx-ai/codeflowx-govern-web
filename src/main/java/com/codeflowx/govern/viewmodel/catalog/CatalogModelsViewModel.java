@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.catalog;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class CatalogModelsViewModel extends MasterPage {
+public class CatalogModelsViewModel extends BaseFront<CatalogModelsViewModel>{
 
     private static final long serialVersionUID = 1L;
     

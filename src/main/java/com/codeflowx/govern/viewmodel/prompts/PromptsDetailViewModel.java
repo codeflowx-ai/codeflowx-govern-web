@@ -12,7 +12,7 @@ import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 
 import org.enartframework.web.exception.UiException;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -69,7 +69,7 @@ import org.zkoss.bind.annotation.Destroy;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class PromptsDetailViewModel extends MasterPage {
+public class PromptsDetailViewModel extends BaseFront<PromptsDetailViewModel> {
 
     private static final long serialVersionUID = 1L;
 

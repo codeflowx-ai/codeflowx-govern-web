@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.incident;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
@@ -31,50 +32,49 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class RootCauseAnalysisViewModel extends MasterPage {
+public class RootCauseAnalysisViewModel extends BaseFront<RootCauseAnalysisViewModel>{
 
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private TaskService taskService;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
-    }
-    
+
     @Override
     public void setBeans(Object bean) {}
 
     private String taskId;
     private String incidentTitle = "";
-    
+
     // RCA Fields
     private String whatHappened = "";
     private String whyHappened = "";
     private String contributingFactors = "";
     private String timeline = "";
     private String automatedRcaReport = "";
-    
+
     @Init
     public void init(@QueryParam("taskId") String taskId) {
         this.taskId = taskId;
         loadTaskData();
     }
-    
+
     private void loadTaskData() {
         try {
             if (taskService != null && taskId != null) {
@@ -90,13 +90,13 @@ public class RootCauseAnalysisViewModel extends MasterPage {
     @NotifyChange("*")
     public void submitRCA() {
         log.info("Submitting RCA - taskId: {}", taskId);
-        
+
         if (whatHappened.trim().isEmpty() || whyHappened.trim().isEmpty()) {
-            Messagebox.show("Please complete What Happened and Why Happened fields", 
+            Messagebox.show("Please complete What Happened and Why Happened fields",
                           "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             if (taskService != null && taskId != null) {
                 java.util.Map<String, Object> variables = new java.util.HashMap<>();
@@ -106,9 +106,9 @@ public class RootCauseAnalysisViewModel extends MasterPage {
                 variables.put("timeline", timeline);
                 variables.put("rcaCompletedBy", ctxBean.getUser().getUsuname());
                 variables.put("rcaCompletionDate", System.currentTimeMillis());
-                
+
                 taskService.complete(taskId, variables);
-                
+
                 Messagebox.show("Root Cause Analysis completed", "Success", Messagebox.OK, Messagebox.INFORMATION);
             }
         } catch (Exception e) {
@@ -117,4 +117,3 @@ public class RootCauseAnalysisViewModel extends MasterPage {
         }
     }
 }
-

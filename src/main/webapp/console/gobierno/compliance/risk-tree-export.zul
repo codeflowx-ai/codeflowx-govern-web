@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <window title="Exportación Árbol de Riesgos"
+            border="normal"
+            width="100%"
+            height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.RiskTreeExportViewModel')">
+
+        <vlayout spacing="10px" style="padding: 10px;">
+            <!-- Información de FRIA -->
+            <groupbox title="Información de FRIA">
+                <hlayout spacing="10px">
+                    <label value="FRIA ID: @load(vm.friaId)" style="font-weight: bold;"/>
+                    <button label="Cargar Árbol"
+                            onClick="@command('loadRiskTree')"
+                            disabled="@load(empty vm.friaId)"/>
+                </hlayout>
+            </groupbox>
+
+            <!-- Información del Árbol -->
+            <groupbox title="Árbol de Riesgos" if="@load(not empty vm.riskTree)">
+                <vlayout>
+                    <hlayout>
+                        <label value="Riesgo General: @load(vm.riskTree.overallRisk)"
+                               style="font-size: 16px; font-weight: bold;"/>
+                        <label value="Proyecto: @load(vm.riskTree.projectName)"/>
+                    </hlayout>
+
+                    <!-- Visualización del árbol (placeholder) -->
+                    <div style="border: 1px solid #e0e0e0; padding: 20px; min-height: 300px;">
+                        <label value="Visualización del árbol de riesgos (en desarrollo)"/>
+                        <!-- TODO: Implementar visualización interactiva del árbol -->
+                    </div>
+                </vlayout>
+            </groupbox>
+
+            <!-- Botones de Exportación -->
+            <groupbox title="Exportar Árbol de Riesgos">
+                <hlayout spacing="10px">
+                    <button label="Exportar PDF"
+                            onClick="@command('exportRiskTree', format='PDF')"
+                            disabled="@load(empty vm.friaId)"/>
+                    <button label="Exportar PNG"
+                            onClick="@command('exportRiskTree', format='PNG')"
+                            disabled="@load(empty vm.friaId)"/>
+                    <button label="Exportar JSON"
+                            onClick="@command('exportRiskTree', format='JSON')"
+                            disabled="@load(empty vm.friaId)"/>
+                </hlayout>
+            </groupbox>
+
+            <!-- Mensaje si no hay datos -->
+            <div if="@load(empty vm.riskTree)"
+                 style="text-align: center; padding: 50px;">
+                <label value="No hay árbol de riesgos cargado. Seleccione una evaluación FRIA y cargue el árbol."
+                       style="font-size: 14px; color: #666;"/>
+            </div>
+        </vlayout>
+    </window>
+</zk>

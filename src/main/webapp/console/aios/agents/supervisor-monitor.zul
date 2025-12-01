@@ -1,0 +1,118 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="aios"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.aios.SupervisorMonitorViewModel')"
+		validationMessages="@id('vmsgs')">
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-shield-halved label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="Monitor del Supervisor" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Estado y salud del sistema de supervisión" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+		</h:div>
+
+		<!-- Estado del Supervisor -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-6">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Estado del Supervisor</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<h:div class="form-group row">
+							<h:div class="col-md-6">
+								<label value="Supervisor:" />
+								<label value="@load(vm.supervisorStatus)"
+									style="@load(vm.supervisorStatus eq 'OK' ? 'color: green; font-weight: bold;' : vm.supervisorStatus eq 'WARN' ? 'color: orange; font-weight: bold;' : 'color: red; font-weight: bold;')" />
+							</h:div>
+							<h:div class="col-md-6">
+								<label value="Worker:" />
+								<label value="@load(vm.workerStatus)"
+									style="@load(vm.workerStatus eq 'OK' ? 'color: green; font-weight: bold;' : 'color: red; font-weight: bold;')" />
+							</h:div>
+						</h:div>
+						<h:div class="form-group row">
+							<h:div class="col-md-12">
+								<label value="Último BPMN:" />
+								<label value="@load(vm.lastBpmnProcess)" />
+							</h:div>
+						</h:div>
+						<button label="Actualizar Estado"
+							onClick="@command('loadStatus')"
+							class="btn btn-primary" />
+					</h:div>
+				</h:div>
+			</h:div>
+
+			<!-- Test de Integridad -->
+			<h:div class="col-lg-6">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Test de Integridad</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<grid model="@load(vm.integrityChecks)"
+							emptyMessage="No hay tests disponibles"
+							style="width: 100%;">
+							<columns>
+								<column label="Componente" width="150px" />
+								<column label="Estado" />
+							</columns>
+							<template name="model">
+								<row>
+									<label value="@load(each.key)" />
+									<label value="@load(each.value)"
+										style="@load(each.value.toString().contains('OK') ? 'color: green;' : 'color: red;')" />
+								</row>
+							</template>
+						</grid>
+						<button label="Ejecutar Tests"
+							onClick="@command('runIntegrityChecks')"
+							class="btn btn-secondary mt-2" />
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Logs Recientes -->
+		<h:div class="row">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Logs Recientes</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<grid model="@load(vm.recentLogs)"
+							emptyMessage="No hay logs disponibles"
+							style="width: 100%;">
+							<columns>
+								<column label="Timestamp" width="180px" />
+								<column label="Nivel" width="100px" />
+								<column label="Mensaje" />
+							</columns>
+							<template name="model">
+								<row>
+									<label value="@load(each.timestamp)" />
+									<label value="@load(each.level)"
+										style="@load(each.level eq 'ERROR' ? 'color: red;' : each.level eq 'WARN' ? 'color: orange;' : '')" />
+									<label value="@load(each.message)" />
+								</row>
+							</template>
+						</grid>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

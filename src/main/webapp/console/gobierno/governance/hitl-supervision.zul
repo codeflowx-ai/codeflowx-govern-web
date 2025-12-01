@@ -1,0 +1,238 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<!-- ViewModel binding -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.governance.HitlSupervisionViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<!-- Título pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-user-shield me-2"></h:i>
+						Supervisión Humana (HITL/HOTL)
+					</h:h2>
+					<h:p class="text-muted">
+						Dashboard consolidado de intervenciones humanas en la supervisión de sistemas de IA
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Métricas HITL -->
+			<div class="col-lg-12 s-bot">
+				<div class="row g-3">
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Total Intervenciones</h:h5>
+								<h:h3 class="mb-0">@load(vm.totalInterventions)</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Pendientes</h:h5>
+								<h:h3 class="mb-0 text-warning">@load(vm.pendingInterventions)</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Tiempo Promedio</h:h5>
+								<h:h3 class="mb-0">@load(vm.averageResponseTime)h</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Cumplimiento SLA</h:h5>
+								<h:h3 class="mb-0 text-success">@load(vm.slaComplianceRate)%</h:h3>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Filtros -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Filtros</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-3">
+								<label class="form-label">Tipo</label>
+								<combobox
+									selectedItem="@bind(vm.filterType)"
+									class="form-control">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="Agente" value="AGENT" />
+									<comboitem label="Modelo" value="MODEL" />
+									<comboitem label="Prompt" value="PROMPT" />
+								</combobox>
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">Estado</label>
+								<combobox
+									selectedItem="@bind(vm.filterStatus)"
+									class="form-control">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="Pendiente" value="PENDING" />
+									<comboitem label="Aprobado" value="APPROVED" />
+									<comboitem label="Rechazado" value="REJECTED" />
+								</combobox>
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">Período</label>
+								<combobox
+									selectedItem="@bind(vm.filterDateRange)"
+									class="form-control">
+									<comboitem label="Últimos 7 días" value="LAST_7_DAYS" />
+									<comboitem label="Últimos 30 días" value="LAST_30_DAYS" />
+									<comboitem label="Últimos 90 días" value="LAST_90_DAYS" />
+								</combobox>
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">&nbsp;</label>
+								<div class="hstack gap-2">
+									<button
+										label="Filtrar"
+										onClick="@command('filterInterventions')"
+										class="btn btn-primary" />
+									<button
+										label="Refrescar"
+										onClick="@command('refreshData')"
+										class="btn btn-secondary" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lista de Intervenciones -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Intervenciones Humanas</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.interventions)" selectedItem="@bind(vm.selectedIntervention)"
+							class="table table-hover">
+							<listhead>
+								<listheader label="Tipo" width="100px" />
+								<listheader label="Entidad" />
+								<listheader label="Versión" width="100px" />
+								<listheader label="Estado" width="120px" />
+								<listheader label="Solicitado" width="150px" />
+								<listheader label="Tiempo Respuesta" width="120px" />
+								<listheader label="Revisor" />
+								<listheader label="Acción" width="100px" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.type)" />
+									<listcell label="@load(each.entityName)" />
+									<listcell label="@load(each.entityVersion)" />
+									<listcell>
+										<span class="badge bg-@load(each.status == 'APPROVED' ? 'success' : each.status == 'REJECTED' ? 'danger' : 'warning')">
+											@load(each.status)
+										</span>
+									</listcell>
+									<listcell label="@load(each.requestedAt)" />
+									<listcell label="@load(each.responseTimeHours)h" />
+									<listcell label="@load(each.reviewer)" />
+									<listcell>
+										<button
+											label="Abrir"
+											onClick="@command('openInterventionForm')"
+											class="btn btn-sm btn-primary" />
+									</listcell>
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Detalle de Intervención Seleccionada -->
+			<div class="col-lg-12 s-bot" visible="@load(not empty vm.selectedIntervention)">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Detalle de Intervención</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Entidad:</label>
+								<textbox value="@load(vm.selectedIntervention.entityName)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Versión:</label>
+								<textbox value="@load(vm.selectedIntervention.entityVersion)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">Risk Score:</label>
+								<textbox value="@load(vm.selectedIntervention.riskScore)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">Compliance Score:</label>
+								<textbox value="@load(vm.selectedIntervention.complianceScore)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">Ethics Score:</label>
+								<textbox value="@load(vm.selectedIntervention.ethicsScore)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-12">
+								<label class="form-label">Justificación:</label>
+								<textbox value="@load(vm.selectedIntervention.justification)" readonly="true"
+									multiline="true" rows="3" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Logs de Auditoría -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Logs de Auditoría</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@load(vm.auditLogs)" class="table table-hover">
+							<listhead>
+								<listheader label="Timestamp" width="150px" />
+								<listheader label="Acción" width="100px" />
+								<listheader label="Tipo Entidad" width="100px" />
+								<listheader label="Entidad" />
+								<listheader label="Usuario" />
+								<listheader label="Detalles" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.timestamp)" />
+									<listcell label="@load(each.action)" />
+									<listcell label="@load(each.entityType)" />
+									<listcell label="@load(each.entityName)" />
+									<listcell label="@load(each.user)" />
+									<listcell label="@load(each.details)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

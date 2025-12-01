@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +47,14 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: Bandeja de Tareas BPMN
- * 
+ *
  * Funcionalidades:
  * - Ver tareas pendientes del usuario logado
  * - Filtrar por proceso, prioridad, estado
  * - Asignar tarea a usuario específico
  * - Claim/Release tareas
  * - Abrir formulario ZUL de la tarea
- * 
+ *
  * Integración:
  * - Ssousuario (usuario logado)
  * - Ssorol (roles del usuario)
@@ -65,35 +66,35 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class TaskInboxViewModel extends MasterPage {
+public class TaskInboxViewModel extends BaseFront<TaskInboxViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -170,21 +171,21 @@ public class TaskInboxViewModel extends MasterPage {
     private UserDTO selectedUserToAssign;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Detectar modo MOCK desde parámetro URL
         String mockParam = Executions.getCurrent().getParameter("mock");
         mockMode = "true".equalsIgnoreCase(mockParam);
-        
+
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.getBoolean(System.getenv("MOCK_MODE").toString());
         }
-        
+
         log.info("🚀 Inicializando TaskInboxViewModel - MOCK MODE: {}", mockMode);
 
         // Obtener usuario logado de sesión ZKoss
@@ -218,7 +219,7 @@ public class TaskInboxViewModel extends MasterPage {
             loadMockTasks();
             return;
         }
-        
+
         try {
             log.info("📥 Cargando tareas para usuario: {}", currentUsername);
 
@@ -245,186 +246,186 @@ public class TaskInboxViewModel extends MasterPage {
                     .collect(Collectors.toList())
             );
 
-            log.info("✅ Cargadas {} tareas ({} asignadas, {} de grupos)", 
+            log.info("✅ Cargadas {} tareas ({} asignadas, {} de grupos)",
                      totalTasks, assignedToMeCount, groupTasksCount);
 
         } catch (Exception e) {
             log.error("❌ Error cargando tareas: {}", e.getMessage(), e);
-            Messagebox.show("Error cargando tareas: " + e.getMessage(), "Error", 
+            Messagebox.show("Error cargando tareas: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Cargar tareas MOCK para demo/presentación
      * Una tarea por cada pantalla de workflow para poder acceder y verificar diseño
      */
     private void loadMockTasks() {
         log.info("🎭 Cargando tareas MOCK para demo - UNA POR CADA PANTALLA WORKFLOW...");
-        
+
         allTasks = new ArrayList<>();
-        
+
         // ========== TAREAS MOCK - UNA POR CADA PANTALLA ==========
-        
+
         // Nombres de usuarios reales para más realismo
         String[] userNames = {"maria.garcia", "carlos.rodriguez", "ana.martinez", "luis.fernandez", "laura.sanchez"};
-        
+
         // Generar fechas de vencimiento
         long now = System.currentTimeMillis();
         Date dueDateSoon = new Date(now + 2 * 3600000); // +2 horas
         Date dueDateTomorrow = new Date(now + 86400000); // +1 día
         Date dueDateNextWeek = new Date(now + 604800000); // +1 semana
-        
+
         // 1. AgentApprovalHumanOverrideViewModel
-        allTasks.add(createMockTask("mock-1", "agent-approval-v1", "Aprobar Agente IA - Cliente Banco Nacional", 
+        allTasks.add(createMockTask("mock-1", "agent-approval-v1", "Aprobar Agente IA - Cliente Banco Nacional",
             "Agente conversacional para atención bancaria. Requiere revisión humana.", userNames[0], "HIGH", "PENDING",
-            "/workflow/agent-approval-override.zul?taskId=mock-1&mock=true", 
+            "/workflow/agent-approval-override.zul?taskId=mock-1&mock=true",
             Arrays.asList("Compliance", "EthicsOfficer"), dueDateTomorrow));
-            
+
         // 2. AlertResponseViewModel
-        allTasks.add(createMockTask("mock-2", "critical-alert-response", "Responder Alerta Crítica - Sistema Producción", 
+        allTasks.add(createMockTask("mock-2", "critical-alert-response", "Responder Alerta Crítica - Sistema Producción",
             "Alerta crítica detectada en sistema de inferencia", userNames[1], "CRITICAL", "PENDING",
             "/workflow/alert-response.zul?taskId=mock-2&mock=true",
             Arrays.asList("MLOps"), dueDateSoon));
-            
+
         // 3. BiasMitigationPlanViewModel
-        allTasks.add(createMockTask("mock-3", "bias-detection-v1", "Plan Mitigación Sesgo - Modelo HR", 
+        allTasks.add(createMockTask("mock-3", "bias-detection-v1", "Plan Mitigación Sesgo - Modelo HR",
             "Crear plan para mitigar sesgo detectado en sistema RRHH", userNames[2], "HIGH", "PENDING",
             "/workflow/bias-mitigation-plan.zul?taskId=mock-3&mock=true",
             Arrays.asList("Compliance", "EthicsOfficer"), dueDateNextWeek));
-            
+
         // 4. BiasReviewViewModel
-        allTasks.add(createMockTask("mock-4", "bias-detection-v1", "Revisar Sesgo Detectado - Modelo Scoring Crédito", 
+        allTasks.add(createMockTask("mock-4", "bias-detection-v1", "Revisar Sesgo Detectado - Modelo Scoring Crédito",
             "Sesgo demográfico: género y edad en aprobaciones", null, "CRITICAL", "PENDING",
             "/workflow/bias-review.zul?taskId=mock-4&mock=true",
             Arrays.asList("Compliance", "EthicsOfficer", "DataEngineer"), dueDateSoon));
-            
+
         // 5. BiasUrgentDecisionViewModel
-        allTasks.add(createMockTask("mock-5", "bias-detection-v1", "Decisión Urgente Sesgo - Sistema Activo", 
+        allTasks.add(createMockTask("mock-5", "bias-detection-v1", "Decisión Urgente Sesgo - Sistema Activo",
             "Sesgo crítico en producción requiere decisión inmediata", userNames[3], "CRITICAL", "PENDING",
             "/workflow/bias-urgent-decision.zul?taskId=mock-5&mock=true",
             Arrays.asList("AdminAI", "Compliance"), dueDateSoon));
-            
+
         // 6. ComplianceReviewDecisionViewModel
-        allTasks.add(createMockTask("mock-6", "compliance-monitoring-v1", "Decisión Revisión Compliance - EU AI Act", 
+        allTasks.add(createMockTask("mock-6", "compliance-monitoring-v1", "Decisión Revisión Compliance - EU AI Act",
             "Decidir acción tras timer de 7 días en compliance", userNames[0], "MEDIUM", "PENDING",
             "/workflow/compliance-review-decision.zul?taskId=mock-6&mock=true",
             Arrays.asList("Compliance"), dueDateNextWeek));
-            
+
         // 7. ComplianceReviewViewModel
-        allTasks.add(createMockTask("mock-7", "compliance-monitoring-v1", "Compliance Review - Sistema RAG Legal", 
+        allTasks.add(createMockTask("mock-7", "compliance-monitoring-v1", "Compliance Review - Sistema RAG Legal",
             "Revisión de hallazgos de compliance", null, "HIGH", "PENDING",
             "/workflow/compliance-review.zul?taskId=mock-7&mock=true",
             Arrays.asList("Compliance", "EthicsOfficer"), dueDateTomorrow));
-            
+
         // 8. DatasetReviewReminderViewModel
-        allTasks.add(createMockTask("mock-8", "dataset-quality-v1", "Recordatorio Dataset - Training Sentiment Analysis", 
+        allTasks.add(createMockTask("mock-8", "dataset-quality-v1", "Recordatorio Dataset - Training Sentiment Analysis",
             "Revisar calidad de dataset tras reminder", userNames[1], "MEDIUM", "PENDING",
             "/workflow/dataset-review-reminder.zul?taskId=mock-8&mock=true",
             Arrays.asList("DataEngineer"), dueDateTomorrow));
-            
+
         // 9. DriftAnalysisViewModel
-        allTasks.add(createMockTask("mock-9", "drift-detection-v1", "Analizar Drift - Modelo Recomendaciones", 
+        allTasks.add(createMockTask("mock-9", "drift-detection-v1", "Analizar Drift - Modelo Recomendaciones",
             "Investigar causa raíz de drift detectado (-12% accuracy)", userNames[2], "CRITICAL", "PENDING",
             "/workflow/drift-analysis.zul?taskId=mock-9&mock=true",
             Arrays.asList("DataEngineer", "MLOps"), dueDateSoon));
-            
+
         // 10. DriftReviewDecisionViewModel
-        allTasks.add(createMockTask("mock-10", "drift-detection-v1", "Decisión Drift - Modelo Predicción Ventas", 
+        allTasks.add(createMockTask("mock-10", "drift-detection-v1", "Decisión Drift - Modelo Predicción Ventas",
             "Decidir acción correctiva para drift", null, "HIGH", "PENDING",
             "/workflow/drift-review-decision.zul?taskId=mock-10&mock=true",
             Arrays.asList("MLOps", "DataEngineer"), dueDateTomorrow));
-            
+
         // 11. EthicsCommitteeReviewViewModel
-        allTasks.add(createMockTask("mock-11", "ethics-review-v1", "Ethics Committee - Chatbot Atención Médica", 
+        allTasks.add(createMockTask("mock-11", "ethics-review-v1", "Ethics Committee - Chatbot Atención Médica",
             "Revisión del comité de ética para sistema médico", userNames[3], "CRITICAL", "PENDING",
             "/workflow/ethics-committee-review.zul?taskId=mock-11&mock=true",
             Arrays.asList("EthicsOfficer", "AdminAI"), dueDateSoon));
-            
+
         // 12. EthicsMitigationPlanViewModel
-        allTasks.add(createMockTask("mock-12", "ethics-review-v1", "Plan Mitigación Ética - Sistema Automático", 
+        allTasks.add(createMockTask("mock-12", "ethics-review-v1", "Plan Mitigación Ética - Sistema Automático",
             "Crear plan para mitigar problemas éticos detectados", userNames[4], "HIGH", "PENDING",
             "/workflow/ethics-mitigation-plan.zul?taskId=mock-12&mock=true",
             Arrays.asList("EthicsOfficer"), dueDateNextWeek));
-            
+
         // 13. EthicsReviewReminderViewModel
-        allTasks.add(createMockTask("mock-13", "ethics-review-v1", "Recordatorio Ethics - Revisión Pendiente", 
+        allTasks.add(createMockTask("mock-13", "ethics-review-v1", "Recordatorio Ethics - Revisión Pendiente",
             "Reminder de revisión ética pendiente", null, "MEDIUM", "PENDING",
             "/workflow/ethics-review-reminder.zul?taskId=mock-13&mock=true",
             Arrays.asList("EthicsOfficer"), dueDateTomorrow));
-            
+
         // 14. EthicsReviewRequestViewModel
-        allTasks.add(createMockTask("mock-14", "ethics-review-v1", "Solicitud Ethics Review - IA Recursos Humanos", 
+        allTasks.add(createMockTask("mock-14", "ethics-review-v1", "Solicitud Ethics Review - IA Recursos Humanos",
             "Solicitar revisión ética para sistema de selección", userNames[0], "HIGH", "PENDING",
             "/workflow/ethics-review-request.zul?taskId=mock-14&mock=true",
             Arrays.asList("EthicsOfficer", "AdminAI"), dueDateNextWeek));
-            
+
         // 15. HitlSlaReminderViewModel
-        allTasks.add(createMockTask("mock-15", "agent-approval-v1", "Recordatorio SLA HITL - Aprobación Pendiente", 
+        allTasks.add(createMockTask("mock-15", "agent-approval-v1", "Recordatorio SLA HITL - Aprobación Pendiente",
             "SLA de revisión humana próximo a vencer", userNames[1], "HIGH", "PENDING",
             "/workflow/hitl-sla-reminder.zul?taskId=mock-15&mock=true",
             Arrays.asList("Compliance"), dueDateSoon));
-            
+
         // 16. LlmEvaluationReviewViewModel
-        allTasks.add(createMockTask("mock-16", "llm-evaluation-v1", "Evaluar LLM - GPT-4o para Soporte Cliente", 
+        allTasks.add(createMockTask("mock-16", "llm-evaluation-v1", "Evaluar LLM - GPT-4o para Soporte Cliente",
             "Revisión de calidad de respuestas del LLM", null, "MEDIUM", "PENDING",
             "/workflow/llm-evaluation-review.zul?taskId=mock-16&mock=true",
             Arrays.asList("MLOps"), dueDateNextWeek));
-            
+
         // 17. ModelApprovalHumanOverrideViewModel
-        allTasks.add(createMockTask("mock-17", "model-approval-v1", "Aprobar Modelo - Predicción Fraude v4.2", 
+        allTasks.add(createMockTask("mock-17", "model-approval-v1", "Aprobar Modelo - Predicción Fraude v4.2",
             "Modelo de ML para detección de fraude en pagos", userNames[2], "HIGH", "PENDING",
             "/workflow/model-approval-override.zul?taskId=mock-17&mock=true",
             Arrays.asList("MLOps", "Compliance"), dueDateTomorrow));
-            
+
         // 18. ModelApprovalReminderViewModel
-        allTasks.add(createMockTask("mock-18", "model-approval-v1", "Recordatorio Aprobación Modelo - Churn Prediction", 
+        allTasks.add(createMockTask("mock-18", "model-approval-v1", "Recordatorio Aprobación Modelo - Churn Prediction",
             "Reminder de aprobación de modelo pendiente", userNames[3], "MEDIUM", "PENDING",
             "/workflow/model-approval-reminder.zul?taskId=mock-18&mock=true",
             Arrays.asList("MLOps"), dueDateNextWeek));
-            
+
         // 19. ModelEvaluationReviewViewModel
-        allTasks.add(createMockTask("mock-19", "model-evaluation-v1", "Revisar Evaluación Modelo - Clasificador Sentimientos", 
+        allTasks.add(createMockTask("mock-19", "model-evaluation-v1", "Revisar Evaluación Modelo - Clasificador Sentimientos",
             "Revisar resultados de evaluación automática", null, "MEDIUM", "PENDING",
             "/workflow/model-evaluation-review.zul?taskId=mock-19&mock=true",
             Arrays.asList("DataEngineer", "MLOps"), dueDateNextWeek));
-            
+
         // 20. PerformanceInterventionViewModel
-        allTasks.add(createMockTask("mock-20", "performance-degradation-v1", "Intervención Performance - API Inference", 
+        allTasks.add(createMockTask("mock-20", "performance-degradation-v1", "Intervención Performance - API Inference",
             "Latencia crítica: 300ms → 1200ms. Acción inmediata requerida", userNames[4], "CRITICAL", "PENDING",
             "/workflow/performance-intervention.zul?taskId=mock-20&mock=true",
             Arrays.asList("MLOps"), dueDateSoon));
-            
+
         // 21. PerformanceReviewDecisionViewModel
-        allTasks.add(createMockTask("mock-21", "performance-degradation-v1", "Decisión Performance - Endpoint Batch", 
+        allTasks.add(createMockTask("mock-21", "performance-degradation-v1", "Decisión Performance - Endpoint Batch",
             "Decidir acción para degradación de performance", userNames[0], "HIGH", "PENDING",
             "/workflow/performance-review-decision.zul?taskId=mock-21&mock=true",
             Arrays.asList("MLOps"), dueDateTomorrow));
-            
+
         // 22. PromptApprovalRequestViewModel (solicitud)
         // Esta es pantalla de inicio de proceso, no user task, se accede diferente
-        
+
         // 23. PromptHumanReviewViewModel
-        allTasks.add(createMockTask("mock-23", "prompt-approval-process", "Revisión Humana Prompt - Marketing Black Friday", 
+        allTasks.add(createMockTask("mock-23", "prompt-approval-process", "Revisión Humana Prompt - Marketing Black Friday",
             "Prompt para campaña marketing requiere revisión", userNames[1], "MEDIUM", "PENDING",
             "/workflow/prompt-human-review.zul?taskId=mock-23&mock=true",
             Arrays.asList("Compliance"), dueDateTomorrow));
-            
+
         // 24. RagEvaluationReviewViewModel
-        allTasks.add(createMockTask("mock-24", "rag-evaluation-v1", "Evaluar RAG - Sistema Documentación Técnica", 
+        allTasks.add(createMockTask("mock-24", "rag-evaluation-v1", "Evaluar RAG - Sistema Documentación Técnica",
             "Revisión de calidad de retrieval y generación", null, "MEDIUM", "PENDING",
             "/workflow/rag-evaluation-review.zul?taskId=mock-24&mock=true",
             Arrays.asList("DataEngineer"), dueDateNextWeek));
-        
+
         filteredTasks = new ArrayList<>(allTasks);
-        
+
         // Calcular estadísticas
         totalTasks = allTasks.size();
         assignedToMeCount = (int) allTasks.stream()
             .filter(t -> "demo.user".equals(t.getAssignee()))
             .count();
         groupTasksCount = totalTasks - assignedToMeCount;
-        
+
         // Procesos únicos
         processDefinitions = new ArrayList<>();
         processDefinitions.add("Todos");
@@ -434,16 +435,16 @@ public class TaskInboxViewModel extends MasterPage {
             .distinct()
             .sorted()
             .collect(Collectors.toList()));
-        
-        log.info("✅ Cargadas {} tareas MOCK ({} asignadas, {} de grupos)", 
+
+        log.info("✅ Cargadas {} tareas MOCK ({} asignadas, {} de grupos)",
                  totalTasks, assignedToMeCount, groupTasksCount);
         log.info("🎬 MODO DEMO ACTIVADO: Todas las tareas llevan parámetro mock=true en sus URLs");
     }
-    
+
     /**
      * Crear tarea MOCK para demo
      */
-    private TaskDTO createMockTask(String id, String processDefId, String name, String description, 
+    private TaskDTO createMockTask(String id, String processDefId, String name, String description,
                                     String assignee, String priorityStr, String status, String formKey,
                                     List<String> candidateGroups, Date dueDate) {
         TaskDTO task = new TaskDTO();
@@ -452,26 +453,26 @@ public class TaskInboxViewModel extends MasterPage {
         task.setName(name);
         task.setDescription(description);
         task.setAssignee(assignee);
-        
+
         // Convertir String a Integer para priority
         Integer priority = convertPriorityToInt(priorityStr);
         task.setPriority(priority);
-        
+
         task.setCreateTime(new java.util.Date(System.currentTimeMillis() - (long)(Math.random() * 86400000))); // Random en último 24h
         task.setFormKey(formKey);
         task.setCandidateGroups(candidateGroups);
         task.setDueDate(dueDate);
-        
+
         // Variables del proceso simuladas
         Map<String, Object> vars = new HashMap<>();
         vars.put("mockMode", true);
         vars.put("priority", priority);
         vars.put("status", status);
         task.setProcessVariables(vars);
-        
+
         return task;
     }
-    
+
     /**
      * Convertir Integer priority a texto legible
      */
@@ -481,14 +482,14 @@ public class TaskInboxViewModel extends MasterPage {
         if (priority >= 50) return "MEDIUM";
         return "LOW";
     }
-    
+
     /**
      * Convierte String de prioridad a Integer
      * Soporta: "CRITICAL", "HIGH", "MEDIUM", "LOW"
      */
     private Integer convertPriorityToInt(String priorityStr) {
         if (priorityStr == null) return 50;
-        
+
         switch (priorityStr.toUpperCase()) {
             case "CRITICAL": return 100;
             case "HIGH": return 90;
@@ -548,17 +549,17 @@ public class TaskInboxViewModel extends MasterPage {
             boolean success = taskManagementService.claimTask(task.getId(), currentUsername);
 
             if (success) {
-                Messagebox.show("Tarea reclamada exitosamente", "Éxito", 
+                Messagebox.show("Tarea reclamada exitosamente", "Éxito",
                                 Messagebox.OK, Messagebox.INFORMATION);
                 loadTasks();
             } else {
-                Messagebox.show("Error reclamando tarea", "Error", 
+                Messagebox.show("Error reclamando tarea", "Error",
                                 Messagebox.OK, Messagebox.ERROR);
             }
 
         } catch (Exception e) {
             log.error("❌ Error reclamando tarea: {}", e.getMessage(), e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -574,17 +575,17 @@ public class TaskInboxViewModel extends MasterPage {
             boolean success = taskManagementService.releaseTask(task.getId());
 
             if (success) {
-                Messagebox.show("Tarea liberada exitosamente", "Éxito", 
+                Messagebox.show("Tarea liberada exitosamente", "Éxito",
                                 Messagebox.OK, Messagebox.INFORMATION);
                 loadTasks();
             } else {
-                Messagebox.show("Error liberando tarea", "Error", 
+                Messagebox.show("Error liberando tarea", "Error",
                                 Messagebox.OK, Messagebox.ERROR);
             }
 
         } catch (Exception e) {
             log.error("❌ Error liberando tarea: {}", e.getMessage(), e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -607,7 +608,7 @@ public class TaskInboxViewModel extends MasterPage {
 
         } catch (Exception e) {
             log.error("❌ Error mostrando dialog: {}", e.getMessage(), e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -632,36 +633,36 @@ public class TaskInboxViewModel extends MasterPage {
     public void confirmAssign() {
         try {
             if (selectedUserToAssign == null) {
-                Messagebox.show("Debe seleccionar un usuario", "Advertencia", 
+                Messagebox.show("Debe seleccionar un usuario", "Advertencia",
                                 Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
 
-            log.info("✅ Asignando tarea {} a usuario {}", 
+            log.info("✅ Asignando tarea {} a usuario {}",
                      taskToAssign.getId(), selectedUserToAssign.getUsername());
 
             boolean success = taskManagementService.assignTaskToUser(
-                taskToAssign.getId(), 
+                taskToAssign.getId(),
                 selectedUserToAssign.getUsername()
             );
 
             if (success) {
                 Messagebox.show(
-                    "Tarea asignada exitosamente a " + selectedUserToAssign.getFullname(), 
-                    "Éxito", 
-                    Messagebox.OK, 
+                    "Tarea asignada exitosamente a " + selectedUserToAssign.getFullname(),
+                    "Éxito",
+                    Messagebox.OK,
                     Messagebox.INFORMATION
                 );
                 closeAssignDialog();
                 loadTasks();
             } else {
-                Messagebox.show("Error asignando tarea", "Error", 
+                Messagebox.show("Error asignando tarea", "Error",
                                 Messagebox.OK, Messagebox.ERROR);
             }
 
         } catch (Exception e) {
             log.error("❌ Error confirmando asignación: {}", e.getMessage(), e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -673,7 +674,7 @@ public class TaskInboxViewModel extends MasterPage {
     public void openTaskForm(@BindingParam("task") TaskDTO task) {
         try {
             if (task.getFormKey() == null || task.getFormKey().isEmpty()) {
-                Messagebox.show("Esta tarea no tiene formulario asociado", "Advertencia", 
+                Messagebox.show("Esta tarea no tiene formulario asociado", "Advertencia",
                                 Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
@@ -690,7 +691,7 @@ public class TaskInboxViewModel extends MasterPage {
 
         } catch (Exception e) {
             log.error("❌ Error abriendo formulario: {}", e.getMessage(), e);
-            Messagebox.show("Error abriendo formulario: " + e.getMessage(), "Error", 
+            Messagebox.show("Error abriendo formulario: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -745,32 +746,32 @@ public class TaskInboxViewModel extends MasterPage {
         if (priority >= 50) return "priority-medium";
         return "priority-low";
     }
-    
+
     public String getPriorityBadgeClass(Integer priority) {
         return "priority-badge " + getPriorityClass(priority);
     }
-    
+
     public String getTaskToAssignTitle() {
         if (taskToAssign == null) return "";
         return "Tarea: " + (taskToAssign.getName() != null ? taskToAssign.getName() : "Sin nombre");
     }
-    
+
     public String getAvailableUsersCount() {
         if (availableUsers == null) return "(0 usuarios)";
         return "(" + availableUsers.size() + " usuarios)";
     }
-    
+
     public String getPriorityStyle(Integer priority) {
         if (priority == null) priority = 50;
         if (priority >= 90) return "font-weight: bold; color: var(--primary-text);";
         if (priority >= 50) return "font-weight: 500; color: var(--first-aux);";
         return "color: var(--second-aux);";
     }
-    
+
     public String getLabelTotal() {
         return totalTasks + " tareas totales";
     }
-    
+
     @Command
     @NotifyChange({"selectedTask"})
     public void selectTask(@BindingParam("task") TaskDTO task) {
@@ -780,7 +781,7 @@ public class TaskInboxViewModel extends MasterPage {
 
     public String getProcessName(String processDefinitionId) {
         if (processDefinitionId == null) return "N/A";
-        
+
         // Extraer nombre del proceso del ID
         // Formato: "agent-approval-process-v3:1:12345"
         String[] parts = processDefinitionId.split(":");
@@ -803,11 +804,11 @@ public class TaskInboxViewModel extends MasterPage {
 
     public String getDueDateStyle(Date dueDate) {
         if (dueDate == null) return "";
-        
+
         long now = System.currentTimeMillis();
         long due = dueDate.getTime();
         long diff = due - now;
-        
+
         // Rojo si ya pasó o falta menos de 2 horas
         if (diff < 0 || diff < 2 * 60 * 60 * 1000) {
             return "color: red; font-weight: bold;";
@@ -825,7 +826,7 @@ public class TaskInboxViewModel extends MasterPage {
 
     public String getTaskVariables(TaskDTO task) {
         if (task == null) return "";
-        
+
         try {
             Map<String, Object> variables = runtimeService.getVariables(task.getProcessInstanceId());
             if (variables.isEmpty()) {
@@ -849,26 +850,11 @@ public class TaskInboxViewModel extends MasterPage {
             return "<i>Error obteniendo variables</i>";
         }
     }
-    
+
     /**
      * Registra la actividad del usuario en el sistema de auditoría
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {
         if (allTasks != null) { allTasks.clear(); allTasks = null; }
@@ -878,4 +864,3 @@ public class TaskInboxViewModel extends MasterPage {
         taskService = null;
     }
 }
-

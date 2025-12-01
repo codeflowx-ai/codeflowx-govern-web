@@ -192,11 +192,16 @@ public class ModelEndpointOverviewViewModel extends MasterPage {
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales");
-            // TODO: Implementar carga de métricas desde vistas SQL cuando estén disponibles
-            // Ejemplo: List<ModelEndpointMetricsSummary> metrics = businessService.findAllView(ModelEndpointMetricsSummary.class);
-            log.debug("Métricas globales pendientes de implementación");
-        } catch (Exception e) {
+            List<ModelEndpointMetricsSummary> metrics = modelEndpointMetricsSummaryService.findAll();
+            if (metrics != null && !metrics.isEmpty()) {
+                ModelEndpointMetricsSummary summary = metrics.get(0);
+                // Procesar métricas si es necesario
+                log.debug("Métricas globales cargadas: {} registros", metrics.size());
+            }
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas globales", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar métricas globales", e);
         }
     }
 
@@ -256,14 +261,18 @@ public class ModelEndpointOverviewViewModel extends MasterPage {
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(ModelEndpoint.class, itemId);
+                            modelEndpointService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "MODENDPOINTS", itemId, "Eliminado registro ID: " + itemId);
                             loadData();
                             Messagebox.show("Registro eliminado correctamente",
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar ID={}", itemId, e);
+                            Messagebox.show("Error al eliminar: " + e.getMessage(),
+                                "Error", Messagebox.OK, Messagebox.ERROR);
+                        } catch (Exception e) {
+                            log.error("Error inesperado al eliminar ID={}", itemId, e);
                             Messagebox.show("Error al eliminar: " + e.getMessage(),
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }
@@ -327,8 +336,10 @@ public class ModelEndpointOverviewViewModel extends MasterPage {
             // Limpiar PageParams
             pageParams = null;
 
-            // Limpiar BusinessService
-            businessService = null;
+            // Limpiar Servicios
+            modelEndpointService = null;
+            modelEndpointMetricsSummaryService = null;
+            businessService = null; // Mantener para Ssoractividad
 
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {

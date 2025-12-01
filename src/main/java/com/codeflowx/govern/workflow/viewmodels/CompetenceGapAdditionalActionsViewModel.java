@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.flowable.engine.TaskService;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class CompetenceGapAdditionalActionsViewModel extends MasterPage {
+public class CompetenceGapAdditionalActionsViewModel extends BaseFront<CompetenceGapAdditionalActionsViewModel>{
 
     private static final long serialVersionUID = 1L;
 

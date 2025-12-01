@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.evaluation.rag;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,7 +23,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.govern.service.rag.RAGEvaluationService;
+import com.codeflowx.govern.business.rag.RAGEvaluationService;
 import com.codeflowx.governance.client.model.*;
 
 import codeflowx.nocode.persist.BusinessService;
@@ -32,7 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel para Crear/Editar Evaluación RAG Completa
- * 
+ *
  * Pantalla: platform/evaluation/rag-evaluation/page.zul
  * Propósito: Formulario completo para evaluación del pipeline RAG
  */
@@ -40,11 +41,11 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class RAGEvaluationViewModel extends MasterPage {
-    
+public class RAGEvaluationViewModel extends BaseFront<RAGEvaluationViewModel>{
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
     private BusinessService businessService;
 
@@ -90,13 +91,13 @@ public class RAGEvaluationViewModel extends MasterPage {
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
-        
+
         // Obtener parámetros de navegación
         mode = (String) Executions.getCurrent().getParameter("mode");
         evaluationId = (String) Executions.getCurrent().getParameter("evaluationId");
-        
+
         log.info("Inicializando RAGEvaluationViewModel - mode: {}, evaluationId: {}", mode, evaluationId);
-        
+
         if ("create".equals(mode)) {
             initNewEvaluation();
         } else if ("edit".equals(mode) && evaluationId != null) {
@@ -111,7 +112,7 @@ public class RAGEvaluationViewModel extends MasterPage {
         log.debug("Inicializando nueva evaluación RAG");
         editing = false;
         pageTitle = "Nueva Evaluación RAG";
-        
+
         // Inicializar lista vacía de documentos
         retrievedDocuments = new ArrayList<>();
     }
@@ -119,11 +120,11 @@ public class RAGEvaluationViewModel extends MasterPage {
     private void loadEvaluation(String id) {
         try {
             log.debug("Cargando evaluación RAG ID={}", id);
-            
+
             // TODO: Cargar desde base de datos cuando esté implementado
             editing = true;
             pageTitle = "Editar Evaluación RAG: " + id;
-            
+
         } catch (Exception e) {
             log.error("Error al cargar evaluación RAG ID={}", id, e);
             Messagebox.show("Error al cargar evaluación: " + e.getMessage(),
@@ -136,31 +137,31 @@ public class RAGEvaluationViewModel extends MasterPage {
 
     @Command
     @NotifyChange({"evaluationResult", "overallScore", "retrievalScore", "answerScore",
-                   "faithfulness", "answerRelevancy", "contextPrecision", "grade", 
+                   "faithfulness", "answerRelevancy", "contextPrecision", "grade",
                    "riskLevel", "bottlenecks", "recommendations", "loading"})
     public void evaluateFullPipeline() {
         if (query == null || query.trim().isEmpty()) {
-            Messagebox.show("Por favor ingrese una consulta", "Validación", 
+            Messagebox.show("Por favor ingrese una consulta", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         if (generatedAnswer == null || generatedAnswer.trim().isEmpty()) {
-            Messagebox.show("Por favor ingrese una respuesta generada", "Validación", 
+            Messagebox.show("Por favor ingrese una respuesta generada", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         loading = true;
-        
+
         try {
             log.info("Evaluando pipeline completo RAG - Query: {}", query);
-            
+
             // Convertir documentos a formato esperado
             List<RetrievedDocument> docs = ragEvaluationService.convertToRetrievedDocuments(
                 convertToMapList(retrievedDocuments)
             );
-            
+
             // Construir request
             RAGFullPipelineRequest request = RAGFullPipelineRequest.builder()
                 .query(query)
@@ -168,10 +169,10 @@ public class RAGEvaluationViewModel extends MasterPage {
                 .generatedAnswer(generatedAnswer)
                 .groundTruth(groundTruth != null && !groundTruth.trim().isEmpty() ? groundTruth : null)
                 .build();
-            
+
             // Llamar servicio
             RAGFullPipelineResponse response = ragEvaluationService.evaluateFullPipeline(request);
-            
+
             // Actualizar propiedades del ViewModel
             this.evaluationResult = response;
             this.overallScore = response.getOverallScore();
@@ -184,16 +185,16 @@ public class RAGEvaluationViewModel extends MasterPage {
             this.riskLevel = calculateRiskLevel(response);
             this.bottlenecks = response.getBottlenecks() != null ? response.getBottlenecks() : new ArrayList<>();
             this.recommendations = response.getRecommendations() != null ? response.getRecommendations() : "";
-            
+
             // Mostrar mensaje de éxito
             Messagebox.show(
-                String.format("Evaluación completada - Score: %.2f, Risk: %s", 
+                String.format("Evaluación completada - Score: %.2f, Risk: %s",
                              overallScore, riskLevel),
                 "Éxito",
                 Messagebox.OK,
                 Messagebox.INFORMATION
             );
-            
+
         } catch (Exception e) {
             log.error("Error evaluando pipeline RAG", e);
             Messagebox.show(
@@ -211,32 +212,32 @@ public class RAGEvaluationViewModel extends MasterPage {
     @NotifyChange({"loading"})
     public void validatePolicies() {
         if (query == null || query.trim().isEmpty()) {
-            Messagebox.show("Por favor ingrese una consulta", "Validación", 
+            Messagebox.show("Por favor ingrese una consulta", "Validación",
                 Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         loading = true;
-        
+
         try {
             log.info("Validando políticas RAG - Query: {}", query);
-            
+
             // Convertir chunks a formato esperado
             List<Map<String, Object>> retrievedChunks = convertToMapList(retrievedDocuments);
             Map<String, Object> clientPolicies = getClientPolicies(); // Obtener desde sesión o BD
-            
+
             RAGPolicyValidationRequest request = RAGPolicyValidationRequest.builder()
                 .query(query)
                 .retrievedChunks(retrievedChunks)
                 .clientPolicies(clientPolicies)
                 .validateBeforeGeneration(true)
                 .build();
-            
+
             RAGPolicyValidationResponse response = ragEvaluationService.validatePolicies(request);
-            
+
             if (response.getValidationPassed()) {
                 Messagebox.show(
-                    String.format("Validación pasada - Alignment Score: %.2f", 
+                    String.format("Validación pasada - Alignment Score: %.2f",
                                  response.getAlignmentScore()),
                     "Éxito",
                     Messagebox.OK,
@@ -244,15 +245,15 @@ public class RAGEvaluationViewModel extends MasterPage {
                 );
             } else {
                 Messagebox.show(
-                    String.format("Validación falló - Alignment Score: %.2f. %s", 
-                                 response.getAlignmentScore(), 
+                    String.format("Validación falló - Alignment Score: %.2f. %s",
+                                 response.getAlignmentScore(),
                                  response.getRecommendation() != null ? response.getRecommendation() : ""),
                     "Advertencia",
                     Messagebox.OK,
                     Messagebox.WARNING
                 );
             }
-            
+
         } catch (Exception e) {
             log.error("Error validando políticas", e);
             Messagebox.show(
@@ -286,7 +287,7 @@ public class RAGEvaluationViewModel extends MasterPage {
     }
 
     @Command
-    @NotifyChange({"query", "generatedAnswer", "groundTruth", "retrievedDocuments", 
+    @NotifyChange({"query", "generatedAnswer", "groundTruth", "retrievedDocuments",
                    "evaluationResult", "overallScore", "riskLevel", "grade"})
     public void clearForm() {
         query = "";
@@ -323,7 +324,7 @@ public class RAGEvaluationViewModel extends MasterPage {
     private String calculateRiskLevel(RAGFullPipelineResponse response) {
         Double score = response.getOverallScore();
         Double faithfulness = response.getFaithfulness();
-        
+
         if (score >= 80 && faithfulness >= 0.8) return "LOW";
         if (score >= 60 && faithfulness >= 0.6) return "MEDIUM";
         if (score >= 40) return "HIGH";
@@ -343,9 +344,9 @@ public class RAGEvaluationViewModel extends MasterPage {
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
     }
-    
+
     // ========== Clases internas ==========
-    
+
     @Getter
     @Setter
     public static class RetrievedDocumentItem {
@@ -355,4 +356,3 @@ public class RAGEvaluationViewModel extends MasterPage {
         private Map<String, Object> metadata;
     }
 }
-

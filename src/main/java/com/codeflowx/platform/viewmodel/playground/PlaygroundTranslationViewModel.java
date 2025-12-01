@@ -13,6 +13,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundTranslation;
@@ -20,48 +21,47 @@ import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import com.codeflowx.govern.service.playground.PlaygroundTranslationService;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
+
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
-public class PlaygroundTranslationViewModel extends BaseFront {
+public class PlaygroundTranslationViewModel extends BaseFront<PlaygroundTranslationViewModel> {
 
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private PlaygroundSessionService playgroundSessionService;
-    
+
     @WireVariable
     private PlaygroundTranslationService playgroundTranslationService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundTranslation> allTranslations = new ArrayList<>();
     private List<PlaygroundTranslation> filteredTranslations = new ArrayList<>();
-    
+
     private String sourceText = "";
     private String targetText = "";
     private String sourceLanguage = "es";
     private String targetLanguage = "en";
     private BigDecimal confidence = BigDecimal.ZERO;
     private Model selectedModel;
-    
+
     private String searchTerm = "";
     private int activePage = 0;
     private int pageSize = 10;
-    
+
     private List<Model> availableModels = new ArrayList<>();
     private List<String> availableLanguages = List.of("es", "en", "fr", "de", "it", "pt", "zh", "ja", "ru", "ar");
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_TRANSLATION", "ACCESS", null, "Usuario accedió a Translation Playground");
+        logActivity("ACCESS", "PLAYGROUND_TRANSLATION", null, "Usuario accedió a Translation Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadTranslations();
@@ -69,7 +69,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_TRANSLATION", "LEAVE", null, "Usuario salió de Translation Playground");
+        logActivity("LEAVE", "PLAYGROUND_TRANSLATION", null, "Usuario salió de Translation Playground");
     }
 
     private void loadAvailableModels() {
@@ -114,12 +114,12 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         if (StringUtils.isBlank(sourceText)) {
             Messagebox.show("Por favor ingresa el texto a traducir", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             PlaygroundTranslation translation = new PlaygroundTranslation();
             translation.setSession(currentSession);
@@ -130,7 +130,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             translation.setModel(selectedModel);
             translation.setTranslationcreatedby(getUserName());
             translation.setTranslationcreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Simulate translation
             translation.setTranslationtargettext("This is a simulated translation of the source text.");
             translation.setTranslationstatus("COMPLETED");
@@ -138,14 +138,14 @@ public class PlaygroundTranslationViewModel extends BaseFront {
             translation.setTranslationprocessingtime(850);
             translation.setTranslationcost(new BigDecimal("0.002"));
             translation.setTranslationmethod("NEURAL");
-            
+
             translation = playgroundTranslationService.create(translation);
-            
+
             targetText = translation.getTranslationtargettext();
             confidence = translation.getTranslationconfidence();
-            
+
             loadTranslations();
-            logActivity("PLAYGROUND_TRANSLATION", "TRANSLATE", null, "Texto traducido");
+            logActivity("TRANSLATE", "PLAYGROUND_TRANSLATION", null, "Texto traducido");
         } catch (GovernanceServiceException e) {
             log.error("Error translating", e);
             Messagebox.show("Error al traducir: " + e.getMessage(), "Error", Messagebox.OK, Messagebox.ERROR);
@@ -158,27 +158,27 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         String tempLang = sourceLanguage;
         sourceLanguage = targetLanguage;
         targetLanguage = tempLang;
-        
+
         String tempText = sourceText;
         sourceText = targetText;
         targetText = tempText;
-        
-        logActivity("PLAYGROUND_TRANSLATION", "SWAP_LANGUAGES", null, "Idiomas intercambiados");
+
+        logActivity("SWAP_LANGUAGES", "PLAYGROUND_TRANSLATION", null, "Idiomas intercambiados");
     }
 
     @Command
     public void transcribeSource() {
-        logActivity("PLAYGROUND_TRANSLATION", "TRANSCRIBE_SOURCE", null, "Transcribiendo fuente");
+        logActivity("TRANSCRIBE_SOURCE", "PLAYGROUND_TRANSLATION", null, "Transcribiendo fuente");
     }
 
     @Command
     public void speakTarget() {
-        logActivity("PLAYGROUND_TRANSLATION", "SPEAK_TARGET", null, "Reproduciendo traducción");
+        logActivity("SPEAK_TARGET", "PLAYGROUND_TRANSLATION", null, "Reproduciendo traducción");
     }
 
     @Command
     public void copyTranslation() {
-        logActivity("PLAYGROUND_TRANSLATION", "COPY", null, "Copiando traducción");
+        logActivity("COPY", "PLAYGROUND_TRANSLATION", null, "Copiando traducción");
     }
 
     @Command
@@ -188,7 +188,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         targetText = translation.getTranslationtargettext();
         sourceLanguage = translation.getTranslationsourcelanguage();
         targetLanguage = translation.getTranslationtargetlanguage();
-        logActivity("PLAYGROUND_TRANSLATION", "REUSE", null, "Re-usando traducción");
+        logActivity("REUSE", "PLAYGROUND_TRANSLATION", null, "Re-usando traducción");
     }
 
     @Command
@@ -197,7 +197,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
         try {
             playgroundTranslationService.deleteById(translation.getIdxplaygroundtranslation());
             loadTranslations();
-            logActivity("PLAYGROUND_TRANSLATION", "DELETE", null, "Traducción eliminada");
+            logActivity("DELETE", "PLAYGROUND_TRANSLATION", null, "Traducción eliminada");
         } catch (GovernanceServiceException e) {
             log.error("Error deleting translation", e);
         }
@@ -212,7 +212,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
     @Command
     @NotifyChange({"translationHistory"})
     public void changePage() {
-        logActivity("PLAYGROUND_TRANSLATION", "PAGE_CHANGE", "Cambio a página: " + activePage);
+        logActivity("PAGE_CHANGE", "PLAYGROUND_TRANSLATION", null, "Cambio a página: " + activePage);
     }
 
     @Command
@@ -241,7 +241,7 @@ public class PlaygroundTranslationViewModel extends BaseFront {
     public List<PlaygroundTranslation> getTranslationHistory() {
         int start = activePage * pageSize;
         int end = Math.min(start + pageSize, filteredTranslations.size());
-        return start < filteredTranslations.size() ? 
+        return start < filteredTranslations.size() ?
                filteredTranslations.subList(start, end) : new ArrayList<>();
     }
 

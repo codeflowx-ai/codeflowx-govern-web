@@ -11,6 +11,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundImage;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
@@ -18,30 +19,29 @@ import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.service.playground.PlaygroundImageService;
 import com.codeflowx.govern.service.playground.PlaygroundSessionService;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
+
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
-public class PlaygroundImageViewModel extends BaseFront {
+public class PlaygroundImageViewModel extends BaseFront<PlaygroundImageViewModel> {
 
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private PlaygroundSessionService playgroundSessionService;
-    
+
     @WireVariable
     private PlaygroundImageService playgroundImageService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundImage> generatedImages = new ArrayList<>();
-    
+
     private String prompt = "";
     private String negativePrompt = "";
     private String style = "";
@@ -49,18 +49,18 @@ public class PlaygroundImageViewModel extends BaseFront {
     private String selectedSize = "1024x1024";
     private String selectedQuality = "STANDARD";
     private String selectedFormat = "PNG";
-    
+
     private List<Model> availableModels = new ArrayList<>();
     private List<String> availableSizes = List.of("256x256", "512x512", "1024x1024", "1024x1792", "1792x1024");
     private List<String> availableQualities = List.of("STANDARD", "HD");
     private List<String> availableFormats = List.of("PNG", "JPEG", "WEBP");
-    
+
     private Integer imageCount = 0;
     private BigDecimal totalCost = BigDecimal.ZERO;
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_IMAGE", "ACCESS", null, "Usuario accedió a Image Playground");
+        logActivity("ACCESS", "PLAYGROUND_IMAGE", null, "Usuario accedió a Image Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadGeneratedImages();
@@ -68,7 +68,7 @@ public class PlaygroundImageViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_IMAGE", "LEAVE", null, "Usuario salió de Image Playground");
+        logActivity("LEAVE", "PLAYGROUND_IMAGE", null, "Usuario salió de Image Playground");
     }
 
     private void loadAvailableModels() {
@@ -114,7 +114,7 @@ public class PlaygroundImageViewModel extends BaseFront {
             Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             PlaygroundImage image = new PlaygroundImage();
             image.setSession(currentSession);
@@ -128,19 +128,19 @@ public class PlaygroundImageViewModel extends BaseFront {
             image.setModel(selectedModel);
             image.setImagecreatedby(getUserName());
             image.setImagecreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Simulate image generation (in production, call AI service)
             image.setImageurl("https://via.placeholder.com/1024x1024?text=Generated+Image");
             image.setImagestatus("COMPLETED");
             image.setImagegenerationtime(3500);
             image.setImagecost(new BigDecimal("0.04"));
-            
+
             image = playgroundImageService.create(image);
             loadGeneratedImages();
             prompt = "";
             negativePrompt = "";
-            
-            logActivity("PLAYGROUND_IMAGE", "GENERATE", null, "Imagen generada");
+
+            logActivity("GENERATE", "PLAYGROUND_IMAGE", null, "Imagen generada");
             Messagebox.show("Imagen generada correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (GovernanceServiceException e) {
             log.error("Error generating image", e);
@@ -150,7 +150,7 @@ public class PlaygroundImageViewModel extends BaseFront {
 
     @Command
     public void downloadImage(PlaygroundImage image) {
-        logActivity("PLAYGROUND_IMAGE", "DOWNLOAD", null, "Descargando imagen");
+        logActivity("DOWNLOAD", "PLAYGROUND_IMAGE", null, "Descargando imagen");
         // Download logic
     }
 
@@ -160,7 +160,7 @@ public class PlaygroundImageViewModel extends BaseFront {
         try {
             playgroundImageService.deleteById(image.getIdxplaygroundimage());
             loadGeneratedImages();
-            logActivity("PLAYGROUND_IMAGE", "DELETE", null, "Imagen eliminada");
+            logActivity("DELETE", "PLAYGROUND_IMAGE", null, "Imagen eliminada");
         } catch (GovernanceServiceException e) {
             log.error("Error deleting image", e);
         }

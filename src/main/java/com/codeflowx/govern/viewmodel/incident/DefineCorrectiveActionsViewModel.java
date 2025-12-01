@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.incident;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,50 +38,49 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class DefineCorrectiveActionsViewModel extends MasterPage {
+public class DefineCorrectiveActionsViewModel extends BaseFront<DefineCorrectiveActionsViewModel>{
 
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private TaskService taskService;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
-    }
-    
+
     @Override
     public void setBeans(Object bean) {}
 
     private String taskId;
     private String incidentTitle = "";
     private String rootCause = "";
-    
+
     // Corrective Actions
     private List<CorrectiveAction> correctiveActions = new ArrayList<>();
     private String newActionDescription = "";
     private String newActionType = "SHORT_TERM";
     private String newActionResponsible = "";
-    
+
     @Init
     public void init(@QueryParam("taskId") String taskId) {
         this.taskId = taskId;
         loadTaskData();
     }
-    
+
     private void loadTaskData() {
         try {
             if (taskService != null && taskId != null) {
@@ -98,14 +98,14 @@ public class DefineCorrectiveActionsViewModel extends MasterPage {
             Messagebox.show("Please enter action description", "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         CorrectiveAction action = new CorrectiveAction();
         action.setDescription(newActionDescription);
         action.setType(newActionType);
         action.setResponsible(newActionResponsible);
-        
+
         correctiveActions.add(action);
-        
+
         // Clear form
         newActionDescription = "";
         newActionResponsible = "";
@@ -121,29 +121,29 @@ public class DefineCorrectiveActionsViewModel extends MasterPage {
     @NotifyChange("*")
     public void submitActions() {
         log.info("Submitting corrective actions - taskId: {}, count: {}", taskId, correctiveActions.size());
-        
+
         if (correctiveActions.isEmpty()) {
-            Messagebox.show("Please define at least one corrective action", 
+            Messagebox.show("Please define at least one corrective action",
                           "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             if (taskService != null && taskId != null) {
                 // Convertir a List<String> para BPMN
                 List<String> actionDescriptions = new ArrayList<>();
                 for (CorrectiveAction action : correctiveActions) {
-                    actionDescriptions.add(action.getType() + ": " + action.getDescription() + 
+                    actionDescriptions.add(action.getType() + ": " + action.getDescription() +
                                          " (Responsible: " + action.getResponsible() + ")");
                 }
-                
+
                 Map<String, Object> variables = new HashMap<>();
                 variables.put("correctiveActions", actionDescriptions);
                 variables.put("correctiveActionsCount", correctiveActions.size());
                 variables.put("definedBy", ctxBean.getUser().getUsuname());
-                
+
                 taskService.complete(taskId, variables);
-                
+
                 Messagebox.show("Corrective actions defined successfully", "Success", Messagebox.OK, Messagebox.INFORMATION);
             }
         } catch (Exception e) {
@@ -159,4 +159,3 @@ public class DefineCorrectiveActionsViewModel extends MasterPage {
         private String responsible;
     }
 }
-

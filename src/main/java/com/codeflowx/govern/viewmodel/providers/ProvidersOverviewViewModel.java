@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
 import org.zkoss.bind.annotation.BindingParam;
@@ -48,12 +48,12 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ProvidersOverviewViewModel extends MasterPage {
-    
+public class ProvidersOverviewViewModel extends BaseFront<ProvidersOverviewViewModel> {
+
     private static final long serialVersionUID = 1L;
 
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
     private ModelService modelService;
 
@@ -80,7 +80,7 @@ public class ProvidersOverviewViewModel extends MasterPage {
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<ProvidersOverview> pageResult;
-    
+
 
     // ========== Métricas globales ==========
     private Long totalProviders = 0L;
@@ -117,7 +117,7 @@ public class ProvidersOverviewViewModel extends MasterPage {
                 .ascending(true)
                 .sortField("modcreatedat")
                 .build();
-       
+
     }
 
     private void initializeFilterOptions() {
@@ -163,20 +163,20 @@ public class ProvidersOverviewViewModel extends MasterPage {
     @NotifyChange({"providers", "pageResult"})
     public void loadData() {
         try {
-            log.info("Cargando proveedores - Página: {}, MaxRows: {}", 
+            log.info("Cargando proveedores - Página: {}, MaxRows: {}",
                 pageParams.getPageActual(), pageParams.getMaxRows());
-            
+
             Criterias criterias = buildCriterias();
             pageResult = providersOverviewService.findAll(pageParams, criterias);
-            
+
             providers = pageResult != null ? pageResult.getContent() : new ArrayList<>();
-            
-            log.info("Cargados {} proveedores de {} totales", 
+
+            log.info("Cargados {} proveedores de {} totales",
                 providers.size(), pageResult != null ? pageResult.getTotalRows() : 0);
-                
+
         } catch (GovernanceServiceException e) {
             log.error("Error al cargar proveedores", e);
-            Messagebox.show(Labels.getLabel("common.error.load"), 
+            Messagebox.show(Labels.getLabel("common.error.load"),
                 Labels.getLabel("common.error.title"),
                 Messagebox.OK, Messagebox.ERROR);
             providers = new ArrayList<>();
@@ -218,13 +218,13 @@ public class ProvidersOverviewViewModel extends MasterPage {
     }
 
     @Command
-    @NotifyChange({"totalProviders", "activeProviders", "inactiveProviders", "totalModels", 
+    @NotifyChange({"totalProviders", "activeProviders", "inactiveProviders", "totalModels",
                    "totalCredentials", "supportsText", "supportsEmbeddings"})
     public void loadMetrics() {
         try {
             log.debug("Cargando métricas globales desde V_PROVIDERS_METRICS_SUMMARY");
             List<ProvidersMetricsSummary> metrics = providersMetricsSummaryService.findAll();
-            
+
             if (metrics != null && !metrics.isEmpty()) {
                 ProvidersMetricsSummary summary = metrics.get(0);
                 totalProviders = summary.getTotalProviders() != null ? summary.getTotalProviders() : 0L;
@@ -234,8 +234,8 @@ public class ProvidersOverviewViewModel extends MasterPage {
                 totalCredentials = summary.getTotalCredentialsAll() != null ? summary.getTotalCredentialsAll() : 0L;
                 supportsText = summary.getSupportsText() != null ? summary.getSupportsText() : 0L;
                 supportsEmbeddings = summary.getSupportsEmbeddings() != null ? summary.getSupportsEmbeddings() : 0L;
-                
-                log.info("Métricas de proveedores cargadas - Total: {}, Activos: {}", 
+
+                log.info("Métricas de proveedores cargadas - Total: {}, Activos: {}",
                     totalProviders, activeProviders);
             } else {
                 log.warn("No se pudieron cargar métricas globales");
@@ -254,14 +254,14 @@ public class ProvidersOverviewViewModel extends MasterPage {
     @Command
     @NotifyChange({"providers", "pageResult"})
     public void applyFilters() {
-        log.info("Aplicando filtros - Estado: {}, Tipo: {}, FreeTier: {}", 
+        log.info("Aplicando filtros - Estado: {}, Tipo: {}, FreeTier: {}",
             selectedStatus, selectedProviderType, selectedHasFreeTier);
         pageParams.setPageActual(1);
         loadData();
     }
 
     @Command
-    @NotifyChange({"searchTerm", "selectedStatus", "selectedProviderType", "selectedHasFreeTier", 
+    @NotifyChange({"searchTerm", "selectedStatus", "selectedProviderType", "selectedHasFreeTier",
                    "providers", "pageResult"})
     public void clearFilters() {
         log.info("Limpiando filtros");
@@ -313,7 +313,7 @@ public class ProvidersOverviewViewModel extends MasterPage {
         appendPage("gobierno/providers/providers-detail.zul", page.getFellow(IDDESKTOP), params);
     }
 
-    
+
     // ========== Acciones de contexto ==========
 
     @Command
@@ -354,7 +354,6 @@ public class ProvidersOverviewViewModel extends MasterPage {
 	@Override
 	public void setBeans(Object bean) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
-

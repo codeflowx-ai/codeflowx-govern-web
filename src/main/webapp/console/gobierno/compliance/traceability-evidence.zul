@@ -1,0 +1,248 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<!-- ViewModel binding -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.TraceabilityEvidenceViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<!-- Título pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-link me-2"></h:i>
+						Trazabilidad y Evidencias
+					</h:h2>
+					<h:p class="text-muted">
+						Vista consolidada de logs, prompts, outputs, decisiones, flags e incidencias
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Estadísticas -->
+			<div class="col-lg-12 s-bot">
+				<div class="row g-3">
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Total Logs</h:h5>
+								<h:h3 class="mb-0">@load(vm.totalLogs)</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Evidencias</h:h5>
+								<h:h3 class="mb-0">@load(vm.totalEvidences)</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Items Marcados</h:h5>
+								<h:h3 class="mb-0 text-warning">@load(vm.flaggedItems)</h:h3>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card">
+							<div class="card-body">
+								<h:h5 class="card-title text-muted mb-2">Incidencias</h:h5>
+								<h:h3 class="mb-0 text-danger">@load(vm.incidentCount)</h:h3>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Filtros -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Filtros</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-3">
+								<label class="form-label">Tipo</label>
+								<combobox
+									selectedItem="@bind(vm.filterType)"
+									class="form-control">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="Log" value="LOG" />
+									<comboitem label="Prompt" value="PROMPT" />
+									<comboitem label="Output" value="OUTPUT" />
+									<comboitem label="Decisión" value="DECISION" />
+									<comboitem label="Flag" value="FLAG" />
+									<comboitem label="Incidente" value="INCIDENT" />
+								</combobox>
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">Tipo Entidad</label>
+								<combobox
+									selectedItem="@bind(vm.filterEntityType)"
+									class="form-control">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="Modelo" value="MODEL" />
+									<comboitem label="Agente" value="AGENT" />
+									<comboitem label="Prompt" value="PROMPT" />
+									<comboitem label="Dataset" value="DATASET" />
+								</combobox>
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">Nombre Entidad</label>
+								<textbox value="@bind(vm.filterEntityName)" placeholder="Buscar..." class="form-control" />
+							</div>
+							<div class="col-md-3">
+								<label class="form-label">&nbsp;</label>
+								<div class="hstack gap-2">
+									<button
+										label="Filtrar"
+										onClick="@command('filterData')"
+										class="btn btn-primary" />
+									<button
+										label="Refrescar"
+										onClick="@command('refreshData')"
+										class="btn btn-secondary" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabs: Logs y Evidencias -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Trazabilidad</h:h5>
+					</div>
+					<div class="card-body">
+						<tabbox>
+							<tabs>
+								<tab label="Logs de Trazabilidad" />
+								<tab label="Evidencias" />
+							</tabs>
+							<tabpanels>
+								<!-- Panel Logs -->
+								<tabpanel>
+									<listbox model="@load(vm.logs)" selectedItem="@bind(vm.selectedLog)"
+										class="table table-hover">
+										<listhead>
+											<listheader label="Timestamp" width="150px" />
+											<listheader label="Tipo" width="100px" />
+											<listheader label="Entidad" />
+											<listheader label="Versión" width="100px" />
+											<listheader label="Usuario" />
+											<listheader label="Acción" width="100px" />
+											<listheader label="Detalles" />
+											<listheader label="Flag" width="60px" />
+										</listhead>
+										<template name="model">
+											<listitem>
+												<listcell label="@load(each.timestamp)" />
+												<listcell label="@load(each.type)" />
+												<listcell label="@load(each.entityName)" />
+												<listcell label="@load(each.entityVersion)" />
+												<listcell label="@load(each.user)" />
+												<listcell label="@load(each.action)" />
+												<listcell label="@load(each.details)" />
+												<listcell>
+													<span class="badge bg-@load(each.flagged ? 'warning' : 'secondary')"
+														visible="@load(each.flagged)">
+														FLAG
+													</span>
+												</listcell>
+											</listitem>
+										</template>
+									</listbox>
+									<div class="mt-3">
+										<button
+											label="Exportar Logs"
+											onClick="@command('exportLogs')"
+											class="btn btn-primary" />
+									</div>
+								</tabpanel>
+								<!-- Panel Evidencias -->
+								<tabpanel>
+									<listbox model="@load(vm.evidences)" selectedItem="@bind(vm.selectedEvidence)"
+										class="table table-hover">
+										<listhead>
+											<listheader label="Timestamp" width="150px" />
+											<listheader label="Tipo" width="150px" />
+											<listheader label="Entidad" />
+											<listheader label="Descripción" />
+											<listheader label="Hash" width="200px" />
+											<listheader label="Inmutable" width="80px" />
+										</listhead>
+										<template name="model">
+											<listitem>
+												<listcell label="@load(each.timestamp)" />
+												<listcell label="@load(each.type)" />
+												<listcell label="@load(each.entityName)" />
+												<listcell label="@load(each.description)" />
+												<listcell>
+													<textbox value="@load(each.hash)" readonly="true"
+														style="font-family: monospace; font-size: 10px;" />
+												</listcell>
+												<listcell>
+													<span class="badge bg-success" visible="@load(each.immutable)">
+														✓
+													</span>
+												</listcell>
+											</listitem>
+										</template>
+									</listbox>
+									<div class="mt-3">
+										<button
+											label="Exportar Evidencias"
+											onClick="@command('exportEvidences')"
+											class="btn btn-primary" />
+									</div>
+								</tabpanel>
+							</tabpanels>
+						</tabbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Detalle de Log Seleccionado -->
+			<div class="col-lg-12 s-bot" visible="@load(not empty vm.selectedLog)">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Detalle de Log</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-6">
+								<label class="form-label">Tipo:</label>
+								<textbox value="@load(vm.selectedLog.type)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Entidad:</label>
+								<textbox value="@load(vm.selectedLog.entityName)" readonly="true" class="form-control" />
+							</div>
+							<div class="col-md-12">
+								<label class="form-label">Detalles:</label>
+								<textbox value="@load(vm.selectedLog.details)" readonly="true"
+									multiline="true" rows="3" class="form-control" />
+							</div>
+							<div class="col-md-12">
+								<label class="form-label">Metadata (JSON):</label>
+								<textbox value="@load(vm.selectedLog.metadata)" readonly="true"
+									multiline="true" rows="5" style="font-family: monospace;" class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</idspace>
+</zk>

@@ -1,10 +1,10 @@
 # PROMPT: INC-010-011 - Optimización de Consultas con Vistas Materializadas
 
-**Incidencia:** INC-010-011  
-**Prioridad:** 🟡 ALTA  
-**Artículo EU AI Act:** Art. 72  
-**Esfuerzo Estimado:** 2 días  
-**Tipo:** DBA - PostgreSQL + TimescaleDB  
+**Incidencia:** INC-010-011
+**Prioridad:** 🟡 ALTA
+**Artículo EU AI Act:** Art. 72
+**Esfuerzo Estimado:** 2 días
+**Tipo:** DBA - PostgreSQL + TimescaleDB
 **Referencia:** GAP-017
 
 ---
@@ -47,14 +47,19 @@ SELECT create_hypertable('MONMONITORINGALERTS', 'MONTRIGGEREDAT',
 
 ### 2. Crear Continuous Aggregates para Métricas
 
+**NOTA:** Las tablas `MONMONITORINGMETRICS` y `MONMONITORINGALERTS` no tienen campos directos `IDXPROJECT` e `IDXMODEL`.
+Los IDs de proyecto y modelo se extraen de los campos JSONB `MONCONTEXT` o `MONMETADATA`, o se relacionan
+a través de planes PMM (`PMMPOSTMARKETMONITORINGPLANS`).
+
 ```sql
 -- Continuous aggregate para métricas diarias
+-- Extrae IDXPROJECT e IDXMODEL de JSONB MONCONTEXT/MONMETADATA
 CREATE MATERIALIZED VIEW mv_pmm_metrics_daily
 WITH (timescaledb.continuous) AS
-SELECT 
+SELECT
     time_bucket('1 day', MONCREATEDAT) AS bucket,
-    IDXPROJECT,
-    IDXMODEL,
+    (MONCONTEXT->>'idxproject')::BIGINT AS idxproject,
+    (MONCONTEXT->>'idxmodel')::BIGINT AS idxmodel,
     MONMETRICNAME,
     AVG(MONMETRICVALUE) AS avg_value,
     MIN(MONMETRICVALUE) AS min_value,
@@ -62,7 +67,8 @@ SELECT
     COUNT(*) AS count,
     STDDEV(MONMETRICVALUE) AS stddev_value
 FROM MONMONITORINGMETRICS
-GROUP BY bucket, IDXPROJECT, IDXMODEL, MONMETRICNAME;
+WHERE MONCONTEXT IS NOT NULL
+GROUP BY bucket, (MONCONTEXT->>'idxproject')::BIGINT, (MONCONTEXT->>'idxmodel')::BIGINT, MONMETRICNAME;
 
 -- Agregar refresh policy (actualizar cada hora)
 SELECT add_continuous_aggregate_policy('mv_pmm_metrics_daily',
@@ -73,10 +79,10 @@ SELECT add_continuous_aggregate_policy('mv_pmm_metrics_daily',
 -- Continuous aggregate para métricas semanales
 CREATE MATERIALIZED VIEW mv_pmm_metrics_weekly
 WITH (timescaledb.continuous) AS
-SELECT 
+SELECT
     time_bucket('1 week', MONCREATEDAT) AS bucket,
-    IDXPROJECT,
-    IDXMODEL,
+    (MONCONTEXT->>'idxproject')::BIGINT AS idxproject,
+    (MONCONTEXT->>'idxmodel')::BIGINT AS idxmodel,
     MONMETRICNAME,
     AVG(MONMETRICVALUE) AS avg_value,
     MIN(MONMETRICVALUE) AS min_value,
@@ -84,7 +90,8 @@ SELECT
     COUNT(*) AS count,
     STDDEV(MONMETRICVALUE) AS stddev_value
 FROM MONMONITORINGMETRICS
-GROUP BY bucket, IDXPROJECT, IDXMODEL, MONMETRICNAME;
+WHERE MONCONTEXT IS NOT NULL
+GROUP BY bucket, (MONCONTEXT->>'idxproject')::BIGINT, (MONCONTEXT->>'idxmodel')::BIGINT, MONMETRICNAME;
 
 -- Agregar refresh policy (actualizar diariamente)
 SELECT add_continuous_aggregate_policy('mv_pmm_metrics_weekly',
@@ -95,10 +102,10 @@ SELECT add_continuous_aggregate_policy('mv_pmm_metrics_weekly',
 -- Continuous aggregate para métricas mensuales
 CREATE MATERIALIZED VIEW mv_pmm_metrics_monthly
 WITH (timescaledb.continuous) AS
-SELECT 
+SELECT
     time_bucket('1 month', MONCREATEDAT) AS bucket,
-    IDXPROJECT,
-    IDXMODEL,
+    (MONCONTEXT->>'idxproject')::BIGINT AS idxproject,
+    (MONCONTEXT->>'idxmodel')::BIGINT AS idxmodel,
     MONMETRICNAME,
     AVG(MONMETRICVALUE) AS avg_value,
     MIN(MONMETRICVALUE) AS min_value,
@@ -106,7 +113,8 @@ SELECT
     COUNT(*) AS count,
     STDDEV(MONMETRICVALUE) AS stddev_value
 FROM MONMONITORINGMETRICS
-GROUP BY bucket, IDXPROJECT, IDXMODEL, MONMETRICNAME;
+WHERE MONCONTEXT IS NOT NULL
+GROUP BY bucket, (MONCONTEXT->>'idxproject')::BIGINT, (MONCONTEXT->>'idxmodel')::BIGINT, MONMETRICNAME;
 
 -- Agregar refresh policy (actualizar semanalmente)
 SELECT add_continuous_aggregate_policy('mv_pmm_metrics_monthly',
@@ -121,17 +129,18 @@ SELECT add_continuous_aggregate_policy('mv_pmm_metrics_monthly',
 -- Continuous aggregate para alertas diarias
 CREATE MATERIALIZED VIEW mv_pmm_alerts_daily
 WITH (timescaledb.continuous) AS
-SELECT 
+SELECT
     time_bucket('1 day', MONTRIGGEREDAT) AS bucket,
-    IDXPROJECT,
-    IDXMODEL,
+    (MONALERTDATA->>'idxproject')::BIGINT AS idxproject,
+    (MONALERTDATA->>'idxmodel')::BIGINT AS idxmodel,
     MONALERTTYPE,
     MONSEVERITY,
     COUNT(*) AS alert_count,
-    COUNT(*) FILTER (WHERE 'RESOLVED' = ANY(MONSTATUS)) AS resolved_count,
-    COUNT(*) FILTER (WHERE 'ACTIVE' = ANY(MONSTATUS)) AS active_count
+    COUNT(*) FILTER (WHERE 'RESOLVED' = ANY(STRING_TO_ARRAY(MONSTATUS::TEXT, ','))) AS resolved_count,
+    COUNT(*) FILTER (WHERE 'ACTIVE' = ANY(STRING_TO_ARRAY(MONSTATUS::TEXT, ','))) AS active_count
 FROM MONMONITORINGALERTS
-GROUP BY bucket, IDXPROJECT, IDXMODEL, MONALERTTYPE, MONSEVERITY;
+WHERE MONALERTDATA IS NOT NULL
+GROUP BY bucket, (MONALERTDATA->>'idxproject')::BIGINT, (MONALERTDATA->>'idxmodel')::BIGINT, MONALERTTYPE, MONSEVERITY;
 
 -- Agregar refresh policy
 SELECT add_continuous_aggregate_policy('mv_pmm_alerts_daily',
@@ -144,17 +153,20 @@ SELECT add_continuous_aggregate_policy('mv_pmm_alerts_daily',
 
 ```sql
 -- Índices en tablas base
-CREATE INDEX idx_mon_metrics_project_date ON MONMONITORINGMETRICS(IDXPROJECT, MONCREATEDAT DESC);
-CREATE INDEX idx_mon_metrics_model_date ON MONMONITORINGMETRICS(IDXMODEL, MONCREATEDAT DESC) WHERE IDXMODEL IS NOT NULL;
+-- Índices GIN para búsqueda en JSONB
+CREATE INDEX idx_mon_metrics_context_gin ON MONMONITORINGMETRICS USING GIN (MONCONTEXT);
+CREATE INDEX idx_mon_metrics_metadata_gin ON MONMONITORINGMETRICS USING GIN (MONMETADATA);
 CREATE INDEX idx_mon_metrics_name_date ON MONMONITORINGMETRICS(MONMETRICNAME, MONCREATEDAT DESC);
+CREATE INDEX idx_mon_metrics_createdat ON MONMONITORINGMETRICS(MONCREATEDAT DESC);
 
-CREATE INDEX idx_mon_alerts_project_date ON MONMONITORINGALERTS(IDXPROJECT, MONTRIGGEREDAT DESC);
-CREATE INDEX idx_mon_alerts_model_date ON MONMONITORINGALERTS(IDXMODEL, MONTRIGGEREDAT DESC) WHERE IDXMODEL IS NOT NULL;
+CREATE INDEX idx_mon_alerts_data_gin ON MONMONITORINGALERTS USING GIN (MONALERTDATA);
+CREATE INDEX idx_mon_alerts_metadata_gin ON MONMONITORINGALERTS USING GIN (MONMETADATA);
 CREATE INDEX idx_mon_alerts_severity_date ON MONMONITORINGALERTS(MONSEVERITY, MONTRIGGEREDAT DESC);
+CREATE INDEX idx_mon_alerts_triggeredat ON MONMONITORINGALERTS(MONTRIGGEREDAT DESC);
 
 -- Índices en continuous aggregates
-CREATE INDEX idx_mv_metrics_daily_project_bucket ON mv_pmm_metrics_daily(IDXPROJECT, bucket DESC);
-CREATE INDEX idx_mv_metrics_daily_model_bucket ON mv_pmm_metrics_daily(IDXMODEL, bucket DESC) WHERE IDXMODEL IS NOT NULL;
+CREATE INDEX idx_mv_metrics_daily_project_bucket ON mv_pmm_metrics_daily(idxproject, bucket DESC);
+CREATE INDEX idx_mv_metrics_daily_model_bucket ON mv_pmm_metrics_daily(idxmodel, bucket DESC) WHERE idxmodel IS NOT NULL;
 CREATE INDEX idx_mv_metrics_daily_name_bucket ON mv_pmm_metrics_daily(MONMETRICNAME, bucket DESC);
 ```
 
@@ -163,9 +175,9 @@ CREATE INDEX idx_mv_metrics_daily_name_bucket ON mv_pmm_metrics_daily(MONMETRICN
 ```sql
 -- Vista materializada para dashboard (métricas recientes)
 CREATE MATERIALIZED VIEW mv_pmm_dashboard_metrics AS
-SELECT 
-    IDXPROJECT,
-    IDXMODEL,
+SELECT
+    (MONCONTEXT->>'idxproject')::BIGINT AS idxproject,
+    (MONCONTEXT->>'idxmodel')::BIGINT AS idxmodel,
     MONMETRICNAME,
     AVG(MONMETRICVALUE) AS avg_value,
     MAX(MONMETRICVALUE) AS max_value,
@@ -174,14 +186,13 @@ SELECT
     MAX(MONCREATEDAT) AS last_updated
 FROM MONMONITORINGMETRICS
 WHERE MONCREATEDAT >= NOW() - INTERVAL '24 hours'
-GROUP BY IDXPROJECT, IDXMODEL, MONMETRICNAME;
+  AND MONCONTEXT IS NOT NULL
+GROUP BY (MONCONTEXT->>'idxproject')::BIGINT, (MONCONTEXT->>'idxmodel')::BIGINT, MONMETRICNAME;
 
 -- Índice en vista materializada
-CREATE UNIQUE INDEX idx_mv_dashboard_metrics_unique 
-    ON mv_pmm_dashboard_metrics(IDXPROJECT, IDXMODEL, MONMETRICNAME);
-
--- Refresh automático cada 5 minutos
-CREATE UNIQUE INDEX ON mv_pmm_dashboard_metrics(IDXPROJECT, IDXMODEL, MONMETRICNAME);
+CREATE UNIQUE INDEX idx_mv_dashboard_metrics_unique
+    ON mv_pmm_dashboard_metrics(idxproject, idxmodel, MONMETRICNAME)
+    WHERE idxproject IS NOT NULL AND idxmodel IS NOT NULL;
 
 -- Función para refresh manual
 CREATE OR REPLACE FUNCTION refresh_pmm_dashboard_metrics()
@@ -192,7 +203,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Programar refresh automático (usando pg_cron si está disponible)
--- SELECT cron.schedule('refresh-pmm-dashboard', '*/5 * * * *', 
+-- SELECT cron.schedule('refresh-pmm-dashboard', '*/5 * * * *',
 --     'SELECT refresh_pmm_dashboard_metrics();');
 ```
 
@@ -219,15 +230,15 @@ BEGIN
     -- Usar continuous aggregate si el rango es grande
     IF p_end_date - p_start_date > INTERVAL '30 days' THEN
         RETURN QUERY
-        SELECT 
+        SELECT
             mv.bucket,
             mv.avg_value,
             mv.min_value,
             mv.max_value,
             mv.count
         FROM mv_pmm_metrics_daily mv
-        WHERE (p_project_id IS NULL OR mv.IDXPROJECT = p_project_id)
-            AND (p_model_id IS NULL OR mv.IDXMODEL = p_model_id)
+        WHERE (p_project_id IS NULL OR mv.idxproject = p_project_id)
+            AND (p_model_id IS NULL OR mv.idxmodel = p_model_id)
             AND (p_metric_name IS NULL OR mv.MONMETRICNAME = p_metric_name)
             AND mv.bucket >= p_start_date
             AND mv.bucket <= p_end_date
@@ -235,15 +246,15 @@ BEGIN
     ELSE
         -- Usar tabla base para rangos pequeños
         RETURN QUERY
-        SELECT 
+        SELECT
             time_bucket(p_bucket_size, m.MONCREATEDAT) AS bucket,
             AVG(m.MONMETRICVALUE) AS avg_value,
             MIN(m.MONMETRICVALUE) AS min_value,
             MAX(m.MONMETRICVALUE) AS max_value,
             COUNT(*) AS count
         FROM MONMONITORINGMETRICS m
-        WHERE (p_project_id IS NULL OR m.IDXPROJECT = p_project_id)
-            AND (p_model_id IS NULL OR m.IDXMODEL = p_model_id)
+        WHERE (p_project_id IS NULL OR (m.MONCONTEXT->>'idxproject')::BIGINT = p_project_id)
+            AND (p_model_id IS NULL OR (m.MONCONTEXT->>'idxmodel')::BIGINT = p_model_id)
             AND (p_metric_name IS NULL OR m.MONMETRICNAME = p_metric_name)
             AND m.MONCREATEDAT >= p_start_date
             AND m.MONCREATEDAT <= p_end_date
@@ -259,7 +270,7 @@ $$ LANGUAGE plpgsql;
 ```sql
 -- Vista para alertas activas (sin materializar, se actualiza en tiempo real)
 CREATE OR REPLACE VIEW vw_pmm_active_alerts AS
-SELECT 
+SELECT
     a.IDXMONALERT,
     a.IDXPROJECT,
     a.IDXMODEL,
@@ -274,15 +285,18 @@ ORDER BY a.MONTRIGGEREDAT DESC;
 
 -- Vista para resumen de métricas por proyecto
 CREATE OR REPLACE VIEW vw_pmm_project_summary AS
-SELECT 
+SELECT
     p.IDXPROJECT,
-    COUNT(DISTINCT m.IDXMODEL) AS model_count,
+    COUNT(DISTINCT (m.MONCONTEXT->>'idxmodel')::BIGINT) AS model_count,
     COUNT(DISTINCT m.MONMETRICNAME) AS metric_types,
     MAX(m.MONCREATEDAT) AS last_metric_date,
-    COUNT(DISTINCT a.IDXMONALERT) FILTER (WHERE 'ACTIVE' = ANY(a.MONSTATUS)) AS active_alerts
+    COUNT(DISTINCT a.IDXMONITORINGALERT) FILTER (
+        WHERE (a.MONALERTDATA->>'status') = 'ACTIVE'
+        OR 'ACTIVE' = ANY(STRING_TO_ARRAY(a.MONSTATUS::TEXT, ','))
+    ) AS active_alerts
 FROM PRJPROJECTS p
-LEFT JOIN MONMONITORINGMETRICS m ON p.IDXPROJECT = m.IDXPROJECT
-LEFT JOIN MONMONITORINGALERTS a ON p.IDXPROJECT = a.IDXPROJECT
+LEFT JOIN MONMONITORINGMETRICS m ON p.IDXPROJECT = (m.MONCONTEXT->>'idxproject')::BIGINT
+LEFT JOIN MONMONITORINGALERTS a ON p.IDXPROJECT = (a.MONALERTDATA->>'idxproject')::BIGINT
 GROUP BY p.IDXPROJECT;
 ```
 
@@ -307,4 +321,3 @@ GROUP BY p.IDXPROJECT;
 - Refresh policies deben configurarse según necesidades
 - Considerar retention policies para datos antiguos
 - Monitorear tamaño de continuous aggregates
-

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.core;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
@@ -28,7 +29,7 @@ import org.springframework.core.env.Environment;
 @Getter
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class MenuViewModel extends MasterBeanUI {
+public class MenuViewModel extends BaseFront<MenuViewModel>{
     
     @WireVariable
     private MenuService menuService;

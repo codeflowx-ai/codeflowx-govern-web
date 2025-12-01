@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodels.playground.documents;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @VariableResolver(DelegatingVariableResolver.class)
-public class DocumentListViewModel {
+public class DocumentListViewModel extends BaseFront<DocumentListViewModel> {
 
     @WireVariable
     private RestTemplate restTemplate;

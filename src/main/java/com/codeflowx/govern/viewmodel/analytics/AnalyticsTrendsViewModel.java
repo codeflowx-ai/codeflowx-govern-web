@@ -1,11 +1,12 @@
 package com.codeflowx.govern.viewmodel.analytics;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import org.zkoss.bind.annotation.*;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
-import org.suinsit.nocode.web.MasterBeanUI;
+import com.codeflowx.framework.zkoss.BaseFront;
 import codeflowx.nocode.persist.*;
 import com.codeflowx.govern.entity.views.analytics.AnalyticsTrends;
 import com.codeflowx.govern.service.models.ModelService;
@@ -29,8 +30,8 @@ import org.springframework.core.env.Environment;
 @Getter
 @Setter
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class AnalyticsTrendsViewModel extends MasterBeanUI {
-    
+public class AnalyticsTrendsViewModel extends BaseFront<AnalyticsTrendsViewModel>{
+
     @WireVariable
     private ModelService modelService;
     @WireVariable
@@ -43,21 +44,21 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
     protected GenericApplicationContext contexto;
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
     }
 
-    
+
     private Long totalItems = 0L;
     private Long activeItems = 0L;
     private Long deployedItems = 0L;
     private Long trainingItems = 0L;
     private Long offlineItems = 0L;
     private java.math.BigDecimal avgScore = java.math.BigDecimal.ZERO;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
@@ -65,17 +66,17 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
         initDao();
         loadTrendsData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadTrendsData() {
         try {
             log.debug("Cargando tendencias de analytics");
             List<AnalyticsTrends> trends = analyticsTrendsService.findAll();
-            
+
             if (trends != null && !trends.isEmpty()) {
                 AnalyticsTrends trend = trends.get(0);
-                
+
                 // Mapear datos
                 this.totalItems = trend.getTotalItems() != null ? trend.getTotalItems() : 0L;
                 this.activeItems = trend.getActiveItems() != null ? trend.getActiveItems() : 0L;
@@ -83,31 +84,31 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
                 this.trainingItems = trend.getTrainingItems() != null ? trend.getTrainingItems() : 0L;
                 this.offlineItems = trend.getOfflineItems() != null ? trend.getOfflineItems() : 0L;
                 this.avgScore = trend.getAvgScore() != null ? trend.getAvgScore() : java.math.BigDecimal.ZERO;
-                
-                log.info("Tendencias cargadas - Total: {}, Activos: {}, Score: {}", 
+
+                log.info("Tendencias cargadas - Total: {}, Activos: {}, Score: {}",
                          totalItems, activeItems, avgScore);
             }
         } catch (GovernanceServiceException e) {
             log.error("Error cargando tendencias de analytics", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void refresh() {
         log.debug("Refrescando tendencias de analytics");
         loadTrendsData();
     }
-    
+
     // Métodos auxiliares
     public String getTrendDirection() {
         if (activeItems == null || deployedItems == null) return "unknown";
-        
+
         if (activeItems > deployedItems) return "up";
         if (activeItems < deployedItems) return "down";
         return "stable";
     }
-    
+
     public String getTrendIcon() {
         String direction = getTrendDirection();
         switch (direction) {
@@ -117,7 +118,7 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
             default: return "bi-question-circle";
         }
     }
-    
+
     public String getTrendColor() {
         String direction = getTrendDirection();
         switch (direction) {
@@ -127,12 +128,12 @@ public class AnalyticsTrendsViewModel extends MasterBeanUI {
             default: return "secondary";
         }
     }
-    
+
     public String getActivityRate() {
         if (totalItems == null || totalItems == 0 || activeItems == null) return "0";
         return String.format("%.1f", (activeItems * 100.0 / totalItems));
     }
-    
+
     public String getScoreLevel() {
         if (avgScore == null) return "Desconocido";
         double score = avgScore.doubleValue();

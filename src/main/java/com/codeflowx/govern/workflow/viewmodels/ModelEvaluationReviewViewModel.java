@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -38,20 +39,20 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: Model Evaluation Review
- * 
+ *
  * Proceso BPMN: 05_MODEL_EVALUATION (model-evaluation-v1)
  * User Task: modelEvaluationReviewTask
  * Candidate Groups: ml-engineers, data-scientists, ai-governance-team
- * 
+ *
  * Funcionalidad:
  * Permite revisar los resultados de evaluación de un modelo (accuracy, precision, recall, F1, etc.)
  * y decidir si el modelo cumple con los umbrales de calidad establecidos.
- * 
+ *
  * Input Variables:
  * - model_id: Long
  * - model_name: String
  * - evaluation_results: Map
- * 
+ *
  * Output Variables:
  * - decision: "approve" | "reject" | "retest"
  * - notes: String
@@ -61,34 +62,34 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ModelEvaluationReviewViewModel extends MasterPage {
+public class ModelEvaluationReviewViewModel extends BaseFront<ModelEvaluationReviewViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -104,10 +105,10 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
     private String processInstanceId;
     private String decision;
     private String notes;
-    
+
     // Mock mode
     private boolean mockMode = false;
-    
+
     // Mock data
     private String modelName;
     private Long modelId;
@@ -121,29 +122,29 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        
+
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         if (params.containsKey("taskId")) {
             this.taskId = params.get("taskId")[0];
             loadTaskData();
         }
     }
-    
-    
-    
+
+
+
     private void setBeans() {
         // Beans ya inyectados por @WireVariable
     }
@@ -153,15 +154,15 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
             org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .taskId(taskId).singleResult();
             this.processInstanceId = task.getProcessInstanceId();
-            
+
             Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
             this.modelName = (String) variables.get("model_name");
             this.modelId = (Long) variables.get("model_id");
-            
+
             log.info("✅ Task data loaded: taskId={}", taskId);
         } catch (Exception e) {
             log.error("❌ Error cargando task data", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -173,27 +174,27 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando submit - decision={}", decision);
                 logActivity("MOCK_SUBMIT_MODEL_EVAL", "ModelEvaluation", modelId, "Simulación de decisión: " + decision);
-                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode", 
+                Messagebox.show("✅ [DEMO] Decisión registrada exitosamente", "Demo Mode",
                     Messagebox.OK, Messagebox.INFORMATION,
                     event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
                 return;
             }
-            
+
             Map<String, Object> taskVariables = new HashMap<>();
             taskVariables.put("decision", decision);
             taskVariables.put("notes", notes);
-            
+
             taskService.complete(taskId, taskVariables);
-            
+
             logActivity("SUBMIT_MODEL_EVAL", "ModelEvaluation", modelId, "Decisión: " + decision);
-            
-            Messagebox.show("Decision submitted", "Success", 
+
+            Messagebox.show("Decision submitted", "Success",
                 Messagebox.OK, Messagebox.INFORMATION,
                 event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul"));
-                
+
         } catch (Exception e) {
             log.error("❌ Error submitting", e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                 Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -203,7 +204,7 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/plataforma/workflow/my-tasks.zul";
         Executions.getCurrent().sendRedirect(redirect);
     }
-    
+
     /**
      * Mock data para demos
      */
@@ -216,29 +217,14 @@ public class ModelEvaluationReviewViewModel extends MasterPage {
         this.precision = 0.89;
         this.recall = 0.92;
         this.f1Score = 0.905;
-        
+
         log.info("🎭 Mock data loaded for Model Evaluation Review");
     }
-    
+
     /**
      * Registra actividad del usuario
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
     @Destroy
     public void destroy() {
         businessService = null;

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -84,7 +85,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ModelsDetailViewModel extends MasterPage {
+public class ModelsDetailViewModel extends BaseFront<ModelsDetailViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";

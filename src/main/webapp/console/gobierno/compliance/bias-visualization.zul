@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <window title="Visualizaciones Gráficas de Bias"
+            border="normal"
+            width="100%"
+            height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.BiasVisualizationViewModel')">
+
+        <style>
+            .chart-container {
+                width: 100%;
+                height: 400px;
+                margin: 10px;
+                border: 1px solid #e0e0e0;
+                border-radius: 5px;
+                padding: 15px;
+                background-color: #ffffff;
+            }
+            .chart-title {
+                font-size: 16px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #333;
+            }
+        </style>
+
+        <vlayout spacing="10px" style="padding: 10px;">
+            <!-- Barra de herramientas -->
+            <hlayout spacing="10px" style="margin-bottom: 10px;">
+                <button label="Cargar Datos"
+                        onClick="@command('loadVisualizationData')"
+                        disabled="@load(empty vm.biasAnalysisId)"/>
+                <button label="Actualizar"
+                        onClick="@command('refreshData')"
+                        disabled="@load(not vm.dataLoaded)"/>
+                <separator/>
+                <label value="Análisis de Bias ID: @load(vm.biasAnalysisId)"
+                       style="font-weight: bold;"/>
+            </hlayout>
+
+            <!-- Tabs para diferentes visualizaciones -->
+            <tabbox height="600px" width="100%">
+                <tabs>
+                    <tab label="Histograma de Distribución"
+                         selected="@load(vm.dataLoaded)"/>
+                    <tab label="Box Plot de Fairness"/>
+                    <tab label="Heatmap de Correlaciones"/>
+                    <tab label="Tendencias Temporales"/>
+                </tabs>
+                <tabpanels>
+                    <!-- Tab Histograma -->
+                    <tabpanel>
+                        <vlayout>
+                            <div class="chart-container">
+                                <div class="chart-title">Distribución de Bias por Grupos Protegidos</div>
+                                <charts id="histogramChart"
+                                       type="column"
+                                       height="350px"
+                                       model="@load(vm.histogramChartModel)"/>
+                            </div>
+                            <hlayout>
+                                <button label="Exportar PNG"
+                                        onClick="@command('exportChart', chartType='histogram-png')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                                <button label="Exportar SVG"
+                                        onClick="@command('exportChart', chartType='histogram-svg')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                            </hlayout>
+                        </vlayout>
+                    </tabpanel>
+
+                    <!-- Tab Box Plot -->
+                    <tabpanel>
+                        <vlayout>
+                            <div class="chart-container">
+                                <div class="chart-title">Métricas de Fairness por Grupo</div>
+                                <charts id="boxPlotChart"
+                                       type="column"
+                                       height="350px"
+                                       model="@load(vm.boxPlotChartModel)"/>
+                            </div>
+                            <hlayout>
+                                <button label="Exportar PNG"
+                                        onClick="@command('exportChart', chartType='boxplot-png')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                                <button label="Exportar SVG"
+                                        onClick="@command('exportChart', chartType='boxplot-svg')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                            </hlayout>
+                        </vlayout>
+                    </tabpanel>
+
+                    <!-- Tab Heatmap -->
+                    <tabpanel>
+                        <vlayout>
+                            <div class="chart-container">
+                                <div class="chart-title">Correlación entre Atributos y Grupos</div>
+                                <charts id="heatmapChart"
+                                       type="heatmap"
+                                       height="350px"
+                                       model="@load(vm.heatmapChartModel)"/>
+                            </div>
+                            <hlayout>
+                                <button label="Exportar PNG"
+                                        onClick="@command('exportChart', chartType='heatmap-png')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                                <button label="Exportar SVG"
+                                        onClick="@command('exportChart', chartType='heatmap-svg')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                            </hlayout>
+                        </vlayout>
+                    </tabpanel>
+
+                    <!-- Tab Tendencias -->
+                    <tabpanel>
+                        <vlayout>
+                            <div class="chart-container">
+                                <div class="chart-title">Tendencias Temporales de Bias y Fairness</div>
+                                <charts id="trendChart"
+                                       type="line"
+                                       height="350px"
+                                       model="@load(vm.trendChartModel)"/>
+                            </div>
+                            <hlayout>
+                                <button label="Exportar PNG"
+                                        onClick="@command('exportChart', chartType='trend-png')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                                <button label="Exportar SVG"
+                                        onClick="@command('exportChart', chartType='trend-svg')"
+                                        disabled="@load(not vm.dataLoaded)"/>
+                            </hlayout>
+                        </vlayout>
+                    </tabpanel>
+                </tabpanels>
+            </tabbox>
+
+            <!-- Mensaje si no hay datos -->
+            <div if="@load(not vm.dataLoaded)"
+                 style="text-align: center; padding: 50px;">
+                <label value="No hay datos de visualización disponibles. Seleccione un análisis de bias o cargue los datos."
+                       style="font-size: 14px; color: #666;"/>
+            </div>
+        </vlayout>
+    </window>
+</zk>

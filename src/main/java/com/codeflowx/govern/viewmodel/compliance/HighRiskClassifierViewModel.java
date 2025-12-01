@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ import java.util.Map;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class HighRiskClassifierViewModel extends MasterPage {
+public class HighRiskClassifierViewModel extends BaseFront<HighRiskClassifierViewModel>{
 
     private static final long serialVersionUID = 1L;
     

@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.governance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import com.codeflowx.govern.business.governance.AICompetenceBusinessService;
 import com.codeflowx.govern.business.governance.AICompetenceBusinessService.CompetenceDashboard;
@@ -23,7 +24,6 @@ import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
 import org.zkoss.bind.annotation.AfterCompose;
@@ -53,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class AICompetenceViewModel extends MasterPage {
+public class AICompetenceViewModel extends BaseFront<AICompetenceViewModel>{
 
     private static final long serialVersionUID = 1L;
 

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <window title="Reporte Ejecutivo Consolidado"
+            border="normal"
+            width="100%"
+            height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.ExecutiveReportViewModel')">
+
+        <vlayout spacing="10px" style="padding: 10px;">
+            <!-- Panel de Configuración -->
+            <groupbox title="Configuración del Reporte" collapsible="true" open="true">
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <cell>
+                                <label value="Tipo de Reporte:"/>
+                            </cell>
+                            <cell>
+                                <radiogroup selectedItem="@bind(vm.reportType)">
+                                    <radio label="Ejecutivo" value="EXECUTIVE"/>
+                                    <radio label="Completo" value="FULL"/>
+                                    <radio label="Técnico" value="TECHNICAL"/>
+                                    <radio label="Auditoría" value="AUDIT"/>
+                                </radiogroup>
+                            </cell>
+                        </row>
+                        <row>
+                            <cell>
+                                <label value="Fecha Desde:"/>
+                            </cell>
+                            <cell>
+                                <datebox value="@bind(vm.startDate)"
+                                        format="yyyy-MM-dd HH:mm:ss"/>
+                            </cell>
+                        </row>
+                        <row>
+                            <cell>
+                                <label value="Fecha Hasta:"/>
+                            </cell>
+                            <cell>
+                                <datebox value="@bind(vm.endDate)"
+                                        format="yyyy-MM-dd HH:mm:ss"/>
+                            </cell>
+                        </row>
+                    </rows>
+                </grid>
+                <hlayout style="margin-top: 10px;">
+                    <button label="Generar Reporte"
+                            onClick="@command('generateReport')"
+                            style="font-weight: bold;"/>
+                    <button label="Exportar PDF"
+                            onClick="@command('exportToPdf')"
+                            disabled="@load(not vm.reportGenerated)"/>
+                </hlayout>
+            </groupbox>
+
+            <!-- Resumen Ejecutivo -->
+            <groupbox title="Resumen Ejecutivo" if="@load(vm.reportGenerated)">
+                <vlayout>
+                    <div if="@load(not empty vm.executiveSummary)">
+                        <grid>
+                            <columns>
+                                <column width="200px"/>
+                                <column/>
+                            </columns>
+                            <rows>
+                                <row if="@load(vm.executiveSummary['totalSystems'] != null)">
+                                    <label value="Total Sistemas:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.executiveSummary['totalSystems'])"/>
+                                </row>
+                                <row if="@load(vm.executiveSummary['compliantSystems'] != null)">
+                                    <label value="Sistemas Compliant:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.executiveSummary['compliantSystems'])"/>
+                                </row>
+                                <row if="@load(vm.executiveSummary['complianceStatus'] != null)">
+                                    <label value="Estado Compliance:" style="font-weight: bold;"/>
+                                    <label value="@load(vm.executiveSummary['complianceStatus'])"/>
+                                </row>
+                            </rows>
+                        </grid>
+                    </div>
+                </vlayout>
+            </groupbox>
+
+            <!-- Métricas -->
+            <groupbox title="Métricas" if="@load(vm.reportGenerated)">
+                <grid model="@load(vm.metrics)" if="@load(not empty vm.metrics)">
+                    <columns>
+                        <column label="Métrica" width="300px"/>
+                        <column label="Valor"/>
+                    </columns>
+                    <template name="model">
+                        <row>
+                            <label value="@load(each.key)" style="font-weight: bold;"/>
+                            <label value="@load(each.value)"/>
+                        </row>
+                    </template>
+                </grid>
+            </groupbox>
+
+            <!-- Conclusiones -->
+            <groupbox title="Conclusiones" if="@load(vm.reportGenerated and not empty vm.conclusions)">
+                <listbox model="@load(vm.conclusions)"
+                         emptyMessage="No hay conclusiones"
+                         width="100%"
+                         height="150px">
+                    <template name="model">
+                        <listitem>
+                            <listcell label="@load(each)"/>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <!-- Recomendaciones -->
+            <groupbox title="Recomendaciones" if="@load(vm.reportGenerated and not empty vm.recommendations)">
+                <listbox model="@load(vm.recommendations)"
+                         emptyMessage="No hay recomendaciones"
+                         width="100%"
+                         height="150px">
+                    <template name="model">
+                        <listitem>
+                            <listcell label="@load(each)"/>
+                        </listitem>
+                    </template>
+                </listbox>
+            </groupbox>
+
+            <!-- Mensaje si no hay reporte -->
+            <div if="@load(not vm.reportGenerated)"
+                 style="text-align: center; padding: 50px;">
+                <label value="Configure los parámetros del reporte y haga clic en 'Generar Reporte' para comenzar."
+                       style="font-size: 14px; color: #666;"/>
+            </div>
+        </vlayout>
+    </window>
+</zk>

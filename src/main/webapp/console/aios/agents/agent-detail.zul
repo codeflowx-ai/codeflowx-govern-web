@@ -1,0 +1,161 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="aios"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.aios.AgentDetailViewModel')"
+		validationMessages="@id('vmsgs')">
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="@load(vm.pageTitle)" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Detalle y control del agente" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+		</h:div>
+
+		<h:div class="row">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:div class="d-flex align-items-center flex-wrap gap-2">
+							<h:div class="flex-grow-1">
+								<a iconSclass="fa-duotone fa-solid fa-reply label-icon align-middle fs-16 me-2"
+									onClick="@command('cancelEdit')"
+									sclass="waves-effect waves-light"
+									tooltiptext="Volver">
+								</a>
+							</h:div>
+							<h:div class="flex-shrink-0">
+								<button label="Ver Memorias"
+									onClick="@command('viewMemories')"
+									class="btn btn-info" />
+								<button label="Ver Telemetría"
+									onClick="@command('viewTelemetry')"
+									class="btn btn-secondary" />
+								<button label="Ver Logs"
+									onClick="@command('viewLogs')"
+									class="btn btn-secondary" />
+							</h:div>
+						</h:div>
+					</h:div>
+
+					<h:div class="card-body">
+						<h:div class="row" visible="@load(vm.currentAgent ne null)">
+							<!-- Información General -->
+							<h:div class="col-lg-6">
+								<h:div class="card default shadow-xl">
+									<h:div class="card-header">
+										<h:h5>Información General</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="form-group row">
+											<h:div class="col-md-12">
+												<label value="Nombre:" />
+												<label value="@load(vm.currentAgent.aiocomponentname)"
+													style="font-weight: bold;" />
+											</h:div>
+										</h:div>
+										<h:div class="form-group row">
+											<h:div class="col-md-6">
+												<label value="Namespace:" />
+												<label value="@load(vm.currentAgent.aiocomponentnamespace)" />
+											</h:div>
+											<h:div class="col-md-6">
+												<label value="Código:" />
+												<label value="@load(vm.currentAgent.aiocomponentcode)" />
+											</h:div>
+										</h:div>
+										<h:div class="form-group row">
+											<h:div class="col-md-6">
+												<label value="Estado:" />
+												<label value="@load(vm.currentAgent.aiocomponentstate)" />
+											</h:div>
+											<h:div class="col-md-6">
+												<label value="Riesgo:" />
+												<label value="@load(vm.currentAgent.aiocomponentriskprofile)" />
+											</h:div>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+
+							<!-- Estado Runtime -->
+							<h:div class="col-lg-6">
+								<h:div class="card default shadow-xl">
+									<h:div class="card-header">
+										<h:h5>Estado Runtime</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="form-group row">
+											<h:div class="col-md-12">
+												<label value="Estado:" />
+												<label value="@load(vm.runtimeState)"
+													style="@load(vm.runtimeState eq 'RUNNING' ? 'color: green; font-weight: bold;' : vm.runtimeState eq 'PAUSED' ? 'color: orange; font-weight: bold;' : vm.runtimeState eq 'TERMINATED' ? 'color: red; font-weight: bold;' : 'color: gray; font-weight: bold;')" />
+											</h:div>
+										</h:div>
+										<h:div class="form-group row">
+											<h:div class="col-md-6">
+												<label value="Última Acción:" />
+												<label value="@load(vm.lastAction)" />
+											</h:div>
+											<h:div class="col-md-6">
+												<label value="Loops Detectados:" />
+												<label value="@load(vm.loopsDetected)"
+													style="@load(vm.loopsDetected gt 0 ? 'color: red; font-weight: bold;' : '')" />
+											</h:div>
+										</h:div>
+										<h:div class="form-group row">
+											<h:div class="col-md-12">
+												<label value="Última Actividad:" />
+												<label value="@load(vm.lastActionTimestamp)" />
+											</h:div>
+										</h:div>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+
+						<!-- Acciones -->
+						<h:div class="row mt-3">
+							<h:div class="col-lg-12">
+								<h:div class="card">
+									<h:div class="card-header">
+										<h:h5>Acciones de Control</h:h5>
+									</h:div>
+									<h:div class="card-body">
+										<h:div class="btn-group" role="group">
+											<button label="PAUSE"
+												onClick="@command('executeAction', action='PAUSE')"
+												class="btn btn-warning"
+												disabled="@load(vm.runtimeState eq 'PAUSED' or vm.runtimeState eq 'TERMINATED')" />
+											<button label="RESUME"
+												onClick="@command('executeAction', action='RESUME')"
+												class="btn btn-success"
+												disabled="@load(vm.runtimeState eq 'RUNNING' or vm.runtimeState eq 'TERMINATED')" />
+											<button label="TERMINATE"
+												onClick="@command('executeAction', action='TERMINATE')"
+												class="btn btn-danger"
+												disabled="@load(vm.runtimeState eq 'TERMINATED')" />
+										</h:div>
+										<h:p class="text-muted mt-2">
+											<label value="Nota: Las acciones requieren rol AIOS_ADMIN" />
+										</h:p>
+									</h:div>
+								</h:div>
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

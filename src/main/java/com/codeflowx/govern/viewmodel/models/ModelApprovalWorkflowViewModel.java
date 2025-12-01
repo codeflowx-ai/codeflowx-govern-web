@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -55,7 +56,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ModelApprovalWorkflowViewModel extends MasterPage {
+public class ModelApprovalWorkflowViewModel extends BaseFront<ModelApprovalWorkflowViewModel>{
 
     private static final long serialVersionUID = 1L;
     

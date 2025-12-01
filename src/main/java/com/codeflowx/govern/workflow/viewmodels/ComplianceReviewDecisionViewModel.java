@@ -6,7 +6,7 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
@@ -36,9 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: Compliance Review Decision
- * 
+ *
  * Formulario BPMN User Task para decidir acción después del Timer Boundary Event.
- * 
+ *
  * Proceso: compliance-monitoring-process
  * Task: reviewDecisionTask
  * Triggered by: Timer Boundary Event (después de 7 días)
@@ -48,35 +48,35 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ComplianceReviewDecisionViewModel extends MasterPage {
+public class ComplianceReviewDecisionViewModel extends BaseFront<ComplianceReviewDecisionViewModel> {
 
     private static final long serialVersionUID = 1L;
 
     // ========== Servicios y contexto Spring ==========
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -92,7 +92,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
     // Variables del proceso BPMN
     @Getter @Setter
     private String taskId;
-    
+
     @Getter @Setter
     private String processInstanceId;
 
@@ -113,35 +113,35 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
     private String reviewNotes;
 
     private Integer postponeDays = 7;
-    
+
     private boolean mockMode = false;
 
     // ========== Inicialización ==========
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         log.info("🚀 Inicializando ComplianceReviewDecisionViewModel");
-        
+
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         try {
             // 1. Obtener taskId desde parámetros
             taskId = Executions.getCurrent().getParameter("taskId");
-            
+
             if (taskId == null || taskId.isEmpty()) {
                 log.error("❌ taskId no proporcionado");
                 Messagebox.show("Error: Task ID no encontrado", "Error", Messagebox.OK, Messagebox.ERROR);
@@ -150,7 +150,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
 
             // 2. Cargar tarea de Flowable
             Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
-            
+
             if (task == null) {
                 log.error("❌ Task no encontrada: {}", taskId);
                 Messagebox.show("Error: Tarea no encontrada", "Error", Messagebox.OK, Messagebox.ERROR);
@@ -168,7 +168,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
             if (reviewDaysDelay == null) reviewDaysDelay = 7;
             if (nonCompliantSystems == null) nonCompliantSystems = 0;
 
-            log.info("✅ Formulario cargado - Task: {} | Process: {} | Non-Compliant: {}", 
+            log.info("✅ Formulario cargado - Task: {} | Process: {} | Non-Compliant: {}",
                      taskId, processInstanceId, nonCompliantSystems);
 
         } catch (Exception e) {
@@ -191,7 +191,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
                 Messagebox.show("Por favor, selecciona una decisión", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
-            
+
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando confirmDecision - decision={}", selectedDecision);
                 logActivity("MOCK_COMPLIANCE_DECISION", "ComplianceDecision", null, "Simulación: " + selectedDecision);
@@ -220,7 +220,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
 
             // 3. Mostrar confirmación y cerrar ventana
             String message = getConfirmationMessage();
-            Messagebox.show(message, "Decisión Confirmada", Messagebox.OK, Messagebox.INFORMATION, 
+            Messagebox.show(message, "Decisión Confirmada", Messagebox.OK, Messagebox.INFORMATION,
                 event -> {
                     // Cerrar ventana
                     Executions.sendRedirect("/governance/reports/effectiveness.zul");
@@ -237,7 +237,7 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
         String redirect = mockMode ? "/plataforma/workflow/my-tasks.zul?mock=true" : "/governance/reports/effectiveness.zul";
         Executions.sendRedirect(redirect);
     }
-    
+
     private void loadMockData() {
         this.taskId = "mock-compliance-decision-001";
         this.processInstanceId = "mock-compliance-decision-process-001";
@@ -262,23 +262,8 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
                 return "Decisión registrada";
         }
     }
-    
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
+
     @org.zkoss.bind.annotation.Destroy
     public void destroy() {
         businessService = null;
@@ -286,4 +271,3 @@ public class ComplianceReviewDecisionViewModel extends MasterPage {
         runtimeService = null;
     }
 }
-

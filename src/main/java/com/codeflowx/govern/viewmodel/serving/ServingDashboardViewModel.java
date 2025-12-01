@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.serving;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -12,7 +13,6 @@ import javax.sql.DataSource;
 import org.enartframework.annotation.context.Autowired;
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericApplicationContext;
@@ -57,7 +57,7 @@ import codeflowx.nocode.persist.PageResult;
  * Gestiona visualización de endpoints, performance, SLA y costos
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class ServingDashboardViewModel extends MasterPage implements Serializable {
+public class ServingDashboardViewModel extends BaseFront<ServingDashboardViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final Logger log = LoggerFactory.getLogger(ServingDashboardViewModel.class);

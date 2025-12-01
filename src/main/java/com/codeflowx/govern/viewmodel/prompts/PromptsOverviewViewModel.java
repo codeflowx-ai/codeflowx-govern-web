@@ -10,7 +10,7 @@ import java.util.Map;
 import javax.naming.Context;
 import javax.sql.DataSource;
 
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -59,7 +59,7 @@ import org.enartframework.nocode.dao.IEntityLocal;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class PromptsOverviewViewModel extends MasterPage {
+public class PromptsOverviewViewModel extends BaseFront<PromptsOverviewViewModel> {
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";

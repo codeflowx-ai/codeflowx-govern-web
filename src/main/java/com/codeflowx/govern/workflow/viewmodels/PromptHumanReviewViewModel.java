@@ -11,7 +11,7 @@ import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.suinsit.Context;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.flowable.engine.TaskService;
 import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class PromptHumanReviewViewModel extends MasterPage {
+public class PromptHumanReviewViewModel extends BaseFront<PromptHumanReviewViewModel> {
 
     private static final long serialVersionUID = 1L;
 
@@ -399,22 +399,4 @@ public class PromptHumanReviewViewModel extends MasterPage {
         }
     }
 
-    /**
-     * Registra la actividad del usuario en la base de datos
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error registrando actividad del usuario", e);
-        }
-    }
 }

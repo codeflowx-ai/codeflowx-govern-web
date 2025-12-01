@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.integrations;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import com.codeflowx.govern.business.integrations.AzureMLConnectorService;
 import com.codeflowx.govern.business.integrations.AzureMLConnectorService.AzureDeploymentMetrics;
@@ -56,7 +57,7 @@ import org.zkoss.zul.Clients;
 @Setter
 @Init(superclass = true)
 @VariableResolver(DelegatingVariableResolver.class)
-public class ExternalPlatformsViewModel extends MasterPage implements Serializable {
+public class ExternalPlatformsViewModel extends BaseFront<ExternalPlatformsViewModel>{
 
     private static final long serialVersionUID = 1L;
 

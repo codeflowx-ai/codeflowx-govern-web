@@ -1,0 +1,170 @@
+{
+  "namespace": "evaluation",
+  "name": "EVHEVALUATIONHISTORIES",
+  "type": "TABLE",
+  "labelMonitor": "evhevaluationtype",
+  "description": "Historial completo de evaluaciones según EU AI Act Art. 12, Art. 18",
+  "fields": [
+    {
+      "name": "idxevaluationhistory",
+      "type": "LONG",
+      "pk": true,
+      "required": false,
+      "label": "ID History",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "iduuid",
+      "type": "VARCHAR",
+      "size": 36,
+      "required": true,
+      "label": "UUID",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evhevaluationtype",
+      "type": "VARCHAR",
+      "size": 50,
+      "required": true,
+      "label": "Tipo Evaluación",
+      "criteria": true,
+      "filter": true,
+      "values": ["MODEL", "DATASET", "RAG", "COMPLIANCE", "FRIA", "QMS"]
+    },
+    {
+      "name": "evhentitytype",
+      "type": "VARCHAR",
+      "size": 50,
+      "required": true,
+      "label": "Tipo Entidad",
+      "criteria": true,
+      "filter": true,
+      "values": ["PROJECT", "MODEL", "DATASET", "RAGSYSTEM", "COMPLIANCE_ASSESSMENT"]
+    },
+    {
+      "name": "evhentityid",
+      "type": "LONG",
+      "required": true,
+      "label": "ID Entidad",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evhevaluationid",
+      "type": "LONG",
+      "required": false,
+      "label": "ID Evaluación Original",
+      "criteria": true,
+      "filter": true,
+      "comment": "FK a la evaluación original (ModelEvaluation, RagEvaluation, etc.)"
+    },
+    {
+      "name": "evhevaluationdate",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Fecha Evaluación",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evhmetrics",
+      "type": "JSONB",
+      "required": true,
+      "label": "Métricas",
+      "criteria": false,
+      "filter": false,
+      "comment": "JSONB con todas las métricas de la evaluación"
+    },
+    {
+      "name": "evhresult",
+      "type": "VARCHAR",
+      "size": 20,
+      "required": true,
+      "label": "Resultado",
+      "criteria": true,
+      "filter": true,
+      "values": ["PASS", "FAIL", "WARNING", "REVIEW_REQUIRED"]
+    },
+    {
+      "name": "evhoverallscore",
+      "type": "DECIMAL",
+      "required": false,
+      "label": "Score Overall",
+      "criteria": true,
+      "filter": true,
+      "comment": "Score numérico si aplica (0.00-1.00)"
+    },
+    {
+      "name": "evhjustification",
+      "type": "CLOB",
+      "required": false,
+      "label": "Justificación",
+      "criteria": false,
+      "filter": false
+    },
+    {
+      "name": "evhevaluatedby",
+      "type": "VARCHAR",
+      "size": 255,
+      "required": false,
+      "label": "Evaluado Por",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evharchived",
+      "type": "BOOLEAN",
+      "required": true,
+      "label": "Archivado",
+      "criteria": true,
+      "filter": true,
+      "default": false
+    },
+    {
+      "name": "evharchiveddate",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Fecha Archivado",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evhretentionpolicy",
+      "type": "VARCHAR",
+      "size": 50,
+      "required": false,
+      "label": "Política Retención",
+      "criteria": true,
+      "filter": true,
+      "values": ["STANDARD", "EXTENDED", "PERMANENT"],
+      "default": "STANDARD"
+    },
+    {
+      "name": "evhmetadata",
+      "type": "JSONB",
+      "required": false,
+      "label": "Metadata",
+      "criteria": false,
+      "filter": false,
+      "comment": "Metadata adicional (versión, configuración, etc.)"
+    },
+    {
+      "name": "evhcreatedat",
+      "type": "TIMESTAMP",
+      "required": true,
+      "label": "Fecha Creación",
+      "criteria": true,
+      "filter": true
+    },
+    {
+      "name": "evhupdatedat",
+      "type": "TIMESTAMP",
+      "required": false,
+      "label": "Fecha Actualización",
+      "criteria": true,
+      "filter": true
+    }
+  ]
+}

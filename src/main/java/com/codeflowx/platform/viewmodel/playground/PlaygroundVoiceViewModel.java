@@ -11,6 +11,7 @@ import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zul.Messagebox;
 
+import com.codeflowx.framework.zkoss.BaseFront;
 import com.codeflowx.govern.entity.models.Model;
 import com.codeflowx.govern.entity.playground.PlaygroundSession;
 import com.codeflowx.govern.entity.playground.PlaygroundVoice;
@@ -18,30 +19,29 @@ import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.govern.service.models.ModelService;
 import com.codeflowx.govern.service.playground.PlaygroundSessionService;
 import com.codeflowx.govern.service.playground.PlaygroundVoiceService;
-import com.codeflowx.platform.service.BaseFront;
-import com.codeflowx.platform.service.BaseFront.Criteria;
-import com.codeflowx.platform.service.BaseFront.Criterias;
-import com.codeflowx.platform.service.BaseFront.Evaluation;
-import com.codeflowx.platform.service.BaseFront.Operation;
+
+import codeflowx.nocode.persist.Criterias;
+import codeflowx.nocode.persist.Evaluation;
+import codeflowx.nocode.persist.Operation;
 
 import lombok.extern.slf4j.Slf4j;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
-public class PlaygroundVoiceViewModel extends BaseFront {
+public class PlaygroundVoiceViewModel extends BaseFront<PlaygroundVoiceViewModel> {
 
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private PlaygroundSessionService playgroundSessionService;
-    
+
     @WireVariable
     private PlaygroundVoiceService playgroundVoiceService;
 
     private PlaygroundSession currentSession;
     private List<PlaygroundVoice> voiceHistory = new ArrayList<>();
-    
+
     // TTS
     private String textToConvert = "";
     private Model selectedTTSModel;
@@ -51,7 +51,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
     private String generatedAudioUrl;
     private Integer audioDuration;
     private BigDecimal audioCost;
-    
+
     // STT
     private Model selectedSTTModel;
     private String selectedAudioFile;
@@ -59,14 +59,14 @@ public class PlaygroundVoiceViewModel extends BaseFront {
     private String transcriptionText;
     private Integer processingTime;
     private BigDecimal transcriptionCost;
-    
+
     private List<Model> availableModels = new ArrayList<>();
     private List<String> availableVoices = List.of("alloy", "echo", "fable", "onyx", "nova", "shimmer");
     private List<String> availableLanguages = List.of("es", "en", "fr", "de", "it", "pt");
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_VOICE", "ACCESS", null, "Usuario accedió a Voice Playground");
+        logActivity("ACCESS", "PLAYGROUND_VOICE", null, "Usuario accedió a Voice Playground");
         loadAvailableModels();
         loadOrCreateSession();
         loadVoiceHistory();
@@ -74,7 +74,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_VOICE", "LEAVE", null, "Usuario salió de Voice Playground");
+        logActivity("LEAVE", "PLAYGROUND_VOICE", null, "Usuario salió de Voice Playground");
     }
 
     private void loadAvailableModels() {
@@ -118,7 +118,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             PlaygroundVoice voice = new PlaygroundVoice();
             voice.setSession(currentSession);
@@ -132,22 +132,22 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setModel(selectedTTSModel);
             voice.setVoicecreatedby(getUserName());
             voice.setVoicecreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Simulate audio generation
             voice.setVoiceaudiourl("https://example.com/audio/generated.mp3");
             voice.setVoicestatus("COMPLETED");
             voice.setVoiceprocessingtime(1200);
             voice.setVoiceduration(15);
             voice.setVoicecost(new BigDecimal("0.015"));
-            
+
             voice = playgroundVoiceService.create(voice);
-            
+
             generatedAudioUrl = voice.getVoiceaudiourl();
             audioDuration = voice.getVoiceduration();
             audioCost = voice.getVoicecost();
-            
+
             loadVoiceHistory();
-            logActivity("PLAYGROUND_VOICE", "GENERATE_SPEECH", null, "Audio generado");
+            logActivity("GENERATE_SPEECH", "PLAYGROUND_VOICE", null, "Audio generado");
             Messagebox.show("Audio generado correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (GovernanceServiceException e) {
             log.error("Error generating speech", e);
@@ -162,7 +162,7 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             Messagebox.show("Por favor selecciona un modelo y un archivo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             PlaygroundVoice voice = new PlaygroundVoice();
             voice.setSession(currentSession);
@@ -173,21 +173,21 @@ public class PlaygroundVoiceViewModel extends BaseFront {
             voice.setModel(selectedSTTModel);
             voice.setVoicecreatedby(getUserName());
             voice.setVoicecreatedat(new Timestamp(System.currentTimeMillis()));
-            
+
             // Simulate transcription
             voice.setVoicetext("Esta es una transcripción simulada del audio proporcionado.");
             voice.setVoicestatus("COMPLETED");
             voice.setVoiceprocessingtime(2500);
             voice.setVoicecost(new BigDecimal("0.006"));
-            
+
             voice = playgroundVoiceService.create(voice);
-            
+
             transcriptionText = voice.getVoicetext();
             processingTime = voice.getVoiceprocessingtime();
             transcriptionCost = voice.getVoicecost();
-            
+
             loadVoiceHistory();
-            logActivity("PLAYGROUND_VOICE", "TRANSCRIBE", null, "Audio transcrito");
+            logActivity("TRANSCRIBE", "PLAYGROUND_VOICE", null, "Audio transcrito");
             Messagebox.show("Audio transcrito correctamente", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (GovernanceServiceException e) {
             log.error("Error transcribing audio", e);
@@ -209,17 +209,17 @@ public class PlaygroundVoiceViewModel extends BaseFront {
 
     @Command
     public void downloadAudio() {
-        logActivity("PLAYGROUND_VOICE", "DOWNLOAD", null, "Descargando audio");
+        logActivity("DOWNLOAD", "PLAYGROUND_VOICE", null, "Descargando audio");
     }
 
     @Command
     public void copyTranscription() {
-        logActivity("PLAYGROUND_VOICE", "COPY", null, "Copiando transcripción");
+        logActivity("COPY", "PLAYGROUND_VOICE", null, "Copiando transcripción");
     }
 
     @Command
     public void viewVoice(PlaygroundVoice voice) {
-        logActivity("PLAYGROUND_VOICE", "VIEW", null, "Viendo detalles de conversión");
+        logActivity("VIEW", "PLAYGROUND_VOICE", null, "Viendo detalles de conversión");
     }
 
     @Command

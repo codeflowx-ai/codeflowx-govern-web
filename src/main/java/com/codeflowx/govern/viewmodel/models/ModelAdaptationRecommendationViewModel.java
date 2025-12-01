@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class ModelAdaptationRecommendationViewModel extends MasterPage {
+public class ModelAdaptationRecommendationViewModel extends BaseFront<ModelAdaptationRecommendationViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String DEFAULT_PRIORITY = "cost";

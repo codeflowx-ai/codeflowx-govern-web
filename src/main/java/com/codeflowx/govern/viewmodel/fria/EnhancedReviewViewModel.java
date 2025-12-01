@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.fria;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class EnhancedReviewViewModel extends MasterPage {
+public class EnhancedReviewViewModel extends BaseFront<EnhancedReviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     

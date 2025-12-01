@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.notifications;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -54,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class NotificationTemplateOverviewViewModel extends MasterPage {
+public class NotificationTemplateOverviewViewModel extends BaseFront<NotificationTemplateOverviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
@@ -281,24 +282,7 @@ public class NotificationTemplateOverviewViewModel extends MasterPage {
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha crea        // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
 

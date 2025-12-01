@@ -1,4 +1,5 @@
 package com.codeflowx.govern.workflow.viewmodels;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -38,19 +39,19 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * ViewModel: HITL SLA Reminder
- * 
+ *
  * Proceso BPMN: 01_AGENT_APPROVAL (agent-approval-v1)
  * User Task: hitlReminder (disparado por Timer Boundary 24h)
  * Candidate Groups: governance-leads
- * 
+ *
  * Funcionalidad:
  * La revisión humana (hitlTask) lleva más de 24h sin completarse.
  * Se notifica a governance-leads para escalar o tomar acción.
- * 
+ *
  * Input Variables:
  * - agentName: String
  * - hitlTaskCreatedAt: Timestamp
- * 
+ *
  * Output Variables:
  * - sla_action: 'escalate', 'extend', 'complete_now'
  * - sla_notes: String
@@ -62,34 +63,34 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class HitlSlaReminderViewModel extends MasterPage {
+public class HitlSlaReminderViewModel extends BaseFront<HitlSlaReminderViewModel>{
 
     private static final long serialVersionUID = 1L;
 
     @WireVariable
     private BusinessService businessService;
-    
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // TODO Auto-generated method stub
@@ -107,7 +108,7 @@ public class HitlSlaReminderViewModel extends MasterPage {
     private String elapsedTime;
     private String slaAction;
     private String slaNotes;
-    
+
     // Mock mode
     private boolean mockMode = false;
 
@@ -116,30 +117,30 @@ public class HitlSlaReminderViewModel extends MasterPage {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         Map<String, String[]> params = Executions.getCurrent().getParameterMap();
-        
+
         // Detectar mock mode
      // Detectar mock mode desde parámetros URL
         if(System.getenv("MOCK_MODE")!=null) {
         	mockMode = Boolean.parseBoolean(System.getenv("MOCK_MODE").toString());
         }
-       
+
         if (mockMode) {
             this.mockMode = true;
             loadMockData();
             log.info("🎭 Mock mode activado");
             return;
         }
-        
+
         if (params.containsKey("taskId")) {
             this.taskId = params.get("taskId")[0];
             loadTaskData();
         }
     }
-    
-   
-    
+
+
+
     private void setBeans() {
         // Beans ya inyectados por @WireVariable
     }
@@ -170,7 +171,7 @@ public class HitlSlaReminderViewModel extends MasterPage {
     public void confirm() {
         try {
             if (slaAction == null || slaAction.isEmpty()) {
-                Messagebox.show("Debe seleccionar una acción", "Advertencia", 
+                Messagebox.show("Debe seleccionar una acción", "Advertencia",
                                 Messagebox.OK, Messagebox.EXCLAMATION);
                 return;
             }
@@ -178,14 +179,14 @@ public class HitlSlaReminderViewModel extends MasterPage {
             if (mockMode) {
                 log.info("🎭 Mock mode: Simulando confirm - action={}", slaAction);
                 logActivity("MOCK_CONFIRM_SLA", "HitlSlaReminder", null, "Simulación de acción SLA: " + slaAction);
-                Messagebox.show("✅ [DEMO] Acción registrada: " + getSlaActionLabel(slaAction), "Demo Mode", 
+                Messagebox.show("✅ [DEMO] Acción registrada: " + getSlaActionLabel(slaAction), "Demo Mode",
                     Messagebox.OK, Messagebox.INFORMATION,
                     event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul?mock=true"));
                 return;
             }
 
             String username = super.getUser() != null ? super.getUser().getUsername() : "SYSTEM";
-            
+
             Map<String, Object> outputVariables = new HashMap<>();
             outputVariables.put("sla_action", slaAction);
             outputVariables.put("sla_notes", slaNotes);
@@ -193,20 +194,20 @@ public class HitlSlaReminderViewModel extends MasterPage {
             outputVariables.put("sla_timestamp", new Timestamp(System.currentTimeMillis()));
 
             taskService.complete(taskId, outputVariables);
-            
+
             logActivity("CONFIRM_SLA", "HitlSlaReminder", null, "Acción SLA: " + slaAction);
 
             Messagebox.show(
-                "Acción registrada: " + getSlaActionLabel(slaAction), 
-                "Éxito", 
-                Messagebox.OK, 
+                "Acción registrada: " + getSlaActionLabel(slaAction),
+                "Éxito",
+                Messagebox.OK,
                 Messagebox.INFORMATION,
                 event -> Executions.getCurrent().sendRedirect("/plataforma/workflow/my-tasks.zul")
             );
 
         } catch (Exception e) {
             log.error("❌ Error completando SLA reminder: {}", e.getMessage(), e);
-            Messagebox.show("Error: " + e.getMessage(), "Error", 
+            Messagebox.show("Error: " + e.getMessage(), "Error",
                             Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -225,7 +226,7 @@ public class HitlSlaReminderViewModel extends MasterPage {
             default: return action;
         }
     }
-    
+
     /**
      * Mock data para demos
      */
@@ -234,29 +235,14 @@ public class HitlSlaReminderViewModel extends MasterPage {
         this.processInstanceId = "mock-process-hitl-sla-001";
         this.agentName = "Customer-Support-Bot-v2";
         this.elapsedTime = "28 horas";
-        
+
         log.info("🎭 Mock data loaded for HITL SLA Reminder");
     }
-    
+
     /**
      * Registra actividad del usuario
      */
-    private void logActivity(String action, String model, Long pk, String mensaje) {
-        try {
-            Ssoractividad activityLog = new Ssoractividad();
-            activityLog.setUsername(getUser().getUsername());
-            activityLog.setAccion(action);
-            activityLog.setAlta(new Timestamp(System.currentTimeMillis()));
-            activityLog.setModulo(model);
-            activityLog.setIdtupla(pk != null ? pk.intValue() : 0);
-            activityLog.setAplicacion(ctxBean.getApplicationName());
-            activityLog.setValuetupla(mensaje);
-            businessService.save(activityLog);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-        }
-    }
-    
+
     @Destroy
     public void destroy() {
         businessService = null;

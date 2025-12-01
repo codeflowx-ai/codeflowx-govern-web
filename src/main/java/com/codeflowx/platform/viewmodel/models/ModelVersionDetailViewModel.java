@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -33,6 +34,11 @@ import com.codeflowx.govern.entity.models.ModelVersion;
 import com.codeflowx.govern.entity.models.ModelArtifact;
 import com.codeflowx.govern.entity.models.ModelStageTransition;
 import com.codeflowx.govern.entity.models.ModelValidation;
+import com.codeflowx.govern.service.models.ModelVersionService;
+import com.codeflowx.govern.service.models.ModelArtifactService;
+import com.codeflowx.govern.service.models.ModelStageTransitionService;
+import com.codeflowx.govern.service.models.ModelValidationService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -55,60 +61,68 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ModelVersionDetailViewModel extends MasterPage {
-    
+public class ModelVersionDetailViewModel extends BaseFront<ModelVersionDetailViewModel>{
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private ModelVersionService modelVersionService;
+    @WireVariable
+    private ModelArtifactService modelArtifactService;
+    @WireVariable
+    private ModelStageTransitionService modelStageTransitionService;
+    @WireVariable
+    private ModelValidationService modelValidationService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para Ssoractividad y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxmodelversion;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private ModelVersion currentModelVersion;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
-    
+
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableModstatuss = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
     private List<String> selectedModtags = new ArrayList<>();
     private String newModtag = "";
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<ModelArtifact> submodmodelartifacts = new ArrayList<>();
     private List<ModelStageTransition> submodmodelstagetransitions = new ArrayList<>();
@@ -116,40 +130,40 @@ public class ModelVersionDetailViewModel extends MasterPage {
     private boolean submodmodelartifactsLoaded = false;
     private boolean submodmodelstagetransitionsLoaded = false;
     private boolean submodmodelvalidationsLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxmodelversion = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ModelVersionDetailViewModel - mode: {}, idxmodelversion: {}", mode, idxmodelversion);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxmodelversion != null) {
@@ -160,11 +174,11 @@ public class ModelVersionDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentModelVersion, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentModelVersion = new ModelVersion();
@@ -172,38 +186,45 @@ public class ModelVersionDetailViewModel extends MasterPage {
         pageTitle = "Crear Nuevo";
         loadModstatuss();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentModelVersion = businessService.findById(ModelVersion.class, id);
-            
+            currentModelVersion = modelVersionService.findById(id);
+
             if (currentModelVersion == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentModelVersion.getModdescription();
         loadModstatuss();
-            
+
             // Cargar tags/roles existentes desde JSON
             selectedModtags = convertJsonToList(currentModelVersion.getModtags());
-            
+
             // Guardar valores originales para validación de unicidad
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "MODMODELVERSIONS", id, "Consulta: " + currentModelVersion.getModdescription());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -211,55 +232,59 @@ public class ModelVersionDetailViewModel extends MasterPage {
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentModelVersion.getIdxmodelversion() == null;
-            
+
             if (isNew) {
-                businessService.save(currentModelVersion);
+                currentModelVersion = modelVersionService.create(currentModelVersion);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "MODMODELVERSIONS", currentModelVersion.getIdxmodelversion(), 
+                logActivity("CREACION", "MODMODELVERSIONS", currentModelVersion.getIdxmodelversion(),
                     "Creado: " + currentModelVersion.getModdescription());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentModelVersion);
+                currentModelVersion = modelVersionService.update(currentModelVersion);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "MODMODELVERSIONS", currentModelVersion.getIdxmodelversion(), 
+                logActivity("EDICION", "MODMODELVERSIONS", currentModelVersion.getIdxmodelversion(),
                     "Actualizado: " + currentModelVersion.getModdescription());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentModelVersion.getModversion() == null || currentModelVersion.getModversion().trim().isEmpty()) {
             errors.append("- Version\n");
         }
@@ -278,16 +303,16 @@ public class ModelVersionDetailViewModel extends MasterPage {
         if (currentModelVersion.getModcreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -296,14 +321,14 @@ public class ModelVersionDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadModstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableModstatuss.add("OPTION_1");
         availableModstatuss.add("OPTION_2");
         availableModstatuss.add("OPTION_3");
     }
-    
+
     @Command
     @NotifyChange("{'selectedModtags', 'currentModelVersion'}")
     public void addModtag() {
@@ -314,7 +339,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
             currentModelVersion.setModtags(convertListToJson(selectedModtags));
         }
     }
-    
+
     @Command
     @NotifyChange("{'selectedModtags', 'currentModelVersion'}")
     public void removeModtag(@BindingParam("tag") String tag) {
@@ -322,7 +347,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
         // Convertir lista a JSON y actualizar en currentModelVersion
         currentModelVersion.setModtags(convertListToJson(selectedModtags));
     }
-    
+
     private String convertListToJson(List<String> list) {
         if (list == null || list.isEmpty()) {
             return "[]";
@@ -335,7 +360,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
         json.append("]");
         return json.toString();
     }
-    
+
     private List<String> convertJsonToList(String json) {
         List<String> result = new ArrayList<>();
         if (json == null || json.trim().isEmpty() || json.equals("[]")) {
@@ -350,7 +375,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
         }
         return result;
     }
-    
+
     private void loadSubmodmodelartifacts() {
         try {
             if (currentModelVersion != null && currentModelVersion.getIdxmodelversion() != null) {
@@ -358,25 +383,28 @@ public class ModelVersionDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "version");
                 criteria.setValues(new Object[]{currentModelVersion.getIdxmodelversion()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ModelArtifact> result = businessService.findAllEntity(ModelArtifact.class, collectionParams, criterias);
+
+                PageResult<ModelArtifact> result = modelArtifactService.findAll(collectionParams, criterias);
                 submodmodelartifacts = result != null ? result.getContent() : new ArrayList<>();
                 submodmodelartifactsLoaded = true;
                 log.debug("Cargados {} submodmodelartifacts", submodmodelartifacts.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar submodmodelartifacts", e);
+            submodmodelartifacts = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar submodmodelartifacts", e);
             submodmodelartifacts = new ArrayList<>();
         }
     }
-    
+
     private void loadSubmodmodelstagetransitions() {
         try {
             if (currentModelVersion != null && currentModelVersion.getIdxmodelversion() != null) {
@@ -384,25 +412,28 @@ public class ModelVersionDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "version");
                 criteria.setValues(new Object[]{currentModelVersion.getIdxmodelversion()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ModelStageTransition> result = businessService.findAllEntity(ModelStageTransition.class, collectionParams, criterias);
+
+                PageResult<ModelStageTransition> result = modelStageTransitionService.findAll(collectionParams, criterias);
                 submodmodelstagetransitions = result != null ? result.getContent() : new ArrayList<>();
                 submodmodelstagetransitionsLoaded = true;
                 log.debug("Cargados {} submodmodelstagetransitions", submodmodelstagetransitions.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar submodmodelstagetransitions", e);
+            submodmodelstagetransitions = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar submodmodelstagetransitions", e);
             submodmodelstagetransitions = new ArrayList<>();
         }
     }
-    
+
     private void loadSubmodmodelvalidations() {
         try {
             if (currentModelVersion != null && currentModelVersion.getIdxmodelversion() != null) {
@@ -410,25 +441,28 @@ public class ModelVersionDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "version");
                 criteria.setValues(new Object[]{currentModelVersion.getIdxmodelversion()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ModelValidation> result = businessService.findAllEntity(ModelValidation.class, collectionParams, criterias);
+
+                PageResult<ModelValidation> result = modelValidationService.findAll(collectionParams, criterias);
                 submodmodelvalidations = result != null ? result.getContent() : new ArrayList<>();
                 submodmodelvalidationsLoaded = true;
                 log.debug("Cargados {} submodmodelvalidations", submodmodelvalidations.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar submodmodelvalidations", e);
+            submodmodelvalidations = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar submodmodelvalidations", e);
             submodmodelvalidations = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("submodmodelartifacts")
     public void onSelectSubmodmodelartifactsTab() {
@@ -436,7 +470,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
             loadSubmodmodelartifacts();
         }
     }
-    
+
     @Command
     @NotifyChange("submodmodelstagetransitions")
     public void onSelectSubmodmodelstagetransitionsTab() {
@@ -444,7 +478,7 @@ public class ModelVersionDetailViewModel extends MasterPage {
             loadSubmodmodelstagetransitions();
         }
     }
-    
+
     @Command
     @NotifyChange("submodmodelvalidations")
     public void onSelectSubmodmodelvalidationsTab() {
@@ -452,33 +486,16 @@ public class ModelVersionDetailViewModel extends MasterPage {
             loadSubmodmodelvalidations();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el mode No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -486,19 +503,19 @@ public class ModelVersionDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentModelVersion = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableModstatuss != null) {
                 availableModstatuss.clear();
                 availableModstatuss = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (submodmodelartifacts != null) {
                 submodmodelartifacts.clear();
@@ -515,20 +532,24 @@ public class ModelVersionDetailViewModel extends MasterPage {
                 submodmodelvalidations = null;
             }
             submodmodelvalidationsLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
             if (selectedModtags != null) {
                 selectedModtags.clear();
                 selectedModtags = null;
             }
             newModtag = null;
-            
+
             // Limpiar validadores
             unique = null;
-            
-            // Limpiar BusinessService
-            businessService = null;
-            
+
+            // Limpiar Servicios
+            modelVersionService = null;
+            modelArtifactService = null;
+            modelStageTransitionService = null;
+            modelValidationService = null;
+            businessService = null; // Mantener para Ssoractividad y UniqueValidator
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

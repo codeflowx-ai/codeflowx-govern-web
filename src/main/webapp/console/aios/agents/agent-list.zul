@@ -1,0 +1,170 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?component name="extHTML" extends="html" class="org.suinsit.nocode.web.components.HtmlExt"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+	<idspace id="aios"
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.aios.AgentListViewModel')"
+		validationMessages="@id('vmsgs')">
+		<h:div class="row">
+			<div>
+				<h:div class="left tittle-principal">
+					<h:h2 class="mb-1" style="font-weight: bold;">
+						<h:i class="fa-sharp-duotone fa-solid fa-robot label-icon align-middle fs-16 me-2"></h:i>
+						<label class="mb-1" value="Agentes AI OS" style="font-weight: bold;" />
+					</h:h2>
+					<h:p class="text-muted">
+						<label value="Supervisión y gestión de agentes" class="text-muted" />
+					</h:p>
+				</h:div>
+			</div>
+		</h:div>
+
+		<!-- Métricas KPIs -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-3 col-md-6">
+				<h:div class="card" style="background-color: #0B2A4A; color: white;">
+					<h:div class="card-body">
+						<h:h5 class="card-title">Agentes Activos</h:h5>
+						<h:h2>@load(vm.runningAgents)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-3 col-md-6">
+				<h:div class="card" style="background-color: #007BFF; color: white;">
+					<h:div class="card-body">
+						<h:h5 class="card-title">Loops Detectados</h:h5>
+						<h:h2>@load(vm.totalLoopsDetected)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-3 col-md-6">
+				<h:div class="card" style="background-color: #dc3545; color: white;">
+					<h:div class="card-body">
+						<h:h5 class="card-title">Pausados</h:h5>
+						<h:h2>@load(vm.pausedAgents)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+			<h:div class="col-lg-3 col-md-6">
+				<h:div class="card" style="background-color: #6c757d; color: white;">
+					<h:div class="card-body">
+						<h:h5 class="card-title">Total Agentes</h:h5>
+						<h:h2>@load(vm.totalAgents)</h:h2>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Filtros -->
+		<h:div class="row mb-3">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-body">
+						<h:div class="row">
+							<h:div class="col-md-4">
+								<label value="Buscar:" />
+								<textbox value="@bind(vm.searchTerm)"
+									onOK="@command('applyFilters')"
+									placeholder="Nombre del agente..." />
+							</h:div>
+							<h:div class="col-md-3">
+								<label value="Estado:" />
+								<combobox value="@bind(vm.stateFilter)"
+									onChange="@command('applyFilters')">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="ACTIVE" value="ACTIVE" />
+									<comboitem label="DRAFT" value="DRAFT" />
+									<comboitem label="SUNSET" value="SUNSET" />
+								</combobox>
+							</h:div>
+							<h:div class="col-md-3">
+								<label value="Runtime State:" />
+								<combobox value="@bind(vm.runtimeStateFilter)"
+									onChange="@command('applyFilters')">
+									<comboitem label="Todos" value="ALL" />
+									<comboitem label="RUNNING" value="RUNNING" />
+									<comboitem label="PAUSED" value="PAUSED" />
+									<comboitem label="TERMINATED" value="TERMINATED" />
+								</combobox>
+							</h:div>
+							<h:div class="col-md-2">
+								<button label="Limpiar"
+									onClick="@command('clearFilters')"
+									class="btn btn-secondary" />
+							</h:div>
+						</h:div>
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+
+		<!-- Tabla de Agentes -->
+		<h:div class="row">
+			<h:div class="col-lg-12">
+				<h:div class="card">
+					<h:div class="card-header">
+						<h:h5>Listado de Agentes</h:h5>
+					</h:div>
+					<h:div class="card-body">
+						<grid model="@load(vm.agentRows)"
+							emptyMessage="No hay agentes disponibles"
+							style="width: 100%;">
+							<columns>
+								<column label="Nombre" width="200px" />
+								<column label="Namespace" width="150px" />
+								<column label="Estado Runtime" width="120px" />
+								<column label="Riesgo" width="100px" />
+								<column label="Loops" width="80px" />
+								<column label="Última Actividad" width="180px" />
+								<column label="Acciones" width="300px" />
+							</columns>
+							<template name="model">
+								<row>
+									<label value="@load(each.name)" />
+									<label value="@load(each.namespace)" />
+									<label value="@load(each.runtimeState)"
+										style="@load(each.runtimeState eq 'RUNNING' ? 'color: green;' : each.runtimeState eq 'PAUSED' ? 'color: orange;' : each.runtimeState eq 'TERMINATED' ? 'color: red;' : 'color: gray;')" />
+									<label value="@load(each.risk)" />
+									<label value="@load(each.loopsDetected)" />
+									<label value="@load(each.lastActivity)" />
+									<h:div>
+										<button label="Ver Detalle"
+											onClick="@command('viewAgentDetails', agentId=each.agentId)"
+											class="btn btn-sm btn-primary" />
+										<button label="Memorias"
+											onClick="@command('viewMemories', agentId=each.agentId)"
+											class="btn btn-sm btn-info" />
+										<menupopup id="actionsMenu_${each.agentId}">
+											<menuitem label="PAUSE"
+												onClick="@command('executeAction', agentId=each.agentId, action='PAUSE')" />
+											<menuitem label="RESUME"
+												onClick="@command('executeAction', agentId=each.agentId, action='RESUME')" />
+											<menuitem label="TERMINATE"
+												onClick="@command('executeAction', agentId=each.agentId, action='TERMINATE')" />
+											<menuseparator />
+											<menuitem label="Ver Logs"
+												onClick="@command('viewLogs', agentId=each.agentId)" />
+										</menupopup>
+										<button label="Acciones"
+											class="btn btn-sm btn-secondary"
+											menupopup="actionsMenu_${each.agentId}" />
+									</h:div>
+								</row>
+							</template>
+						</grid>
+
+						<!-- Paginación -->
+						<paging id="paging"
+							pageSize="@load(vm.pageParams.maxRows)"
+							totalSize="@load(vm.totalAgents)"
+							activePage="@bind(vm.pageParams.pageActual)"
+							onPaging="@command('onPaging', event=event)" />
+					</h:div>
+				</h:div>
+			</h:div>
+		</h:div>
+	</idspace>
+</zk>

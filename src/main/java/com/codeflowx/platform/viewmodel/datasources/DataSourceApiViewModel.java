@@ -27,7 +27,7 @@ import codeflowx.nocode.persist.Criterias;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class DataSourceApiViewModel extends BaseFront {
+public class DataSourceApiViewModel extends BaseFront<DataSourceApiViewModel> {
 
     @WireVariable
     private DataSourceApiService dataSourceApiService;

@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<window id="developerConsoleWin"
+        title="Developer Console"
+        width="100%"
+        height="100%"
+        border="normal"
+        apply="com.codeflowx.govern.viewmodels.developer.DeveloperConsoleViewModel"
+        xmlns="http://www.zkoss.org/2005/zul">
+
+    <style>
+        .developer-console {
+            padding: 20px;
+        }
+        .plugin-card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .api-key-display {
+            font-family: monospace;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 3px;
+        }
+    </style>
+
+    <div class="developer-console">
+        <tabbox width="100%" height="100%">
+            <tabs>
+                <tab label="Plugins" />
+                <tab label="MCP Components" />
+                <tab label="API Keys" />
+                <tab label="Logs" />
+                <tab label="Playground" />
+            </tabs>
+
+            <tabpanels>
+                <!-- Tab: Plugins -->
+                <tabpanel>
+                    <vbox>
+                        <hbox>
+                            <button label="Registrar Plugin"
+                                    onClick="@command('registerPlugin')"
+                                    sclass="btn-primary" />
+                            <button label="Refrescar"
+                                    onClick="@command('loadPlugins')"
+                                    sclass="btn-default" />
+                        </hbox>
+
+                        <separator />
+
+                        <groupbox>
+                            <caption label="Nuevo Plugin" />
+                            <grid>
+                                <rows>
+                                    <row>
+                                        <label value="Nombre:" />
+                                        <textbox value="@bind(vm.newPluginName)" width="300px" />
+                                    </row>
+                                    <row>
+                                        <label value="Versión:" />
+                                        <textbox value="@bind(vm.newPluginVersion)" width="300px" />
+                                    </row>
+                                    <row>
+                                        <label value="Descripción:" />
+                                        <textbox value="@bind(vm.newPluginDescription)"
+                                                 width="300px"
+                                                 rows="3" />
+                                    </row>
+                                    <row>
+                                        <label value="Manifest JSON:" />
+                                        <textbox value="@bind(vm.newPluginManifest)"
+                                                 width="500px"
+                                                 rows="10" />
+                                    </row>
+                                </rows>
+                            </grid>
+                        </groupbox>
+
+                        <separator />
+
+                        <listbox model="@bind(vm.plugins)"
+                                 selectedItem="@bind(vm.selectedPlugin)"
+                                 width="100%"
+                                 height="400px">
+                            <listhead>
+                                <listheader label="Nombre" />
+                                <listheader label="Versión" />
+                                <listheader label="Estado" />
+                                <listheader label="Creado" />
+                            </listhead>
+                            <template name="model">
+                                <listitem>
+                                    <listcell label="@load(each.entryName)" />
+                                    <listcell label="@load(each.entryVersion)" />
+                                    <listcell label="@load(each.entryStatus)" />
+                                    <listcell label="@load(each.entryCreatedAt)" />
+                                    <listcell>
+                                        <button label="Ver Detalles"
+                                                onClick="@command('viewPluginDetails', plugin=each)" />
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vbox>
+                </tabpanel>
+
+                <!-- Tab: MCP Components -->
+                <tabpanel>
+                    <vbox>
+                        <button label="Refrescar"
+                                onClick="@command('loadMcpComponents')"
+                                sclass="btn-default" />
+                        <separator />
+                        <listbox model="@bind(vm.mcpComponents)"
+                                 width="100%"
+                                 height="500px">
+                            <listhead>
+                                <listheader label="Nombre" />
+                                <listheader label="Namespace" />
+                                <listheader label="Versión" />
+                                <listheader label="Estado" />
+                            </listhead>
+                            <template name="model">
+                                <listitem>
+                                    <listcell label="@load(each.aiocomponentname)" />
+                                    <listcell label="@load(each.aiocomponentnamespace)" />
+                                    <listcell label="@load(each.aiocomponentversion)" />
+                                    <listcell label="@load(each.aiocomponentstate)" />
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vbox>
+                </tabpanel>
+
+                <!-- Tab: API Keys -->
+                <tabpanel>
+                    <vbox>
+                        <hbox>
+                            <button label="Generar API Key"
+                                    onClick="@command('generateApiKey')"
+                                    sclass="btn-primary" />
+                            <button label="Refrescar"
+                                    onClick="@command('loadApiKeys')"
+                                    sclass="btn-default" />
+                        </hbox>
+                        <separator />
+                        <listbox model="@bind(vm.apiKeys)"
+                                 width="100%"
+                                 height="500px">
+                            <listhead>
+                                <listheader label="API Key" />
+                                <listheader label="Creado" />
+                                <listheader label="Último Uso" />
+                                <listheader label="Acciones" />
+                            </listhead>
+                            <template name="model">
+                                <listitem>
+                                    <listcell>
+                                        <label value="@load(each.api_key)"
+                                               sclass="api-key-display" />
+                                    </listcell>
+                                    <listcell label="@load(each.created_at)" />
+                                    <listcell label="@load(each.last_used)" />
+                                    <listcell>
+                                        <button label="Eliminar"
+                                                onClick="@command('deleteApiKey', apiKey=each)"
+                                                sclass="btn-danger" />
+                                    </listcell>
+                                </listitem>
+                            </template>
+                        </listbox>
+                    </vbox>
+                </tabpanel>
+
+                <!-- Tab: Logs -->
+                <tabpanel>
+                    <vbox>
+                        <button label="Refrescar"
+                                onClick="@command('refreshLogs')"
+                                sclass="btn-default" />
+                        <separator />
+                        <textbox value="@bind(vm.logs)"
+                                 width="100%"
+                                 height="500px"
+                                 multiline="true"
+                                 readonly="true" />
+                    </vbox>
+                </tabpanel>
+
+                <!-- Tab: Playground -->
+                <tabpanel>
+                    <vbox>
+                        <groupbox>
+                            <caption label="Test Endpoint" />
+                            <grid>
+                                <rows>
+                                    <row>
+                                        <label value="Endpoint:" />
+                                        <textbox value="@bind(vm.playgroundEndpoint)"
+                                                 width="500px"
+                                                 placeholder="/api/v1/agents/register" />
+                                    </row>
+                                    <row>
+                                        <label value="Método:" />
+                                        <combobox value="@bind(vm.playgroundMethod)">
+                                            <comboitem label="GET" />
+                                            <comboitem label="POST" />
+                                            <comboitem label="PUT" />
+                                            <comboitem label="DELETE" />
+                                        </combobox>
+                                    </row>
+                                    <row>
+                                        <label value="Payload (JSON):" />
+                                        <textbox value="@bind(vm.playgroundPayload)"
+                                                 width="500px"
+                                                 rows="10" />
+                                    </row>
+                                </rows>
+                            </grid>
+                            <button label="Ejecutar"
+                                    onClick="@command('testEndpoint')"
+                                    sclass="btn-primary" />
+                        </groupbox>
+
+                        <separator />
+
+                        <groupbox>
+                            <caption label="Response" />
+                            <textbox value="@bind(vm.playgroundResponse)"
+                                     width="100%"
+                                     height="300px"
+                                     multiline="true"
+                                     readonly="true" />
+                        </groupbox>
+                    </vbox>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </div>
+</window>

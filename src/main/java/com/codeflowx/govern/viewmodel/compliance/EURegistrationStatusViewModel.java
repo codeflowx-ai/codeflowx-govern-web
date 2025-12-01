@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class EURegistrationStatusViewModel extends MasterPage {
+public class EURegistrationStatusViewModel extends BaseFront<EURegistrationStatusViewModel>{
 
     private static final long serialVersionUID = 1L;
     

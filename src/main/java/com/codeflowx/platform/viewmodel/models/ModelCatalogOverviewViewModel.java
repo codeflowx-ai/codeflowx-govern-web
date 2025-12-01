@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.models;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -52,145 +53,155 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ModelCatalogOverviewViewModel extends MasterPage {
+public class ModelCatalogOverviewViewModel extends BaseFront<ModelCatalogOverviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private ModelCatalogService modelCatalogService;
+    @WireVariable
+    private ModelCatalogMetricsSummaryService modelCatalogMetricsSummaryService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para Ssoractividad
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     // ========== Paginación ==========
     private PageParams pageParams;
     private PageResult<ModelCatalog> pageResult;
-    
+
     // ========== Filtros ==========
     private String searchTerm = "";
     private String statusFilter = "ALL";
     private String modtasktypeFilter = "ALL";
-    
+
     // ========== Datos ==========
     private List<ModelCatalog> filteredItems = new ArrayList<>();
-    
+
     // ========== Métricas globales ==========
     private int totalItems = 0;
     private long activeItems = 0L;
     private long pendingApproval = 0L;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         pageParams = PageParams.builder()
             .maxRows(20)
             .pageActual(1)
             .rowActual(0)
             .build();
-        
+
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void loadData() {
         try {
             log.debug("Cargando datos - Página: {}", pageParams.getPageActual());
-            
+
             Criterias criterias = buildCriterias();
-            
-            pageResult = businessService.findAllEntity(
-                ModelCatalog.class,
-                pageParams,
-                criterias
-            );
-            
+
+            pageResult = modelCatalogService.findAll(pageParams, criterias);
+
             if (pageResult != null && pageResult.getContent() != null) {
                 filteredItems = pageResult.getContent();
                 totalItems = pageResult.getTotalRows();
-                
+
                 loadGlobalMetrics();
-                
+
                 // Auditar búsqueda
-                logActivity("BUSCAR", "MODCATALOG", null, 
+                logActivity("BUSCAR", "MODCATALOG", null,
                     "Búsqueda: " + filteredItems.size() + " resultados (término: '" + searchTerm + "')");
-                
-                log.info("Cargados {} items de {} totales", 
+
+                log.info("Cargados {} items de {} totales",
                     filteredItems.size(), totalItems);
             } else {
                 filteredItems = new ArrayList<>();
                 totalItems = 0;
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar datos", e);
-            Messagebox.show("Error al cargar datos: " + e.getMessage(), 
+            Messagebox.show("Error al cargar datos: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            filteredItems = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar datos", e);
+            Messagebox.show("Error al cargar datos: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             filteredItems = new ArrayList<>();
         }
     }
-    
+
     private Criterias buildCriterias() {
         Criterias criterias = new Criterias();
-        
+
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.LIKE, "modmodelname");
             criteria.setValues(new Object[]{searchTerm.trim()});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(statusFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "status");
             criteria.setValues(new Object[]{statusFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         if (!"ALL".equals(modtasktypeFilter)) {
             Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modtasktype");
             criteria.setValues(new Object[]{modtasktypeFilter});
             criterias.addCriteria(criteria);
         }
-        
+
         return criterias;
     }
-    
+
     private void loadGlobalMetrics() {
         try {
             log.debug("Cargando métricas globales");
-            // TODO: Implementar carga de métricas desde vistas SQL cuando estén disponibles
-            // Ejemplo: List<ModelCatalogMetricsSummary> metrics = businessService.findAllView(ModelCatalogMetricsSummary.class);
-            log.debug("Métricas globales pendientes de implementación");
-        } catch (Exception e) {
+            List<ModelCatalogMetricsSummary> metrics = modelCatalogMetricsSummaryService.findAll();
+            if (metrics != null && !metrics.isEmpty()) {
+                ModelCatalogMetricsSummary summary = metrics.get(0);
+                // Procesar métricas si es necesario
+                log.debug("Métricas globales cargadas: {} registros", metrics.size());
+            }
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar métricas globales", e);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar métricas globales", e);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void applyFilters() {
@@ -198,7 +209,7 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void clearFilters() {
@@ -209,7 +220,7 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
         pageParams.setPageActual(1);
         loadData();
     }
-    
+
     @Command
     @NotifyChange("*")
     public void onPaging(@BindingParam("event") PagingEvent event) {
@@ -218,7 +229,7 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
         pageParams.setRowActual(pageIndex * pageParams.getMaxRows());
         loadData();
     }
-    
+
     @Command
     public void registerItem() {
         log.info("Navegando a creación");
@@ -226,7 +237,7 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
         params.put("action", Action.NEW);
         appendPage("plataforma/models/models-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     public void viewItemDetails(@BindingParam("itemId") Long itemId) {
         log.info("Navegando a detalle ID={}", itemId);
@@ -235,27 +246,31 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/models/models-detail.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     @Command
     @NotifyChange("*")
     public void deleteItem(@BindingParam("itemId") Long itemId) {
         try {
-            Messagebox.show("¿Está seguro de eliminar este registro?", 
-                "Confirmar eliminación", 
-                Messagebox.YES | Messagebox.NO, 
+            Messagebox.show("¿Está seguro de eliminar este registro?",
+                "Confirmar eliminación",
+                Messagebox.YES | Messagebox.NO,
                 Messagebox.QUESTION,
                 event -> {
                     if (Messagebox.ON_YES.equals(event.getName())) {
                         try {
-                            businessService.removeFromID(ModelCatalog.class, itemId);
+                            modelCatalogService.deleteById(itemId);
                             log.info("Registro eliminado: ID={}", itemId);
                             logActivity("BORRAR", "MODCATALOG", itemId, "Eliminado registro ID: " + itemId);
                             loadData();
-                            Messagebox.show("Registro eliminado correctamente", 
+                            Messagebox.show("Registro eliminado correctamente",
                                 "Éxito", Messagebox.OK, Messagebox.INFORMATION);
-                        } catch (Exception e) {
+                        } catch (GovernanceServiceException e) {
                             log.error("Error al eliminar ID={}", itemId, e);
-                            Messagebox.show("Error al eliminar: " + e.getMessage(), 
+                            Messagebox.show("Error al eliminar: " + e.getMessage(),
+                                "Error", Messagebox.OK, Messagebox.ERROR);
+                        } catch (Exception e) {
+                            log.error("Error inesperado al eliminar ID={}", itemId, e);
+                            Messagebox.show("Error al eliminar: " + e.getMessage(),
                                 "Error", Messagebox.OK, Messagebox.ERROR);
                         }
                     }
@@ -265,33 +280,16 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
             log.error("Error en diálogo de eliminación", e);
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el mo// No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -299,14 +297,14 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar lista filtrada
             if (filteredItems != null) {
                 filteredItems.clear();
                 filteredItems = null;
             }
-            
+
             // Limpiar PageResult
             if (pageResult != null) {
                 if (pageResult.getContent() != null) {
@@ -314,13 +312,15 @@ public class ModelCatalogOverviewViewModel extends MasterPage {
                 }
                 pageResult = null;
             }
-            
+
             // Limpiar PageParams
             pageParams = null;
-            
-            // Limpiar BusinessService
-            businessService = null;
-            
+
+            // Limpiar Servicios
+            modelCatalogService = null;
+            modelCatalogMetricsSummaryService = null;
+            businessService = null; // Mantener para Ssoractividad
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

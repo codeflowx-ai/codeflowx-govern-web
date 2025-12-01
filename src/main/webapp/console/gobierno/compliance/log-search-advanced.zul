@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zk xmlns="http://www.zkoss.org/2005/zul"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <window title="Búsqueda Avanzada de Logs"
+            border="normal"
+            width="100%"
+            height="100%"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.LogSearchViewModel')">
+
+        <vlayout spacing="10px" style="padding: 10px;">
+            <!-- Panel de Filtros -->
+            <groupbox title="Filtros de Búsqueda" collapsible="true" open="true">
+                <grid>
+                    <columns>
+                        <column width="200px"/>
+                        <column/>
+                        <column width="200px"/>
+                        <column/>
+                    </columns>
+                    <rows>
+                        <row>
+                            <cell>
+                                <label value="Tipo de Entidad:"/>
+                            </cell>
+                            <cell>
+                                <combobox model="@load(vm.availableEntityTypes)"
+                                         selectedItem="@bind(vm.criteria.entityType)"
+                                         placeholder="Todos"/>
+                            </cell>
+                            <cell>
+                                <label value="ID Entidad:"/>
+                            </cell>
+                            <cell>
+                                <longbox value="@bind(vm.criteria.entityId)"
+                                        placeholder="Opcional"/>
+                            </cell>
+                        </row>
+                        <row>
+                            <cell>
+                                <label value="Acción:"/>
+                            </cell>
+                            <cell>
+                                <combobox model="@load(vm.availableActions)"
+                                         selectedItem="@bind(vm.criteria.action)"
+                                         placeholder="Todas"/>
+                            </cell>
+                            <cell>
+                                <label value="Usuario ID:"/>
+                            </cell>
+                            <cell>
+                                <longbox value="@bind(vm.criteria.userId)"
+                                        placeholder="Opcional"/>
+                            </cell>
+                        </row>
+                        <row>
+                            <cell>
+                                <label value="Fecha Desde:"/>
+                            </cell>
+                            <cell>
+                                <datebox value="@bind(vm.criteria.dateFrom)"
+                                        format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="Opcional"/>
+                            </cell>
+                            <cell>
+                                <label value="Fecha Hasta:"/>
+                            </cell>
+                            <cell>
+                                <datebox value="@bind(vm.criteria.dateTo)"
+                                        format="yyyy-MM-dd HH:mm:ss"
+                                        placeholder="Opcional"/>
+                            </cell>
+                        </row>
+                        <row>
+                            <cell>
+                                <label value="Búsqueda de Texto:"/>
+                            </cell>
+                            <cell colspan="3">
+                                <textbox value="@bind(vm.criteria.textSearch)"
+                                        placeholder="Buscar en datos del log (JSON)"/>
+                            </cell>
+                        </row>
+                    </rows>
+                </grid>
+                <hlayout style="margin-top: 10px;">
+                    <button label="Buscar"
+                            onClick="@command('search')"
+                            style="font-weight: bold;"/>
+                    <button label="Limpiar Filtros"
+                            onClick="@command('clearFilters')"/>
+                    <button label="Exportar Resultados"
+                            onClick="@command('exportResults')"
+                            disabled="@load(empty vm.logs)"/>
+                </hlayout>
+            </groupbox>
+
+            <!-- Resultados -->
+            <groupbox title="Resultados de Búsqueda">
+                <vlayout>
+                    <!-- Información de paginación -->
+                    <hlayout style="margin-bottom: 10px;">
+                        <label value="@load(vm.pageInfo)"
+                               style="font-weight: bold;"/>
+                        <separator/>
+                        <button label="Anterior"
+                                onClick="@command('previousPage')"
+                                disabled="@load(not vm.hasPreviousPage)"/>
+                        <button label="Siguiente"
+                                onClick="@command('nextPage')"
+                                disabled="@load(not vm.hasNextPage)"/>
+                    </hlayout>
+
+                    <!-- Grid de resultados -->
+                    <grid model="@load(vm.logs)"
+                          emptyMessage="No hay resultados. Use los filtros para buscar logs."
+                          width="100%"
+                          height="400px">
+                        <columns>
+                            <column label="ID" width="80px"/>
+                            <column label="Timestamp" width="150px"/>
+                            <column label="Tipo Entidad" width="120px"/>
+                            <column label="ID Entidad" width="100px"/>
+                            <column label="Acción" width="150px"/>
+                            <column label="Usuario ID" width="100px"/>
+                            <column label="Hash" width="200px"/>
+                        </columns>
+                        <template name="model">
+                            <row>
+                                <label value="@load(each.idximmutablelog)"/>
+                                <label value="@load(each.imltimestamp)"/>
+                                <label value="@load(each.imlentitytype)"/>
+                                <label value="@load(each.imlentityid)"/>
+                                <label value="@load(each.imlaction)"/>
+                                <label value="@load(each.imluserid)"/>
+                                <label value="@load(each.imlcurrenthash)"
+                                       style="font-family: monospace; font-size: 10px;"/>
+                            </row>
+                        </template>
+                    </grid>
+                </vlayout>
+            </groupbox>
+        </vlayout>
+    </window>
+</zk>

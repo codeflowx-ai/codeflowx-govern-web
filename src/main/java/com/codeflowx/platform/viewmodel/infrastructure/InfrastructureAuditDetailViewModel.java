@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.infrastructure;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -10,7 +11,6 @@ import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.web.annotation.Action;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -54,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class InfrastructureAuditDetailViewModel extends MasterPage {
+public class InfrastructureAuditDetailViewModel extends BaseFront<InfrastructureAuditDetailViewModel>{
 
     @WireVariable
     private BusinessService businessService;
@@ -303,24 +303,7 @@ public class InfrastructureAuditDetailViewModel extends MasterPage {
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado     // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
 

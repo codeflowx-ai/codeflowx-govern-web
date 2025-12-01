@@ -1,0 +1,261 @@
+<?component name="includeHTML" extends="include" class="org.enartframework.zk.utils.IncludeHTML"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c"?>
+<zk xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul/zul.xsd"
+	xmlns:h="xhtml"
+	xmlns:d="http://www.zkoss.org/2005/zk/client/attribute">
+
+	<!-- ViewModel binding -->
+	<idspace
+		viewModel="@id('vm') @init('com.codeflowx.govern.viewmodel.compliance.PostMarketMonitoringDashboardViewModel')"
+		validationMessages="@id('vmsgs')">
+
+		<div class="row" style="background-color:;">
+			<div>
+				<!-- Título pantalla -->
+				<div class="left tittle-principal">
+					<h:h2 class="mb-sm-0">
+						<h:i class="fa-sharp-duotone fa-solid fa-chart-line me-2"></h:i>
+						Dashboard Post-Market Monitoring
+					</h:h2>
+					<h:p class="text-muted">
+						Monitoreo continuo de sistemas de IA según EU AI Act Art. 72
+					</h:p>
+				</div>
+			</div>
+
+			<!-- Filtros -->
+			<div class="col-lg-12 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Filtros</h:h5>
+					</div>
+					<div class="card-body">
+						<div class="row g-3">
+							<div class="col-md-4">
+								<label class="form-label">Proyecto</label>
+								<combobox
+									selectedItem="@bind(vm.selectedProjectId)"
+									class="form-control"
+									placeholder="Todos los proyectos">
+									<!-- TODO: Cargar lista de proyectos -->
+								</combobox>
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">Tipo de Métrica</label>
+								<combobox
+									selectedItem="@bind(vm.selectedMetricType)"
+									class="form-control"
+									placeholder="Todas las métricas">
+									<comboitem label="Performance" value="PERFORMANCE" />
+									<comboitem label="Drift" value="DRIFT" />
+									<comboitem label="Bias" value="BIAS" />
+									<comboitem label="Accuracy" value="ACCURACY" />
+									<comboitem label="Latency" value="LATENCY" />
+								</combobox>
+							</div>
+							<div class="col-md-4">
+								<label class="form-label">&nbsp;</label>
+								<div class="hstack gap-2">
+									<button
+										label="Aplicar Filtros"
+										onClick="@command('applyFilters')"
+										class="btn btn-primary" />
+									<button
+										label="Limpiar"
+										onClick="@command('clearFilters')"
+										class="btn btn-secondary" />
+									<button
+										label="Refrescar"
+										onClick="@command('loadDashboard')"
+										class="btn btn-outline-primary" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- KPIs -->
+			<div class="col-lg-12 s-bot">
+				<div class="row g-3">
+					<div class="col-md-3">
+						<div class="card border-primary">
+							<div class="card-body">
+								<div class="d-flex align-items-center">
+									<div class="flex-grow-1">
+										<h:h5 class="text-muted mb-0">Planes Activos</h:h5>
+										<h:h2 class="mt-2 mb-0">@load(vm.activePlansCount)</h:h2>
+									</div>
+									<div class="flex-shrink-0">
+										<h:i class="fa-solid fa-clipboard-list fa-2x text-primary"></h:i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card border-warning">
+							<div class="card-body">
+								<div class="d-flex align-items-center">
+									<div class="flex-grow-1">
+										<h:h5 class="text-muted mb-0">Incidentes Recientes</h:h5>
+										<h:h2 class="mt-2 mb-0">@load(vm.recentIncidentsCount)</h:h2>
+									</div>
+									<div class="flex-shrink-0">
+										<h:i class="fa-solid fa-triangle-exclamation fa-2x text-warning"></h:i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card border-danger">
+							<div class="card-body">
+								<div class="d-flex align-items-center">
+									<div class="flex-grow-1">
+										<h:h5 class="text-muted mb-0">Alertas Activas</h:h5>
+										<h:h2 class="mt-2 mb-0">@load(vm.activeAlertsCount)</h:h2>
+									</div>
+									<div class="flex-shrink-0">
+										<h:i class="fa-solid fa-bell fa-2x text-danger"></h:i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="card border-success">
+							<div class="card-body">
+								<div class="d-flex align-items-center">
+									<div class="flex-grow-1">
+										<h:h5 class="text-muted mb-0">Informes Generados</h:h5>
+										<h:h2 class="mt-2 mb-0">@load(vm.recentReportsCount)</h:h2>
+									</div>
+									<div class="flex-shrink-0">
+										<h:i class="fa-solid fa-file-chart-line fa-2x text-success"></h:i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Tabla de Alertas Activas -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Alertas Activas</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@bind(vm.activeAlerts)" mold="paging" pageSize="10" width="100%">
+							<listhead>
+								<listheader label="Métrica" width="25%" />
+								<listheader label="Tipo" width="15%" />
+								<listheader label="Warning" width="15%" />
+								<listheader label="Critical" width="15%" />
+								<listheader label="Severidad" width="15%" />
+								<listheader label="Estado" width="15%" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.altmetricname)" />
+									<listcell label="@load(each.altmetrictype)" />
+									<listcell label="@load(each.altwarningthreshold)" />
+									<listcell label="@load(each.altcriticalthreshold)" />
+									<listcell label="@load(each.altseverity)" />
+									<listcell label="@load(each.altstatus)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Lista de Incidentes Recientes -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Incidentes Recientes</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@bind(vm.recentIncidents)" mold="paging" pageSize="10" width="100%">
+							<listhead>
+								<listheader label="Título" width="40%" />
+								<listheader label="Severidad" width="15%" />
+								<listheader label="Estado" width="15%" />
+								<listheader label="Tipo" width="20%" />
+								<listheader label="Fecha" width="10%" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.incincidenttitle)" />
+									<listcell label="@load(each.incseverity)" />
+									<listcell label="@load(each.incstatus)" />
+									<listcell label="@load(each.incincidenttype)" />
+									<listcell label="@load(each.incdetectedat)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Planes PMM Activos -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Planes PMM Activos</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@bind(vm.activePlans)" mold="paging" pageSize="10" width="100%">
+							<listhead>
+								<listheader label="Plan" width="40%" />
+								<listheader label="Frecuencia" width="20%" />
+								<listheader label="Estado" width="15%" />
+								<listheader label="Último Monitoreo" width="25%" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.pmmplanname)" />
+									<listcell label="@load(each.pmmfrequency)" />
+									<listcell label="@load(each.pmmstatus)" />
+									<listcell label="@load(each.pmmlastmonitoringdate)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+			<!-- Informes Recientes -->
+			<div class="col-lg-6 s-bot">
+				<div class="card">
+					<div class="card-header">
+						<h:h5 class="card-title mb-0">Informes Recientes</h:h5>
+					</div>
+					<div class="card-body">
+						<listbox model="@bind(vm.recentReports)" mold="paging" pageSize="10" width="100%">
+							<listhead>
+								<listheader label="Nombre" width="40%" />
+								<listheader label="Tipo" width="20%" />
+								<listheader label="Fecha" width="20%" />
+								<listheader label="Estado" width="20%" />
+							</listhead>
+							<template name="model">
+								<listitem>
+									<listcell label="@load(each.psrreportname)" />
+									<listcell label="@load(each.psrreporttype)" />
+									<listcell label="@load(each.psrreportdate)" />
+									<listcell label="@load(each.psrstatus)" />
+								</listitem>
+							</template>
+						</listbox>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</idspace>
+</zk>

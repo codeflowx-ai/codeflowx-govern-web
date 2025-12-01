@@ -10,7 +10,7 @@ import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 import org.enartframework.nocode.dao.IEntityLocal;
 import org.enartframework.web.annotation.Action;
-import org.enartframework.web.zk.page.MasterPage;
+import com.codeflowx.framework.zkoss.BaseFront;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -33,6 +33,11 @@ import com.codeflowx.govern.entity.models.ModelCatalog;
 import com.codeflowx.govern.entity.models.ModelCapability;
 import com.codeflowx.govern.entity.models.ModelEndpoint;
 import com.codeflowx.govern.entity.models.ModelUsage;
+import com.codeflowx.govern.service.models.ModelCatalogService;
+import com.codeflowx.govern.service.models.ModelCapabilityService;
+import com.codeflowx.govern.service.models.ModelEndpointService;
+import com.codeflowx.govern.service.models.ModelUsageService;
+import com.codeflowx.govern.service.exception.GovernanceServiceException;
 import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import codeflowx.nocode.persist.BusinessService;
@@ -55,61 +60,69 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class ModelCatalogDetailViewModel extends MasterPage {
-    
+public class ModelCatalogDetailViewModel extends BaseFront<ModelCatalogDetailViewModel> {
+
     @WireVariable
-    private BusinessService businessService;
-    
+    private ModelCatalogService modelCatalogService;
+    @WireVariable
+    private ModelCapabilityService modelCapabilityService;
+    @WireVariable
+    private ModelEndpointService modelEndpointService;
+    @WireVariable
+    private ModelUsageService modelUsageService;
+    @WireVariable
+    private BusinessService businessService; // Mantener para Ssoractividad y UniqueValidator
+
     @Autowired
     protected IEntityLocal dao;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     @WireVariable("APPLICATION_DS")
     protected DataSource ds;
-    
+
     protected void initDao() {
         if (businessService == null) {
             businessService = new BusinessService((DataSource) environment.getProperty("APPLICATION_DS", DataSource.class));
         }
     }
-    
+
     @Override
     public void setBeans(Object bean) {
         // Auto-generated method stub
     }
-    
+
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
-    
+
     // ========== Modo de operación ==========
     private String mode;
     private Long idxmodelcatalog;
     private boolean editing = false;
     private String pageTitle = "Detalle";
-    
+
     // ========== Datos ==========
     private ModelCatalog currentModelCatalog;
-    
+
     // ========== Validadores ==========
     private UniqueValidator unique;
-    
+
     private String originalModmodelname = null;
     private String originalModdisplayname = null;
-    
+
     // ========== Listas para combos (FK) ==========
     private List<String> availableModstatuss = new ArrayList<>();
     private List<String> availableModlicensetypes = new ArrayList<>();
-    
+
     // ========== Tags/Roles JSONB (selección múltiple con chips) ==========
-    
+
     // ========== Colecciones descendientes (tabs con lazy loading) ==========
     private List<ModelCapability> submodcapabilities = new ArrayList<>();
     private List<ModelEndpoint> submodendpoints = new ArrayList<>();
@@ -117,40 +130,40 @@ public class ModelCatalogDetailViewModel extends MasterPage {
     private boolean submodcapabilitiesLoaded = false;
     private boolean submodendpointsLoaded = false;
     private boolean submodusageLoaded = false;
-    
+
     @AfterCompose
     public void afterCompose(@ContextParam(ContextType.VIEW) Component view) throws Exception {
         Selectors.wireComponents(view, this, false);
         super.doAfterCompose(view);
         initDao();
-        
+
         // Obtener parámetros de navegación - con protección para action null
 
-        
+
         if (super.action != null) {
 
-        
+
             mode = super.action.name();
 
-        
+
         } else {
 
-        
+
             mode = (dataParam != null) ? "LOAD" : "NEW";
 
-        
+
             log.warn("Action es null, infiriendo modo: {}", mode);
 
-        
+
         }
-        
+
         // dataParam siempre contiene el ID (PK de tipo Long)
         if (dataParam != null) {
             idxmodelcatalog = Long.valueOf(String.valueOf(dataParam));
         }
-        
+
         log.info("Inicializando ModelCatalogDetailViewModel - mode: {}, idxmodelcatalog: {}", mode, idxmodelcatalog);
-        
+
         if ("NEW".equals(mode)) {
             initNew();
         } else if ("LOAD".equals(mode) && idxmodelcatalog != null) {
@@ -161,11 +174,11 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             params.put("action", Action.LOAD);
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
         }
-        
+
         // Inicializar validador de unicidad
         unique = new UniqueValidator(currentModelCatalog, businessService);
     }
-    
+
     private void initNew() {
         log.debug("Inicializando nuevo registro");
         currentModelCatalog = new ModelCatalog();
@@ -174,40 +187,47 @@ public class ModelCatalogDetailViewModel extends MasterPage {
         loadModstatuss();
         loadModlicensetypes();
     }
-    
+
     private void loadItem(Long id) {
         try {
             log.debug("Cargando registro ID={}", id);
-            
+
             // findById siempre recibe Long id (el PK)
-            currentModelCatalog = businessService.findById(ModelCatalog.class, id);
-            
+            currentModelCatalog = modelCatalogService.findById(id);
+
             if (currentModelCatalog == null) {
                 log.error("Registro no encontrado: ID={}", id);
-                Messagebox.show("Registro no encontrado", "Error", 
+                Messagebox.show("Registro no encontrado", "Error",
                     Messagebox.OK, Messagebox.ERROR);
                 Map<String, Object> params = new HashMap<>();
                 params.put("action", Action.LOAD);
                 appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
                 return;
             }
-            
+
             editing = true;
             pageTitle = "Editar: " + currentModelCatalog.getModmodelname();
         loadModstatuss();
         loadModlicensetypes();
-            
+
             // Cargar tags/roles existentes desde JSON
-            
+
             // Guardar valores originales para validación de unicidad
             originalModmodelname = currentModelCatalog.getModmodelname();
             originalModdisplayname = currentModelCatalog.getModdisplayname();
-            
+
             // Auditar carga de registro
             logActivity("CONSULTA", "MODCATALOG", id, "Consulta: " + currentModelCatalog.getModmodelname());
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar registro ID={}", id, e);
+            Messagebox.show("Error al cargar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+            Map<String, Object> params = new HashMap<>();
+            params.put("action", Action.LOAD);
+            appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar registro ID={}", id, e);
             Messagebox.show("Error al cargar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
             Map<String, Object> params = new HashMap<>();
@@ -215,55 +235,59 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
         }
     }
-    
+
     @Command
     @NotifyChange("*")
     public void saveItem() {
         try {
             log.info("Guardando registro");
-            
+
             // Validar campos obligatorios
             if (!validateRequiredFields()) {
                 return;
             }
-            
+
             boolean isNew = currentModelCatalog.getIdxmodelcatalog() == null;
-            
+
             if (isNew) {
-                businessService.save(currentModelCatalog);
+                currentModelCatalog = modelCatalogService.create(currentModelCatalog);
                 log.info("Registro creado exitosamente");
-                logActivity("CREACION", "MODCATALOG", currentModelCatalog.getIdxmodelcatalog(), 
+                logActivity("CREACION", "MODCATALOG", currentModelCatalog.getIdxmodelcatalog(),
                     "Creado: " + currentModelCatalog.getModmodelname());
                 Messagebox.show("Registro creado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             } else {
-                businessService.update(currentModelCatalog);
+                currentModelCatalog = modelCatalogService.update(currentModelCatalog);
                 log.info("Registro actualizado exitosamente");
-                logActivity("EDICION", "MODCATALOG", currentModelCatalog.getIdxmodelcatalog(), 
+                logActivity("EDICION", "MODCATALOG", currentModelCatalog.getIdxmodelcatalog(),
                     "Actualizado: " + currentModelCatalog.getModmodelname());
                 Messagebox.show("Registro actualizado exitosamente",
                     "Éxito", Messagebox.OK, Messagebox.INFORMATION);
             }
-            
+
             // Regresar al overview
             Map<String, Object> params = new HashMap<>();
             params.put("action", Action.LOAD);
             appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
-            
-        } catch (Exception e) {
+
+        } catch (GovernanceServiceException e) {
             log.error("Error al guardar", e);
+            Messagebox.show("Error al guardar: " + e.getMessage(),
+                "Error", Messagebox.OK, Messagebox.ERROR);
+        } catch (Exception e) {
+            log.error("Error inesperado al guardar", e);
             Messagebox.show("Error al guardar: " + e.getMessage(),
                 "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
-    
+
     /**
      * Valida que todos los campos obligatorios estén completos
      * @return true si la validación es exitosa
      */
     private boolean validateRequiredFields() {
         StringBuilder errors = new StringBuilder();
-        
+
         if (currentModelCatalog.getModmodelname() == null || currentModelCatalog.getModmodelname().trim().isEmpty()) {
             errors.append("- Model Name\n");
         }
@@ -288,16 +312,16 @@ public class ModelCatalogDetailViewModel extends MasterPage {
         if (currentModelCatalog.getModcreatedat() == null) {
             errors.append("- Created At\n");
         }
-        
+
         if (errors.length() > 0) {
             Messagebox.show("Por favor complete los siguientes campos:\n" + errors.toString(),
                 "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Command
     public void cancelEdit() {
         log.debug("Cancelando edición");
@@ -306,21 +330,21 @@ public class ModelCatalogDetailViewModel extends MasterPage {
         params.put("action", Action.LOAD);
         appendPage("plataforma/models/models-overview.zul", page.getFellow(IDDESKTOP), params);
     }
-    
+
     private void loadModstatuss() {
         // TODO: Cargar valores desde configuración o BD
         availableModstatuss.add("OPTION_1");
         availableModstatuss.add("OPTION_2");
         availableModstatuss.add("OPTION_3");
     }
-    
+
     private void loadModlicensetypes() {
         // TODO: Cargar valores desde configuración o BD
         availableModlicensetypes.add("OPTION_1");
         availableModlicensetypes.add("OPTION_2");
         availableModlicensetypes.add("OPTION_3");
     }
-    
+
     private void loadSubmodcapabilities() {
         try {
             if (currentModelCatalog != null && currentModelCatalog.getIdxmodelcatalog() != null) {
@@ -328,14 +352,14 @@ public class ModelCatalogDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modelCatalog");
                 criteria.setValues(new Object[]{currentModelCatalog.getIdxmodelcatalog()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
+
                 PageResult<ModelCapability> result = businessService.findAllEntity(ModelCapability.class, collectionParams, criterias);
                 submodcapabilities = result != null ? result.getContent() : new ArrayList<>();
                 submodcapabilitiesLoaded = true;
@@ -346,7 +370,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             submodcapabilities = new ArrayList<>();
         }
     }
-    
+
     private void loadSubmodendpoints() {
         try {
             if (currentModelCatalog != null && currentModelCatalog.getIdxmodelcatalog() != null) {
@@ -354,25 +378,28 @@ public class ModelCatalogDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modelCatalog");
                 criteria.setValues(new Object[]{currentModelCatalog.getIdxmodelcatalog()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ModelEndpoint> result = businessService.findAllEntity(ModelEndpoint.class, collectionParams, criterias);
+
+                PageResult<ModelEndpoint> result = modelEndpointService.findAll(collectionParams, criterias);
                 submodendpoints = result != null ? result.getContent() : new ArrayList<>();
                 submodendpointsLoaded = true;
                 log.debug("Cargados {} submodendpoints", submodendpoints.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar submodendpoints", e);
+            submodendpoints = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar submodendpoints", e);
             submodendpoints = new ArrayList<>();
         }
     }
-    
+
     private void loadSubmodusage() {
         try {
             if (currentModelCatalog != null && currentModelCatalog.getIdxmodelcatalog() != null) {
@@ -380,25 +407,28 @@ public class ModelCatalogDetailViewModel extends MasterPage {
                 Criteria criteria = new Criteria(Operation.AND, Evaluation.EQUALS, "modelCatalog");
                 criteria.setValues(new Object[]{currentModelCatalog.getIdxmodelcatalog()});
                 criterias.addCriteria(criteria);
-                
+
                 // PageParams para colecciones (sin límite de paginación)
                 PageParams collectionParams = PageParams.builder()
                     .maxRows(1000)
                     .pageActual(1)
                     .rowActual(0)
                     .build();
-                
-                PageResult<ModelUsage> result = businessService.findAllEntity(ModelUsage.class, collectionParams, criterias);
+
+                PageResult<ModelUsage> result = modelUsageService.findAll(collectionParams, criterias);
                 submodusage = result != null ? result.getContent() : new ArrayList<>();
                 submodusageLoaded = true;
                 log.debug("Cargados {} submodusage", submodusage.size());
             }
-        } catch (Exception e) {
+        } catch (GovernanceServiceException e) {
             log.error("Error al cargar submodusage", e);
+            submodusage = new ArrayList<>();
+        } catch (Exception e) {
+            log.error("Error inesperado al cargar submodusage", e);
             submodusage = new ArrayList<>();
         }
     }
-    
+
     @Command
     @NotifyChange("submodcapabilities")
     public void onSelectSubmodcapabilitiesTab() {
@@ -406,7 +436,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             loadSubmodcapabilities();
         }
     }
-    
+
     @Command
     @NotifyChange("submodendpoints")
     public void onSelectSubmodendpointsTab() {
@@ -414,7 +444,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             loadSubmodendpoints();
         }
     }
-    
+
     @Command
     @NotifyChange("submodusage")
     public void onSelectSubmodusageTab() {
@@ -422,7 +452,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             loadSubmodusage();
         }
     }
-    
+
     /**
      * audita las acciones de un usuario
      * @param action - buscar, edicion ,borrar,creacion ...
@@ -448,7 +478,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
             // No lanzar excepción para que no interrumpa el flujo normal
         }
     }
-    
+
     /**
      * Libera recursos y limpia referencias para ayudar al GC
      * Se llama automáticamente cuando el ViewModel se destruye
@@ -456,13 +486,13 @@ public class ModelCatalogDetailViewModel extends MasterPage {
     @Destroy
     public void destroy() {
         log.debug("[Destroy] Liberando recursos del ViewModel {}", this.getClass().getSimpleName());
-        
+
         try {
             // Limpiar entidad actual
             currentModelCatalog = null;
-            
+
             // Limpiar listas de FK
-            
+
             // Limpiar listas de LIST_STRING
             if (availableModstatuss != null) {
                 availableModstatuss.clear();
@@ -472,7 +502,7 @@ public class ModelCatalogDetailViewModel extends MasterPage {
                 availableModlicensetypes.clear();
                 availableModlicensetypes = null;
             }
-            
+
             // Limpiar colecciones @OneToMany
             if (submodcapabilities != null) {
                 submodcapabilities.clear();
@@ -489,15 +519,19 @@ public class ModelCatalogDetailViewModel extends MasterPage {
                 submodusage = null;
             }
             submodusageLoaded = false;
-            
+
             // Limpiar tags/roles JSONB
-            
+
             // Limpiar validadores
             unique = null;
-            
-            // Limpiar BusinessService
-            businessService = null;
-            
+
+            // Limpiar Servicios
+            modelCatalogService = null;
+            modelCapabilityService = null;
+            modelEndpointService = null;
+            modelUsageService = null;
+            businessService = null; // Mantener para Ssoractividad y UniqueValidator
+
             log.debug("[Destroy] Recursos liberados correctamente");
         } catch (Exception e) {
             log.warn("[Destroy] Error al liberar recursos: {}", e.getMessage());

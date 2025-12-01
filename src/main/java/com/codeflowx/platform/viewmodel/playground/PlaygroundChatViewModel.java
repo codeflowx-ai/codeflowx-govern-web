@@ -34,34 +34,34 @@ import lombok.extern.slf4j.Slf4j;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 @Slf4j
-public class PlaygroundChatViewModel extends BaseFront {
+public class PlaygroundChatViewModel extends BaseFront<PlaygroundChatViewModel> {
 
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private AgentService agentService;
-    
+
     @WireVariable
     private PlaygroundSessionService playgroundSessionService;
-    
+
     @WireVariable
     private PlaygroundChatService playgroundChatService;
 
     private Long sessionId;
     private PlaygroundSession currentSession;
     private List<PlaygroundChat> messages = new ArrayList<>();
-    
+
     private String currentPrompt = "";
     private Model selectedModel;
     private Agent selectedAgent;
     private BigDecimal temperature = new BigDecimal("1.0");
     private Integer maxTokens = 4096;
     private String systemPrompt = "Eres un asistente útil, preciso y profesional.";
-    
+
     private List<Model> availableModels = new ArrayList<>();
     private List<Agent> availableAgents = new ArrayList<>();
-    
+
     // Session stats
     private Integer messageCount = 0;
     private Long tokensUsed = 0L;
@@ -69,7 +69,7 @@ public class PlaygroundChatViewModel extends BaseFront {
 
     @Init(superclass = true)
     public void init() {
-        logActivity("PLAYGROUND_CHAT", "ACCESS", null, "Usuario accedió al Chat Playground");
+        logActivity("ACCESS", "PLAYGROUND_CHAT", null, "Usuario accedió al Chat Playground");
         loadAvailableModels();
         loadAvailableAgents();
         loadOrCreateSession();
@@ -83,14 +83,14 @@ public class PlaygroundChatViewModel extends BaseFront {
 
     @Destroy
     public void destroy() {
-        logActivity("PLAYGROUND_CHAT", "LEAVE", null, "Usuario salió del Chat Playground");
+        logActivity("LEAVE", "PLAYGROUND_CHAT", null, "Usuario salió del Chat Playground");
     }
 
     private void loadAvailableModels() {
         try {
             Criterias criterias = new Criterias();
             criterias.addCriteria(  "modelstatus", Operation.EQUAL, "ACTIVE", Evaluation.STRING);
-            
+
             availableModels = modelService.findAll(criterias);
         } catch (GovernanceServiceException e) {
             log.error("Error loading models", e);
@@ -112,7 +112,7 @@ public class PlaygroundChatViewModel extends BaseFront {
             if (sessionId != null) {
                 currentSession = playgroundSessionService.findById(sessionId);
             }
-            
+
             if (currentSession == null) {
                 currentSession = new PlaygroundSession();
                 currentSession.setSessionname("Chat Session - " + new Timestamp(System.currentTimeMillis()));
@@ -127,7 +127,7 @@ public class PlaygroundChatViewModel extends BaseFront {
             }
         } catch (GovernanceServiceException e) {
             log.error("Error loading/creating session", e);
-            Messagebox.show("Error al cargar la sesión: " + e.getMessage(), 
+            Messagebox.show("Error al cargar la sesión: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -150,7 +150,7 @@ public class PlaygroundChatViewModel extends BaseFront {
             Messagebox.show("Por favor selecciona un modelo", "Validación", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             // Create user message
             PlaygroundChat userMessage = new PlaygroundChat();
@@ -166,7 +166,7 @@ public class PlaygroundChatViewModel extends BaseFront {
             userMessage.setChatcreatedby(getUserName());
             userMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
             userMessage = playgroundChatService.create(userMessage);
-            
+
             // Simulate assistant response (in production, call AI service)
             PlaygroundChat assistantMessage = new PlaygroundChat();
             assistantMessage.setSession(currentSession);
@@ -186,22 +186,22 @@ public class PlaygroundChatViewModel extends BaseFront {
             assistantMessage.setChatcreatedby("SYSTEM");
             assistantMessage.setChatcreatedat(new Timestamp(System.currentTimeMillis()));
             assistantMessage = playgroundChatService.create(assistantMessage);
-            
+
             // Update session
             currentSession.setMessagecount(currentSession.getMessagecount() + 2);
             currentSession.setTokensused(currentSession.getTokensused() + userMessage.getChattokensused() + assistantMessage.getChattokensused());
             currentSession.setCost(currentSession.getCost().add(assistantMessage.getChatcost()));
             currentSession.setSessionlastaccessat(new Timestamp(System.currentTimeMillis()));
             currentSession = playgroundSessionService.update(currentSession);
-            
+
             loadMessages();
             currentPrompt = "";
-            
-            logActivity("PLAYGROUND_CHAT", "SEND_MESSAGE", "Mensaje enviado en sesión: " + currentSession.getIdxplaygroundsession());
-            
+
+            logActivity("SEND_MESSAGE", "PLAYGROUND_CHAT", currentSession.getIdxplaygroundsession(), "Mensaje enviado en sesión");
+
         } catch (GovernanceServiceException e) {
             log.error("Error sending message", e);
-            Messagebox.show("Error al enviar el mensaje: " + e.getMessage(), 
+            Messagebox.show("Error al enviar el mensaje: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
@@ -220,24 +220,24 @@ public class PlaygroundChatViewModel extends BaseFront {
             currentSession.setTokensused(0L);
             currentSession.setCost(BigDecimal.ZERO);
             currentSession = playgroundSessionService.create(currentSession);
-            
+
             messages.clear();
             currentPrompt = "";
             updateSessionStats();
-            
-            logActivity("PLAYGROUND_CHAT", "NEW_CONVERSATION", null, "Nueva conversación creada");
-            
+
+            logActivity("NEW_CONVERSATION", "PLAYGROUND_CHAT", null, "Nueva conversación creada");
+
             Messagebox.show("Nueva conversación iniciada", "Éxito", Messagebox.OK, Messagebox.INFORMATION);
         } catch (GovernanceServiceException e) {
             log.error("Error creating new conversation", e);
-            Messagebox.show("Error al crear nueva conversación: " + e.getMessage(), 
+            Messagebox.show("Error al crear nueva conversación: " + e.getMessage(),
                           "Error", Messagebox.OK, Messagebox.ERROR);
         }
     }
 
     @Command
     public void showConfig() {
-        logActivity("PLAYGROUND_CHAT", "SHOW_CONFIG", null, "Mostrando configuración");
+        logActivity("SHOW_CONFIG", "PLAYGROUND_CHAT", null, "Mostrando configuración");
         // Show config dialog
     }
 

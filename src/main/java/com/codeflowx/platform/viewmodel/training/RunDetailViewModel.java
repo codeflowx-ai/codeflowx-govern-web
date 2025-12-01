@@ -1,4 +1,5 @@
 package com.codeflowx.platform.viewmodel.training;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,10 +9,8 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.orm.exception.DaoException;
 import org.enartframework.suinsit.Context;
 import org.enartframework.web.annotation.Action;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -23,14 +22,12 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.Destroy;
 import org.zkoss.bind.annotation.NotifyChange;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.UiException;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zkplus.spring.DelegatingVariableResolver;
 import org.zkoss.zul.Messagebox;
 
-import com.codeflowx.admin.Ssoractividad;
 import com.codeflowx.framework.validators.UniqueValidator;
 import com.codeflowx.govern.entity.training.Checkpoint;
 import com.codeflowx.govern.entity.training.HPOTrial;
@@ -62,7 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class RunDetailViewModel extends MasterPage {
+public class RunDetailViewModel extends BaseFront<RunDetailViewModel>{
 
     @WireVariable
     private RunService runService;
@@ -841,24 +838,7 @@ public class RunDetailViewModel extends MasterPage {
      * @param action - buscar, edicion ,borrar,creacion ...
      * @param model - nombre del modulo/tabla
      * @param pk  - clave primaria del registro
-     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXX
-     * @throws DaoException
-     * @throws UiException
-     */
-    private void logActivity(String action, String model, Long pk, String mensaje) throws DaoException, UiException {
-        try {
-            Ssoractividad log = new Ssoractividad();
-            log.setUsername(getUser().getUsername());
-            log.setAccion(action);
-            log.setAlta(new java.sql.Timestamp(System.currentTimeMillis()));
-            log.setModulo(model);
-            log.setIdtupla(pk != null ? pk.intValue() : 0);
-            log.setAplicacion(ctxBean.getApplicationName());
-            log.setValuetupla(mensaje);
-            businessService.save(log);
-        } catch (Exception e) {
-            log.error("Error al auditar acción: {} en módulo: {}", action, model, e);
-            // No lanzar excepción para que no interrumpa el flujo normal
+     * @param mensaje  -- mensaje aclaratorio, ejemplo ha creado el modelo XXXXr excepción para que no interrumpa el flujo normal
         }
     }
 

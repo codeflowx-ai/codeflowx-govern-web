@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.compliance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -56,7 +57,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class FriaWizardViewModel extends MasterPage {
+public class FriaWizardViewModel extends BaseFront<FriaWizardViewModel>{
 
     private static final long serialVersionUID = 1L;
     

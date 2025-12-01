@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.incident;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import javax.sql.DataSource;
 
@@ -31,51 +32,50 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
 @Init(superclass = true)
-public class DocumentIncidentDetailsViewModel extends MasterPage {
+public class DocumentIncidentDetailsViewModel extends BaseFront<DocumentIncidentDetailsViewModel>{
 
     private static final long serialVersionUID = 1L;
-    
+
     @WireVariable
     private ModelService modelService;
-    
+
     @WireVariable
     private TaskService taskService;
-    
+
     @WireVariable
     public Environment environment;
-    
+
     @WireVariable("context")
     protected GenericApplicationContext contexto;
-    
+
     @WireVariable("ctxBean")
     protected Context ctxBean;
-    
+
     protected void initDao() {
         // Ya no es necesario inicializar BusinessService manualmente
         // El Service se inyecta automáticamente mediante @WireVariable
     }
-    }
-    
+
     @Override
     public void setBeans(Object bean) {}
 
     private String taskId;
     private String severity = "";
     private Integer affectedUsersCount = 0;
-    
+
     // Formulario documentación
     private String incidentTitle = "";
     private String detailedDescription = "";
     private String impactAssessment = "";
     private String initialActions = "";
     private String potentialRisks = "";
-    
+
     @Init
     public void init(@QueryParam("taskId") String taskId) {
         this.taskId = taskId;
         loadTaskData();
     }
-    
+
     private void loadTaskData() {
         try {
             if (taskService != null && taskId != null) {
@@ -90,12 +90,12 @@ public class DocumentIncidentDetailsViewModel extends MasterPage {
     @NotifyChange("*")
     public void submitDocumentation() {
         log.info("Submitting incident documentation - taskId: {}", taskId);
-        
+
         if (incidentTitle.trim().isEmpty() || detailedDescription.trim().isEmpty()) {
             Messagebox.show("Please fill all required fields", "Validation", Messagebox.OK, Messagebox.EXCLAMATION);
             return;
         }
-        
+
         try {
             if (taskService != null && taskId != null) {
                 java.util.Map<String, Object> variables = new java.util.HashMap<>();
@@ -106,9 +106,9 @@ public class DocumentIncidentDetailsViewModel extends MasterPage {
                 variables.put("potentialRisks", potentialRisks);
                 variables.put("documentedBy", ctxBean.getUser().getUsuname());
                 variables.put("documentationDate", System.currentTimeMillis());
-                
+
                 taskService.complete(taskId, variables);
-                
+
                 Messagebox.show("Incident documented successfully", "Success", Messagebox.OK, Messagebox.INFORMATION);
             }
         } catch (Exception e) {
@@ -117,4 +117,3 @@ public class DocumentIncidentDetailsViewModel extends MasterPage {
         }
     }
 }
-

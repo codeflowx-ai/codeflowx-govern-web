@@ -1,4 +1,5 @@
 package com.codeflowx.govern.viewmodel.governance;
+import com.codeflowx.framework.zkoss.BaseFront;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -9,7 +10,6 @@ import java.util.Map;
 import org.enartframework.suinsit.Context;
 import javax.sql.DataSource;
 import org.enartframework.nocode.dao.IEntityLocal;
-import org.enartframework.web.zk.page.MasterPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.env.Environment;
@@ -51,7 +51,7 @@ import com.codeflowx.govern.service.governance.PolicyService;
 @Getter
 @Setter
 @VariableResolver(DelegatingVariableResolver.class)
-public class GovernanceOverviewViewModel extends MasterPage {
+public class GovernanceOverviewViewModel extends BaseFront<GovernanceOverviewViewModel>{
 
     private static final long serialVersionUID = 1L;
     private static final String IDDESKTOP = "contenedor";
