@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/DI"
+             targetNamespace="http://codeflowx.com/govern/iso38507/board-decision"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso38507BoardDecisionV1"
+           name="ISO 38507 Board Decision Approval"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="proposalSubmitted" name="Propuesta presentada">
+      <outgoing>flowPrepareBoardPaper</outgoing>
+    </startEvent>
+
+    <userTask id="prepareBoardPaperTask"
+              name="Preparar board paper"
+              flowable:formKey="console/bpmn/board-decision-paper-form.zul"
+              flowable:candidateGroups="strategy-office,ai-owners">
+      <incoming>flowPrepareBoardPaper</incoming>
+      <outgoing>flowCalculateAlignment</outgoing>
+    </userTask>
+
+    <serviceTask id="calculateAlignmentTask"
+                 name="Calcular alineación estratégica"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso38507.CalculateStrategicAlignmentDelegate">
+      <incoming>flowCalculateAlignment</incoming>
+      <outgoing>flowBoardReview</outgoing>
+    </serviceTask>
+
+    <userTask id="boardReviewTask"
+              name="Revisión del board"
+              flowable:formKey="console/bpmn/board-decision-review-form.zul"
+              flowable:candidateGroups="board-members">
+      <incoming>flowBoardReview</incoming>
+      <outgoing>flowDecisionGateway</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="boardDecisionGateway" name="¿Decisión del board?">
+      <incoming>flowDecisionGateway</incoming>
+      <outgoing>flowApproveDecision</outgoing>
+      <outgoing>flowRequestMoreInfo</outgoing>
+      <outgoing>flowRejectDecision</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="boardDecisionTask"
+              name="Board decide"
+              flowable:formKey="console/bpmn/board-decision-approval-form.zul"
+              flowable:candidateGroups="board-members">
+      <incoming>flowApproveDecision</incoming>
+      <outgoing>flowRecordDecision</outgoing>
+    </userTask>
+
+    <userTask id="reworkProposalTask"
+              name="Reelaborar propuesta"
+              flowable:formKey="console/bpmn/board-decision-rework-form.zul"
+              flowable:candidateGroups="strategy-office,ai-owners">
+      <incoming>flowRequestMoreInfo</incoming>
+      <outgoing>flowPrepareBoardPaper</outgoing>
+    </userTask>
+
+    <endEvent id="decisionRejected" name="Propuesta rechazada">
+      <incoming>flowRejectDecision</incoming>
+    </endEvent>
+
+    <serviceTask id="recordDecisionTask"
+                 name="Registrar decisión"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso38507.RecordBoardDecisionDelegate">
+      <incoming>flowRecordDecision</incoming>
+      <outgoing>flowImplementDecision</outgoing>
+    </serviceTask>
+
+    <userTask id="implementDecisionTask"
+              name="Implementar decisión"
+              flowable:formKey="console/bpmn/board-decision-implementation-form.zul"
+              flowable:candidateGroups="implementation-leads">
+      <incoming>flowImplementDecision</incoming>
+      <outgoing>flowMonitorImplementation</outgoing>
+    </userTask>
+
+    <serviceTask id="monitorImplementationTask"
+                 name="Monitorear implementación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso38507.MonitorBoardDecisionDelegate">
+      <incoming>flowMonitorImplementation</incoming>
+      <outgoing>flowCloseDecision</outgoing>
+    </serviceTask>
+
+    <endEvent id="decisionImplemented" name="Decisión implementada">
+      <incoming>flowCloseDecision</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowPrepareBoardPaper"
+                  sourceRef="proposalSubmitted"
+                  targetRef="prepareBoardPaperTask"/>
+    <sequenceFlow id="flowCalculateAlignment"
+                  sourceRef="prepareBoardPaperTask"
+                  targetRef="calculateAlignmentTask"/>
+    <sequenceFlow id="flowBoardReview"
+                  sourceRef="calculateAlignmentTask"
+                  targetRef="boardReviewTask"/>
+    <sequenceFlow id="flowDecisionGateway"
+                  sourceRef="boardReviewTask"
+                  targetRef="boardDecisionGateway"/>
+    <sequenceFlow id="flowApproveDecision"
+                  sourceRef="boardDecisionGateway"
+                  targetRef="boardDecisionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boardDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRequestMoreInfo"
+                  sourceRef="boardDecisionGateway"
+                  targetRef="reworkProposalTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boardDecision == 'REQUEST_INFO'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRejectDecision"
+                  sourceRef="boardDecisionGateway"
+                  targetRef="decisionRejected">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${boardDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRecordDecision"
+                  sourceRef="boardDecisionTask"
+                  targetRef="recordDecisionTask"/>
+    <sequenceFlow id="flowImplementDecision"
+                  sourceRef="recordDecisionTask"
+                  targetRef="implementDecisionTask"/>
+    <sequenceFlow id="flowMonitorImplementation"
+                  sourceRef="implementDecisionTask"
+                  targetRef="monitorImplementationTask"/>
+    <sequenceFlow id="flowCloseDecision"
+                  sourceRef="monitorImplementationTask"
+                  targetRef="decisionImplemented"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso38507BoardDecision">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso38507BoardDecision" bpmnElement="iso38507BoardDecisionV1">
+      <bpmndi:BPMNShape id="BPMNShape_proposalSubmitted" bpmnElement="proposalSubmitted">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_prepareBoardPaperTask" bpmnElement="prepareBoardPaperTask">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_calculateAlignmentTask" bpmnElement="calculateAlignmentTask">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_boardReviewTask" bpmnElement="boardReviewTask">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_boardDecisionGateway" bpmnElement="boardDecisionGateway">
+        <omgdc:Bounds x="175" y="795" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_boardDecisionTask" bpmnElement="boardDecisionTask">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reworkProposalTask" bpmnElement="reworkProposalTask">
+        <omgdc:Bounds x="350" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_decisionRejected" bpmnElement="decisionRejected">
+        <omgdc:Bounds x="582" y="982" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_recordDecisionTask" bpmnElement="recordDecisionTask">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_implementDecisionTask" bpmnElement="implementDecisionTask">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_monitorImplementationTask" bpmnElement="monitorImplementationTask">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_decisionImplemented" bpmnElement="decisionImplemented">
+        <omgdc:Bounds x="182" y="1702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowPrepareBoardPaper" bpmnElement="flowPrepareBoardPaper">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCalculateAlignment" bpmnElement="flowCalculateAlignment">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowBoardReview" bpmnElement="flowBoardReview">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDecisionGateway" bpmnElement="flowDecisionGateway">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="175" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproveDecision" bpmnElement="flowApproveDecision">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRequestMoreInfo" bpmnElement="flowRequestMoreInfo">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="350" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejectDecision" bpmnElement="flowRejectDecision">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="582" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRecordDecision" bpmnElement="flowRecordDecision">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowImplementDecision" bpmnElement="flowImplementDecision">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowMonitorImplementation" bpmnElement="flowMonitorImplementation">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCloseDecision" bpmnElement="flowCloseDecision">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="182" y="1720" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+
+

@@ -1,0 +1,54 @@
+package com.codeflowx.govern.workflow.drools.aios.onboarding;
+
+import com.codeflowx.govern.workflow.drools.facts.AioComponentOnboardingFact;
+
+global org.slf4j.Logger logger;
+
+rule "Approve Component"
+    ruleflow-group "ai-component-onboarding"
+    when
+        $fact : AioComponentOnboardingFact(
+            decision == null,
+            riskLevel != "CRITICAL" && riskLevel != "HIGH",
+            securityScore >= 85,
+            complianceScore >= 85,
+            policyCoverage >= 3
+        )
+    then
+        logger.info("🟢 [Drools] Component {} auto-approved", $fact.getComponentId());
+        $fact.setDecision("APPROVE");
+        $fact.setRequiresHumanReview(false);
+        $fact.setJustification(String.format(
+            "Scores altos (security=%.1f, compliance=%.1f) y cobertura %d políticas",
+            $fact.getSecurityScore(), $fact.getComplianceScore(), $fact.safePolicyCoverage()
+        ));
+        update($fact);
+end
+
+rule "Conditional Approval"
+    ruleflow-group "ai-component-onboarding"
+    when
+        $fact : AioComponentOnboardingFact(
+            decision == null,
+            securityScore >= 70,
+            complianceScore >= 70
+        )
+    then
+        logger.warn("🟡 [Drools] Component {} requiere revisión HITL", $fact.getComponentId());
+        $fact.setDecision("CONDITIONAL");
+        $fact.setRequiresHumanReview(true);
+        $fact.setJustification("Revisión humana requerida por scores intermedios o riesgo elevado");
+        update($fact);
+end
+
+rule "Reject Component"
+    ruleflow-group "ai-component-onboarding"
+    when
+        $fact : AioComponentOnboardingFact(decision == null)
+    then
+        logger.error("🔴 [Drools] Component {} rechazado", $fact.getComponentId());
+        $fact.setDecision("REJECT");
+        $fact.setRequiresHumanReview(false);
+        $fact.setJustification("No cumple requisitos mínimos de seguridad/compliance");
+        update($fact);
+end

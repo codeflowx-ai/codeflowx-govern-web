@@ -1,0 +1,50 @@
+package com.codeflowx.govern.workflow.drools.aios.policy;
+
+import com.codeflowx.govern.workflow.drools.facts.PolicyReviewFact;
+
+global org.slf4j.Logger logger;
+
+rule "Policy Compliant"
+    ruleflow-group "ai-policy-review"
+    when
+        $fact : PolicyReviewFact(
+            decision == null,
+            safeCompliance() >= 90,
+            safeOpenViolations() == 0,
+            safeDaysSinceAudit() <= 30
+        )
+    then
+        logger.info("🟢 [Drools] Policy {} compliant", $fact.getPolicyBindingId());
+        $fact.setDecision("COMPLIANT");
+        $fact.setRequiresRemediation(false);
+        $fact.setJustification("Puntaje >= 90 sin violaciones ni atrasos en auditoría");
+        update($fact);
+end
+
+rule "Policy HITL"
+    ruleflow-group "ai-policy-review"
+    when
+        $fact : PolicyReviewFact(
+            decision == null,
+            safeCompliance() >= 75,
+            safeOpenViolations() <= 2
+        )
+    then
+        logger.warn("🟡 [Drools] Policy {} requiere HITL", $fact.getPolicyBindingId());
+        $fact.setDecision("HITL");
+        $fact.setRequiresRemediation(true);
+        $fact.setJustification("Se detectan violaciones menores o auditoría atrasada");
+        update($fact);
+end
+
+rule "Policy Non-Compliant"
+    ruleflow-group "ai-policy-review"
+    when
+        $fact : PolicyReviewFact(decision == null)
+    then
+        logger.error("🔴 [Drools] Policy {} non-compliant", $fact.getPolicyBindingId());
+        $fact.setDecision("NON_COMPLIANT");
+        $fact.setRequiresRemediation(true);
+        $fact.setJustification("Violaciones abiertas o score menor a 75");
+        update($fact);
+end

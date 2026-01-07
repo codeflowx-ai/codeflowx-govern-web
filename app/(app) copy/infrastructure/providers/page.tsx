@@ -1,0 +1,899 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Activity,
+  BarChart3,
+  CheckCircle,
+  Cloud,
+  CreditCard,
+  HardDrive,
+  Monitor,
+  Plus,
+  Server,
+  Settings,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+
+export default function InfrastructureProvidersPage() {
+  const [selectedProvider, setSelectedProvider] = useState<any>(null);
+  const [showMonitorModal, setShowMonitorModal] = useState(false);
+  const [showManageModal, setShowManageModal] = useState(false);
+  const providers = [
+    {
+      id: 1,
+      name: "AWS",
+      type: "cloud",
+      status: "active",
+      color: "#ff9900",
+      gradient: "from-orange-500 to-orange-600",
+      details: {
+        region: "eu-west-1",
+        accountId: "123456789012",
+        plan: "Enterprise",
+        billingCycle: "Monthly",
+        nextBilling: "2024-02-15",
+      },
+      services: [
+        "EC2 Instances",
+        "S3 Storage",
+        "RDS Database",
+        "Lambda Functions",
+        "CloudFormation",
+      ],
+      usage: {
+        instances: "24",
+        storage: "15.7TB",
+        compute: "1,248 hours",
+        cost: "$2,847.32",
+        budget: "$5,000",
+      },
+      metadata: {
+        contact: "aws@company.com",
+        support: "Premium",
+        sla: "99.99%",
+        compliance: ["SOC2", "ISO27001", "GDPR"],
+      },
+    },
+    {
+      id: 2,
+      name: "Google Cloud",
+      type: "cloud",
+      status: "active",
+      color: "#4285f4",
+      gradient: "from-blue-500 to-blue-600",
+      details: {
+        region: "europe-west1",
+        projectId: "codeflowx-prod",
+        plan: "Business",
+        billingCycle: "Monthly",
+        nextBilling: "2024-02-10",
+      },
+      services: [
+        "Compute Engine",
+        "Cloud Storage",
+        "Cloud SQL",
+        "Cloud Functions",
+        "Kubernetes Engine",
+      ],
+      usage: {
+        instances: "18",
+        storage: "8.2TB",
+        compute: "892 hours",
+        cost: "$1,456.78",
+        budget: "$3,000",
+      },
+      metadata: {
+        contact: "gcp@company.com",
+        support: "Standard",
+        sla: "99.95%",
+        compliance: ["SOC2", "ISO27001"],
+      },
+    },
+    {
+      id: 3,
+      name: "Azure",
+      type: "cloud",
+      status: "active",
+      color: "#0078d4",
+      gradient: "from-blue-600 to-blue-700",
+      details: {
+        region: "West Europe",
+        subscriptionId: "sub-azure-prod",
+        plan: "Enterprise",
+        billingCycle: "Annual",
+        nextBilling: "2024-12-15",
+      },
+      services: [
+        "Virtual Machines",
+        "Blob Storage",
+        "SQL Database",
+        "Functions",
+        "AKS",
+      ],
+      usage: {
+        instances: "12",
+        storage: "6.8TB",
+        compute: "456 hours",
+        cost: "$987.45",
+        budget: "$2,500",
+      },
+      metadata: {
+        contact: "azure@company.com",
+        support: "Enterprise",
+        sla: "99.99%",
+        compliance: ["SOC2", "ISO27001", "HIPAA"],
+      },
+    },
+    {
+      id: 4,
+      name: "On-Premise DC",
+      type: "datacenter",
+      status: "active",
+      color: "#10b981",
+      gradient: "from-green-500 to-green-600",
+      details: {
+        location: "Madrid HQ",
+        facility: "Tier III",
+        plan: "Internal",
+        billingCycle: "N/A",
+        nextBilling: "N/A",
+      },
+      services: [
+        "Physical Servers",
+        "Storage Arrays",
+        "Network Equipment",
+        "Backup Systems",
+        "Security Appliances",
+      ],
+      usage: {
+        instances: "45",
+        storage: "89.3TB",
+        compute: "24/7",
+        cost: "$0",
+        budget: "Internal",
+      },
+      metadata: {
+        contact: "infra@company.com",
+        support: "Internal",
+        sla: "99.9%",
+        compliance: ["Internal", "GDPR"],
+      },
+    },
+    {
+      id: 5,
+      name: "DigitalOcean",
+      type: "cloud",
+      status: "inactive",
+      color: "#0080ff",
+      gradient: "from-blue-500 to-blue-600",
+      details: {
+        region: "fra1",
+        accountId: "do-company-dev",
+        plan: "Developer",
+        billingCycle: "Monthly",
+        nextBilling: "Suspended",
+      },
+      services: [
+        "Droplets",
+        "Spaces Storage",
+        "Managed Databases",
+        "Load Balancers",
+        "Kubernetes",
+      ],
+      usage: {
+        instances: "0",
+        storage: "0GB",
+        compute: "0 hours",
+        cost: "$0",
+        budget: "$100",
+      },
+      metadata: {
+        contact: "do@company.com",
+        support: "Basic",
+        sla: "99.99%",
+        compliance: ["SOC2"],
+      },
+    },
+    {
+      id: 6,
+      name: "Hetzner Cloud",
+      type: "cloud",
+      status: "active",
+      color: "#d50fa1",
+      gradient: "from-pink-500 to-pink-600",
+      details: {
+        region: "FSN1",
+        accountId: "hetzner-prod",
+        plan: "Professional",
+        billingCycle: "Monthly",
+        nextBilling: "2024-02-20",
+      },
+      services: [
+        "Cloud Servers",
+        "Cloud Storage",
+        "Managed Kubernetes",
+        "Load Balancers",
+        "Firewalls",
+      ],
+      usage: {
+        instances: "8",
+        storage: "2.1TB",
+        compute: "234 hours",
+        cost: "$234.56",
+        budget: "$500",
+      },
+      metadata: {
+        contact: "hetzner@company.com",
+        support: "Professional",
+        sla: "99.9%",
+        compliance: ["ISO27001"],
+      },
+    },
+  ];
+
+  const systemStats = {
+    totalProviders: providers.length,
+    activeProviders: providers.filter(
+      (provider) => provider.status === "active"
+    ).length,
+    inactiveProviders: providers.filter(
+      (provider) => provider.status === "inactive"
+    ).length,
+    cloudProviders: providers.filter((provider) => provider.type === "cloud")
+      .length,
+    datacenterProviders: providers.filter(
+      (provider) => provider.type === "datacenter"
+    ).length,
+    totalInstances: "107",
+    totalStorage: "122.1TB",
+    totalCost: "$5,525.11",
+    totalBudget: "$11,000",
+    costEfficiency: "50.2%",
+  };
+
+  const quickActions = [
+    {
+      title: "Add Provider",
+      icon: Plus,
+      color: "#3b82f6",
+      href: "/infrastructure/providers/new",
+    },
+    {
+      title: "Cost Analysis",
+      icon: BarChart3,
+      color: "#10b981",
+      href: "/infrastructure/providers/costs",
+    },
+    {
+      title: "Health Check",
+      icon: Activity,
+      color: "#8b5cf6",
+      href: "/infrastructure/providers/health",
+    },
+    {
+      title: "Compliance",
+      icon: Shield,
+      color: "#f59e0b",
+      href: "/infrastructure/providers/compliance",
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-500";
+      case "inactive":
+        return "bg-red-500";
+      case "maintenance":
+        return "bg-yellow-500";
+      case "suspended":
+        return "bg-gray-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const handleMonitorProvider = (provider: any) => {
+    setSelectedProvider(provider);
+    setShowMonitorModal(true);
+  };
+
+  const handleManageProvider = (provider: any) => {
+    setSelectedProvider(provider);
+    setShowManageModal(true);
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "active":
+        return "Active";
+      case "inactive":
+        return "Inactive";
+      case "maintenance":
+        return "Maintenance";
+      case "suspended":
+        return "Suspended";
+      default:
+        return "Unknown";
+    }
+  };
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case "cloud":
+        return "bg-blue-500";
+      case "datacenter":
+        return "bg-green-500";
+      case "hybrid":
+        return "bg-purple-500";
+      case "edge":
+        return "bg-orange-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="w-full px-4 py-6 space-y-6">
+        {/* Header - Título y subtítulo alineados a la izquierda */}
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <div className="flex items-center gap-3">
+              <Cloud className="w-6 h-6 text-primary" />
+              <h1 className="text-2xl font-bold text-foreground">
+                Infrastructure Providers
+              </h1>
+            </div>
+            <p className="text-sm text-muted-foreground ml-9">
+              Gestiona proveedores de infraestructura cloud y on-premise
+            </p>
+          </div>
+
+          {/* Estadísticas generales del sistema */}
+          <div className="flex items-center gap-4 p-4 rounded-xl backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-black/20 shadow-lg">
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Total Cost</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.totalCost}
+              </p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Active Providers</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.activeProviders}
+              </p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Efficiency</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.costEfficiency}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Grid con efectos avanzados */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              title: "Active Providers",
+              value: systemStats.activeProviders.toString(),
+              change: `${(
+                (systemStats.activeProviders / systemStats.totalProviders) *
+                100
+              ).toFixed(1)}% availability`,
+              icon: CheckCircle,
+              color: "#10b981",
+              gradient: "from-green-500 to-green-600",
+            },
+            {
+              title: "Total Instances",
+              value: systemStats.totalInstances,
+              change: "Across all providers",
+              icon: Server,
+              color: "#3b82f6",
+              gradient: "from-blue-500 to-blue-600",
+            },
+            {
+              title: "Total Storage",
+              value: systemStats.totalStorage,
+              change: "Combined capacity",
+              icon: HardDrive,
+              color: "#8b5cf6",
+              gradient: "from-purple-500 to-purple-600",
+            },
+            {
+              title: "Budget Usage",
+              value: `${(
+                (parseFloat(
+                  systemStats.totalCost.replace("$", "").replace(",", "")
+                ) /
+                  parseFloat(
+                    systemStats.totalBudget.replace("$", "").replace(",", "")
+                  )) *
+                100
+              ).toFixed(1)}%`,
+              change: `${systemStats.totalCost} of ${systemStats.totalBudget}`,
+              icon: CreditCard,
+              color: "#f59e0b",
+              gradient: "from-orange-500 to-orange-600",
+            },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              style={{
+                animationDelay: `${index * 150}ms`,
+                animation: "fadeInUp 0.8s ease-out forwards",
+              }}
+            >
+              <Card className="group transition-all duration-700 hover:scale-105 hover:shadow-2xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90">
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                {/* Efecto de borde brillante */}
+                <div
+                  className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(45deg, ${stat.color}40, transparent, ${stat.color}40)`,
+                    backgroundSize: "200% 200%",
+                    animation: "shimmer 2s ease-in-out infinite",
+                  }}
+                />
+
+                <CardContent className="p-4 relative z-10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <p className="text-xs font-medium mb-1 text-muted-foreground transition-colors duration-300 group-hover:text-foreground">
+                        {stat.title}
+                      </p>
+                      <div className="flex items-baseline gap-1">
+                        <p className="text-xl font-bold text-foreground transition-all duration-300 group-hover:scale-110">
+                          {stat.value}
+                        </p>
+                      </div>
+                      <p
+                        className="text-xs transition-all duration-300 group-hover:scale-105 font-medium"
+                        style={{ color: stat.color }}
+                      >
+                        {stat.change}
+                      </p>
+                    </div>
+                    <div
+                      className="p-2.5 rounded-xl ml-3 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden"
+                      style={{
+                        background: `linear-gradient(135deg, ${stat.color}20, ${stat.color}10)`,
+                        borderColor: stat.color,
+                        borderWidth: "2px",
+                        boxShadow: `0 0 25px ${stat.color}50, inset 0 0 20px ${stat.color}10`,
+                      }}
+                    >
+                      {/* Efecto de partículas en el icono */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                      <stat.icon
+                        className="w-5 h-5 transition-all duration-500 group-hover:scale-110 relative z-10"
+                        style={{ color: stat.color }}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-foreground text-lg flex items-center gap-2">
+              <Zap className="w-5 h-5 text-yellow-500" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {quickActions.map((action, index) => (
+                <Link key={index} href={action.href}>
+                  <div className="group p-3 rounded-lg border-2 border-dashed transition-all duration-500 hover:scale-105 cursor-pointer bg-card/50 border-border hover:border-primary overflow-hidden relative hover:bg-card/70">
+                    {/* Efecto de brillo en hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                    <div className="flex flex-col items-center text-center space-y-2 relative z-10">
+                      <div
+                        className="p-2 rounded-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden"
+                        style={{
+                          backgroundColor: `${action.color}20`,
+                          boxShadow: `0 0 20px ${action.color}40`,
+                        }}
+                      >
+                        {/* Efecto de partículas en el icono */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                        <action.icon
+                          className="w-4 h-4 transition-all duration-300 group-hover:scale-110 relative z-10"
+                          style={{ color: action.color }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-foreground transition-all duration-300 group-hover:scale-105">
+                        {action.title}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Grid de proveedores */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {providers.map((provider, index) => (
+            <div
+              key={provider.id}
+              style={{
+                animationDelay: `${index * 150}ms`,
+                animation: "fadeInUp 0.8s ease-out forwards",
+              }}
+            >
+              <Card className="group transition-all duration-700 hover:scale-105 hover:shadow-2xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90">
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                {/* Efecto de borde brillante */}
+                <div
+                  className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(45deg, ${provider.color}40, transparent, ${provider.color}40)`,
+                    backgroundSize: "200% 200%",
+                    animation: "shimmer 2s ease-in-out infinite",
+                  }}
+                />
+
+                <CardHeader className="pb-3 relative z-10">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="p-3 rounded-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden"
+                        style={{
+                          background: `linear-gradient(135deg, ${provider.color}20, ${provider.color}10)`,
+                          borderColor: provider.color,
+                          borderWidth: "2px",
+                          boxShadow: `0 0 25px ${provider.color}50, inset 0 0 20px ${provider.color}10`,
+                        }}
+                      >
+                        {/* Efecto de partículas en el icono */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                        <Cloud
+                          className="w-6 h-6 transition-all duration-500 group-hover:scale-110 relative z-10"
+                          style={{ color: provider.color }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-foreground text-lg group-hover:text-primary transition-colors duration-300">
+                          {provider.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div
+                            className={`w-2 h-2 rounded-full ${getStatusColor(
+                              provider.status
+                            )}`}
+                          />
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {getStatusText(provider.status)}
+                          </span>
+                          <div
+                            className={`w-2 h-2 rounded-full ${getTypeColor(
+                              provider.type
+                            )}`}
+                          />
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {provider.type}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <CardDescription className="text-muted-foreground text-sm mt-2">
+                    {provider.details.region} • {provider.details.plan} •{" "}
+                    {provider.details.billingCycle}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="pt-0 relative z-10">
+                  {/* Detalles del proveedor */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Instances</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {provider.usage.instances}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Storage</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {provider.usage.storage}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Cost</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {provider.usage.cost}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Budget</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {provider.usage.budget}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Servicios principales */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Key Services
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {provider.services.slice(0, 3).map((service, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {service}
+                        </Badge>
+                      ))}
+                      {provider.services.length > 3 && (
+                        <Badge variant="outline" className="text-xs">
+                          +{provider.services.length - 3} more
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Información de soporte y compliance */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Support & Compliance
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Support:</span>
+                        <span className="text-foreground">
+                          {provider.metadata.support}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">SLA:</span>
+                        <span className="text-foreground">
+                          {provider.metadata.sla}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Contact:</span>
+                        <span className="text-foreground">
+                          {provider.metadata.contact}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">
+                          Compliance:
+                        </span>
+                        <span className="text-foreground">
+                          {provider.metadata.compliance.length} standards
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botones de acción */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {provider.details.billingCycle}
+                      </Badge>
+                      {provider.status === "active" && (
+                        <Badge variant="outline" className="text-xs">
+                          {provider.metadata.sla}
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleMonitorProvider(provider)}
+                        className="hover:bg-blue-50 hover:text-blue-700 transition-colors"
+                      >
+                        <Monitor className="w-3 h-3 mr-1" />
+                        Monitor
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => handleManageProvider(provider)}
+                        className="hover:bg-green-50 hover:text-green-700 transition-colors"
+                      >
+                        <Settings className="w-3 h-3 mr-1" />
+                        Manage
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer con información adicional */}
+        <Card className="bg-card/60 backdrop-blur-sm border-border shadow-lg">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+              <div>
+                <p className="text-sm text-muted-foreground">Cloud Providers</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStats.cloudProviders}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Data Centers</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStats.datacenterProviders}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Inactive</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStats.inactiveProviders}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Last Updated</p>
+                <p className="text-lg font-semibold text-foreground">
+                  Just now
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Modal de Monitor */}
+      <SimpleModal
+        isOpen={showMonitorModal}
+        onClose={() => setShowMonitorModal(false)}
+        title={`Monitor - ${selectedProvider?.name || 'Provider'}`}
+        maxWidth="max-w-2xl"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-foreground">System Status</h4>
+              <div className="space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">CPU Usage:</span>
+                  <span className="text-sm font-medium">78%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Memory:</span>
+                  <span className="text-sm font-medium">65%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Storage:</span>
+                  <span className="text-sm font-medium">45%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-sm text-muted-foreground">Network:</span>
+                  <span className="text-sm font-medium">32%</span>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-foreground">Recent Alerts</h4>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span>All systems operational</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                  <span>High memory usage detected</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <span>Backup completed successfully</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="pt-4 border-t">
+            <Button
+              onClick={() => setShowMonitorModal(false)}
+              className="w-full"
+            >
+              Close
+            </Button>
+          </div>
+        </div>
+      </SimpleModal>
+
+      {/* Modal de Manage */}
+      <SimpleModal
+        isOpen={showManageModal}
+        onClose={() => setShowManageModal(false)}
+        title={`Manage - ${selectedProvider?.name || 'Provider'}`}
+        maxWidth="max-w-2xl"
+      >
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-foreground">Provider Settings</h4>
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm font-medium text-foreground">Provider Name</label>
+                  <input
+                    type="text"
+                    defaultValue={selectedProvider?.name || ''}
+                    className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground">Status</label>
+                  <select
+                    defaultValue={selectedProvider?.status || 'active'}
+                    className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="suspended">Suspended</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground">Support Level</label>
+                  <select
+                    defaultValue={selectedProvider?.metadata?.support || 'Standard'}
+                    className="w-full mt-1 px-3 py-2 border border-border rounded-md bg-background text-foreground"
+                  >
+                    <option value="Basic">Basic</option>
+                    <option value="Standard">Standard</option>
+                    <option value="Professional">Professional</option>
+                    <option value="Premium">Premium</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="pt-4 border-t flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowManageModal(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => setShowManageModal(false)}
+              className="flex-1"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      </SimpleModal>
+    </div>
+  );
+}

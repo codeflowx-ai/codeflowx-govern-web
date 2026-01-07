@@ -1,0 +1,422 @@
+// app/config/invoices/page.tsx
+"use client";
+
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+import { useState } from "react";
+
+interface Invoice {
+  id: string;
+  number: string;
+  date: string;
+  dueDate: string;
+  amount: number;
+  status: "paid" | "pending" | "overdue" | "draft";
+  plan: string;
+  period: string;
+  downloadUrl?: string;
+}
+
+// app/config/invoices/page.tsx - Actualizar los datos mock
+const mockInvoices: Invoice[] = [
+  {
+    id: "1",
+    number: "INV-2024-001",
+    date: "2024-01-01",
+    dueDate: "2024-01-15",
+    amount: 149.0,
+    status: "paid",
+    plan: "Pro License",
+    period: "Jan 2024",
+    downloadUrl: "#",
+  },
+  {
+    id: "2",
+    number: "INV-2023-012",
+    date: "2023-12-01",
+    dueDate: "2023-12-15",
+    amount: 149.0,
+    status: "paid",
+    plan: "Pro License",
+    period: "Dec 2023",
+    downloadUrl: "#",
+  },
+  {
+    id: "3",
+    number: "INV-2023-011",
+    date: "2023-11-01",
+    dueDate: "2023-11-15",
+    amount: 39.0,
+    status: "paid",
+    plan: "Starter License",
+    period: "Nov 2023",
+    downloadUrl: "#",
+  },
+  {
+    id: "4",
+    number: "INV-2024-002",
+    date: "2024-02-01",
+    dueDate: "2024-02-15",
+    amount: 149.0,
+    status: "pending",
+    plan: "Pro License",
+    period: "Feb 2024",
+  },
+];
+
+import UmamiTracker from "@/components/analytics/UmamiTracker";
+export default function InvoicesPage() {
+  const [invoices] = useState<Invoice[]>(mockInvoices);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "bg-green-100 text-green-700";
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+      case "overdue":
+        return "bg-red-100 text-red-700";
+      case "draft":
+        return "bg-gray-100 text-gray-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "paid":
+        return "✅";
+      case "pending":
+        return "⏳";
+      case "overdue":
+        return "❌";
+      case "draft":
+        return "📝";
+      default:
+        return "❓";
+    }
+  };
+
+  const handleDownload = (invoice: Invoice) => {
+    // Simular descarga
+    alert(`Downloading invoice ${invoice.number}...`);
+  };
+
+  const handlePayNow = (invoice: Invoice) => {
+    // Simular pago
+    alert(`Redirecting to payment for invoice ${invoice.number}...`);
+  };
+
+  const totalPaid = invoices
+    .filter((inv) => inv.status === "paid")
+    .reduce((sum, inv) => sum + inv.amount, 0);
+
+  const pendingAmount = invoices
+    .filter((inv) => inv.status === "pending" || inv.status === "overdue")
+    .reduce((sum, inv) => sum + inv.amount, 0);
+
+  return (
+    <div className="p-6 space-y-6">
+      <UmamiTracker />
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold text-gray-900">
+          🧾 Invoices & Billing
+        </h1>
+        <p className="text-gray-600">View and manage your billing history</p>
+        {/* Banner de Desarrollo - Versión 1.0.0 Operativa */}
+        <DevelopmentBanner
+          type="operational"
+          customText="✅ Versión 1.0.0 - Operativa"
+          showEarlyAdopterButton={false}
+          className="justify-start"
+        />
+      </div>
+
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">💰</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Total Paid</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${totalPaid.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">⏳</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">Pending</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${pendingAmount.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <span className="text-2xl">📊</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-600">
+                Total Invoices
+              </p>
+              <p className="text-2xl font-bold text-gray-900">
+                {invoices.length}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Invoices Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Invoice History
+          </h2>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Invoice
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Plan & Period
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Amount
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {invoices.map((invoice) => (
+                <tr key={invoice.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {invoice.number}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Issued: {new Date(invoice.date).toLocaleDateString()}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Due: {new Date(invoice.dueDate).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div>
+                      <div className="font-medium text-gray-900">
+                        {invoice.plan}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {invoice.period}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="font-medium text-gray-900">
+                      ${invoice.amount.toFixed(2)}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(
+                        invoice.status
+                      )}`}
+                    >
+                      <span>{getStatusIcon(invoice.status)}</span>
+                      {invoice.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2">
+                      {invoice.status === "paid" && invoice.downloadUrl && (
+                        <button
+                          onClick={() => handleDownload(invoice)}
+                          className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                        >
+                          📥 Download
+                        </button>
+                      )}
+
+                      {(invoice.status === "pending" ||
+                        invoice.status === "overdue") && (
+                        <button
+                          onClick={() => handlePayNow(invoice)}
+                          className="px-3 py-1 text-sm bg-green-100 text-green-700 rounded hover:bg-green-200"
+                        >
+                          💳 Pay Now
+                        </button>
+                      )}
+
+                      <button
+                        onClick={() => setSelectedInvoice(invoice)}
+                        className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                      >
+                        👁️ View
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Invoice Detail Modal */}
+      <SimpleModal
+        isOpen={!!selectedInvoice}
+        onClose={() => setSelectedInvoice(null)}
+        title="Invoice Details"
+        maxWidth="max-w-2xl"
+      >
+        {/* Invoice Header */}
+        <div className="border-b border-gray-200 pb-6 mb-6">
+          <div className="flex justify-between items-start">
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Leka Server</h2>
+              <p className="text-gray-600">AI Code Generation Platform</p>
+            </div>
+            <div className="text-right">
+              <h3 className="text-xl font-bold text-gray-900">
+                {selectedInvoice.number}
+              </h3>
+              <span
+                className={`inline-flex items-center gap-1 px-3 py-1 text-sm rounded-full font-medium ${getStatusColor(
+                  selectedInvoice.status
+                )}`}
+              >
+                <span>{getStatusIcon(selectedInvoice.status)}</span>
+                {selectedInvoice.status}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Invoice Details */}
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div>
+            <h4 className="font-medium text-gray-900 mb-2">Bill To:</h4>
+            <div className="text-sm text-gray-600">
+              <p>Demo Company</p>
+              <p>admin@company.com</p>
+              <p>123 Business St</p>
+              <p>City, State 12345</p>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-medium text-gray-900 mb-2">Invoice Info:</h4>
+            <div className="text-sm text-gray-600 space-y-1">
+              <div className="flex justify-between">
+                <span>Issue Date:</span>
+                <span>
+                  {new Date(selectedInvoice.date).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Due Date:</span>
+                <span>
+                  {new Date(selectedInvoice.dueDate).toLocaleDateString()}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span>Period:</span>
+                <span>{selectedInvoice.period}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Line Items */}
+        <div className="border border-gray-200 rounded-lg overflow-hidden mb-6">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-900">
+                  Description
+                </th>
+                <th className="px-4 py-3 text-right text-sm font-medium text-gray-900">
+                  Amount
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {selectedInvoice.plan} Plan - {selectedInvoice.period}
+                </td>
+                <td className="px-4 py-3 text-sm text-gray-900 text-right">
+                  ${selectedInvoice.amount.toFixed(2)}
+                </td>
+              </tr>
+            </tbody>
+            <tfoot className="bg-gray-50">
+              <tr>
+                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  Total
+                </td>
+                <td className="px-4 py-3 text-sm font-bold text-gray-900 text-right">
+                  ${selectedInvoice.amount.toFixed(2)}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3">
+          {selectedInvoice.status === "paid" && selectedInvoice.downloadUrl && (
+            <button
+              onClick={() => handleDownload(selectedInvoice)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              📥 Download PDF
+            </button>
+          )}
+
+          {(selectedInvoice.status === "pending" ||
+            selectedInvoice.status === "overdue") && (
+            <button
+              onClick={() => handlePayNow(selectedInvoice)}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+            >
+              💳 Pay Now
+            </button>
+          )}
+
+          <button
+            onClick={() => setSelectedInvoice(null)}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          >
+            Close
+          </button>
+        </div>
+      </SimpleModal>
+    </div>
+  );
+}

@@ -1,0 +1,861 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+import {
+  Activity,
+  CheckCircle,
+  Clock,
+  Cpu,
+  HardDrive,
+  Monitor,
+  Plus,
+  RefreshCw,
+  Server,
+  Settings,
+  Shield,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
+
+interface KubernetesCluster {
+  id: string;
+  name: string;
+  status: "active" | "scaling" | "maintenance" | "error";
+  type: "production" | "staging" | "development";
+  version: string;
+  nodes: number;
+  color: string;
+  specs: {
+    cpu: string;
+    memory: string;
+    storage: string;
+    network: string;
+  };
+  metrics: {
+    cpuUsage: string;
+    memoryUsage: string;
+    storageUsage: string;
+    podCount: string;
+  };
+  services: string[];
+  lastDeployment: string;
+  uptime: string;
+  cost: string;
+  region: string;
+  tags: string[];
+  metadata: {
+    created: string;
+    owner: string;
+    team: string;
+    environment: string;
+  };
+}
+
+const kubernetesClusters: KubernetesCluster[] = [
+  {
+    id: "k8s-prod-01",
+    name: "Production Cluster",
+    status: "active",
+    type: "production",
+    version: "1.28.0",
+    nodes: 12,
+    color: "#10b981",
+    specs: {
+      cpu: "48 cores",
+      memory: "192GB",
+      storage: "2TB SSD",
+      network: "10Gbps",
+    },
+    metrics: {
+      cpuUsage: "78%",
+      memoryUsage: "65%",
+      storageUsage: "45%",
+      podCount: "156",
+    },
+    services: ["API Gateway", "Database", "Cache", "Monitoring"],
+    lastDeployment: "2 hours ago",
+    uptime: "99.9%",
+    cost: "$2,450/month",
+    region: "us-east-1",
+    tags: ["production", "critical", "high-availability"],
+    metadata: {
+      created: "2024-01-15",
+      owner: "DevOps Team",
+      team: "Platform Engineering",
+      environment: "Production",
+    },
+  },
+  {
+    id: "k8s-staging-01",
+    name: "Staging Environment",
+    status: "active",
+    type: "staging",
+    version: "1.28.0",
+    nodes: 6,
+    color: "#3b82f6",
+    specs: {
+      cpu: "24 cores",
+      memory: "96GB",
+      storage: "1TB SSD",
+      network: "5Gbps",
+    },
+    metrics: {
+      cpuUsage: "45%",
+      memoryUsage: "52%",
+      storageUsage: "38%",
+      podCount: "89",
+    },
+    services: ["API Gateway", "Database", "Cache"],
+    lastDeployment: "1 day ago",
+    uptime: "98.5%",
+    cost: "$1,200/month",
+    region: "us-west-2",
+    tags: ["staging", "testing", "pre-production"],
+    metadata: {
+      created: "2024-02-01",
+      owner: "QA Team",
+      team: "Quality Assurance",
+      environment: "Staging",
+    },
+  },
+  {
+    id: "k8s-dev-01",
+    name: "Development Cluster",
+    status: "active",
+    type: "development",
+    version: "1.27.0",
+    nodes: 4,
+    color: "#8b5cf6",
+    specs: {
+      cpu: "16 cores",
+      memory: "64GB",
+      storage: "500GB SSD",
+      network: "2.5Gbps",
+    },
+    metrics: {
+      cpuUsage: "32%",
+      memoryUsage: "41%",
+      storageUsage: "28%",
+      podCount: "67",
+    },
+    services: ["API Gateway", "Database"],
+    lastDeployment: "3 days ago",
+    uptime: "95.2%",
+    cost: "$800/month",
+    region: "eu-west-1",
+    tags: ["development", "experimental", "low-priority"],
+    metadata: {
+      created: "2024-03-01",
+      owner: "Dev Team",
+      team: "Software Development",
+      environment: "Development",
+    },
+  },
+  {
+    id: "k8s-test-01",
+    name: "Testing Cluster",
+    status: "scaling",
+    type: "development",
+    version: "1.28.0",
+    nodes: 3,
+    color: "#f59e0b",
+    specs: {
+      cpu: "12 cores",
+      memory: "48GB",
+      storage: "250GB SSD",
+      network: "1Gbps",
+    },
+    metrics: {
+      cpuUsage: "68%",
+      memoryUsage: "73%",
+      storageUsage: "55%",
+      podCount: "42",
+    },
+    services: ["API Gateway", "Cache"],
+    lastDeployment: "5 hours ago",
+    uptime: "92.8%",
+    cost: "$600/month",
+    region: "us-central-1",
+    tags: ["testing", "automation", "ci-cd"],
+    metadata: {
+      created: "2024-03-15",
+      owner: "Automation Team",
+      team: "DevOps",
+      environment: "Testing",
+    },
+  },
+];
+
+const systemStats = {
+  totalClusters: kubernetesClusters.length,
+  activeClusters: kubernetesClusters.filter(
+    (cluster) => cluster.status === "active"
+  ).length,
+  scalingClusters: kubernetesClusters.filter(
+    (cluster) => cluster.status === "scaling"
+  ).length,
+  totalNodes: kubernetesClusters.reduce(
+    (sum, cluster) => sum + cluster.nodes,
+    0
+  ),
+  totalCost: "$5,050/month",
+  averageUptime: "96.6%",
+  totalPods: "354",
+  lastDeployment: "2 hours ago",
+};
+
+const quickActions = [
+  {
+    title: "Add Cluster",
+    description: "Create new Kubernetes cluster",
+    icon: Plus,
+    action: () => console.log("Add cluster"),
+    color: "#10b981",
+  },
+  {
+    title: "Scale Cluster",
+    description: "Adjust cluster capacity",
+    icon: RefreshCw,
+    action: () => console.log("Scale cluster"),
+    color: "#3b82f6",
+  },
+  {
+    title: "Update Version",
+    description: "Upgrade cluster version",
+    icon: Zap,
+    action: () => console.log("Update version"),
+    color: "#8b5cf6",
+  },
+  {
+    title: "Monitor Health",
+    description: "Check cluster status",
+    icon: Monitor,
+    action: () => console.log("Monitor health"),
+    color: "#f59e0b",
+  },
+];
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "active":
+      return "bg-green-500";
+    case "scaling":
+      return "bg-blue-500";
+    case "maintenance":
+      return "bg-yellow-500";
+    case "error":
+      return "bg-red-500";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+const getStatusText = (status: string) => {
+  switch (status) {
+    case "active":
+      return "Active";
+    case "scaling":
+      return "Scaling";
+    case "maintenance":
+      return "Maintenance";
+    case "error":
+      return "Error";
+    default:
+      return "Unknown";
+  }
+};
+
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case "production":
+      return "bg-red-500";
+    case "staging":
+      return "bg-blue-500";
+    case "development":
+      return "bg-purple-500";
+    default:
+      return "bg-gray-500";
+  }
+};
+
+import UmamiTracker from "@/components/analytics/UmamiTracker";
+export default function KubernetesPage() {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCluster, setSelectedCluster] =
+    useState<KubernetesCluster | null>(null);
+
+  const handleEditCluster = (cluster: KubernetesCluster) => {
+    setSelectedCluster(cluster);
+    setIsEditModalOpen(true);
+  };
+
+  return (
+    <div className="w-full p-6 space-y-6 relative min-h-screen">
+      <UmamiTracker />
+      {/* Partículas flotantes de fondo */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-20 left-10 w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "0s" }}
+        />
+        <div
+          className="absolute top-40 right-20 w-1 h-1 bg-green-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
+        <div
+          className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-purple-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "2s" }}
+        />
+        <div
+          className="absolute top-80 right-1/3 w-1 h-1 bg-orange-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "3s" }}
+        />
+        <div
+          className="absolute top-32 left-1/2 w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "4s" }}
+        />
+        <div
+          className="absolute top-96 left-1/3 w-1 h-1 bg-green-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "5s" }}
+        />
+      </div>
+
+      <DevelopmentBanner />
+
+      {/* Header de la página con estilo Wow Factor */}
+      <div className="relative z-10">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/20 dark:via-indigo-950/20 dark:to-purple-950/20 p-8 border border-blue-200/50 dark:border-blue-800/50 shadow-xl">
+          {/* Efecto de brillo animado */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 animate-pulse" />
+
+          <div className="relative z-10 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                <Server className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Kubernetes Clusters
+                </h1>
+                <p className="text-muted-foreground text-lg">
+                  Gestiona y monitorea todos tus clusters de Kubernetes
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <HelpTooltip
+                title="Kubernetes Clusters"
+                content="Gestiona y monitorea todos tus clusters de Kubernetes. Aquí puedes ver el estado, métricas y configuraciones de cada cluster."
+              />
+              <Settings className="w-5 h-5 text-muted-foreground" />
+            </div>
+          </div>
+
+          {/* Estadísticas generales del sistema */}
+          <div className="mt-6 flex items-center gap-4 p-4 rounded-xl backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-black/20 shadow-lg">
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Total Cost</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.totalCost}
+              </p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Active Clusters</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.activeClusters}
+              </p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Total Nodes</p>
+              <p className="text-lg font-bold text-foreground">
+                {systemStats.totalNodes}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Botón para agregar cluster */}
+        <Button
+          onClick={() => setIsAddModalOpen(true)}
+          className="mt-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Add Kubernetes Cluster
+        </Button>
+      </div>
+
+      {/* Grid de estadísticas principales */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
+        {[
+          {
+            title: "Active Clusters",
+            value: systemStats.activeClusters.toString(),
+            change: `${(
+              (systemStats.activeClusters / systemStats.totalClusters) *
+              100
+            ).toFixed(1)}% availability`,
+            icon: CheckCircle,
+            color: "#10b981",
+          },
+          {
+            title: "Total Pods",
+            value: systemStats.totalPods,
+            change: "Across all clusters",
+            icon: Server,
+            color: "#3b82f6",
+          },
+          {
+            title: "Average Uptime",
+            value: systemStats.averageUptime,
+            change: "System reliability",
+            icon: Shield,
+            color: "#8b5cf6",
+          },
+          {
+            title: "Last Deployment",
+            value: systemStats.lastDeployment,
+            change: "Recent activity",
+            icon: Clock,
+            color: "#f59e0b",
+          },
+        ].map((stat, index) => (
+          <div
+            key={stat.title}
+            className="relative"
+            style={{
+              animationDelay: `${index * 150}ms`,
+              animation: "fadeInUp 0.8s ease-out forwards",
+            }}
+          >
+            <Card className="group transition-all duration-700 hover:scale-105 hover:shadow-2xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90">
+              {/* Efecto de brillo en hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+              {/* Efecto de borde brillante */}
+              <div
+                className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                style={{
+                  background: `linear-gradient(45deg, ${stat.color}40, transparent, ${stat.color}40)`,
+                  backgroundSize: "200% 200%",
+                  animation: "shimmer 2s ease-in-out infinite",
+                }}
+              />
+
+              <CardContent className="p-4 relative z-10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground">
+                      {stat.title}
+                    </p>
+                    <p className="text-2xl font-bold text-foreground">
+                      {stat.value}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {stat.change}
+                    </p>
+                  </div>
+                  <div className="relative">
+                    {/* Efecto de partículas en el icono */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                    <stat.icon
+                      className="w-8 h-8 transition-all duration-500 group-hover:scale-110 relative z-10"
+                      style={{ color: stat.color }}
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        ))}
+      </div>
+
+      {/* Acciones rápidas */}
+      <div className="relative z-10">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map((action, index) => (
+            <div
+              key={action.title}
+              className="relative"
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animation: "fadeInUp 0.6s ease-out forwards",
+              }}
+            >
+              <Card
+                className="group cursor-pointer transition-all duration-500 hover:scale-105 hover:shadow-xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90"
+                onClick={action.action}
+              >
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                <div className="flex flex-col items-center text-center space-y-2 relative z-10">
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                    style={{ backgroundColor: `${action.color}20` }}
+                  >
+                    {/* Efecto de partículas en el icono */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                    <action.icon
+                      className="w-6 h-6 transition-all duration-300 group-hover:scale-110 relative z-10"
+                      style={{ color: action.color }}
+                    />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-foreground">
+                      {action.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Grid de clusters de Kubernetes */}
+      <div className="relative z-10">
+        <h2 className="text-xl font-semibold text-foreground mb-4">
+          Kubernetes Clusters
+        </h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {kubernetesClusters.map((cluster, index) => (
+            <div
+              key={cluster.id}
+              className="relative"
+              style={{
+                animationDelay: `${index * 150}ms`,
+                animation: "fadeInUp 0.8s ease-out forwards",
+              }}
+            >
+              <Card className="group transition-all duration-700 hover:scale-105 hover:shadow-2xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90">
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                {/* Efecto de borde brillante */}
+                <div
+                  className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(45deg, ${cluster.color}40, transparent, ${cluster.color}40)`,
+                    backgroundSize: "200% 200%",
+                    animation: "shimmer 2s ease-in-out infinite",
+                  }}
+                />
+
+                <CardHeader className="pb-3 relative z-10">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        {/* Efecto de partículas en el icono */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                        <Server
+                          className="w-6 h-6 transition-all duration-500 group-hover:scale-110 relative z-10"
+                          style={{ color: cluster.color }}
+                        />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg font-semibold text-foreground">
+                          {cluster.name}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div
+                            className={`w-2 h-2 rounded-full ${getStatusColor(
+                              cluster.status
+                            )}`}
+                          />
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {getStatusText(cluster.status)}
+                          </span>
+                          <div
+                            className={`w-2 h-2 rounded-full ${getTypeColor(
+                              cluster.type
+                            )}`}
+                          />
+                          <span className="text-xs text-muted-foreground capitalize">
+                            {cluster.type}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        v{cluster.version}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {cluster.nodes} nodes
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardDescription className="text-muted-foreground text-sm mt-2">
+                    {cluster.region} • {cluster.uptime} uptime • {cluster.cost}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="relative z-10">
+                  {/* Especificaciones del cluster */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">CPU</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {cluster.specs.cpu}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Memory</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {cluster.specs.memory}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Storage</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {cluster.specs.storage}
+                      </p>
+                    </div>
+                    <div className="p-2 rounded-lg bg-card/50">
+                      <p className="text-xs text-muted-foreground">Network</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {cluster.specs.network}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Métricas de rendimiento */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Performance Metrics
+                    </p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Cpu className="w-3 h-3 text-blue-500" />
+                        <span className="text-muted-foreground">CPU:</span>
+                        <span className="text-foreground">
+                          {cluster.metrics.cpuUsage}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <HardDrive className="w-3 h-3 text-green-500" />
+                        <span className="text-muted-foreground">RAM:</span>
+                        <span className="text-foreground">
+                          {cluster.metrics.memoryUsage}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <HardDrive className="w-3 h-3 text-purple-500" />
+                        <span className="text-muted-foreground">Storage:</span>
+                        <span className="text-foreground">
+                          {cluster.metrics.storageUsage}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <Activity className="w-3 h-3 text-orange-500" />
+                        <span className="text-muted-foreground">Pods:</span>
+                        <span className="text-foreground">
+                          {cluster.metrics.podCount}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Servicios principales */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Key Services
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {cluster.services.map((service, idx) => (
+                        <Badge
+                          key={idx}
+                          variant="secondary"
+                          className="text-xs bg-card/70 hover:bg-card/90 transition-colors duration-300"
+                        >
+                          {service}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tags del cluster */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Tags
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {cluster.tags.map((tag, idx) => (
+                        <Badge
+                          key={idx}
+                          variant="outline"
+                          className="text-xs border-border/50 text-muted-foreground"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Información del cluster */}
+                  <div className="space-y-2 mb-4">
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Cluster Info
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Owner:</span>
+                        <span className="text-foreground">
+                          {cluster.metadata.owner}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Team:</span>
+                        <span className="text-foreground">
+                          {cluster.metadata.team}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">Created:</span>
+                        <span className="text-foreground">
+                          {cluster.metadata.created}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-muted-foreground">
+                          Last Deploy:
+                        </span>
+                        <span className="text-foreground">
+                          {cluster.lastDeployment}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Acciones del cluster */}
+                  <div className="flex items-center justify-between pt-4 border-t border-border/50">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {cluster.uptime}
+                      </Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {cluster.cost}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditCluster(cluster)}
+                      >
+                        <Settings className="w-3 h-3 mr-1" />
+                        Configure
+                      </Button>
+                      <Button size="sm">
+                        <Monitor className="w-3 h-3 mr-1" />
+                        Monitor
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer con estadísticas adicionales */}
+      <div className="relative z-10 pt-8 border-t border-border/50">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+          <div>
+            <p className="text-sm text-muted-foreground">Scaling Clusters</p>
+            <p className="text-lg font-semibold text-foreground">
+              {systemStats.scalingClusters}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Total Pods</p>
+            <p className="text-lg font-semibold text-foreground">
+              {systemStats.totalPods}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Average Uptime</p>
+            <p className="text-lg font-semibold text-foreground">
+              {systemStats.averageUptime}
+            </p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground">Last Updated</p>
+            <p className="text-lg font-semibold text-foreground">Just now</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Modal para agregar cluster */}
+      <SimpleModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Add Kubernetes Cluster"
+        maxWidth="max-w-4xl"
+      >
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Configure a new Kubernetes cluster with your preferred
+            specifications.
+          </p>
+          {/* Aquí irían los campos del formulario */}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setIsAddModalOpen(false)}>
+              Create Cluster
+            </Button>
+          </div>
+        </div>
+      </SimpleModal>
+
+      {/* Modal para editar cluster */}
+      <SimpleModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        title={`Edit Cluster: ${selectedCluster?.name}`}
+        maxWidth="max-w-4xl"
+      >
+        <div className="space-y-4">
+          <p className="text-muted-foreground">
+            Modify the configuration of your Kubernetes cluster.
+          </p>
+          {/* Aquí irían los campos del formulario */}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setIsEditModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => setIsEditModalOpen(false)}>
+              Save Changes
+            </Button>
+          </div>
+        </div>
+      </SimpleModal>
+    </div>
+  );
+}

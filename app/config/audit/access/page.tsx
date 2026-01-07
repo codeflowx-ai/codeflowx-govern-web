@@ -1,0 +1,321 @@
+// app/config/audit/access/page.tsx
+"use client";
+
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { useState } from "react";
+
+interface AccessLog {
+  id: string;
+  timestamp: string;
+  user: string;
+  email: string;
+  action: string;
+  resource: string;
+  ip: string;
+  userAgent: string;
+  status: "success" | "failed" | "blocked";
+  details?: string;
+}
+
+const mockAccessLogs: AccessLog[] = [
+  {
+    id: "1",
+    timestamp: "2024-01-15T10:30:00Z",
+    user: "Admin User",
+    email: "admin@company.com",
+    action: "LOGIN",
+    resource: "Dashboard",
+    ip: "192.168.1.100",
+    userAgent: "Chrome/120.0",
+    status: "success",
+  },
+  {
+    id: "2",
+    timestamp: "2024-01-15T10:25:00Z",
+    user: "Developer User",
+    email: "dev@company.com",
+    action: "CODE_GENERATION",
+    resource: "Angular Model",
+    ip: "192.168.1.101",
+    userAgent: "Chrome/120.0",
+    status: "success",
+  },
+  {
+    id: "3",
+    timestamp: "2024-01-15T10:20:00Z",
+    user: "Unknown",
+    email: "hacker@evil.com",
+    action: "LOGIN_ATTEMPT",
+    resource: "Dashboard",
+    ip: "45.123.45.67",
+    userAgent: "Bot/1.0",
+    status: "blocked",
+    details: "Suspicious IP detected",
+  },
+  {
+    id: "4",
+    timestamp: "2024-01-15T10:15:00Z",
+    user: "Developer User",
+    email: "dev@company.com",
+    action: "MODEL_TRAINING",
+    resource: "Custom Model",
+    ip: "192.168.1.101",
+    userAgent: "Chrome/120.0",
+    status: "failed",
+    details: "Insufficient permissions",
+  },
+];
+
+export default function AccessAuditPage() {
+  const [logs] = useState<AccessLog[]>(mockAccessLogs);
+  const [filter, setFilter] = useState("all");
+  const [timeRange, setTimeRange] = useState("24h");
+
+  const filteredLogs = logs.filter((log) => {
+    if (filter === "all") return true;
+    return log.status === filter;
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "success":
+        return "bg-green-100 text-green-700";
+      case "failed":
+        return "bg-red-100 text-red-700";
+      case "blocked":
+        return "bg-yellow-100 text-yellow-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "success":
+        return "✅";
+      case "failed":
+        return "❌";
+      case "blocked":
+        return "🚫";
+      default:
+        return "❓";
+    }
+  };
+
+  const getActionIcon = (action: string) => {
+    switch (action) {
+      case "LOGIN":
+        return "🔐";
+      case "LOGIN_ATTEMPT":
+        return "🔓";
+      case "CODE_GENERATION":
+        return "⚡";
+      case "MODEL_TRAINING":
+        return "🧠";
+      case "USER_CREATED":
+        return "👤";
+      case "CONFIG_CHANGED":
+        return "⚙️";
+      default:
+        return "📝";
+    }
+  };
+
+  const stats = {
+    total: logs.length,
+    success: logs.filter((l) => l.status === "success").length,
+    failed: logs.filter((l) => l.status === "failed").length,
+    blocked: logs.filter((l) => l.status === "blocked").length,
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      
+      {/* Header */}
+      <div className="space-y-2">
+        <h1 className="text-2xl font-bold text-gray-900">🔍 Access Audit</h1>
+        <p className="text-gray-600">Monitor user access and security events</p>
+        {/* Banner de Desarrollo - Versión 1.0.0 Operativa */}
+        <DevelopmentBanner
+          type="operational"
+          customText="✅ Versión 1.0.0 - Operativa"
+          showEarlyAdopterButton={false}
+          className="justify-start"
+        />
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📊</span>
+            <div>
+              <p className="text-sm text-gray-600">Total Events</p>
+              <p className="text-xl font-bold">{stats.total}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">✅</span>
+            <div>
+              <p className="text-sm text-gray-600">Successful</p>
+              <p className="text-xl font-bold text-green-600">
+                {stats.success}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">❌</span>
+            <div>
+              <p className="text-sm text-gray-600">Failed</p>
+              <p className="text-xl font-bold text-red-600">{stats.failed}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg border border-gray-200 p-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🚫</span>
+            <div>
+              <p className="text-sm text-gray-600">Blocked</p>
+              <p className="text-xl font-bold text-yellow-600">
+                {stats.blocked}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4">
+        <div className="flex flex-wrap gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status Filter
+            </label>
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="all">All Events</option>
+              <option value="success">Successful</option>
+              <option value="failed">Failed</option>
+              <option value="blocked">Blocked</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Time Range
+            </label>
+            <select
+              value={timeRange}
+              onChange={(e) => setTimeRange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="1h">Last Hour</option>
+              <option value="24h">Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+              <option value="30d">Last 30 Days</option>
+            </select>
+          </div>
+
+          <div className="flex items-end">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
+              📥 Export Logs
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Logs Table */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Timestamp
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  User
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Action
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Resource
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  IP Address
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Status
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {filteredLogs.map((log) => (
+                <tr key={log.id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {new Date(log.timestamp).toLocaleString()}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div>
+                      <div className="text-sm font-medium text-gray-900">
+                        {log.user}
+                      </div>
+                      <div className="text-xs text-gray-500">{log.email}</div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2">
+                      <span>{getActionIcon(log.action)}</span>
+                      <span className="text-sm text-gray-900">
+                        {log.action}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900">
+                    {log.resource}
+                  </td>
+                  <td className="px-4 py-3">
+                    <div>
+                      <div className="text-sm text-gray-900 font-mono">
+                        {log.ip}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {log.userAgent}
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full font-medium ${getStatusColor(
+                        log.status
+                      )}`}
+                    >
+                      <span>{getStatusIcon(log.status)}</span>
+                      {log.status}
+                    </span>
+                    {log.details && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {log.details}
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}

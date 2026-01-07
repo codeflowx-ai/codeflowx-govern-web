@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Component Files</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        .module { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; max-height: 200px; overflow-y: auto; }
+        .component-list { margin: 10px 0; }
+        .component-item { display: inline-block; margin: 2px; padding: 4px 8px; background: #e3f2fd; border-radius: 3px; font-size: 12px; }
+    </style>
+</head>
+<body>
+<h1>Component Files Debug</h1>
+<div id="results"></div>
+
+<script>
+    const componentModules = [
+        { path: '/config/toolkit/components/basic-inputs.json', name: 'Basic Inputs', expected: ['input', 'textarea', 'select', 'checkbox', 'radio', 'toggle'] },
+        { path: '/config/toolkit/components/numeric-inputs.json', name: 'Numeric Inputs', expected: ['number', 'currency', 'percentage', 'range'] },
+        { path: '/config/toolkit/components/advanced-inputs.json', name: 'Advanced Inputs', expected: ['file', 'richtext', 'map', 'tsvector', 'autocomplete', 'rating', 'color'] },
+        { path: '/config/toolkit/components/buttons.json', name: 'Buttons', expected: ['button', 'link'] },
+        { path: '/config/toolkit/components/date-time.json', name: 'Date Time', expected: ['date', 'time', 'datetime'] },
+        { path: '/config/toolkit/components/data-display.json', name: 'Data Display', expected: ['table', 'list', 'card', 'badge', 'progress'] },
+        { path: '/config/toolkit/components/layout.json', name: 'Layout', expected: ['container', 'tabs', 'accordion', 'divider', 'panel', 'fieldset'] },
+        { path: '/config/toolkit/components/media.json', name: 'Media', expected: ['image', 'video', 'audio'] }
+    ];
+
+    async function debugFiles() {
+        const results = document.getElementById('results');
+
+        for (const module of componentModules) {
+            const moduleDiv = document.createElement('div');
+            moduleDiv.className = 'module';
+
+            try {
+                console.log(`Checking ${module.path}...`);
+                const response = await fetch(module.path);
+
+                if (response.ok) {
+                    const text = await response.text();
+
+                    if (text.length === 0) {
+                        moduleDiv.innerHTML = `
+                                <h3 class="error">❌ ${module.name}</h3>
+                                <p class="error">File is empty</p>
+                            `;
+                    } else {
+                        try {
+                            const data = JSON.parse(text);
+
+                            if (data.components) {
+                                const actualComponents = Object.keys(data.components);
+                                const missing = module.expected.filter(comp => !actualComponents.includes(comp));
+                                const extra = actualComponents.filter(comp => !module.expected.includes(comp));
+
+                                let statusClass = 'success';
+                                let statusIcon = '✅';
+
+                                if (missing.length > 0 || extra.length > 0) {
+                                    statusClass = 'warning';
+                                    statusIcon = '⚠️';
+                                }
+
+                                moduleDiv.innerHTML = `
+                                        <h3 class="${statusClass}">${statusIcon} ${module.name}</h3>
+                                        <p><strong>File size:</strong> ${text.length} bytes</p>
+                                        <p><strong>Components found:</strong> ${actualComponents.length}</p>
+                                        <div class="component-list">
+                                            ${actualComponents.map(comp => `<span class="component-item">${comp}</span>`).join('')}
+                                        </div>
+                                        ${missing.length > 0 ? `<p class="warning"><strong>Missing:</strong> ${missing.join(', ')}</p>` : ''}
+                                        ${extra.length > 0 ? `<p class="warning"><strong>Extra:</strong> ${extra.join(', ')}</p>` : ''}
+                                        <details>
+                                            <summary>View JSON structure</summary>
+                                            <pre>${JSON.stringify(data, null, 2).substring(0, 1000)}${text.length > 1000 ? '...' : ''}</pre>
+                                        </details>
+                                    `;
+                            } else {
+                                moduleDiv.innerHTML = `
+                                        <h3 class="error">❌ ${module.name}</h3>
+                                        <p class="error">No 'components' object found</p>
+                                        <p><strong>File size:</strong> ${text.length} bytes</p>
+                                        <p><strong>Root keys:</strong> ${Object.keys(data).join(', ')}</p>
+                                        <details>
+                                            <summary>View JSON content</summary>
+                                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                                        </details>
+                                    `;
+                            }
+                        } catch (parseError) {
+                            moduleDiv.innerHTML = `
+                                    <h3 class="error">🔥 ${module.name}</h3>
+                                    <p class="error">JSON Parse Error: ${parseError.message}</p>
+                                    <p><strong>File size:</strong> ${text.length} bytes</p>
+                                    <details>
+                                        <summary>View raw content</summary>
+                                        <pre>${text.substring(0, 1000)}${text.length > 1000 ? '...' : ''}</pre>
+                                    </details>
+                                `;
+                        }
+                    }
+                } else {
+                    moduleDiv.innerHTML = `
+                            <h3 class="error">❌ ${module.name}</h3>
+                            <p class="error">HTTP ${response.status}: ${response.statusText}</p>
+                            <p><strong>Path:</strong> ${module.path}</p>
+                        `;
+                }
+            } catch (error) {
+                moduleDiv.innerHTML = `
+                        <h3 class="error">🔥 ${module.name}</h3>
+                        <p class="error">Network Error: ${error.message}</p>
+                        <p><strong>Path:</strong> ${module.path}</p>
+                    `;
+            }
+
+            results.appendChild(moduleDiv);
+        }
+    }
+
+    debugFiles();
+</script>
+</body>
+</html>

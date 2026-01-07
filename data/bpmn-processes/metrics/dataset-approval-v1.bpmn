@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-approval">
+  <process id="dataset-approval-v1" name="Dataset Approval Process V1" isExecutable="true" version="1.0" flowable:candidateStarterGroups="data-engineers,governance-admins">
+    <startEvent id="startApproval" name="Start Dataset Approval">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Verificar calidad (subproceso) -->
+    <callActivity id="checkQuality" name="Check Dataset Quality" calledElement="dataset-quality-v1">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Calidad aprobada? -->
+    <exclusiveGateway id="qualityGateway" name="Quality Approved?">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+      <outgoing>flow4</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Calidad rechazada: Fin con rechazo -->
+    <endEvent id="endRejectedQuality" name="Rejected - Quality">
+      <incoming>flow3</incoming>
+    </endEvent>
+    
+    <!-- Calidad aprobada: Verificar riesgos (subproceso) -->
+    <callActivity id="checkRisks" name="Check Dataset Risks" calledElement="dataset-risk-assessment-v1">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Riesgos aprobados? -->
+    <exclusiveGateway id="riskGateway" name="Risks Approved?">
+      <incoming>flow5</incoming>
+      <outgoing>flow6</outgoing>
+      <outgoing>flow7</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Riesgos rechazados: Fin con rechazo -->
+    <endEvent id="endRejectedRisks" name="Rejected - Risks">
+      <incoming>flow6</incoming>
+    </endEvent>
+    
+    <!-- Riesgos aprobados: Verificar privacidad (subproceso) -->
+    <callActivity id="checkPrivacy" name="Check Dataset Privacy" calledElement="dataset-privacy-assessment-v1">
+      <incoming>flow7</incoming>
+      <outgoing>flow8</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Privacidad aprobada? -->
+    <exclusiveGateway id="privacyGateway" name="Privacy Approved?">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+      <outgoing>flow10</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Privacidad rechazada: Fin con rechazo -->
+    <endEvent id="endRejectedPrivacy" name="Rejected - Privacy">
+      <incoming>flow9</incoming>
+    </endEvent>
+    
+    <!-- Todos los checks pasan: Revisión final opcional -->
+    <exclusiveGateway id="finalReviewGateway" name="Final Review Required?">
+      <incoming>flow10</incoming>
+      <outgoing>flow11</outgoing>
+      <outgoing>flow12</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Revisión final requerida -->
+    <userTask id="finalReview" name="Final Review" flowable:candidateGroups="governance-admins,data-stewards" flowable:formKey="dataset-final-review-form" flowable:priority="60">
+      <incoming>flow11</incoming>
+      <outgoing>flow13</outgoing>
+      <documentation>Revisión final antes de aprobación para uso en producción</documentation>
+    </userTask>
+    
+    <!-- Gateway: ¿Aprobado en revisión final? -->
+    <exclusiveGateway id="finalDecisionGateway" name="Final Decision">
+      <incoming>flow13</incoming>
+      <outgoing>flow14</outgoing>
+      <outgoing>flow15</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Rechazado en revisión final -->
+    <endEvent id="endRejectedFinal" name="Rejected - Final Review">
+      <incoming>flow14</incoming>
+    </endEvent>
+    
+    <!-- Aprobado: Aprobar dataset -->
+    <serviceTask id="approveDataset" name="Approve Dataset" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.ApproveDatasetDelegate">
+      <incoming>flow12</incoming>
+      <incoming>flow15</incoming>
+      <outgoing>flow16</outgoing>
+    </serviceTask>
+    
+    <!-- Registrar documentación -->
+    <serviceTask id="recordDocumentation" name="Record Approval Documentation" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.RecordDatasetApprovalDocumentationDelegate">
+      <incoming>flow16</incoming>
+      <outgoing>flow17</outgoing>
+    </serviceTask>
+    
+    <!-- Notificar aprobación -->
+    <serviceTask id="notifyApproval" name="Notify Dataset Approval" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyDatasetApprovedDelegate">
+      <incoming>flow17</incoming>
+      <outgoing>flow18</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endApproved" name="Dataset Approved">
+      <incoming>flow18</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startApproval" targetRef="checkQuality"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="checkQuality" targetRef="qualityGateway"></sequenceFlow>
+    <sequenceFlow id="flow3" name="Rejected" sourceRef="qualityGateway" targetRef="endRejectedQuality">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qualityResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" name="Approved" sourceRef="qualityGateway" targetRef="checkRisks">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qualityResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="checkRisks" targetRef="riskGateway"></sequenceFlow>
+    <sequenceFlow id="flow6" name="Rejected" sourceRef="riskGateway" targetRef="endRejectedRisks">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="Approved" sourceRef="riskGateway" targetRef="checkPrivacy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="checkPrivacy" targetRef="privacyGateway"></sequenceFlow>
+    <sequenceFlow id="flow9" name="Rejected" sourceRef="privacyGateway" targetRef="endRejectedPrivacy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${privacyResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow10" name="Approved" sourceRef="privacyGateway" targetRef="finalReviewGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${privacyResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" name="Required" sourceRef="finalReviewGateway" targetRef="finalReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewRequired == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" name="Not Required" sourceRef="finalReviewGateway" targetRef="approveDataset">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewRequired == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="finalReview" targetRef="finalDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow14" name="Rejected" sourceRef="finalDecisionGateway" targetRef="endRejectedFinal">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" name="Approved" sourceRef="finalDecisionGateway" targetRef="approveDataset">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="approveDataset" targetRef="recordDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="recordDocumentation" targetRef="notifyApproval"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="notifyApproval" targetRef="endApproved"></sequenceFlow>
+  </process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-approval-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-approval-v1" id="BPMNPlane_dataset-approval-v1">
+      <bpmndi:BPMNShape id="BPMNShape_startApproval" bpmnElement="startApproval">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_checkQuality" bpmnElement="checkQuality">
+        <omgdc:Bounds x="140" y="235" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_qualityGateway" bpmnElement="qualityGateway">
+        <omgdc:Bounds x="175" y="435" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRejectedQuality" bpmnElement="endRejectedQuality">
+        <omgdc:Bounds x="182" y="622" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_checkRisks" bpmnElement="checkRisks">
+        <omgdc:Bounds x="340" y="595" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskGateway" bpmnElement="riskGateway">
+        <omgdc:Bounds x="175" y="795" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRejectedRisks" bpmnElement="endRejectedRisks">
+        <omgdc:Bounds x="182" y="982" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_checkPrivacy" bpmnElement="checkPrivacy">
+        <omgdc:Bounds x="340" y="955" width="120" height="90" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_privacyGateway" bpmnElement="privacyGateway">
+        <omgdc:Bounds x="175" y="1155" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRejectedPrivacy" bpmnElement="endRejectedPrivacy">
+        <omgdc:Bounds x="182" y="1342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalReviewGateway" bpmnElement="finalReviewGateway">
+        <omgdc:Bounds x="375" y="1335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalReview" bpmnElement="finalReview">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalDecisionGateway" bpmnElement="finalDecisionGateway">
+        <omgdc:Bounds x="175" y="1695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRejectedFinal" bpmnElement="endRejectedFinal">
+        <omgdc:Bounds x="182" y="1882" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approveDataset" bpmnElement="approveDataset">
+        <omgdc:Bounds x="350" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_recordDocumentation" bpmnElement="recordDocumentation">
+        <omgdc:Bounds x="350" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyApproval" bpmnElement="notifyApproval">
+        <omgdc:Bounds x="350" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endApproved" bpmnElement="endApproved">
+        <omgdc:Bounds x="182" y="2062" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="140" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="260" y="280" />
+        <omgdi:waypoint x="175" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="182" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="340" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="460" y="640" />
+        <omgdi:waypoint x="175" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="182" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="340" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow8" bpmnElement="flow8">
+        <omgdi:waypoint x="460" y="1000" />
+        <omgdi:waypoint x="175" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow9" bpmnElement="flow9">
+        <omgdi:waypoint x="225" y="1180" />
+        <omgdi:waypoint x="182" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow10" bpmnElement="flow10">
+        <omgdi:waypoint x="225" y="1180" />
+        <omgdi:waypoint x="375" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow11" bpmnElement="flow11">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow12" bpmnElement="flow12">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="350" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow13" bpmnElement="flow13">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="175" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow14" bpmnElement="flow14">
+        <omgdi:waypoint x="225" y="1720" />
+        <omgdi:waypoint x="182" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow15" bpmnElement="flow15">
+        <omgdi:waypoint x="225" y="1720" />
+        <omgdi:waypoint x="350" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow16" bpmnElement="flow16">
+        <omgdi:waypoint x="450" y="1540" />
+        <omgdi:waypoint x="350" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow17" bpmnElement="flow17">
+        <omgdi:waypoint x="450" y="1720" />
+        <omgdi:waypoint x="350" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow18" bpmnElement="flow18">
+        <omgdi:waypoint x="450" y="1900" />
+        <omgdi:waypoint x="182" y="2080" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

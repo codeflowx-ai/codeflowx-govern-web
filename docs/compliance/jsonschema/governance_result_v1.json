@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://codeflowx.io/schemas/governance_result_v1.json",
+  "title": "GovernanceResult",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "result_id",
+    "sector_code",
+    "use_case_code",
+    "regulation_refs",
+    "tenant_id",
+    "geo_scope",
+    "metrics"
+  ],
+  "properties": {
+    "result_id": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 64
+    },
+    "sector_code": {
+      "type": "string",
+      "pattern": "^[A-Z_]{3,40}$"
+    },
+    "use_case_code": {
+      "type": "string",
+      "pattern": "^[A-Z0-9_]{5,60}$"
+    },
+    "regulation_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 3
+      },
+      "uniqueItems": true
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 36
+    },
+    "geo_scope": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]{2,10}$"
+      },
+      "uniqueItems": true
+    },
+    "sla_profile": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 40
+    },
+    "metrics": {
+      "type": "object",
+      "description": "Resultados cuantitativos calculados por el framework FaaS.",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Metadatos adicionales derivados de la ejecución del framework.",
+      "additionalProperties": true
+    }
+  }
+}

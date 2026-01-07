@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify Toolkit Files</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .warning { color: orange; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+<h1>Toolkit Files Verification</h1>
+<div id="results"></div>
+
+<script>
+    const files = [
+        '/config/toolkit/base-config.json',
+        '/config/toolkit/categories.json',
+        '/config/toolkit/property-types.json',
+        '/config/toolkit/components/basic-inputs.json',
+        '/config/toolkit/components/numeric-inputs.json',
+        '/config/toolkit/components/advanced-inputs.json',
+        '/config/toolkit/components/buttons.json',
+        '/config/toolkit/components/date-time.json',
+        '/config/toolkit/components/data-display.json',
+        '/config/toolkit/components/layout.json',
+        '/config/toolkit/components/media.json',
+        '/config/toolkit/database/field-mappings.json',
+        '/config/toolkit/validation/rules.json',
+        '/config/toolkit/events/actions.json',
+        '/config/toolkit/templates/form-templates.json',
+        '/config/toolkit/themes/default-themes.json',
+        '/config/toolkit/snippets/code-snippets.json'
+    ];
+
+    async function verifyFiles() {
+        const results = document.getElementById('results');
+
+        for (const file of files) {
+            const div = document.createElement('div');
+
+            try {
+                const response = await fetch(file);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const size = JSON.stringify(data).length;
+
+                    if (file.includes('/components/')) {
+                        const componentCount = data.components ? Object.keys(data.components).length : 0;
+                        div.innerHTML = `<span class="success">✅ ${file}</span> - ${componentCount} components, ${size} bytes`;
+                    } else {
+                        div.innerHTML = `<span class="success">✅ ${file}</span> - ${size} bytes`;
+                    }
+                } else {
+                    div.innerHTML = `<span class="error">❌ ${file}</span> - HTTP ${response.status}: ${response.statusText}`;
+                }
+            } catch (error) {
+                div.innerHTML = `<span class="error">🔥 ${file}</span> - ${error.message}`;
+            }
+
+            results.appendChild(div);
+        }
+    }
+
+    verifyFiles();
+</script>
+</body>
+</html>

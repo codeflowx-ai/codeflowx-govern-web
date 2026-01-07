@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://codeflowx.com/govern/aios">
+    <process id="ai_policy_review_v1"
+             name="AI Policy Review &amp; Enforcement"
+             isExecutable="true">
+
+        <startEvent id="start_policy_review" name="Policy Trigger">
+            <outgoing>flow_start_load</outgoing>
+        </startEvent>
+
+        <serviceTask id="task_load_policies"
+                     name="Load Active Policies"
+                     camunda:delegateExpression="#{loadPoliciesDelegate}">
+            <incoming>flow_start_load</incoming>
+            <outgoing>flow_load_evidence</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_evaluate_evidence"
+                     name="Evaluate Runtime Evidence"
+                     camunda:delegateExpression="#{evaluatePolicyEvidenceDelegate}">
+            <!-- @todo implement client for aio-policy-service -->
+            <incoming>flow_load_evidence</incoming>
+            <outgoing>flow_evidence_parallel</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_policy_parallel" name="Review Parallel Tasks">
+            <incoming>flow_evidence_parallel</incoming>
+            <outgoing>flow_parallel_rules</outgoing>
+            <outgoing>flow_parallel_dashboard</outgoing>
+        </parallelGateway>
+
+        <serviceTask id="task_policy_rules"
+                     name="Policy Compliance Decision"
+                     camunda:delegateExpression="#{policyReviewRulesDelegate}">
+            <incoming>flow_parallel_rules</incoming>
+            <outgoing>flow_rules_join</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_update_policy_dashboard"
+                     name="Update Policy Dashboard"
+                     camunda:delegateExpression="#{updatePolicyDashboardDelegate}">
+            <incoming>flow_parallel_dashboard</incoming>
+            <outgoing>flow_dashboard_join</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_policy_join" name="Join Review Branches">
+            <incoming>flow_rules_join</incoming>
+            <incoming>flow_dashboard_join</incoming>
+            <outgoing>flow_join_gateway</outgoing>
+        </parallelGateway>
+
+        <exclusiveGateway id="gateway_policy_decision" name="Decision">
+            <incoming>flow_join_gateway</incoming>
+            <outgoing>flow_decision_compliant</outgoing>
+            <outgoing>flow_decision_hitl</outgoing>
+            <outgoing>flow_decision_noncompliant</outgoing>
+        </exclusiveGateway>
+
+        <serviceTask id="task_log_compliance"
+                     name="Log Compliance"
+                     camunda:delegateExpression="#{logPolicyComplianceDelegate}">
+            <incoming>flow_decision_compliant</incoming>
+            <outgoing>flow_compliant_end</outgoing>
+        </serviceTask>
+
+        <userTask id="task_policy_committee"
+                  name="Policy Committee Review"
+                  camunda:formKey="zul:aios/policy_committee_review.zul"
+                  camunda:candidateGroups="POLICY_COMMITTEE">
+            <incoming>flow_decision_hitl</incoming>
+            <outgoing>flow_hitl_end</outgoing>
+        </userTask>
+
+        <serviceTask id="task_enforce_remediation"
+                     name="Enforce Remediation"
+                     camunda:delegateExpression="#{policyRemediationDelegate}">
+            <incoming>flow_decision_noncompliant</incoming>
+            <outgoing>flow_remediation_to_suspension</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_trigger_suspension"
+                     name="Trigger Suspension"
+                     camunda:delegateExpression="#{triggerPolicySuspensionDelegate}">
+            <incoming>flow_remediation_to_suspension</incoming>
+            <outgoing>flow_suspension_end</outgoing>
+        </serviceTask>
+
+        <endEvent id="end_compliant" name="Compliant">
+            <incoming>flow_compliant_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_hitl" name="HITL Review Logged">
+            <incoming>flow_hitl_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_suspension" name="Suspension Triggered">
+            <incoming>flow_suspension_end</incoming>
+        </endEvent>
+
+        <sequenceFlow id="flow_start_load" sourceRef="start_policy_review" targetRef="task_load_policies"/>
+        <sequenceFlow id="flow_load_evidence" sourceRef="task_load_policies" targetRef="task_evaluate_evidence"/>
+        <sequenceFlow id="flow_evidence_parallel" sourceRef="task_evaluate_evidence" targetRef="gateway_policy_parallel"/>
+        <sequenceFlow id="flow_parallel_rules" sourceRef="gateway_policy_parallel" targetRef="task_policy_rules"/>
+        <sequenceFlow id="flow_parallel_dashboard" sourceRef="gateway_policy_parallel" targetRef="task_update_policy_dashboard"/>
+        <sequenceFlow id="flow_rules_join" sourceRef="task_policy_rules" targetRef="gateway_policy_join"/>
+        <sequenceFlow id="flow_dashboard_join" sourceRef="task_update_policy_dashboard" targetRef="gateway_policy_join"/>
+        <sequenceFlow id="flow_join_gateway" sourceRef="gateway_policy_join" targetRef="gateway_policy_decision"/>
+        <sequenceFlow id="flow_decision_compliant" sourceRef="gateway_policy_decision" targetRef="task_log_compliance">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${policyDecision == 'COMPLIANT'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_hitl" sourceRef="gateway_policy_decision" targetRef="task_policy_committee">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${policyDecision == 'HITL'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_noncompliant" sourceRef="gateway_policy_decision" targetRef="task_enforce_remediation">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${policyDecision == 'NON_COMPLIANT'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_compliant_end" sourceRef="task_log_compliance" targetRef="end_compliant"/>
+        <sequenceFlow id="flow_hitl_end" sourceRef="task_policy_committee" targetRef="end_hitl"/>
+        <sequenceFlow id="flow_remediation_to_suspension" sourceRef="task_enforce_remediation" targetRef="task_trigger_suspension"/>
+        <sequenceFlow id="flow_suspension_end" sourceRef="task_trigger_suspension" targetRef="end_suspension"/>
+    </process>
+</definitions>
+
+

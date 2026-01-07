@@ -1,0 +1,462 @@
+{
+  "templates": [
+    {
+      "id": "generic-search",
+      "name": "Generic Search & Preview",
+      "type": "SEARCH_LIST",
+      "toolkit": "enterprise-forms",
+      "description": "Pantalla de búsqueda y maestro detalle",
+      "version": "1.2.2",
+      "licenses": ["FREE", "PERSONAL", "PROFESSIONAL", "TEAMS"],
+      "icon": "lucide:search",
+      "preview": "/templates/previews/generic-search.png",
+      "sections": ["search", "grid", "preview"],
+      "events": ["onCreate", "onLoad", "onSearch", "onSelect"],
+      "properties": [
+        {
+          "id": "title",
+          "name": "Title",
+          "type": "input",
+          "required": true,
+          "label": "Screen Title",
+          "default": "Search Screen",
+          "validation": { "range": "5,100" }
+        },
+        {
+          "id": "entity",
+          "name": "entity",
+          "type": "combo",
+          "list": "$tables",
+          "required": true,
+          "label": "Main Entity"
+        },
+        {
+          "id": "searchFields",
+          "name": "searchFields",
+          "type": "multiselect",
+          "list": "$fields",
+          "label": "Search Fields"
+        },
+        {
+          "id": "gridColumns",
+          "name": "gridColumns",
+          "type": "multiselect",
+          "list": "$fields",
+          "label": "Grid Columns"
+        },
+        {
+          "id": "actions",
+          "name": "actions",
+          "type": "combo",
+          "default": "All",
+          "label": "Allowed Actions",
+          "options": [
+            { "value": "All", "label": "All Actions" },
+            { "value": "New", "label": "New Only" },
+            { "value": "Update", "label": "Update Only" },
+            { "value": "Delete", "label": "Delete Only" },
+            { "value": "View", "label": "View Only" }
+          ]
+        },
+        {
+          "id": "popup",
+          "name": "popup",
+          "type": "boolean",
+          "default": false,
+          "label": "Open in Popup"
+        },
+        {
+          "id": "theme",
+          "name": "theme",
+          "type": "combo",
+          "default": "default",
+          "label": "Theme",
+          "options": [
+            { "value": "default", "label": "Default" },
+            { "value": "dark", "label": "Dark" },
+            { "value": "corporate", "label": "Corporate" },
+            { "value": "modern", "label": "Modern" }
+          ]
+        }
+      ],
+      "automappings": [
+        {
+          "mold": "nocode",
+          "className": "SearchPreviewComponent",
+          "sections": ["search", "grid", "preview"]
+        }
+      ],
+      "builders": [
+        {
+          "type": "search",
+          "ratio": 100,
+          "estimatedTime": 180,
+          "generator": "React",
+          "key": "search-panel",
+          "template": "search-panel.ftl",
+          "builder": "SearchPanelBuilder",
+          "extension": ".tsx",
+          "outputFile": "SearchPanel.tsx"
+        },
+        {
+          "type": "grid",
+          "ratio": 100,
+          "estimatedTime": 240,
+          "generator": "React",
+          "key": "data-grid",
+          "template": "data-grid.ftl",
+          "builder": "DataGridBuilder",
+          "extension": ".tsx",
+          "outputFile": "DataGrid.tsx"
+        },
+        {
+          "type": "preview",
+          "ratio": 100,
+          "estimatedTime": 120,
+          "generator": "React",
+          "key": "detail-preview",
+          "template": "detail-preview.ftl",
+          "builder": "PreviewBuilder",
+          "extension": ".tsx",
+          "outputFile": "DetailPreview.tsx"
+        }
+      ],
+      "metadata": {
+        "tags": ["search", "grid", "preview", "crud"],
+        "category": "Data Management",
+        "complexity": "MEDIUM",
+        "estimatedTime": 540
+      }
+    },
+    {
+      "id": "crud-form",
+      "name": "CRUD Form",
+      "type": "BASIC_FORM",
+      "toolkit": "enterprise-forms",
+      "description": "Formulario CRUD básico",
+      "version": "1.0.0",
+      "licenses": ["FREE", "PERSONAL", "PROFESSIONAL", "TEAMS"],
+      "icon": "lucide:edit",
+      "sections": ["form", "actions"],
+      "events": ["onCreate", "onLoad", "onSave", "onDelete", "onCancel"],
+      "properties": [
+        {
+          "id": "title",
+          "name": "Title",
+          "type": "input",
+          "required": true,
+          "label": "Form Title",
+          "default": "Entity Form"
+        },
+        {
+          "id": "entity",
+          "name": "entity",
+          "type": "combo",
+          "list": "$tables",
+          "required": true,
+          "label": "Entity"
+        },
+        {
+          "id": "formFields",
+          "name": "formFields",
+          "type": "multiselect",
+          "list": "$fields",
+          "label": "Form Fields"
+        },
+        {
+          "id": "layout",
+          "name": "layout",
+          "type": "combo",
+          "default": "2-column",
+          "label": "Form Layout",
+          "options": [
+            { "value": "1-column", "label": "1 Column" },
+            { "value": "2-column", "label": "2 Columns" },
+            { "value": "3-column", "label": "3 Columns" },
+            { "value": "tabs", "label": "Tabbed Layout" }
+          ]
+        },
+        {
+          "id": "validation",
+          "name": "validation",
+          "type": "boolean",
+          "default": true,
+          "label": "Enable Validation"
+        }
+      ],
+      "automappings": [
+        {
+          "mold": "nocode",
+          "className": "CRUDFormComponent",
+          "sections": ["form", "actions"]
+        }
+      ],
+      "builders": [
+        {
+          "type": "form",
+          "ratio": 100,
+          "estimatedTime": 300,
+          "generator": "React",
+          "key": "crud-form",
+          "template": "crud-form.ftl",
+          "builder": "CRUDFormBuilder",
+          "extension": ".tsx",
+          "outputFile": "CRUDForm.tsx"
+        }
+      ],
+      "metadata": {
+        "tags": ["form", "crud", "basic"],
+        "category": "Forms",
+        "complexity": "SIMPLE",
+        "estimatedTime": 300
+      }
+    },
+    {
+      "id": "dashboard",
+      "name": "Dashboard",
+      "type": "DASHBOARD",
+      "toolkit": "enterprise-forms",
+      "description": "Dashboard empresarial",
+      "version": "1.0.0",
+      "licenses": ["PROFESSIONAL", "TEAMS"],
+      "icon": "lucide:layout-dashboard",
+      "sections": ["header", "widgets", "footer"],
+      "events": ["onLoad", "onRefresh"],
+      "properties": [
+        {
+          "id": "title",
+          "name": "Title",
+          "type": "input",
+          "required": true,
+          "label": "Dashboard Title",
+          "default": "Dashboard"
+        },
+        {
+          "id": "widgets",
+          "name": "widgets",
+          "type": "multiselect",
+          "label": "Dashboard Widgets",
+          "options": [
+            { "value": "chart", "label": "Charts" },
+            { "value": "table", "label": "Data Tables" },
+            { "value": "metric", "label": "Metrics" },
+            { "value": "calendar", "label": "Calendar" },
+            { "value": "news", "label": "News Feed" }
+          ]
+        },
+        {
+          "id": "refreshInterval",
+          "name": "refreshInterval",
+          "type": "number",
+          "default": 30,
+          "label": "Refresh Interval (seconds)",
+          "validation": { "min": 10, "max": 3600 }
+        },
+        {
+          "id": "layout",
+          "name": "layout",
+          "type": "combo",
+          "default": "grid",
+          "label": "Layout Type",
+          "options": [
+            { "value": "grid", "label": "Grid Layout" },
+            { "value": "flex", "label": "Flex Layout" },
+            { "value": "masonry", "label": "Masonry Layout" }
+          ]
+        }
+      ],
+      "automappings": [
+        {
+          "mold": "lowcode",
+          "className": "DashboardComponent",
+          "sections": ["header", "widgets", "footer"]
+        }
+      ],
+      "builders": [
+        {
+          "type": "dashboard",
+          "ratio": 100,
+          "estimatedTime": 600,
+          "generator": "React",
+          "key": "dashboard",
+          "template": "dashboard.ftl",
+          "builder": "DashboardBuilder",
+          "extension": ".tsx",
+          "outputFile": "Dashboard.tsx"
+        }
+      ],
+      "metadata": {
+        "tags": ["dashboard", "widgets", "analytics"],
+        "category": "Analytics",
+        "complexity": "COMPLEX",
+        "estimatedTime": 600
+      }
+    },
+    {
+      "id": "master-detail",
+      "name": "Master-Detail",
+      "type": "MASTER_DETAIL",
+      "toolkit": "enterprise-forms",
+      "description": "Pantalla maestro-detalle",
+      "version": "1.0.0",
+      "licenses": ["PERSONAL", "PROFESSIONAL", "TEAMS"],
+      "icon": "lucide:split",
+      "sections": ["master", "detail"],
+      "events": ["onLoad", "onMasterSelect", "onDetailChange"],
+      "properties": [
+        {
+          "id": "title",
+          "name": "Title",
+          "type": "input",
+          "required": true,
+          "label": "Screen Title",
+          "default": "Master-Detail View"
+        },
+        {
+          "id": "masterEntity",
+          "name": "masterEntity",
+          "type": "combo",
+          "list": "$tables",
+          "required": true,
+          "label": "Master Entity"
+        },
+        {
+          "id": "detailEntity",
+          "name": "detailEntity",
+          "type": "combo",
+          "list": "$tables",
+          "required": true,
+          "label": "Detail Entity"
+        },
+        {
+          "id": "relationship",
+          "name": "relationship",
+          "type": "combo",
+          "list": "$fields",
+          "required": true,
+          "label": "Relationship Field"
+        },
+        {
+          "id": "orientation",
+          "name": "orientation",
+          "type": "combo",
+          "default": "horizontal",
+          "label": "Layout Orientation",
+          "options": [
+            { "value": "horizontal", "label": "Horizontal Split" },
+            { "value": "vertical", "label": "Vertical Split" }
+          ]
+        },
+        {
+          "id": "masterRatio",
+          "name": "masterRatio",
+          "type": "number",
+          "default": 60,
+          "label": "Master Panel Ratio (%)",
+          "validation": { "min": 30, "max": 80 }
+        }
+      ],
+      "automappings": [
+        {
+          "mold": "nocode",
+          "className": "MasterDetailComponent",
+          "sections": ["master", "detail"]
+        }
+      ],
+      "builders": [
+        {
+          "type": "master-detail",
+          "ratio": 100,
+          "estimatedTime": 480,
+          "generator": "React",
+          "key": "master-detail",
+          "template": "master-detail.ftl",
+          "builder": "MasterDetailBuilder",
+          "extension": ".tsx",
+          "outputFile": "MasterDetail.tsx"
+        }
+      ],
+      "metadata": {
+        "tags": ["master-detail", "relationship", "data"],
+        "category": "Data Management",
+        "complexity": "MEDIUM",
+        "estimatedTime": 480
+      }
+    },
+    {
+      "id": "popup-form",
+      "name": "Popup Form",
+      "type": "POPUP",
+      "toolkit": "enterprise-forms",
+      "description": "Formulario en ventana popup",
+      "version": "1.0.0",
+      "licenses": ["FREE", "PERSONAL", "PROFESSIONAL", "TEAMS"],
+      "icon": "lucide:external-link",
+      "sections": ["popup", "form"],
+      "events": ["onOpen", "onClose", "onSubmit"],
+      "properties": [
+        {
+          "id": "title",
+          "name": "Title",
+          "type": "input",
+          "required": true,
+          "label": "Popup Title",
+          "default": "Form"
+        },
+        {
+          "id": "size",
+          "name": "size",
+          "type": "combo",
+          "default": "medium",
+          "label": "Popup Size",
+          "options": [
+            { "value": "small", "label": "Small (400px)" },
+            { "value": "medium", "label": "Medium (600px)" },
+            { "value": "large", "label": "Large (800px)" },
+            { "value": "fullscreen", "label": "Full Screen" }
+          ]
+        },
+        {
+          "id": "modal",
+          "name": "modal",
+          "type": "boolean",
+          "default": true,
+          "label": "Modal (blocks background)"
+        },
+        {
+          "id": "closable",
+          "name": "closable",
+          "type": "boolean",
+          "default": true,
+          "label": "User can close"
+        }
+      ],
+      "automappings": [
+        {
+          "mold": "nocode",
+          "className": "PopupFormComponent",
+          "sections": ["popup", "form"]
+        }
+      ],
+      "builders": [
+        {
+          "type": "popup",
+          "ratio": 100,
+          "estimatedTime": 180,
+          "generator": "React",
+          "key": "popup-form",
+          "template": "popup-form.ftl",
+          "builder": "PopupFormBuilder",
+          "extension": ".tsx",
+          "outputFile": "PopupForm.tsx"
+        }
+      ],
+      "metadata": {
+        "tags": ["popup", "modal", "form"],
+        "category": "Forms",
+        "complexity": "SIMPLE",
+        "estimatedTime": 180
+      }
+    }
+  ]
+}

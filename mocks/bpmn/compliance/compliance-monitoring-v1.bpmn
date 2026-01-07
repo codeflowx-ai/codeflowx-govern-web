@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/compliance">
+  <process id="compliance-monitoring-v1" name="Compliance Monitoring V1" isExecutable="true" version="1.0">
+    <startEvent id="timerStart" name="Scheduled Check (24h)">
+      <timerEventDefinition>
+        <timeCycle>R/PT24H</timeCycle>
+      </timerEventDefinition>
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <serviceTask id="executeComplianceCheck" name="Execute Compliance Check" activiti:class="com.codeflowx.govern.workflow.delegates.ScheduledComplianceDelegate">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </serviceTask>
+    <!-- EU AI Act Extensions - Parallel Verification Tasks -->
+    <parallelGateway id="parallelVerificationGateway" name="Parallel Verification">
+      <incoming>flow2</incoming>
+      <outgoing>flowToLogIntegrity</outgoing>
+      <outgoing>flowToAdversarial</outgoing>
+      <outgoing>flowToFeedbackLoop</outgoing>
+      <outgoing>flowToPostMarket</outgoing>
+    </parallelGateway>
+    <!-- Art. 19 - Log Integrity Check -->
+    <serviceTask id="verifyLogIntegrity" name="Verify Log Integrity (Art. 19)" activiti:class="com.codeflowx.govern.workflow.delegates.compliance.VerifyLogIntegrityDelegate">
+      <incoming>flowToLogIntegrity</incoming>
+      <outgoing>flowToLogIntegrityGateway</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="logIntegrityGateway" name="Tampering Detected?">
+      <incoming>flowToLogIntegrityGateway</incoming>
+      <outgoing>flowLogIntegrityOK</outgoing>
+      <outgoing>flowTamperingDetected</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="createCriticalTamperingAlert" name="Create Critical Tampering Alert" activiti:class="com.codeflowx.govern.workflow.delegates.compliance.CreateTamperingAlertDelegate">
+      <incoming>flowTamperingDetected</incoming>
+      <outgoing>flowFromTamperingAlert</outgoing>
+    </serviceTask>
+    <!-- Art. 15.4/15.5 - Adversarial Evaluation -->
+    <serviceTask id="runAdversarialEvaluation" name="Run Adversarial Evaluation (Art. 15.4)" activiti:class="com.codeflowx.govern.workflow.delegates.compliance.RunAdversarialEvaluationDelegate">
+      <incoming>flowToAdversarial</incoming>
+      <outgoing>flowFromAdversarial</outgoing>
+    </serviceTask>
+    <!-- Art. 15.4 - Feedback Loop Analysis -->
+    <serviceTask id="runFeedbackLoopAnalysis" name="Analyze Feedback Loop Bias (Art. 15.4)" activiti:class="com.codeflowx.govern.workflow.delegates.compliance.RunFeedbackLoopAnalysisDelegate">
+      <incoming>flowToFeedbackLoop</incoming>
+      <outgoing>flowFromFeedbackLoop</outgoing>
+    </serviceTask>
+    <!-- Art. 72 - Post-Market Monitoring -->
+    <serviceTask id="checkPostMarketMetrics" name="Check Post-Market Metrics (Art. 72)" activiti:class="com.codeflowx.govern.workflow.delegates.compliance.CheckPostMarketMetricsDelegate">
+      <incoming>flowToPostMarket</incoming>
+      <outgoing>flowFromPostMarket</outgoing>
+    </serviceTask>
+    <!-- Join Parallel Verification Tasks -->
+    <parallelGateway id="joinVerificationGateway" name="Join Verification">
+      <incoming>flowLogIntegrityOK</incoming>
+      <incoming>flowFromTamperingAlert</incoming>
+      <incoming>flowFromAdversarial</incoming>
+      <incoming>flowFromFeedbackLoop</incoming>
+      <incoming>flowFromPostMarket</incoming>
+      <outgoing>flowToNonComplianceGateway</outgoing>
+    </parallelGateway>
+    <exclusiveGateway id="nonComplianceGateway" name="Non-Compliance?">
+      <incoming>flowToNonComplianceGateway</incoming>
+      <outgoing>flowCompliant</outgoing>
+      <outgoing>flowNonCompliant</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="createAlerts" name="Create Compliance Alerts" activiti:class="com.codeflowx.govern.workflow.delegates.CreateComplianceAlertsDelegate">
+      <incoming>flowNonCompliant</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    <userTask id="reviewIssues" name="Review Compliance Issues" activiti:candidateGroups="compliance-officers" activiti:formKey="compliance-issues-review-form">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+    </userTask>
+    <exclusiveGateway id="criticalIssueGateway" name="Critical Issue?">
+      <incoming>flow4</incoming>
+      <outgoing>flowCritical</outgoing>
+      <outgoing>flowNonCritical</outgoing>
+    </exclusiveGateway>
+    <userTask id="createIncident" name="Create Compliance Incident" activiti:candidateGroups="compliance-officers" activiti:formKey="compliance-incident-form">
+      <incoming>flowCritical</incoming>
+      <outgoing>flow5</outgoing>
+    </userTask>
+    <serviceTask id="scheduleReview" name="Schedule Review" activiti:class="com.codeflowx.govern.workflow.delegates.ScheduleReviewDelegate">
+      <incoming>flowNonCritical</incoming>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    <serviceTask id="updateDashboardSuccess" name="Update Dashboard (Success)" activiti:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate">
+      <incoming>flowCompliant</incoming>
+      <incoming>flow6</incoming>
+      <incoming>flowResolve</incoming>
+      <outgoing>flowToEnd</outgoing>
+    </serviceTask>
+    <serviceTask id="updateDashboardIncident" name="Update Dashboard (Incident)" activiti:class="com.codeflowx.govern.workflow.delegates.UpdateComplianceDashboardDelegate">
+      <incoming>flow5</incoming>
+      <outgoing>flowToEndIncident</outgoing>
+    </serviceTask>
+    <endEvent id="endSuccess" name="Check Complete">
+      <incoming>flowToEnd</incoming>
+    </endEvent>
+    <endEvent id="endIncident" name="Incident Created">
+      <incoming>flowToEndIncident</incoming>
+    </endEvent>
+    <boundaryEvent id="reviewTimer" name="7 Day Timer" attachedToRef="scheduleReview" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P7D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flowTimerToDecision</outgoing>
+    </boundaryEvent>
+    <userTask id="reviewDecisionTask" name="Review Decision" activiti:candidateGroups="compliance-officers" activiti:formKey="compliance-review-decision-form">
+      <incoming>flowTimerToDecision</incoming>
+      <outgoing>flowDecisionToGateway</outgoing>
+    </userTask>
+    <exclusiveGateway id="reviewDecisionGateway" name="Decision?">
+      <incoming>flowDecisionToGateway</incoming>
+      <outgoing>flowResolve</outgoing>
+      <outgoing>flowEscalate</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="timerStart" targetRef="executeComplianceCheck"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="executeComplianceCheck" targetRef="parallelVerificationGateway"></sequenceFlow>
+    <!-- Parallel Verification Flows -->
+    <sequenceFlow id="flowToLogIntegrity" sourceRef="parallelVerificationGateway" targetRef="verifyLogIntegrity"></sequenceFlow>
+    <sequenceFlow id="flowToAdversarial" sourceRef="parallelVerificationGateway" targetRef="runAdversarialEvaluation"></sequenceFlow>
+    <sequenceFlow id="flowToFeedbackLoop" sourceRef="parallelVerificationGateway" targetRef="runFeedbackLoopAnalysis"></sequenceFlow>
+    <sequenceFlow id="flowToPostMarket" sourceRef="parallelVerificationGateway" targetRef="checkPostMarketMetrics"></sequenceFlow>
+    <!-- Log Integrity Flows -->
+    <sequenceFlow id="flowToLogIntegrityGateway" sourceRef="verifyLogIntegrity" targetRef="logIntegrityGateway"></sequenceFlow>
+    <sequenceFlow id="flowLogIntegrityOK" name="OK" sourceRef="logIntegrityGateway" targetRef="joinVerificationGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!tamperingDetected}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowTamperingDetected" name="Tampering" sourceRef="logIntegrityGateway" targetRef="createCriticalTamperingAlert">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${tamperingDetected}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowFromTamperingAlert" sourceRef="createCriticalTamperingAlert" targetRef="joinVerificationGateway"></sequenceFlow>
+    <!-- Join Verification Flows -->
+    <sequenceFlow id="flowFromAdversarial" sourceRef="runAdversarialEvaluation" targetRef="joinVerificationGateway"></sequenceFlow>
+    <sequenceFlow id="flowFromFeedbackLoop" sourceRef="runFeedbackLoopAnalysis" targetRef="joinVerificationGateway"></sequenceFlow>
+    <sequenceFlow id="flowFromPostMarket" sourceRef="checkPostMarketMetrics" targetRef="joinVerificationGateway"></sequenceFlow>
+    <sequenceFlow id="flowToNonComplianceGateway" sourceRef="joinVerificationGateway" targetRef="nonComplianceGateway"></sequenceFlow>
+    <!-- Non-Compliance Gateway -->
+    <sequenceFlow id="flowCompliant" name="Compliant" sourceRef="nonComplianceGateway" targetRef="updateDashboardSuccess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!nonComplianceDetected}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowNonCompliant" name="Non-Compliant" sourceRef="nonComplianceGateway" targetRef="createAlerts">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nonComplianceDetected}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="createAlerts" targetRef="reviewIssues"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="reviewIssues" targetRef="criticalIssueGateway"></sequenceFlow>
+    <sequenceFlow id="flowCritical" name="Critical" sourceRef="criticalIssueGateway" targetRef="createIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${criticalIssue}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowNonCritical" name="Non-Critical" sourceRef="criticalIssueGateway" targetRef="scheduleReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!criticalIssue}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="createIncident" targetRef="updateDashboardIncident"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="scheduleReview" targetRef="updateDashboardSuccess"></sequenceFlow>
+    <sequenceFlow id="flowToEnd" sourceRef="updateDashboardSuccess" targetRef="endSuccess"></sequenceFlow>
+    <sequenceFlow id="flowToEndIncident" sourceRef="updateDashboardIncident" targetRef="endIncident"></sequenceFlow>
+    <sequenceFlow id="flowTimerToDecision" sourceRef="reviewTimer" targetRef="reviewDecisionTask"></sequenceFlow>
+    <sequenceFlow id="flowDecisionToGateway" sourceRef="reviewDecisionTask" targetRef="reviewDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowResolve" name="Resolve" sourceRef="reviewDecisionGateway" targetRef="updateDashboardSuccess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'RESOLVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowEscalate" name="Escalate" sourceRef="reviewDecisionGateway" targetRef="createIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'ESCALATE'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_compliance-monitoring-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_compliance-monitoring-v1" bpmnElement="compliance-monitoring-v1">
+      <bpmndi:BPMNShape id="BPMNShape_timerStart" bpmnElement="timerStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeComplianceCheck" bpmnElement="executeComplianceCheck">
+        <omgdc:Bounds height="80.0" width="100.0" x="150.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_nonComplianceGateway" bpmnElement="nonComplianceGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="300.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_createAlerts" bpmnElement="createAlerts">
+        <omgdc:Bounds height="80.0" width="100.0" x="400.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewIssues" bpmnElement="reviewIssues">
+        <omgdc:Bounds height="80.0" width="100.0" x="550.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_criticalIssueGateway" bpmnElement="criticalIssueGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="700.0" y="335.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_createIncident" bpmnElement="createIncident">
+        <omgdc:Bounds height="80.0" width="100.0" x="800.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_scheduleReview" bpmnElement="scheduleReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="800.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateDashboardSuccess" bpmnElement="updateDashboardSuccess">
+        <omgdc:Bounds height="80.0" width="100.0" x="1050.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateDashboardIncident" bpmnElement="updateDashboardIncident">
+        <omgdc:Bounds height="80.0" width="100.0" x="950.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endSuccess" bpmnElement="endSuccess">
+        <omgdc:Bounds height="35.0" width="35.0" x="1200.0" y="202.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endIncident" bpmnElement="endIncident">
+        <omgdc:Bounds height="35.0" width="35.0" x="1100.0" y="422.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewTimer" bpmnElement="reviewTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="850.0" y="255.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDecisionTask" bpmnElement="reviewDecisionTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="950.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDecisionGateway" bpmnElement="reviewDecisionGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="1075.0" y="335.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="250.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCompliant" bpmnElement="flowCompliant">
+        <omgdi:waypoint x="325.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="325.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="220.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNonCompliant" bpmnElement="flowNonCompliant">
+        <omgdi:waypoint x="325.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="325.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="500.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="650.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCritical" bpmnElement="flowCritical">
+        <omgdi:waypoint x="725.0" y="385.0"></omgdi:waypoint>
+        <omgdi:waypoint x="725.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNonCritical" bpmnElement="flowNonCritical">
+        <omgdi:waypoint x="725.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="725.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="280.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="900.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="900.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEnd" bpmnElement="flowToEnd">
+        <omgdi:waypoint x="1150.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="220.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndIncident" bpmnElement="flowToEndIncident">
+        <omgdi:waypoint x="1050.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTimerToDecision" bpmnElement="flowTimerToDecision">
+        <omgdi:waypoint x="865.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDecisionToGateway" bpmnElement="flowDecisionToGateway">
+        <omgdi:waypoint x="1050.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="335.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowResolve" bpmnElement="flowResolve">
+        <omgdi:waypoint x="1100.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEscalate" bpmnElement="flowEscalate">
+        <omgdi:waypoint x="1100.0" y="385.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="440.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

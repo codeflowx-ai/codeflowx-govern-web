@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:flowable="http://flowable.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="eu_database_registration_process" name="EU Database Registration (Art. 49)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event: Registration Required -->
+    <startEvent id="registrationRequiredStart" name="Registration Required">
+      <outgoing>flowToDetermineType</outgoing>
+    </startEvent>
+    
+    <!-- Service Task: Determine Registration Type -->
+    <serviceTask id="determineRegistrationType" name="Determine Registration Type (Annex VIII)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.DetermineRegistrationTypeDelegate">
+      <incoming>flowToDetermineType</incoming>
+      <outgoing>flowToTypeGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Registration Type? -->
+    <exclusiveGateway id="registrationTypeGateway" name="Registration Type?">
+      <incoming>flowToTypeGateway</incoming>
+      <outgoing>flowSectionA</outgoing>
+      <outgoing>flowSectionB</outgoing>
+      <outgoing>flowSectionC</outgoing>
+      <outgoing>flowMultiple</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Fill Registration Form (adaptado según sección) -->
+    <userTask id="fillRegistrationForm" name="Fill Registration Form (Annex VIII)" 
+              flowable:candidateGroups="compliance-officers,legal" 
+              flowable:formKey="eu-registration-form">
+      <incoming>flowSectionA</incoming>
+      <incoming>flowSectionB</incoming>
+      <incoming>flowSectionC</incoming>
+      <incoming>flowMultiple</incoming>
+      <incoming>flowRetryForm</incoming>
+      <outgoing>flowToValidate</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Validate Registration Data -->
+    <serviceTask id="validateRegistrationData" name="Validate Registration Data" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.ValidateRegistrationDataDelegate">
+      <incoming>flowToValidate</incoming>
+      <outgoing>flowToValidGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Valid? -->
+    <exclusiveGateway id="validGateway" name="Valid?">
+      <incoming>flowToValidGateway</incoming>
+      <outgoing>flowValid</outgoing>
+      <outgoing>flowInvalid</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Fix Validation Errors -->
+    <userTask id="fixValidationErrors" name="Fix Validation Errors" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="fix-validation-errors-form">
+      <incoming>flowInvalid</incoming>
+      <outgoing>flowRetryForm</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowRetryForm" sourceRef="fixValidationErrors" targetRef="fillRegistrationForm"></sequenceFlow>
+    
+    <!-- Service Task: Generate Registration Package -->
+    <serviceTask id="generateRegistrationPackage" name="Generate Registration Package" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.GenerateRegistrationPackageDelegate">
+      <incoming>flowValid</incoming>
+      <outgoing>flowToReviewPackage</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Review Registration Package -->
+    <userTask id="reviewRegistrationPackage" name="Review Registration Package" 
+              flowable:candidateGroups="compliance-officers,legal,management" 
+              flowable:formKey="review-registration-package-form">
+      <incoming>flowToReviewPackage</incoming>
+      <outgoing>flowToSubmitGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Submit? -->
+    <exclusiveGateway id="submitGateway" name="Submit?">
+      <incoming>flowToSubmitGateway</incoming>
+      <outgoing>flowSubmit</outgoing>
+      <outgoing>flowModify</outgoing>
+      <outgoing>flowCancelRegistration</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Loop: Modify -->
+    <sequenceFlow id="flowModify" name="Modify" sourceRef="submitGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Registration Cancelled -->
+    <endEvent id="endRegistrationCancelled" name="Registration Cancelled">
+      <incoming>flowCancelRegistration</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancelRegistration" name="Cancel" sourceRef="submitGateway" targetRef="endRegistrationCancelled">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Submit to EU Database API -->
+    <serviceTask id="submitToEuDatabase" name="Submit to EU Database API (Art. 49)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.SubmitToEuDatabaseDelegate">
+      <incoming>flowSubmit</incoming>
+      <outgoing>flowToSuccessGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Submission Success? -->
+    <exclusiveGateway id="submissionSuccessGateway" name="Submission Success?">
+      <incoming>flowToSuccessGateway</incoming>
+      <outgoing>flowSuccess</outgoing>
+      <outgoing>flowFailure</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Update Project (Success) -->
+    <serviceTask id="updateProjectRegistration" name="Update Project Registration" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.UpdateProjectRegistrationDelegate">
+      <incoming>flowSuccess</incoming>
+      <outgoing>flowToEndSuccess</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Log Error & Retry -->
+    <serviceTask id="logErrorAndRetry" name="Log Error & Retry" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.euregistration.LogRegistrationErrorDelegate">
+      <incoming>flowFailure</incoming>
+      <outgoing>flowToRetryGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Retry? -->
+    <exclusiveGateway id="retryGateway" name="Retry?">
+      <incoming>flowToRetryGateway</incoming>
+      <outgoing>flowRetrySubmit</outgoing>
+      <outgoing>flowManualIntervention</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Loop: Retry submission (max 3 attempts) -->
+    <sequenceFlow id="flowRetrySubmit" name="Retry" sourceRef="retryGateway" targetRef="submitToEuDatabase">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retryAttempts < 3}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Manual Resolution -->
+    <userTask id="manualResolution" name="Manual Resolution" 
+              flowable:candidateGroups="compliance-officers,tech-team" 
+              flowable:formKey="manual-resolution-form">
+      <incoming>flowManualIntervention</incoming>
+      <outgoing>flowToEndManual</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowManualIntervention" name="Manual" sourceRef="retryGateway" targetRef="manualResolution">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retryAttempts >= 3}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End Events -->
+    <endEvent id="endRegistrationComplete" name="Registration Complete">
+      <incoming>flowToEndSuccess</incoming>
+    </endEvent>
+    
+    <endEvent id="endManualResolution" name="Manual Intervention Required">
+      <incoming>flowToEndManual</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToDetermineType" sourceRef="registrationRequiredStart" targetRef="determineRegistrationType"></sequenceFlow>
+    <sequenceFlow id="flowToTypeGateway" sourceRef="determineRegistrationType" targetRef="registrationTypeGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSectionA" name="Section A (13 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_A'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowSectionB" name="Section B (9 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_B'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowSectionC" name="Section C (5 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_C'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowMultiple" name="Multiple Sections" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'MULTIPLE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToValidate" sourceRef="fillRegistrationForm" targetRef="validateRegistrationData"></sequenceFlow>
+    <sequenceFlow id="flowToValidGateway" sourceRef="validateRegistrationData" targetRef="validGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowValid" name="Yes" sourceRef="validGateway" targetRef="generateRegistrationPackage">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationPassed == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowInvalid" name="No" sourceRef="validGateway" targetRef="fixValidationErrors">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationPassed == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToReviewPackage" sourceRef="generateRegistrationPackage" targetRef="reviewRegistrationPackage"></sequenceFlow>
+    <sequenceFlow id="flowToSubmitGateway" sourceRef="reviewRegistrationPackage" targetRef="submitGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSubmit" name="Submit" sourceRef="submitGateway" targetRef="submitToEuDatabase">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'SUBMIT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToSuccessGateway" sourceRef="submitToEuDatabase" targetRef="submissionSuccessGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSuccess" name="Success" sourceRef="submissionSuccessGateway" targetRef="updateProjectRegistration">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submissionSuccess == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFailure" name="Failure" sourceRef="submissionSuccessGateway" targetRef="logErrorAndRetry">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submissionSuccess == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToRetryGateway" sourceRef="logErrorAndRetry" targetRef="retryGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToEndSuccess" sourceRef="updateProjectRegistration" targetRef="endRegistrationComplete"></sequenceFlow>
+    <sequenceFlow id="flowToEndManual" sourceRef="manualResolution" targetRef="endManualResolution"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_eu_database_registration_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_eu_database_registration_process" bpmnElement="eu_database_registration_process">
+      <bpmndi:BPMNShape id="BPMNShape_registrationRequiredStart" bpmnElement="registrationRequiredStart">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_determineRegistrationType" bpmnElement="determineRegistrationType">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_registrationTypeGateway" bpmnElement="registrationTypeGateway">
+        <omgdc:Bounds x="175" y="435" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_fillRegistrationForm" bpmnElement="fillRegistrationForm">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_validateRegistrationData" bpmnElement="validateRegistrationData">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_validGateway" bpmnElement="validGateway">
+        <omgdc:Bounds x="175" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_fixValidationErrors" bpmnElement="fixValidationErrors">
+        <omgdc:Bounds x="350" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateRegistrationPackage" bpmnElement="generateRegistrationPackage">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewRegistrationPackage" bpmnElement="reviewRegistrationPackage">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_submitGateway" bpmnElement="submitGateway">
+        <omgdc:Bounds x="175" y="1515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRegistrationCancelled" bpmnElement="endRegistrationCancelled">
+        <omgdc:Bounds x="182" y="1702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_submitToEuDatabase" bpmnElement="submitToEuDatabase">
+        <omgdc:Bounds x="350" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_submissionSuccessGateway" bpmnElement="submissionSuccessGateway">
+        <omgdc:Bounds x="175" y="1875" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateProjectRegistration" bpmnElement="updateProjectRegistration">
+        <omgdc:Bounds x="150" y="2040" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_logErrorAndRetry" bpmnElement="logErrorAndRetry">
+        <omgdc:Bounds x="350" y="2040" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_retryGateway" bpmnElement="retryGateway">
+        <omgdc:Bounds x="375" y="2235" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_manualResolution" bpmnElement="manualResolution">
+        <omgdc:Bounds x="150" y="2400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRegistrationComplete" bpmnElement="endRegistrationComplete">
+        <omgdc:Bounds x="182" y="2242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endManualResolution" bpmnElement="endManualResolution">
+        <omgdc:Bounds x="182" y="2602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetryForm" bpmnElement="flowRetryForm">
+        <omgdi:waypoint x="450" y="1180" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowModify" bpmnElement="flowModify">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCancelRegistration" bpmnElement="flowCancelRegistration">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="182" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetrySubmit" bpmnElement="flowRetrySubmit">
+        <omgdi:waypoint x="425" y="2260" />
+        <omgdi:waypoint x="350" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowManualIntervention" bpmnElement="flowManualIntervention">
+        <omgdi:waypoint x="425" y="2260" />
+        <omgdi:waypoint x="150" y="2440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDetermineType" bpmnElement="flowToDetermineType">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToTypeGateway" bpmnElement="flowToTypeGateway">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="175" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSectionA" bpmnElement="flowSectionA">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSectionB" bpmnElement="flowSectionB">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSectionC" bpmnElement="flowSectionC">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowMultiple" bpmnElement="flowMultiple">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToValidate" bpmnElement="flowToValidate">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToValidGateway" bpmnElement="flowToValidGateway">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowValid" bpmnElement="flowValid">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowInvalid" bpmnElement="flowInvalid">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="350" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToReviewPackage" bpmnElement="flowToReviewPackage">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSubmitGateway" bpmnElement="flowToSubmitGateway">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="175" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSubmit" bpmnElement="flowSubmit">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="350" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSuccessGateway" bpmnElement="flowToSuccessGateway">
+        <omgdi:waypoint x="450" y="1720" />
+        <omgdi:waypoint x="175" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSuccess" bpmnElement="flowSuccess">
+        <omgdi:waypoint x="225" y="1900" />
+        <omgdi:waypoint x="150" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFailure" bpmnElement="flowFailure">
+        <omgdi:waypoint x="225" y="1900" />
+        <omgdi:waypoint x="350" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRetryGateway" bpmnElement="flowToRetryGateway">
+        <omgdi:waypoint x="450" y="2080" />
+        <omgdi:waypoint x="375" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndSuccess" bpmnElement="flowToEndSuccess">
+        <omgdi:waypoint x="250" y="2080" />
+        <omgdi:waypoint x="182" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndManual" bpmnElement="flowToEndManual">
+        <omgdi:waypoint x="250" y="2440" />
+        <omgdi:waypoint x="182" y="2620" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="agent-approval-v1" name="Agent Approval V1" isExecutable="true" flowable:candidateStarterGroups="ml-engineers,governance-admins">
+    <documentation>Proceso de aprobación de Agent IA - VERSIÓN COMPLETA
+
+ELEMENTOS: ParallelGateway, BusinessRuleTask, Error Boundary, Timer Boundary, MailTask
+PROPORCIÓN: 80% Automatizado - 20% HITL</documentation>
+    <startEvent id="start" name="Inicio">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <parallelGateway id="fork" name="Fork">
+      <incoming>flow1</incoming>
+      <outgoing>flow2a</outgoing>
+      <outgoing>flow2b</outgoing>
+      <outgoing>flow2c</outgoing>
+    </parallelGateway>
+    <serviceTask id="riskTask" name="AI Risk Assessment" flowable:class="com.codeflowx.govern.workflow.delegates.AIRiskAssessmentDelegate">
+      <incoming>flow2a</incoming>
+      <outgoing>flow3a</outgoing>
+      <documentation>Evalúa riesgos usando LLM. Output: riskScore (0-100)</documentation>
+    </serviceTask>
+    <scriptTask id="handleRiskError" name="Score Conservador" scriptFormat="javascript" flowable:autoStoreVariables="false">
+      <incoming>flowRiskError</incoming>
+      <outgoing>flowRiskErrorToJoin</outgoing>
+      <script><![CDATA[execution.setVariable('riskScore', 75);]]></script>
+    </scriptTask>
+    <boundaryEvent id="riskError" name="Error" attachedToRef="riskTask">
+      <outgoing>flowRiskError</outgoing>
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="complianceTask" name="AI Compliance Check" flowable:class="com.codeflowx.govern.workflow.delegates.AIComplianceCheckDelegate">
+      <incoming>flow2b</incoming>
+      <outgoing>flow3b</outgoing>
+      <documentation>Verifica compliance. Output: complianceScore (0-100), compliant (bool)</documentation>
+    </serviceTask>
+    <serviceTask id="ethicsTask" name="AI Ethical Review" flowable:class="com.codeflowx.govern.workflow.delegates.AIEthicalReviewDelegate">
+      <incoming>flow2c</incoming>
+      <outgoing>flow3c</outgoing>
+      <documentation>Evalúa ética. Output: ethicsScore (0-100)</documentation>
+    </serviceTask>
+    <parallelGateway id="join" name="Join">
+      <incoming>flow3a</incoming>
+      <incoming>flow3b</incoming>
+      <incoming>flow3c</incoming>
+      <incoming>flowRiskErrorToJoin</incoming>
+      <outgoing>flow4</outgoing>
+    </parallelGateway>
+    <businessRuleTask id="droolsScore" name="Calculate Score (Drools)" flowable:ruleVariablesInput="${agentApprovalFact}" flowable:rules="agent-scoring" flowable:resultVariable="decision">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+      <documentation>Ejecuta reglas Drools.
+Input: AgentApprovalFact
+Output: decision, minScore, confidenceLevel, justification
+DRL: agent-scoring.drl (9 reglas)</documentation>
+    </businessRuleTask>
+    <exclusiveGateway id="gateway" name="Decisión">
+      <incoming>flow5</incoming>
+      <outgoing>flowApprove</outgoing>
+      <outgoing>flowHitl</outgoing>
+      <outgoing>flowReject</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="approveTask" name="Auto Aprobar" flowable:class="com.codeflowx.govern.workflow.delegates.AutoApproveAgentDelegate">
+      <incoming>flowApprove</incoming>
+      <outgoing>flowApprove2</outgoing>
+      <documentation>Marca Agent como aprobado.</documentation>
+    </serviceTask>
+    <serviceTask id="mailApprove" name="Email: Aprobado" flowable:type="mail">
+      <incoming>flowApprove2</incoming>
+      <outgoing>flowApprove3</outgoing>
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:expression><![CDATA[${approverEmail}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string><![CDATA[governance@company.com]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:expression><![CDATA[Agent Aprobado: ${agentName}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression><![CDATA[Agent aprobado: ${agentName}, Score: ${minScore}]]></flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="endApproved" name="Aprobado">
+      <incoming>flowApprove3</incoming>
+    </endEvent>
+    <userTask id="hitlTask" name="Human Review" flowable:candidateGroups="governance-admins" flowable:dueDate="PT4H" flowable:formKey="bpmn/agent-approval-human-override-form.zul" flowable:priority="80">
+      <incoming>flowHitl</incoming>
+      <outgoing>flowHitl2</outgoing>
+      <documentation>Revisión humana requerida.</documentation>
+    </userTask>
+    <boundaryEvent id="hitlTimer" name="SLA 24h" attachedToRef="hitlTask" cancelActivity="false">
+      <outgoing>flowTimer</outgoing>
+      <timerEventDefinition>
+        <timeDuration>P1D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="hitlReminder" name="Recordatorio" flowable:candidateGroups="governance-leads" flowable:formKey="bpmn/hitl-sla-reminder-form.zul" flowable:priority="95">
+      <incoming>flowTimer</incoming>
+      <outgoing>flowReminder</outgoing>
+      <documentation>Recordatorio SLA excedido.</documentation>
+    </userTask>
+    <exclusiveGateway id="hitlGateway" name="Decisión Humana">
+      <incoming>flowHitl2</incoming>
+      <incoming>flowReminder</incoming>
+      <outgoing>flowHitlApp</outgoing>
+      <outgoing>flowHitlRej</outgoing>
+    </exclusiveGateway>
+    <endEvent id="endHitlApproved" name="HITL Aprobado">
+      <incoming>flowHitlApp</incoming>
+    </endEvent>
+    <endEvent id="endHitlRejected" name="HITL Rechazado">
+      <incoming>flowHitlRej</incoming>
+    </endEvent>
+    <serviceTask id="rejectTask" name="Auto Rechazar" flowable:class="com.codeflowx.govern.workflow.delegates.AutoRejectAgentDelegate">
+      <incoming>flowReject</incoming>
+      <outgoing>flowReject2</outgoing>
+      <documentation>Marca Agent como rechazado.</documentation>
+    </serviceTask>
+    <serviceTask id="mailReject" name="Email: Rechazado" flowable:type="mail">
+      <incoming>flowReject2</incoming>
+      <outgoing>flowReject3</outgoing>
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:expression><![CDATA[${approverEmail}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string><![CDATA[governance@company.com]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:expression><![CDATA[Agent Rechazado: ${agentName}]]></flowable:expression>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression><![CDATA[Agent rechazado: ${agentName}, Razón: ${justification}]]></flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="endRejected" name="Rechazado">
+      <incoming>flowReject3</incoming>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="fork"></sequenceFlow>
+    <sequenceFlow id="flow2a" sourceRef="fork" targetRef="riskTask"></sequenceFlow>
+    <sequenceFlow id="flow2b" sourceRef="fork" targetRef="complianceTask"></sequenceFlow>
+    <sequenceFlow id="flow2c" sourceRef="fork" targetRef="ethicsTask"></sequenceFlow>
+    <sequenceFlow id="flowRiskError" sourceRef="riskError" targetRef="handleRiskError"></sequenceFlow>
+    <sequenceFlow id="flowRiskErrorToJoin" sourceRef="handleRiskError" targetRef="join"></sequenceFlow>
+    <sequenceFlow id="flow3a" sourceRef="riskTask" targetRef="join"></sequenceFlow>
+    <sequenceFlow id="flow3b" sourceRef="complianceTask" targetRef="join"></sequenceFlow>
+    <sequenceFlow id="flow3c" sourceRef="ethicsTask" targetRef="join"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="join" targetRef="droolsScore"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="droolsScore" targetRef="gateway"></sequenceFlow>
+    <sequenceFlow id="flowApprove" name="AUTO_APPROVE" sourceRef="gateway" targetRef="approveTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'AUTO_APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowApprove2" sourceRef="approveTask" targetRef="mailApprove"></sequenceFlow>
+    <sequenceFlow id="flowApprove3" sourceRef="mailApprove" targetRef="endApproved"></sequenceFlow>
+    <sequenceFlow id="flowHitl" name="HITL_REQUIRED" sourceRef="gateway" targetRef="hitlTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'HITL_REQUIRED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowHitl2" sourceRef="hitlTask" targetRef="hitlGateway"></sequenceFlow>
+    <sequenceFlow id="flowTimer" sourceRef="hitlTimer" targetRef="hitlReminder"></sequenceFlow>
+    <sequenceFlow id="flowReminder" sourceRef="hitlReminder" targetRef="hitlGateway"></sequenceFlow>
+    <sequenceFlow id="flowHitlApp" name="approve" sourceRef="hitlGateway" targetRef="endHitlApproved">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${human_decision == 'approve'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowHitlRej" name="reject" sourceRef="hitlGateway" targetRef="endHitlRejected">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${human_decision == 'reject'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowReject" name="AUTO_REJECT" sourceRef="gateway" targetRef="rejectTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'AUTO_REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowReject2" sourceRef="rejectTask" targetRef="mailReject"></sequenceFlow>
+    <sequenceFlow id="flowReject3" sourceRef="mailReject" targetRef="endRejected"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_agent-approval-v1">
+    <bpmndi:BPMNPlane bpmnElement="agent-approval-v1" id="BPMNPlane_agent-approval-v1">
+      <bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="297.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="fork" id="BPMNShape_fork">
+        <omgdc:Bounds height="40.0" width="40.0" x="170.0" y="294.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="riskTask" id="BPMNShape_riskTask">
+        <omgdc:Bounds height="70.0" width="140.0" x="270.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleRiskError" id="BPMNShape_handleRiskError">
+        <omgdc:Bounds height="70.0" width="141.0" x="230.0" y="191.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="riskError" id="BPMNShape_riskError">
+        <omgdc:Bounds height="30.0" width="30.0" x="360.0" y="145.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="complianceTask" id="BPMNShape_complianceTask">
+        <omgdc:Bounds height="75.0" width="131.0" x="290.0" y="277.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ethicsTask" id="BPMNShape_ethicsTask">
+        <omgdc:Bounds height="69.0" width="131.0" x="290.0" y="434.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="join" id="BPMNShape_join">
+        <omgdc:Bounds height="40.0" width="40.0" x="510.0" y="287.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="droolsScore" id="BPMNShape_droolsScore">
+        <omgdc:Bounds height="67.0" width="130.0" x="610.0" y="277.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="gateway" id="BPMNShape_gateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="810.0" y="273.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="approveTask" id="BPMNShape_approveTask">
+        <omgdc:Bounds height="60.0" width="120.0" x="1020.0" y="98.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailApprove" id="BPMNShape_mailApprove">
+        <omgdc:Bounds height="60.0" width="120.0" x="1280.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endApproved" id="BPMNShape_endApproved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1460.0" y="112.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hitlTask" id="BPMNShape_hitlTask">
+        <omgdc:Bounds height="60.0" width="120.0" x="1020.0" y="264.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hitlTimer" id="BPMNShape_hitlTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="1110.0" y="309.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hitlReminder" id="BPMNShape_hitlReminder">
+        <omgdc:Bounds height="65.0" width="116.0" x="1064.0" y="381.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="hitlGateway" id="BPMNShape_hitlGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1280.0" y="273.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endHitlApproved" id="BPMNShape_endHitlApproved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1400.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endHitlRejected" id="BPMNShape_endHitlRejected">
+        <omgdc:Bounds height="35.0" width="35.0" x="1400.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectTask" id="BPMNShape_rejectTask">
+        <omgdc:Bounds height="60.0" width="120.0" x="930.0" y="474.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailReject" id="BPMNShape_mailReject">
+        <omgdc:Bounds height="60.0" width="120.0" x="1280.0" y="474.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endRejected" id="BPMNShape_endRejected">
+        <omgdc:Bounds height="35.0" width="35.0" x="1460.0" y="486.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="314.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="314.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2a" id="BPMNEdge_flow2a">
+        <omgdi:waypoint x="190.0" y="294.0"></omgdi:waypoint>
+        <omgdi:waypoint x="190.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="125.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2b" id="BPMNEdge_flow2b">
+        <omgdi:waypoint x="210.0" y="314.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="314.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2c" id="BPMNEdge_flow2c">
+        <omgdi:waypoint x="190.0" y="334.0"></omgdi:waypoint>
+        <omgdi:waypoint x="190.0" y="464.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="468.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3a" id="BPMNEdge_flow3a">
+        <omgdi:waypoint x="410.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="287.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3b" id="BPMNEdge_flow3b">
+        <omgdi:waypoint x="421.0" y="314.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3c" id="BPMNEdge_flow3c">
+        <omgdi:waypoint x="421.0" y="468.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="464.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="327.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="550.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="610.0" y="310.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="740.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="810.0" y="293.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowApprove" id="BPMNEdge_flowApprove">
+        <omgdi:waypoint x="830.0" y="273.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1020.0" y="128.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="720.0" y="178.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowApprove2" id="BPMNEdge_flowApprove2">
+        <omgdi:waypoint x="1140.0" y="128.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowApprove3" id="BPMNEdge_flowApprove3">
+        <omgdi:waypoint x="1400.0" y="130.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1460.0" y="129.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowHitl" id="BPMNEdge_flowHitl">
+        <omgdi:waypoint x="850.0" y="293.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1020.0" y="294.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="879.0" y="244.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowHitl2" id="BPMNEdge_flowHitl2">
+        <omgdi:waypoint x="1140.0" y="294.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.0" y="293.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowTimer" id="BPMNEdge_flowTimer">
+        <omgdi:waypoint x="1125.0" y="339.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1122.0" y="381.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowReminder" id="BPMNEdge_flowReminder">
+        <omgdi:waypoint x="1180.0" y="413.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1180.0" y="410.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="313.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowHitlApp" id="BPMNEdge_flowHitlApp">
+        <omgdi:waypoint x="1300.0" y="273.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1400.0" y="267.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1302.0" y="245.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowHitlRej" id="BPMNEdge_flowHitlRej">
+        <omgdi:waypoint x="1300.0" y="313.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="347.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1400.0" y="347.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1310.0" y="327.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowReject" id="BPMNEdge_flowReject">
+        <omgdi:waypoint x="830.0" y="313.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="504.0"></omgdi:waypoint>
+        <omgdi:waypoint x="930.0" y="504.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="730.0" y="383.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowReject2" id="BPMNEdge_flowReject2">
+        <omgdi:waypoint x="1050.0" y="504.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1280.0" y="504.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowReject3" id="BPMNEdge_flowReject3">
+        <omgdi:waypoint x="1400.0" y="504.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1460.0" y="503.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowRiskError" id="BPMNEdge_flowRiskError">
+        <omgdi:waypoint x="375.0" y="175.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="191.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flowRiskErrorToJoin" id="BPMNEdge_flowRiskErrorToJoin">
+        <omgdi:waypoint x="371.0" y="226.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="287.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

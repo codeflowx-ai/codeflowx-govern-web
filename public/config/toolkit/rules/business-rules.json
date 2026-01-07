@@ -1,0 +1,213 @@
+{
+  "ruleTypes": {
+    "visibility": {
+      "name": "Visibility Rules",
+      "description": "Control when components are visible",
+      "icon": "lucide:eye",
+      "conditions": [
+        "fieldValue",
+        "fieldEmpty",
+        "fieldNotEmpty",
+        "fieldEquals",
+        "fieldContains",
+        "userRole",
+        "dateRange"
+      ],
+      "actions": [
+        "show",
+        "hide",
+        "enable",
+        "disable"
+      ]
+    },
+    "validation": {
+      "name": "Validation Rules",
+      "description": "Custom validation logic",
+      "icon": "lucide:shield-check",
+      "conditions": [
+        "fieldValue",
+        "fieldLength",
+        "fieldPattern",
+        "crossFieldValidation"
+      ],
+      "actions": [
+        "showError",
+        "preventSubmit",
+        "highlightField"
+      ]
+    },
+    "calculation": {
+      "name": "Calculation Rules",
+      "description": "Automatic field calculations",
+      "icon": "lucide:calculator",
+      "conditions": [
+        "fieldChange",
+        "formLoad"
+      ],
+      "actions": [
+        "calculateValue",
+        "updateField",
+        "sumFields",
+        "averageFields"
+      ]
+    },
+    "workflow": {
+      "name": "Workflow Rules",
+      "description": "Business process automation",
+      "icon": "lucide:workflow",
+      "conditions": [
+        "statusChange",
+        "userAction",
+        "timeElapsed",
+        "dataCondition"
+      ],
+      "actions": [
+        "sendNotification",
+        "createRecord",
+        "updateStatus",
+        "triggerProcess"
+      ]
+    }
+  },
+  "conditions": {
+    "fieldValue": {
+      "name": "Field Value",
+      "description": "Check field value against criteria",
+      "parameters": [
+        {
+          "name": "field",
+          "type": "componentSelector",
+          "label": "Field",
+          "required": true
+        },
+        {
+          "name": "operator",
+          "type": "combo",
+          "label": "Operator",
+          "options": [
+            {"value": "equals", "label": "Equals"},
+            {"value": "notEquals", "label": "Not Equals"},
+            {"value": "contains", "label": "Contains"},
+            {"value": "startsWith", "label": "Starts With"},
+            {"value": "endsWith", "label": "Ends With"},
+            {"value": "greaterThan", "label": "Greater Than"},
+            {"value": "lessThan", "label": "Less Than"},
+            {"value": "isEmpty", "label": "Is Empty"},
+            {"value": "isNotEmpty", "label": "Is Not Empty"}
+          ],
+          "required": true
+        },
+        {
+          "name": "value",
+          "type": "input",
+          "label": "Value",
+          "required": false
+        }
+      ]
+    },
+    "userRole": {
+      "name": "User Role",
+      "description": "Check current user role",
+      "parameters": [
+        {
+          "name": "roles",
+          "type": "multiselect",
+          "label": "Allowed Roles",
+          "options": "$roles",
+          "required": true
+        }
+      ]
+    },
+    "dateRange": {
+      "name": "Date Range",
+      "description": "Check if current date is within range",
+      "parameters": [
+        {
+          "name": "startDate",
+          "type": "input",
+          "label": "Start Date",
+          "placeholder": "YYYY-MM-DD"
+        },
+        {
+          "name": "endDate",
+          "type": "input",
+          "label": "End Date",
+          "placeholder": "YYYY-MM-DD"
+        }
+      ]
+    }
+  },
+  "actions": {
+    "show": {
+      "name": "Show Component",
+      "description": "Make component visible",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true
+        },
+        {
+          "name": "animation",
+          "type": "combo",
+          "label": "Animation",
+          "options": [
+            {"value": "none", "label": "None"},
+            {"value": "fade", "label": "Fade In"},
+            {"value": "slide", "label": "Slide Down"}
+          ],
+          "default": "none"
+        }
+      ]
+    },
+    "calculateValue": {
+      "name": "Calculate Value",
+      "description": "Calculate and set field value",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Field",
+          "required": true
+        },
+        {
+          "name": "formula",
+          "type": "textarea",
+          "label": "Formula",
+          "placeholder": "field1 + field2 * 0.1",
+          "required": true
+        }
+      ]
+    },
+    "sendNotification": {
+      "name": "Send Notification",
+      "description": "Send notification to users",
+      "parameters": [
+        {
+          "name": "recipients",
+          "type": "multiselect",
+          "label": "Recipients",
+          "options": "$users"
+        },
+        {
+          "name": "message",
+          "type": "textarea",
+          "label": "Message",
+          "required": true
+        },
+        {
+          "name": "type",
+          "type": "combo",
+          "label": "Type",
+          "options": [
+            {"value": "email", "label": "Email"},
+            {"value": "sms", "label": "SMS"},
+            {"value": "push", "label": "Push Notification"},
+            {"value": "inApp", "label": "In-App Notification"}
+          ]
+        }
+      ]
+    }
+  }
+}

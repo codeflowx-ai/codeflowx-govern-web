@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/incident">
+  <process id="incident-response-rca-v1" name="AI Incident Response &amp; RCA V1" isExecutable="true" version="1.0">
+    <startEvent id="incidentCreated" name="Incident Created">
+      <messageEventDefinition messageRef="incidentMessage"></messageEventDefinition>
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <parallelGateway id="parallelCollect" name="Parallel Collect">
+      <incoming>flow1</incoming>
+      <outgoing>flowToLogs</outgoing>
+      <outgoing>flowToMetrics</outgoing>
+      <outgoing>flowToTraces</outgoing>
+    </parallelGateway>
+    <serviceTask id="collectLogs" name="Collect Logs" flowable:class="com.codeflowx.govern.workflow.delegates.CollectLogsDelegate">
+      <incoming>flowToLogs</incoming>
+      <outgoing>flowFromLogs</outgoing>
+    </serviceTask>
+    <serviceTask id="collectMetrics" name="Collect Metrics" flowable:class="com.codeflowx.govern.workflow.delegates.CollectMetricsDelegate">
+      <incoming>flowToMetrics</incoming>
+      <outgoing>flowFromMetrics</outgoing>
+    </serviceTask>
+    <serviceTask id="collectTraces" name="Collect Traces" flowable:class="com.codeflowx.govern.workflow.delegates.CollectTracesDelegate">
+      <incoming>flowToTraces</incoming>
+      <outgoing>flowFromTraces</outgoing>
+    </serviceTask>
+    <parallelGateway id="parallelMerge" name="Parallel Merge">
+      <incoming>flowFromLogs</incoming>
+      <incoming>flowFromMetrics</incoming>
+      <incoming>flowFromTraces</incoming>
+      <outgoing>flow2</outgoing>
+    </parallelGateway>
+    <businessRuleTask id="classifyIncident" name="Classify Incident (Drools)" flowable:ruleVariablesInput="${incidentResponseFact}" flowable:resultVariable="incidentResult">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </businessRuleTask>
+    <serviceTask id="aiRootCauseAnalysis" name="AI Root Cause Analysis (LLM)" flowable:async="true" flowable:class="com.codeflowx.govern.workflow.delegates.AIRootCauseAnalysisDelegate">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="remediationGateway" name="Can Auto-Remediate?">
+      <incoming>flow4</incoming>
+      <outgoing>flowAutoFix</outgoing>
+      <outgoing>flowRollback</outgoing>
+      <outgoing>flowScale</outgoing>
+      <outgoing>flowHITL</outgoing>
+      <outgoing>flowEscalate</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="applyAutoFix" name="Apply Auto-Fix" flowable:class="com.codeflowx.govern.workflow.delegates.ApplyAutoFixDelegate">
+      <incoming>flowAutoFix</incoming>
+      <outgoing>flowFixToVerify</outgoing>
+    </serviceTask>
+    <serviceTask id="executeRollback" name="Execute Rollback" flowable:class="com.codeflowx.govern.workflow.delegates.ExecuteRollbackDelegate">
+      <incoming>flowRollback</incoming>
+      <outgoing>flowRollbackToVerify</outgoing>
+    </serviceTask>
+    <serviceTask id="executeScaling" name="Execute Scaling" flowable:class="com.codeflowx.govern.workflow.delegates.ExecuteScalingDelegate">
+      <incoming>flowScale</incoming>
+      <outgoing>flowScaleToVerify</outgoing>
+    </serviceTask>
+    <userTask id="manualIntervention" name="Manual Intervention" flowable:candidateGroups="mlops-engineers,on-call-team" flowable:formKey="incident-manual-intervention-form" flowable:priority="100">
+      <incoming>flowHITL</incoming>
+      <outgoing>flowManualToVerify</outgoing>
+    </userTask>
+    <serviceTask id="escalateIncident" name="Escalate to Leadership" flowable:class="com.codeflowx.govern.workflow.delegates.EscalateIncidentDelegate">
+      <incoming>flowEscalate</incoming>
+      <outgoing>flowEscalateToVerify</outgoing>
+    </serviceTask>
+    <serviceTask id="verifyResolution" name="Verify Resolution" flowable:class="com.codeflowx.govern.workflow.delegates.VerifyResolutionDelegate">
+      <incoming>flowFixToVerify</incoming>
+      <incoming>flowRollbackToVerify</incoming>
+      <incoming>flowScaleToVerify</incoming>
+      <incoming>flowManualToVerify</incoming>
+      <incoming>flowEscalateToVerify</incoming>
+      <outgoing>flow5</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="verificationGateway" name="Resolved?">
+      <incoming>flow5</incoming>
+      <outgoing>flowResolved</outgoing>
+      <outgoing>flowNotResolved</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="updateKnowledgeBase" name="Update Knowledge Base (Self-Learning)" flowable:class="com.codeflowx.govern.workflow.delegates.UpdateKnowledgeBaseDelegate">
+      <incoming>flowResolved</incoming>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    <serviceTask id="generatePostMortem" name="Generate Post-Mortem" flowable:class="com.codeflowx.govern.workflow.delegates.GeneratePostMortemDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+    <serviceTask id="notifyResolution" name="Notify Resolution" flowable:class="com.codeflowx.govern.workflow.delegates.NotifyIncidentResolutionDelegate">
+      <incoming>flow7</incoming>
+      <outgoing>flowToSuccess</outgoing>
+    </serviceTask>
+    <endEvent id="endResolved" name="Incident Resolved">
+      <incoming>flowToSuccess</incoming>
+    </endEvent>
+    <endEvent id="endUnresolved" name="Unresolved - Escalated">
+      <incoming>flowNotResolved</incoming>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="incidentCreated" targetRef="parallelCollect"></sequenceFlow>
+    <sequenceFlow id="flowToLogs" sourceRef="parallelCollect" targetRef="collectLogs"></sequenceFlow>
+    <sequenceFlow id="flowToMetrics" sourceRef="parallelCollect" targetRef="collectMetrics"></sequenceFlow>
+    <sequenceFlow id="flowToTraces" sourceRef="parallelCollect" targetRef="collectTraces"></sequenceFlow>
+    <sequenceFlow id="flowFromLogs" sourceRef="collectLogs" targetRef="parallelMerge"></sequenceFlow>
+    <sequenceFlow id="flowFromMetrics" sourceRef="collectMetrics" targetRef="parallelMerge"></sequenceFlow>
+    <sequenceFlow id="flowFromTraces" sourceRef="collectTraces" targetRef="parallelMerge"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="parallelMerge" targetRef="classifyIncident"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="classifyIncident" targetRef="aiRootCauseAnalysis"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="aiRootCauseAnalysis" targetRef="remediationGateway"></sequenceFlow>
+    <sequenceFlow id="flowAutoFix" name="AUTO_FIX" sourceRef="remediationGateway" targetRef="applyAutoFix">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResult.responseAction == 'AUTO_FIX'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRollback" name="ROLLBACK" sourceRef="remediationGateway" targetRef="executeRollback">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResult.responseAction == 'ROLLBACK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowScale" name="SCALE" sourceRef="remediationGateway" targetRef="executeScaling">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResult.responseAction == 'SCALE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowHITL" name="HITL_REQUIRED" sourceRef="remediationGateway" targetRef="manualIntervention">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResult.responseAction == 'HITL_REQUIRED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowEscalate" name="ESCALATE" sourceRef="remediationGateway" targetRef="escalateIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResult.responseAction == 'ESCALATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowFixToVerify" sourceRef="applyAutoFix" targetRef="verifyResolution"></sequenceFlow>
+    <sequenceFlow id="flowRollbackToVerify" sourceRef="executeRollback" targetRef="verifyResolution"></sequenceFlow>
+    <sequenceFlow id="flowScaleToVerify" sourceRef="executeScaling" targetRef="verifyResolution"></sequenceFlow>
+    <sequenceFlow id="flowManualToVerify" sourceRef="manualIntervention" targetRef="verifyResolution"></sequenceFlow>
+    <sequenceFlow id="flowEscalateToVerify" sourceRef="escalateIncident" targetRef="verifyResolution"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="verifyResolution" targetRef="verificationGateway"></sequenceFlow>
+    <sequenceFlow id="flowResolved" name="Resolved" sourceRef="verificationGateway" targetRef="updateKnowledgeBase">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResolved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowNotResolved" name="Not Resolved" sourceRef="verificationGateway" targetRef="endUnresolved">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!incidentResolved}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="updateKnowledgeBase" targetRef="generatePostMortem"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="generatePostMortem" targetRef="notifyResolution"></sequenceFlow>
+    <sequenceFlow id="flowToSuccess" sourceRef="notifyResolution" targetRef="endResolved"></sequenceFlow>
+  </process>
+  <message id="incidentMessage" name="incident_created"></message>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_incident-response-rca-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_incident-response-rca-v1" bpmnElement="incident-response-rca-v1">
+      <bpmndi:BPMNShape id="BPMNShape_incidentCreated" bpmnElement="incidentCreated">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelCollect" bpmnElement="parallelCollect">
+        <omgdc:Bounds height="50.0" width="50.0" x="150.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_collectLogs" bpmnElement="collectLogs">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_collectMetrics" bpmnElement="collectMetrics">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_collectTraces" bpmnElement="collectTraces">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelMerge" bpmnElement="parallelMerge">
+        <omgdc:Bounds height="50.0" width="50.0" x="400.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_classifyIncident" bpmnElement="classifyIncident">
+        <omgdc:Bounds height="80.0" width="100.0" x="500.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_aiRootCauseAnalysis" bpmnElement="aiRootCauseAnalysis">
+        <omgdc:Bounds height="80.0" width="100.0" x="650.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_remediationGateway" bpmnElement="remediationGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="800.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_applyAutoFix" bpmnElement="applyAutoFix">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeRollback" bpmnElement="executeRollback">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeScaling" bpmnElement="executeScaling">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_manualIntervention" bpmnElement="manualIntervention">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="380.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_escalateIncident" bpmnElement="escalateIncident">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="480.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyResolution" bpmnElement="verifyResolution">
+        <omgdc:Bounds height="80.0" width="100.0" x="1050.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verificationGateway" bpmnElement="verificationGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="1200.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateKnowledgeBase" bpmnElement="updateKnowledgeBase">
+        <omgdc:Bounds height="80.0" width="100.0" x="1300.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generatePostMortem" bpmnElement="generatePostMortem">
+        <omgdc:Bounds height="80.0" width="100.0" x="1450.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyResolution" bpmnElement="notifyResolution">
+        <omgdc:Bounds height="80.0" width="100.0" x="1600.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endResolved" bpmnElement="endResolved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1750.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endUnresolved" bpmnElement="endUnresolved">
+        <omgdc:Bounds height="35.0" width="35.0" x="1300.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToLogs" bpmnElement="flowToLogs">
+        <omgdi:waypoint x="175.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToMetrics" bpmnElement="flowToMetrics">
+        <omgdi:waypoint x="200.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToTraces" bpmnElement="flowToTraces">
+        <omgdi:waypoint x="175.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromLogs" bpmnElement="flowFromLogs">
+        <omgdi:waypoint x="350.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="242.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromMetrics" bpmnElement="flowFromMetrics">
+        <omgdi:waypoint x="350.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromTraces" bpmnElement="flowFromTraces">
+        <omgdi:waypoint x="350.0" y="380.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="292.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="450.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="600.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="750.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAutoFix" bpmnElement="flowAutoFix">
+        <omgdi:waypoint x="825.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRollback" bpmnElement="flowRollback">
+        <omgdi:waypoint x="825.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="220.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowScale" bpmnElement="flowScale">
+        <omgdi:waypoint x="825.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowHITL" bpmnElement="flowHITL">
+        <omgdi:waypoint x="825.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="420.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEscalate" bpmnElement="flowEscalate">
+        <omgdi:waypoint x="825.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="520.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFixToVerify" bpmnElement="flowFixToVerify">
+        <omgdi:waypoint x="1000.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="227.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRollbackToVerify" bpmnElement="flowRollbackToVerify">
+        <omgdi:waypoint x="1000.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="227.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowScaleToVerify" bpmnElement="flowScaleToVerify">
+        <omgdi:waypoint x="1000.0" y="320.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowManualToVerify" bpmnElement="flowManualToVerify">
+        <omgdi:waypoint x="1000.0" y="420.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEscalateToVerify" bpmnElement="flowEscalateToVerify">
+        <omgdi:waypoint x="1000.0" y="520.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="1150.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowResolved" bpmnElement="flowResolved">
+        <omgdi:waypoint x="1250.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNotResolved" bpmnElement="flowNotResolved">
+        <omgdi:waypoint x="1225.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="367.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="1400.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1450.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="1550.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1600.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSuccess" bpmnElement="flowToSuccess">
+        <omgdi:waypoint x="1700.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1750.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

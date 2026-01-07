@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-documentation">
+  <process id="dataset-documentation-v1" name="Dataset Documentation V1" isExecutable="true" version="1.0" flowable:candidateStarterGroups="data-engineers,governance-admins">
+    <startEvent id="startDocumentation" name="Start Documentation">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Capturar contexto de decisión -->
+    <userTask id="captureDecisionContext" name="Capture Decision Context" flowable:candidateGroups="data-engineers,governance-admins" flowable:formKey="dataset-decision-context-form" flowable:priority="40">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+      <documentation>Capturar contexto y detalles de la decisión tomada sobre el dataset</documentation>
+    </userTask>
+    
+    <!-- Generar documentación -->
+    <serviceTask id="generateDocumentation" name="Generate Documentation" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.GenerateDatasetDocumentationDelegate">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    
+    <!-- Revisión de documentación -->
+    <userTask id="reviewDocumentation" name="Review Documentation" flowable:candidateGroups="governance-admins,data-stewards" flowable:formKey="dataset-documentation-review-form" flowable:priority="50">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+      <documentation>Revisar documentación generada antes de publicar</documentation>
+    </userTask>
+    
+    <!-- Gateway: ¿Documentación aprobada? -->
+    <exclusiveGateway id="documentationDecisionGateway" name="Documentation Approved?">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+      <outgoing>flow6</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Documentación rechazada: Solicitar correcciones -->
+    <userTask id="requestCorrections" name="Request Corrections" flowable:candidateGroups="data-engineers" flowable:formKey="dataset-documentation-corrections-form" flowable:priority="30">
+      <incoming>flow5</incoming>
+      <outgoing>flow7</outgoing>
+      <documentation>Solicitar correcciones a la documentación</documentation>
+    </userTask>
+    
+    <!-- Volver a generar con correcciones -->
+    <sequenceFlow id="flow7" sourceRef="requestCorrections" targetRef="generateDocumentation"></sequenceFlow>
+    
+    <!-- Documentación aprobada: Publicar -->
+    <serviceTask id="publishDocumentation" name="Publish Documentation" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.PublishDatasetDocumentationDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow8</outgoing>
+    </serviceTask>
+    
+    <!-- Notificar publicación -->
+    <serviceTask id="notifyPublication" name="Notify Documentation Published" flowable:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyDatasetDocumentationPublishedDelegate">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endDocumentation" name="Documentation Completed">
+      <incoming>flow9</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startDocumentation" targetRef="captureDecisionContext"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="captureDecisionContext" targetRef="generateDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="generateDocumentation" targetRef="reviewDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="reviewDocumentation" targetRef="documentationDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow5" name="Rejected" sourceRef="documentationDecisionGateway" targetRef="requestCorrections">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentationDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" name="Approved" sourceRef="documentationDecisionGateway" targetRef="publishDocumentation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentationDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="publishDocumentation" targetRef="notifyPublication"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="notifyPublication" targetRef="endDocumentation"></sequenceFlow>
+  </process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-documentation-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-documentation-v1" id="BPMNPlane_dataset-documentation-v1">
+      <bpmndi:BPMNShape id="BPMNShape_startDocumentation" bpmnElement="startDocumentation">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_captureDecisionContext" bpmnElement="captureDecisionContext">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateDocumentation" bpmnElement="generateDocumentation">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDocumentation" bpmnElement="reviewDocumentation">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_documentationDecisionGateway" bpmnElement="documentationDecisionGateway">
+        <omgdc:Bounds x="175" y="795" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_requestCorrections" bpmnElement="requestCorrections">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_publishDocumentation" bpmnElement="publishDocumentation">
+        <omgdc:Bounds x="350" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyPublication" bpmnElement="notifyPublication">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endDocumentation" bpmnElement="endDocumentation">
+        <omgdc:Bounds x="182" y="1342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="175" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="350" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow8" bpmnElement="flow8">
+        <omgdi:waypoint x="450" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow9" bpmnElement="flow9">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="182" y="1360" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

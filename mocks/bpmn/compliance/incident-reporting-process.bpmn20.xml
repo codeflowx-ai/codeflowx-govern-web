@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="incident_reporting_process" name="Incident Reporting & Resolution Process" isExecutable="true" version="1.0">
+    
+    <!-- Start Event: Incident Detected (Manual or Signal) -->
+    <startEvent id="incidentDetectedStart" name="Incident Detected">
+      <outgoing>flowToClassify</outgoing>
+    </startEvent>
+    
+    <!-- Service Task: Classify Incident Severity -->
+    <serviceTask id="classifyIncidentSeverity" name="Classify Incident Severity" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.ClassifyIncidentSeverityDelegate">
+      <incoming>flowToClassify</incoming>
+      <outgoing>flowToSeriousGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Serious Incident? (Art. 73) -->
+    <exclusiveGateway id="seriousIncidentGateway" name="Serious Incident? (Art. 73)">
+      <incoming>flowToSeriousGateway</incoming>
+      <outgoing>flowSerious</outgoing>
+      <outgoing>flowNormal</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Branch: Serious Incident - Parallel Notifications -->
+    <parallelGateway id="seriousIncidentParallelGateway" name="Parallel Notifications">
+      <incoming>flowSerious</incoming>
+      <outgoing>flowToNotifyAuthority</outgoing>
+      <outgoing>flowToNotifyUsers</outgoing>
+      <outgoing>flowToDocumentSerious</outgoing>
+    </parallelGateway>
+    
+    <!-- Service Task: Notify Market Surveillance Authority (IMMEDIATE - Art. 73.1) -->
+    <serviceTask id="notifyMarketSurveillanceAuthority" name="Notify Authority Immediately (Art. 73.1)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.NotifyMarketSurveillanceAuthorityDelegate">
+      <incoming>flowToNotifyAuthority</incoming>
+      <outgoing>flowFromNotifyAuthority</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Notify Affected Users -->
+    <serviceTask id="notifyAffectedUsers" name="Notify Affected Users" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.NotifyAffectedUsersDelegate">
+      <incoming>flowToNotifyUsers</incoming>
+      <outgoing>flowFromNotifyUsers</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Document Incident Details -->
+    <userTask id="documentIncidentDetails" name="Document Incident Details" 
+              activiti:candidateGroups="compliance-officers,tech-team" 
+              activiti:formKey="document-incident-details-form">
+      <incoming>flowToDocumentSerious</incoming>
+      <outgoing>flowFromDocumentSerious</outgoing>
+    </userTask>
+    
+    <!-- Join Parallel Branch -->
+    <parallelGateway id="joinSeriousNotifications" name="Join Notifications">
+      <incoming>flowFromNotifyAuthority</incoming>
+      <incoming>flowFromNotifyUsers</incoming>
+      <incoming>flowFromDocumentSerious</incoming>
+      <outgoing>flowToRCA</outgoing>
+    </parallelGateway>
+    
+    <!-- Branch: Normal Incident -->
+    <userTask id="categorizeAndDocument" name="Categorize and Document" 
+              activiti:candidateGroups="compliance-officers" 
+              activiti:formKey="categorize-incident-form">
+      <incoming>flowNormal</incoming>
+      <outgoing>flowFromCategorize</outgoing>
+    </userTask>
+    
+    <!-- Merge Both Branches -->
+    <exclusiveGateway id="mergeBranchesGateway" name="Merge">
+      <incoming>flowToRCA</incoming>
+      <incoming>flowFromCategorize</incoming>
+      <outgoing>flowToRCATask</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Root Cause Analysis (Art. 20) -->
+    <userTask id="rootCauseAnalysis" name="Root Cause Analysis (Art. 20)" 
+              activiti:candidateGroups="tech-team,compliance-officers" 
+              activiti:formKey="root-cause-analysis-form">
+      <incoming>flowToRCATask</incoming>
+      <outgoing>flowToRCAService</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Call RCA Microservice -->
+    <serviceTask id="executeRCAMicroservice" name="Execute RCA Microservice" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.ExecuteRCADelegate">
+      <incoming>flowToRCAService</incoming>
+      <outgoing>flowToCorrectiveActions</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Define Corrective Actions (Art. 20) -->
+    <userTask id="defineCorrectiveActions" name="Define Corrective Actions (Art. 20)" 
+              activiti:candidateGroups="tech-lead,compliance" 
+              activiti:formKey="define-corrective-actions-form">
+      <incoming>flowToCorrectiveActions</incoming>
+      <outgoing>flowToCreateTasks</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Create Corrective Action Tasks -->
+    <serviceTask id="createCorrectiveActionTasks" name="Create Corrective Action Tasks" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.CreateCorrectiveActionTasksDelegate">
+      <incoming>flowToCreateTasks</incoming>
+      <outgoing>flowToExecuteActions</outgoing>
+    </serviceTask>
+    
+    <!-- Parallel Gateway: Execute Actions + Follow-up -->
+    <parallelGateway id="executeActionsParallelGateway" name="Execute Actions">
+      <incoming>flowToExecuteActions</incoming>
+      <outgoing>flowToMultiInstance</outgoing>
+      <outgoing>flowToFollowUpTimer</outgoing>
+    </parallelGateway>
+    
+    <!-- Multi-Instance: Execute Corrective Actions (one per action) -->
+    <userTask id="executeCorrectiveAction" name="Execute Corrective Action" 
+              activiti:candidateGroups="tech-team" 
+              activiti:formKey="execute-corrective-action-form">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${correctiveActionsCount}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <incoming>flowToMultiInstance</incoming>
+      <outgoing>flowFromMultiInstance</outgoing>
+    </userTask>
+    
+    <!-- Timer: Follow-up Reminder (every 48h) -->
+    <intermediateCatchEvent id="followUpTimer" name="Follow-up Reminder (48h)">
+      <timerEventDefinition>
+        <timeDuration>P2D</timeDuration>
+      </timerEventDefinition>
+      <incoming>flowToFollowUpTimer</incoming>
+      <outgoing>flowFromFollowUpTimer</outgoing>
+    </intermediateCatchEvent>
+    
+    <!-- Join: All Actions Complete -->
+    <parallelGateway id="joinAllActions" name="All Actions Complete">
+      <incoming>flowFromMultiInstance</incoming>
+      <incoming>flowFromFollowUpTimer</incoming>
+      <outgoing>flowToVerifyResolution</outgoing>
+    </parallelGateway>
+    
+    <!-- User Task: Verify Resolution -->
+    <userTask id="verifyIncidentResolution" name="Verify Resolution" 
+              activiti:candidateGroups="compliance-officers" 
+              activiti:formKey="verify-incident-resolution-form">
+      <incoming>flowToVerifyResolution</incoming>
+      <outgoing>flowToResolvedGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Resolved? -->
+    <exclusiveGateway id="resolvedGateway" name="Resolved?">
+      <incoming>flowToResolvedGateway</incoming>
+      <outgoing>flowResolved</outgoing>
+      <outgoing>flowNotResolved</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Close Incident -->
+    <serviceTask id="closeIncident" name="Close Incident" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.CloseIncidentDelegate">
+      <incoming>flowResolved</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Escalate -->
+    <serviceTask id="escalateIncident" name="Escalate Incident" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.incident.EscalateIncidentDelegate">
+      <incoming>flowNotResolved</incoming>
+      <outgoing>flowEscalateLoop</outgoing>
+    </serviceTask>
+    
+    <!-- Loop back to Define Corrective Actions -->
+    <sequenceFlow id="flowEscalateLoop" sourceRef="escalateIncident" targetRef="defineCorrectiveActions"></sequenceFlow>
+    
+    <!-- End Events -->
+    <endEvent id="endIncidentResolved" name="Incident Resolved">
+      <incoming>flowToEndResolved</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToClassify" sourceRef="incidentDetectedStart" targetRef="classifyIncidentSeverity"></sequenceFlow>
+    <sequenceFlow id="flowToSeriousGateway" sourceRef="classifyIncidentSeverity" targetRef="seriousIncidentGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSerious" name="Serious" sourceRef="seriousIncidentGateway" targetRef="seriousIncidentParallelGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSerious == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowNormal" name="Normal" sourceRef="seriousIncidentGateway" targetRef="categorizeAndDocument">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSerious == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Parallel Notifications -->
+    <sequenceFlow id="flowToNotifyAuthority" sourceRef="seriousIncidentParallelGateway" targetRef="notifyMarketSurveillanceAuthority"></sequenceFlow>
+    <sequenceFlow id="flowToNotifyUsers" sourceRef="seriousIncidentParallelGateway" targetRef="notifyAffectedUsers"></sequenceFlow>
+    <sequenceFlow id="flowToDocumentSerious" sourceRef="seriousIncidentParallelGateway" targetRef="documentIncidentDetails"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromNotifyAuthority" sourceRef="notifyMarketSurveillanceAuthority" targetRef="joinSeriousNotifications"></sequenceFlow>
+    <sequenceFlow id="flowFromNotifyUsers" sourceRef="notifyAffectedUsers" targetRef="joinSeriousNotifications"></sequenceFlow>
+    <sequenceFlow id="flowFromDocumentSerious" sourceRef="documentIncidentDetails" targetRef="joinSeriousNotifications"></sequenceFlow>
+    
+    <sequenceFlow id="flowToRCA" sourceRef="joinSeriousNotifications" targetRef="mergeBranchesGateway"></sequenceFlow>
+    
+    <!-- Normal Branch -->
+    <sequenceFlow id="flowFromCategorize" sourceRef="categorizeAndDocument" targetRef="mergeBranchesGateway"></sequenceFlow>
+    
+    <!-- RCA Flow -->
+    <sequenceFlow id="flowToRCATask" sourceRef="mergeBranchesGateway" targetRef="rootCauseAnalysis"></sequenceFlow>
+    <sequenceFlow id="flowToRCAService" sourceRef="rootCauseAnalysis" targetRef="executeRCAMicroservice"></sequenceFlow>
+    <sequenceFlow id="flowToCorrectiveActions" sourceRef="executeRCAMicroservice" targetRef="defineCorrectiveActions"></sequenceFlow>
+    <sequenceFlow id="flowToCreateTasks" sourceRef="defineCorrectiveActions" targetRef="createCorrectiveActionTasks"></sequenceFlow>
+    
+    <!-- Execute Actions -->
+    <sequenceFlow id="flowToExecuteActions" sourceRef="createCorrectiveActionTasks" targetRef="executeActionsParallelGateway"></sequenceFlow>
+    <sequenceFlow id="flowToMultiInstance" sourceRef="executeActionsParallelGateway" targetRef="executeCorrectiveAction"></sequenceFlow>
+    <sequenceFlow id="flowToFollowUpTimer" sourceRef="executeActionsParallelGateway" targetRef="followUpTimer"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromMultiInstance" sourceRef="executeCorrectiveAction" targetRef="joinAllActions"></sequenceFlow>
+    <sequenceFlow id="flowFromFollowUpTimer" sourceRef="followUpTimer" targetRef="joinAllActions"></sequenceFlow>
+    
+    <!-- Verify Resolution -->
+    <sequenceFlow id="flowToVerifyResolution" sourceRef="joinAllActions" targetRef="verifyIncidentResolution"></sequenceFlow>
+    <sequenceFlow id="flowToResolvedGateway" sourceRef="verifyIncidentResolution" targetRef="resolvedGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowResolved" name="Yes" sourceRef="resolvedGateway" targetRef="closeIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResolved == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowNotResolved" name="No" sourceRef="resolvedGateway" targetRef="escalateIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResolved == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToEndResolved" sourceRef="closeIncident" targetRef="endIncidentResolved"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_incident_reporting_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_incident_reporting_process" bpmnElement="incident_reporting_process">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

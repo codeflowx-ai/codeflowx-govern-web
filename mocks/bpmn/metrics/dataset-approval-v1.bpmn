@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-approval">
+  <process id="dataset-approval-v1" name="Dataset Approval Process V1" isExecutable="true" version="1.0" activiti:candidateStarterGroups="data-engineers,governance-admins">
+    <startEvent id="startApproval" name="Start Dataset Approval">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Verificar calidad (subproceso) -->
+    <callActivity id="checkQuality" name="Check Dataset Quality" calledElement="dataset-quality-v1">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Calidad aprobada? -->
+    <exclusiveGateway id="qualityGateway" name="Quality Approved?">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+      <outgoing>flow4</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Calidad rechazada: Fin con rechazo -->
+    <endEvent id="endRejectedQuality" name="Rejected - Quality">
+      <incoming>flow3</incoming>
+    </endEvent>
+    
+    <!-- Calidad aprobada: Verificar riesgos (subproceso) -->
+    <callActivity id="checkRisks" name="Check Dataset Risks" calledElement="dataset-risk-assessment-v1">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Riesgos aprobados? -->
+    <exclusiveGateway id="riskGateway" name="Risks Approved?">
+      <incoming>flow5</incoming>
+      <outgoing>flow6</outgoing>
+      <outgoing>flow7</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Riesgos rechazados: Fin con rechazo -->
+    <endEvent id="endRejectedRisks" name="Rejected - Risks">
+      <incoming>flow6</incoming>
+    </endEvent>
+    
+    <!-- Riesgos aprobados: Verificar privacidad (subproceso) -->
+    <callActivity id="checkPrivacy" name="Check Dataset Privacy" calledElement="dataset-privacy-assessment-v1">
+      <incoming>flow7</incoming>
+      <outgoing>flow8</outgoing>
+    </callActivity>
+    
+    <!-- Gateway: ¿Privacidad aprobada? -->
+    <exclusiveGateway id="privacyGateway" name="Privacy Approved?">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+      <outgoing>flow10</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Privacidad rechazada: Fin con rechazo -->
+    <endEvent id="endRejectedPrivacy" name="Rejected - Privacy">
+      <incoming>flow9</incoming>
+    </endEvent>
+    
+    <!-- Todos los checks pasan: Revisión final opcional -->
+    <exclusiveGateway id="finalReviewGateway" name="Final Review Required?">
+      <incoming>flow10</incoming>
+      <outgoing>flow11</outgoing>
+      <outgoing>flow12</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Revisión final requerida -->
+    <userTask id="finalReview" name="Final Review" activiti:candidateGroups="governance-admins,data-stewards" activiti:formKey="dataset-final-review-form" activiti:priority="60">
+      <incoming>flow11</incoming>
+      <outgoing>flow13</outgoing>
+      <documentation>Revisión final antes de aprobación para uso en producción</documentation>
+    </userTask>
+    
+    <!-- Gateway: ¿Aprobado en revisión final? -->
+    <exclusiveGateway id="finalDecisionGateway" name="Final Decision">
+      <incoming>flow13</incoming>
+      <outgoing>flow14</outgoing>
+      <outgoing>flow15</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Rechazado en revisión final -->
+    <endEvent id="endRejectedFinal" name="Rejected - Final Review">
+      <incoming>flow14</incoming>
+    </endEvent>
+    
+    <!-- Aprobado: Aprobar dataset -->
+    <serviceTask id="approveDataset" name="Approve Dataset" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.ApproveDatasetDelegate">
+      <incoming>flow12</incoming>
+      <incoming>flow15</incoming>
+      <outgoing>flow16</outgoing>
+    </serviceTask>
+    
+    <!-- Registrar documentación -->
+    <serviceTask id="recordDocumentation" name="Record Approval Documentation" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.RecordDatasetApprovalDocumentationDelegate">
+      <incoming>flow16</incoming>
+      <outgoing>flow17</outgoing>
+    </serviceTask>
+    
+    <!-- Notificar aprobación -->
+    <serviceTask id="notifyApproval" name="Notify Dataset Approval" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyDatasetApprovedDelegate">
+      <incoming>flow17</incoming>
+      <outgoing>flow18</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endApproved" name="Dataset Approved">
+      <incoming>flow18</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startApproval" targetRef="checkQuality"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="checkQuality" targetRef="qualityGateway"></sequenceFlow>
+    <sequenceFlow id="flow3" name="Rejected" sourceRef="qualityGateway" targetRef="endRejectedQuality">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qualityResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" name="Approved" sourceRef="qualityGateway" targetRef="checkRisks">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qualityResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="checkRisks" targetRef="riskGateway"></sequenceFlow>
+    <sequenceFlow id="flow6" name="Rejected" sourceRef="riskGateway" targetRef="endRejectedRisks">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="Approved" sourceRef="riskGateway" targetRef="checkPrivacy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="checkPrivacy" targetRef="privacyGateway"></sequenceFlow>
+    <sequenceFlow id="flow9" name="Rejected" sourceRef="privacyGateway" targetRef="endRejectedPrivacy">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${privacyResult == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow10" name="Approved" sourceRef="privacyGateway" targetRef="finalReviewGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${privacyResult == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" name="Required" sourceRef="finalReviewGateway" targetRef="finalReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewRequired == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" name="Not Required" sourceRef="finalReviewGateway" targetRef="approveDataset">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewRequired == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="finalReview" targetRef="finalDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow14" name="Rejected" sourceRef="finalDecisionGateway" targetRef="endRejectedFinal">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" name="Approved" sourceRef="finalDecisionGateway" targetRef="approveDataset">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="approveDataset" targetRef="recordDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="recordDocumentation" targetRef="notifyApproval"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="notifyApproval" targetRef="endApproved"></sequenceFlow>
+  </process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-approval-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-approval-v1" id="BPMNPlane_dataset-approval-v1">
+      <!-- Diagram elements would go here -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

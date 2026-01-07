@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="fria_process" name="FRIA Process (Art. 27)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event -->
+    <startEvent id="initiateFriaStart" name="Initiate FRIA">
+      <outgoing>flowToFriaWizard</outgoing>
+    </startEvent>
+    
+    <!-- User Task: FRIA Wizard 6 pasos (Art. 27.1 a-f) -->
+    <userTask id="friaWizardSteps" name="FRIA Wizard (Art. 27.1 a-f)" 
+              activiti:candidateGroups="deployer,deployment-manager,compliance-officers" 
+              activiti:formKey="fria-wizard-form">
+      <incoming>flowToFriaWizard</incoming>
+      <incoming>flowRetryWizard</incoming>
+      <outgoing>flowToGenerateDoc</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Generate FRIA Document -->
+    <serviceTask id="generateFriaDocument" name="Generate FRIA Document" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.GenerateFriaDocumentDelegate">
+      <incoming>flowToGenerateDoc</incoming>
+      <outgoing>flowToDocGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: FRIA Complete? -->
+    <exclusiveGateway id="friaCompleteGateway" name="FRIA Complete?">
+      <incoming>flowToDocGateway</incoming>
+      <outgoing>flowFriaComplete</outgoing>
+      <outgoing>flowFriaIncomplete</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Complete Missing Elements -->
+    <userTask id="completeMissingElements" name="Complete Missing Elements" 
+              activiti:candidateGroups="deployer,compliance-officers" 
+              activiti:formKey="complete-missing-elements-form">
+      <incoming>flowFriaIncomplete</incoming>
+      <outgoing>flowRetryWizard</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowRetryWizard" sourceRef="completeMissingElements" targetRef="friaWizardSteps"></sequenceFlow>
+    
+    <!-- Service Task: Analyze Fundamental Rights Impact -->
+    <serviceTask id="analyzeFundamentalRights" name="Analyze Fundamental Rights Impact" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.AnalyzeFundamentalRightsDelegate">
+      <incoming>flowFriaComplete</incoming>
+      <outgoing>flowToHighImpactGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: High Impact? -->
+    <exclusiveGateway id="highImpactGateway" name="High Impact?">
+      <incoming>flowToHighImpactGateway</incoming>
+      <outgoing>flowHighImpact</outgoing>
+      <outgoing>flowMediumLowImpact</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Enhanced Review (si high impact) -->
+    <userTask id="enhancedReview" name="Enhanced Review (High Impact)" 
+              activiti:candidateGroups="ethics-committee,legal,compliance-officers" 
+              activiti:formKey="enhanced-review-form">
+      <incoming>flowHighImpact</incoming>
+      <outgoing>flowToReviewDecision</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Review Decision -->
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision?">
+      <incoming>flowToReviewDecision</incoming>
+      <outgoing>flowApproveReview</outgoing>
+      <outgoing>flowRejectReview</outgoing>
+      <outgoing>flowModifySystem</outgoing>
+    </exclusiveGateway>
+    
+    <!-- End: Deployment Blocked -->
+    <endEvent id="endDeploymentBlocked" name="Deployment Blocked">
+      <incoming>flowRejectReview</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowRejectReview" name="Reject" sourceRef="reviewDecisionGateway" targetRef="endDeploymentBlocked">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Define Modifications -->
+    <userTask id="defineModifications" name="Define System Modifications" 
+              activiti:candidateGroups="deployer,tech-team" 
+              activiti:formKey="define-modifications-form">
+      <incoming>flowModifySystem</incoming>
+      <outgoing>flowLoopModifications</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowModifySystem" name="Modify" sourceRef="reviewDecisionGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowLoopModifications" sourceRef="defineModifications" targetRef="friaWizardSteps"></sequenceFlow>
+    
+    <!-- Merge flows (enhanced review approved o medium/low impact) -->
+    <exclusiveGateway id="mergeToDeployerApproval" name="Merge">
+      <incoming>flowApproveReview</incoming>
+      <incoming>flowMediumLowImpact</incoming>
+      <outgoing>flowToDeployerApproval</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowApproveReview" name="Approve" sourceRef="reviewDecisionGateway" targetRef="mergeToDeployerApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Deployer Approval -->
+    <userTask id="deployerApproval" name="Deployer Approval" 
+              activiti:candidateGroups="deployer,deployment-manager" 
+              activiti:formKey="deployer-approval-form">
+      <incoming>flowToDeployerApproval</incoming>
+      <outgoing>flowToProceedGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Proceed? -->
+    <exclusiveGateway id="proceedGateway" name="Proceed?">
+      <incoming>flowToProceedGateway</incoming>
+      <outgoing>flowProceed</outgoing>
+      <outgoing>flowCancel</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Cancel Deployment -->
+    <serviceTask id="cancelDeployment" name="Cancel Deployment" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.CancelDeploymentDelegate">
+      <incoming>flowCancel</incoming>
+      <outgoing>flowToEndCancelled</outgoing>
+    </serviceTask>
+    
+    <!-- End: Deployment Cancelled -->
+    <endEvent id="endDeploymentCancelled" name="Deployment Cancelled">
+      <incoming>flowToEndCancelled</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancel" name="Cancel" sourceRef="proceedGateway" targetRef="cancelDeployment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${proceedWithDeployment == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Parallel: Notify Authority + Register + Update Project -->
+    <parallelGateway id="finalActionsParallelGateway" name="Final Actions">
+      <incoming>flowProceed</incoming>
+      <outgoing>flowToNotifyAuthority</outgoing>
+      <outgoing>flowToRegisterFria</outgoing>
+      <outgoing>flowToUpdateProject</outgoing>
+    </parallelGateway>
+    
+    <sequenceFlow id="flowProceed" name="Proceed" sourceRef="proceedGateway" targetRef="finalActionsParallelGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${proceedWithDeployment == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Notify Market Surveillance Authority (Art. 27.3) -->
+    <serviceTask id="notifyAuthorityFria" name="Notify Authority (Art. 27.3)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.NotifyAuthorityFriaDelegate">
+      <incoming>flowToNotifyAuthority</incoming>
+      <outgoing>flowFromNotifyAuthority</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Register FRIA in Database -->
+    <serviceTask id="registerFria" name="Register FRIA in Database" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.RegisterFriaDelegate">
+      <incoming>flowToRegisterFria</incoming>
+      <outgoing>flowFromRegisterFria</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Update Project Status -->
+    <serviceTask id="updateProjectFriaStatus" name="Update Project FRIA Status" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.fria.UpdateProjectFriaStatusDelegate">
+      <incoming>flowToUpdateProject</incoming>
+      <outgoing>flowFromUpdateProject</outgoing>
+    </serviceTask>
+    
+    <!-- Join Final Actions -->
+    <parallelGateway id="joinFinalActions" name="Join">
+      <incoming>flowFromNotifyAuthority</incoming>
+      <incoming>flowFromRegisterFria</incoming>
+      <incoming>flowFromUpdateProject</incoming>
+      <outgoing>flowToEndComplete</outgoing>
+    </parallelGateway>
+    
+    <!-- End: FRIA Completed & Notified -->
+    <endEvent id="endFriaComplete" name="FRIA Completed & Notified">
+      <incoming>flowToEndComplete</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToFriaWizard" sourceRef="initiateFriaStart" targetRef="friaWizardSteps"></sequenceFlow>
+    <sequenceFlow id="flowToGenerateDoc" sourceRef="friaWizardSteps" targetRef="generateFriaDocument"></sequenceFlow>
+    <sequenceFlow id="flowToDocGateway" sourceRef="generateFriaDocument" targetRef="friaCompleteGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowFriaComplete" name="Yes" sourceRef="friaCompleteGateway" targetRef="analyzeFundamentalRights">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${friaComplete == true && friaComplianceScore >= 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFriaIncomplete" name="No" sourceRef="friaCompleteGateway" targetRef="completeMissingElements">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${friaComplete == false || friaComplianceScore < 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToHighImpactGateway" sourceRef="analyzeFundamentalRights" targetRef="highImpactGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowHighImpact" name="High" sourceRef="highImpactGateway" targetRef="enhancedReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${impactSeverity == 'HIGH'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowMediumLowImpact" name="Medium/Low" sourceRef="highImpactGateway" targetRef="mergeToDeployerApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${impactSeverity == 'MEDIUM' || impactSeverity == 'LOW'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToReviewDecision" sourceRef="enhancedReview" targetRef="reviewDecisionGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToDeployerApproval" sourceRef="mergeToDeployerApproval" targetRef="deployerApproval"></sequenceFlow>
+    <sequenceFlow id="flowToProceedGateway" sourceRef="deployerApproval" targetRef="proceedGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToNotifyAuthority" sourceRef="finalActionsParallelGateway" targetRef="notifyAuthorityFria"></sequenceFlow>
+    <sequenceFlow id="flowToRegisterFria" sourceRef="finalActionsParallelGateway" targetRef="registerFria"></sequenceFlow>
+    <sequenceFlow id="flowToUpdateProject" sourceRef="finalActionsParallelGateway" targetRef="updateProjectFriaStatus"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromNotifyAuthority" sourceRef="notifyAuthorityFria" targetRef="joinFinalActions"></sequenceFlow>
+    <sequenceFlow id="flowFromRegisterFria" sourceRef="registerFria" targetRef="joinFinalActions"></sequenceFlow>
+    <sequenceFlow id="flowFromUpdateProject" sourceRef="updateProjectFriaStatus" targetRef="joinFinalActions"></sequenceFlow>
+    
+    <sequenceFlow id="flowToEndComplete" sourceRef="joinFinalActions" targetRef="endFriaComplete"></sequenceFlow>
+    <sequenceFlow id="flowToEndCancelled" sourceRef="cancelDeployment" targetRef="endDeploymentCancelled"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_fria_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_fria_process" bpmnElement="fria_process">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

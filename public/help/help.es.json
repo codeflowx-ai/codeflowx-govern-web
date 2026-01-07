@@ -1,0 +1,94 @@
+{
+  "/dashboard": {
+    "title": "Dashboard principal",
+    "body": "Visión general del proyecto: alertas, últimas ejecuciones y accesos rápidos. Usa los accesos directos para saltar a Generación, Conocimiento (RAG) o Evaluación. Consejo: filtra por proyecto activo en la barra superior."
+  },
+  "/projects": {
+    "title": "Gestión de proyectos",
+    "body": "Crea y organiza iniciativas. Cada proyecto agrupa fuentes (RAG), plantillas de generación, adapters de dominio/stack, endpoints y evaluación. Consejo: define objetivos y métricas antes de cargar contenido."
+  },
+  "/generation": {
+    "title": "Generación (plantillas)",
+    "body": "Produce entregables (emails, posts, fichas) con plantillas guiadas y policies de tono/formato por proyecto. Lotes CSV disponibles. Consejo: fija políticas por proyecto y revisa el panel de calidad tras cada lote."
+  },
+  "/conocimiento": {
+    "title": "Conocimiento (RAG)",
+    "body": "Conecta fuentes, indexa y habilita respuestas con citas. Ajusta chunking y metadatos; configura re‑ranking y políticas de citación. Consejo: si el 80% de los errores son de recuperación, mejora el índice antes de entrenar."
+  },
+  "/conocimiento/indices": {
+    "title": "Índices y fuentes",
+    "body": "Gestiona Qdrant/pgvector y buckets (MinIO/Blob). Define metadatos, filtros y re‑indexados. Consejo: usa tags (cliente, fecha, idioma) para mejorar precisión y filtrado."
+  },
+  "/conocimiento/chat": {
+    "title": "Chat con RAG (con citas)",
+    "body": "Consulta el conocimiento del proyecto. Las respuestas incluyen citas verificables. Consejo: usa prompts claros y verifica las fuentes antes de compartir."
+  },
+  "/conocimiento/analitica": {
+    "title": "Analítica de RAG",
+    "body": "Métricas: precision@k, recall@k, nDCG, groundedness y latencia p95. Consejo: fija umbrales mínimos y habilita gating en Evaluación para promover cambios a GA."
+  },
+  "/dominios": {
+    "title": "Dominios de negocio",
+    "body": "Especializa el modelo a tu sector: corpus curado, tono/estilo, extracción y formatos. Entrena adapters LoRA/QLoRA, evalúa y promueve si mejora vs baseline. Consejo: JSON válido ≥99% y +10–15% vs baseline antes de GA."
+  },
+  "/dominios/datasets": {
+    "title": "Datasets de dominio",
+    "body": "Carga y etiqueta ejemplos (instrucciones, Q&A, formularios). Consejo: deduplica y cubre casos borde; pocos ejemplos de calidad superan muchos ruidosos."
+  },
+  "/dominios/adapters": {
+    "title": "Adapters y merges",
+    "body": "Entrena adapters por dominio y combínalos con merges controlados. Consejo: evalúa interferencias al combinar adapters (no asumas compatibilidad total)."
+  },
+  "/dominios/entrenamientos": {
+    "title": "Entrenamientos (jobs)",
+    "body": "Lanza y monitoriza jobs de training con colas y prioridades. Requiere GPU 16–24 GB para LoRA/QLoRA. Consejo: activa early stopping y valida cada N pasos."
+  },
+  "/dominios/evaluacion": {
+    "title": "Evaluación de dominio",
+    "body": "Mide exactitud, estilo, JSON válido y latencia. Usa juez LLM + muestreo humano (HITL). Consejo: promueve solo si todas las métricas superan umbrales."
+  },
+  "/stacks": {
+    "title": "Stacks y tecnologías",
+    "body": "Adapta a patrones de código (Spring, Next.js, Azure…). Entrena adapters con repos/plantillas y evalúa con pass@k, tests y SAST básico. Consejo: prioriza scaffolds y convenciones de mayor impacto."
+  },
+  "/modelos": {
+    "title": "Modelos y versiones",
+    "body": "Catálogo de modelos, adapters y merges. Versionado compatible con MLflow 3.2. Consejo: nombra bundles como model@adapter@policy@index para rastrear."
+  },
+  "/serving/endpoints": {
+    "title": "Endpoints (OpenAI‑compatible)",
+    "body": "Configura base_url, modelos y claves (PAT) por proyecto. Opcional: alias leka‑rag para retrieval integrado. Consejo: habilita rate‑limits y no registres PII por defecto."
+  },
+  "/evaluation": {
+    "title": "Evaluación y gating",
+    "body": "Panel unificado de calidad (RAG, dominio, stack). Define umbrales (precision/recall, groundedness p95, JSON válido, latencia). Consejo: activa gating para que solo se promueva a GA con evidencia."
+  },
+  "/settings/mlflow": {
+    "title": "Compatibilidad MLflow",
+    "body": "Conecta tracking/registry MLflow 3.2 para runs, artefactos y versiones. La evidencia detallada vive en CodeflowX. Consejo: evita subir PII; usa artefactos agregados."
+  },
+  "/mlflow": {
+    "title": "UI MLflow (embebida)",
+    "body": "Explora runs, artefactos y transiciones de modelo. Acceso detrás de login. Consejo: usa los deep‑links desde CodeflowX para ver evidencia."
+  },
+  "/portals": {
+    "title": "Portales white‑label",
+    "body": "Entrega a tus clientes un portal (chat, RAG, imagen) con tu marca. Core o Source+SDK. Consejo: separa índices y secretos por cliente; aplica el checklist de hardening."
+  },
+  "/infrastructure": {
+    "title": "Infraestructura",
+    "body": "Clústeres K8s, GPUs, despliegues y costes. Consejo: alinea ventanas de 'update day' y backups verificados."
+  },
+  "/config/users": {
+    "title": "Usuarios y roles",
+    "body": "Gestión de accesos. Consejo: usa roles por vista (agencia, it, oem) y limita privilegios de producción."
+  },
+  "/demo": {
+    "title": "Modo Demo",
+    "body": "Experiencia de demostración con datos de ejemplo. Selecciona tu rol para acceder a las funcionalidades específicas de tu perfil. Consejo: explora todas las opciones disponibles para tu rol."
+  },
+  "/demo/experiencia": {
+    "title": "Experiencia por Rol",
+    "body": "Accede a la funcionalidad específica de tu rol con datos de ejemplo. Cada rol tiene acceso a diferentes módulos y capacidades. Consejo: revisa las limitaciones de tu rol en el banner superior."
+  }
+}

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://codeflowx.com/govern/aios">
+    <process id="ai_marketplace_publish_v1"
+             name="AI Marketplace Publication"
+             isExecutable="true">
+
+        <startEvent id="start_publish" name="Publish Request">
+            <outgoing>flow_start_verify</outgoing>
+        </startEvent>
+
+        <serviceTask id="task_verify_artifacts"
+                     name="Verify Certification Artifacts"
+                     camunda:delegateExpression="#{verifyCertificationArtifactsDelegate}">
+            <incoming>flow_start_verify</incoming>
+            <outgoing>flow_verify_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_artifacts_complete" name="Artifacts Complete?">
+            <incoming>flow_verify_gateway</incoming>
+            <outgoing>flow_artifacts_yes</outgoing>
+            <outgoing>flow_artifacts_no</outgoing>
+        </exclusiveGateway>
+
+        <userTask id="task_upload_evidence"
+                  name="Upload Missing Evidence"
+                  camunda:formKey="zul:aios/marketplace_evidence_upload.zul"
+                  camunda:candidateGroups="AIOS_ADMIN">
+            <incoming>flow_artifacts_no</incoming>
+            <outgoing>flow_evidence_loop</outgoing>
+        </userTask>
+
+        <serviceTask id="task_marketplace_score"
+                     name="Calculate Marketplace Score"
+                     camunda:delegateExpression="#{marketplaceScoringDelegate}">
+            <incoming>flow_artifacts_yes</incoming>
+            <outgoing>flow_score_to_rules</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_marketplace_rules"
+                     name="Determine Publication Tier"
+                     camunda:delegateExpression="#{marketplacePublicationRulesDelegate}">
+            <incoming>flow_score_to_rules</incoming>
+            <outgoing>flow_rules_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_publication_tier" name="Publication Tier">
+            <incoming>flow_rules_gateway</incoming>
+            <outgoing>flow_tier_public</outgoing>
+            <outgoing>flow_tier_restricted</outgoing>
+            <outgoing>flow_tier_denied</outgoing>
+        </exclusiveGateway>
+
+        <serviceTask id="task_publish_marketplace"
+                     name="Publish to Marketplace"
+                     camunda:delegateExpression="#{publishComponentMarketplaceDelegate}">
+            <incoming>flow_tier_public</incoming>
+            <outgoing>flow_public_end</outgoing>
+        </serviceTask>
+
+        <userTask id="task_legal_review"
+                  name="Legal Review"
+                  camunda:formKey="zul:aios/marketplace_legal_review.zul"
+                  camunda:candidateGroups="LEGAL,AIOS_ADMIN">
+            <incoming>flow_tier_restricted</incoming>
+            <outgoing>flow_legal_end</outgoing>
+        </userTask>
+
+        <serviceTask id="task_notify_denial"
+                     name="Notify Denial"
+                     camunda:delegateExpression="#{notifyMarketplaceDenialDelegate}">
+            <incoming>flow_tier_denied</incoming>
+            <outgoing>flow_denial_end</outgoing>
+        </serviceTask>
+
+        <endEvent id="end_public" name="Published">
+            <incoming>flow_public_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_restricted" name="Restricted Review">
+            <incoming>flow_legal_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_denied" name="Denied">
+            <incoming>flow_denial_end</incoming>
+        </endEvent>
+
+        <sequenceFlow id="flow_start_verify" sourceRef="start_publish" targetRef="task_verify_artifacts"/>
+        <sequenceFlow id="flow_verify_gateway" sourceRef="task_verify_artifacts" targetRef="gateway_artifacts_complete"/>
+        <sequenceFlow id="flow_artifacts_yes" sourceRef="gateway_artifacts_complete" targetRef="task_marketplace_score">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${artifactsComplete == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_artifacts_no" sourceRef="gateway_artifacts_complete" targetRef="task_upload_evidence">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${artifactsComplete == false}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_evidence_loop" sourceRef="task_upload_evidence" targetRef="task_verify_artifacts"/>
+        <sequenceFlow id="flow_score_to_rules" sourceRef="task_marketplace_score" targetRef="task_marketplace_rules"/>
+        <sequenceFlow id="flow_rules_gateway" sourceRef="task_marketplace_rules" targetRef="gateway_publication_tier"/>
+        <sequenceFlow id="flow_tier_public" sourceRef="gateway_publication_tier" targetRef="task_publish_marketplace">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${publicationDecision == 'PUBLIC'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_tier_restricted" sourceRef="gateway_publication_tier" targetRef="task_legal_review">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${publicationDecision == 'RESTRICTED'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_tier_denied" sourceRef="gateway_publication_tier" targetRef="task_notify_denial">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${publicationDecision == 'DENIED'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_public_end" sourceRef="task_publish_marketplace" targetRef="end_public"/>
+        <sequenceFlow id="flow_legal_end" sourceRef="task_legal_review" targetRef="end_restricted"/>
+        <sequenceFlow id="flow_denial_end" sourceRef="task_notify_denial" targetRef="end_denied"/>
+    </process>
+</definitions>
+
+

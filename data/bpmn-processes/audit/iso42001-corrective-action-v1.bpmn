@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://codeflowx.com/govern/iso42001/corrective-action"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso42001CorrectiveActionV1"
+           name="ISO 42001 Corrective Action"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="nonConformityReported" name="No conformidad reportada">
+      <outgoing>flowAssessNonConformity</outgoing>
+    </startEvent>
+
+    <userTask id="assessNonConformityTask"
+              name="Evaluar no conformidad"
+              flowable:formKey="console/bpmn/corrective-action-assessment-form.zul"
+              flowable:candidateGroups="compliance-officers">
+      <incoming>flowAssessNonConformity</incoming>
+      <outgoing>flowAssignResponsible</outgoing>
+    </userTask>
+
+    <serviceTask id="assignResponsibleTask"
+                 name="Asignar responsable"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.AssignCorrectiveActionResponsibleDelegate">
+      <incoming>flowAssignResponsible</incoming>
+      <outgoing>flowRootCause</outgoing>
+    </serviceTask>
+
+    <userTask id="rootCauseTask"
+              name="Análisis causa raíz"
+              flowable:formKey="console/bpmn/root-cause-analysis-form.zul"
+              flowable:candidateGroups="quality-engineers,compliance-officers">
+      <incoming>flowRootCause</incoming>
+      <outgoing>flowDefineAction</outgoing>
+    </userTask>
+
+    <userTask id="defineCorrectiveActionTask"
+              name="Definir acción correctiva"
+              flowable:formKey="console/bpmn/define-corrective-actions-form.zul"
+              flowable:candidateGroups="quality-engineers,compliance-officers">
+      <incoming>flowDefineAction</incoming>
+      <outgoing>flowSeverityGateway</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="severityGateway" name="¿Severidad crítica?">
+      <incoming>flowSeverityGateway</incoming>
+      <outgoing>flowNeedsApproval</outgoing>
+      <outgoing>flowSkipApproval</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="approveCorrectiveActionTask"
+              name="Aprobar acción correctiva"
+              flowable:formKey="console/bpmn/corrective-action-approval-form.zul"
+              flowable:candidateGroups="top-management,compliance-managers">
+      <incoming>flowNeedsApproval</incoming>
+      <outgoing>flowImplementAction</outgoing>
+    </userTask>
+
+    <userTask id="implementCorrectiveActionTask"
+              name="Implementar acción"
+              flowable:formKey="console/bpmn/corrective-action-implementation-form.zul"
+              flowable:candidateGroups="corrective-action-owners">
+      <incoming>flowSkipApproval</incoming>
+      <incoming>flowImplementAction</incoming>
+      <outgoing>flowVerifyEffectiveness</outgoing>
+    </userTask>
+
+    <userTask id="verifyEffectivenessTask"
+              name="Verificar efectividad"
+              flowable:formKey="console/bpmn/corrective-action-effectiveness-form.zul"
+              flowable:candidateGroups="quality-engineers,compliance-officers">
+      <incoming>flowVerifyEffectiveness</incoming>
+      <outgoing>flowEffectivenessGateway</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="effectivenessGateway" name="¿Acción efectiva?">
+      <incoming>flowEffectivenessGateway</incoming>
+      <outgoing>flowLoopBack</outgoing>
+      <outgoing>flowUpdateStatus</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="updateNonConformityStatus"
+                 name="Actualizar estado no conformidad"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.UpdateCorrectiveActionStatusDelegate">
+      <incoming>flowUpdateStatus</incoming>
+      <outgoing>flowEndCorrectiveAction</outgoing>
+    </serviceTask>
+
+    <endEvent id="correctiveActionClosed" name="No conformidad cerrada">
+      <incoming>flowEndCorrectiveAction</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowAssessNonConformity"
+                  sourceRef="nonConformityReported"
+                  targetRef="assessNonConformityTask"/>
+    <sequenceFlow id="flowAssignResponsible"
+                  sourceRef="assessNonConformityTask"
+                  targetRef="assignResponsibleTask"/>
+    <sequenceFlow id="flowRootCause"
+                  sourceRef="assignResponsibleTask"
+                  targetRef="rootCauseTask"/>
+    <sequenceFlow id="flowDefineAction"
+                  sourceRef="rootCauseTask"
+                  targetRef="defineCorrectiveActionTask"/>
+    <sequenceFlow id="flowSeverityGateway"
+                  sourceRef="defineCorrectiveActionTask"
+                  targetRef="severityGateway"/>
+    <sequenceFlow id="flowNeedsApproval"
+                  sourceRef="severityGateway"
+                  targetRef="approveCorrectiveActionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nonConformitySeverity == 'CRITICAL'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowSkipApproval"
+                  sourceRef="severityGateway"
+                  targetRef="implementCorrectiveActionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${nonConformitySeverity != 'CRITICAL'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowImplementAction"
+                  sourceRef="approveCorrectiveActionTask"
+                  targetRef="implementCorrectiveActionTask"/>
+    <sequenceFlow id="flowVerifyEffectiveness"
+                  sourceRef="implementCorrectiveActionTask"
+                  targetRef="verifyEffectivenessTask"/>
+    <sequenceFlow id="flowEffectivenessGateway"
+                  sourceRef="verifyEffectivenessTask"
+                  targetRef="effectivenessGateway"/>
+    <sequenceFlow id="flowLoopBack"
+                  sourceRef="effectivenessGateway"
+                  targetRef="defineCorrectiveActionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!correctiveActionEffective}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowUpdateStatus"
+                  sourceRef="effectivenessGateway"
+                  targetRef="updateNonConformityStatus">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${correctiveActionEffective}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowEndCorrectiveAction"
+                  sourceRef="updateNonConformityStatus"
+                  targetRef="correctiveActionClosed"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso42001CorrectiveAction">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso42001CorrectiveAction" bpmnElement="iso42001CorrectiveActionV1">
+      <bpmndi:BPMNShape id="BPMNShape_nonConformityReported" bpmnElement="nonConformityReported">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assessNonConformityTask" bpmnElement="assessNonConformityTask">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assignResponsibleTask" bpmnElement="assignResponsibleTask">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rootCauseTask" bpmnElement="rootCauseTask">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_defineCorrectiveActionTask" bpmnElement="defineCorrectiveActionTask">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_severityGateway" bpmnElement="severityGateway">
+        <omgdc:Bounds x="175" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approveCorrectiveActionTask" bpmnElement="approveCorrectiveActionTask">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_implementCorrectiveActionTask" bpmnElement="implementCorrectiveActionTask">
+        <omgdc:Bounds x="350" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyEffectivenessTask" bpmnElement="verifyEffectivenessTask">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_effectivenessGateway" bpmnElement="effectivenessGateway">
+        <omgdc:Bounds x="175" y="1515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateNonConformityStatus" bpmnElement="updateNonConformityStatus">
+        <omgdc:Bounds x="150" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_correctiveActionClosed" bpmnElement="correctiveActionClosed">
+        <omgdc:Bounds x="182" y="1882" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAssessNonConformity" bpmnElement="flowAssessNonConformity">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAssignResponsible" bpmnElement="flowAssignResponsible">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRootCause" bpmnElement="flowRootCause">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDefineAction" bpmnElement="flowDefineAction">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSeverityGateway" bpmnElement="flowSeverityGateway">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNeedsApproval" bpmnElement="flowNeedsApproval">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSkipApproval" bpmnElement="flowSkipApproval">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="350" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowImplementAction" bpmnElement="flowImplementAction">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="350" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowVerifyEffectiveness" bpmnElement="flowVerifyEffectiveness">
+        <omgdi:waypoint x="450" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEffectivenessGateway" bpmnElement="flowEffectivenessGateway">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="175" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowLoopBack" bpmnElement="flowLoopBack">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowUpdateStatus" bpmnElement="flowUpdateStatus">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="150" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEndCorrectiveAction" bpmnElement="flowEndCorrectiveAction">
+        <omgdi:waypoint x="250" y="1720" />
+        <omgdi:waypoint x="182" y="1900" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+

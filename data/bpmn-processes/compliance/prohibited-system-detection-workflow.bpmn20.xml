@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/compliance">
+
+  <process id="prohibited-system-detection-workflow" name="Prohibited System Detection Workflow (Art. 5)" isExecutable="true" version="1.0">
+
+    <!-- Start Event -->
+    <startEvent id="prohibitedSystemDetectedStart" name="Prohibited System Detected">
+      <outgoing>flowToReviewDetection</outgoing>
+    </startEvent>
+
+    <!-- User Task: Review Detection -->
+    <userTask id="reviewDetection" name="Review Prohibited System Detection"
+              flowable:candidateGroups="compliance-officers,deployment-manager,legal"
+              flowable:formKey="prohibited-system-review-form">
+      <incoming>flowToReviewDetection</incoming>
+      <outgoing>flowToReviewDecision</outgoing>
+    </userTask>
+
+    <!-- Gateway: Review Decision -->
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision?">
+      <incoming>flowToReviewDecision</incoming>
+      <outgoing>flowFalsePositive</outgoing>
+      <outgoing>flowConfirmedProhibited</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Unblock Deployment (False Positive) -->
+    <serviceTask id="unblockDeployment" name="Unblock Deployment"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.UnblockDeploymentDelegate">
+      <incoming>flowFalsePositive</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+
+    <!-- End: Resolved (False Positive) -->
+    <endEvent id="endResolved" name="Resolved (False Positive)">
+      <incoming>flowToEndResolved</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowFalsePositive" name="False Positive" sourceRef="reviewDecisionGateway" targetRef="unblockDeployment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'FALSE_POSITIVE'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- User Task: Compliance Officer Review (Confirmed) -->
+    <userTask id="complianceOfficerReview" name="Compliance Officer Review"
+              flowable:candidateGroups="compliance-officers,legal"
+              flowable:formKey="compliance-officer-review-form">
+      <incoming>flowConfirmedProhibited</incoming>
+      <outgoing>flowToComplianceDecision</outgoing>
+    </userTask>
+
+    <sequenceFlow id="flowConfirmedProhibited" name="Confirmed Prohibited" sourceRef="reviewDecisionGateway" targetRef="complianceOfficerReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'CONFIRMED'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Gateway: Compliance Decision -->
+    <exclusiveGateway id="complianceDecisionGateway" name="Compliance Decision?">
+      <incoming>flowToComplianceDecision</incoming>
+      <outgoing>flowBlockPermanently</outgoing>
+      <outgoing>flowRequireModification</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Block Deployment Permanently -->
+    <serviceTask id="blockDeploymentPermanently" name="Block Deployment Permanently"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.BlockDeploymentPermanentlyDelegate">
+      <incoming>flowBlockPermanently</incoming>
+      <outgoing>flowToNotifyStakeholders</outgoing>
+    </serviceTask>
+
+    <!-- Service Task: Notify Stakeholders -->
+    <serviceTask id="notifyStakeholders" name="Notify Stakeholders"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.NotifyStakeholdersDelegate">
+      <incoming>flowToNotifyStakeholders</incoming>
+      <outgoing>flowToEndBlocked</outgoing>
+    </serviceTask>
+
+    <!-- End: Deployment Blocked -->
+    <endEvent id="endBlocked" name="Deployment Blocked">
+      <incoming>flowToEndBlocked</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowBlockPermanently" name="Block Permanently" sourceRef="complianceDecisionGateway" targetRef="blockDeploymentPermanently">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${complianceDecision == 'BLOCK'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- User Task: Define System Modifications -->
+    <userTask id="defineModifications" name="Define System Modifications"
+              flowable:candidateGroups="deployer,tech-team"
+              flowable:formKey="define-modifications-form">
+      <incoming>flowRequireModification</incoming>
+      <outgoing>flowToVerifyModifications</outgoing>
+    </userTask>
+
+    <sequenceFlow id="flowRequireModification" name="Require Modifications" sourceRef="complianceDecisionGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${complianceDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Service Task: Verify Modifications -->
+    <serviceTask id="verifyModifications" name="Verify Modifications"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.VerifyModificationsDelegate">
+      <incoming>flowToVerifyModifications</incoming>
+      <outgoing>flowToModificationGateway</outgoing>
+    </serviceTask>
+
+    <!-- Gateway: Modifications Verified? -->
+    <exclusiveGateway id="modificationGateway" name="Modifications Verified?">
+      <incoming>flowToModificationGateway</incoming>
+      <outgoing>flowModificationsOK</outgoing>
+      <outgoing>flowModificationsRejected</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Unblock and Re-check -->
+    <serviceTask id="unblockAndRecheck" name="Unblock and Re-check Prohibited Systems"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.UnblockAndRecheckDelegate">
+      <incoming>flowModificationsOK</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+
+    <sequenceFlow id="flowModificationsOK" name="OK" sourceRef="modificationGateway" targetRef="unblockAndRecheck">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${modificationsVerified == true}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Loop back to define modifications -->
+    <sequenceFlow id="flowModificationsRejected" name="Rejected" sourceRef="modificationGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${modificationsVerified == false}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToReviewDetection" sourceRef="prohibitedSystemDetectedStart" targetRef="reviewDetection"></sequenceFlow>
+    <sequenceFlow id="flowToReviewDecision" sourceRef="reviewDetection" targetRef="reviewDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowToEndResolved" sourceRef="unblockAndRecheck" targetRef="endResolved"></sequenceFlow>
+    <sequenceFlow id="flowToComplianceDecision" sourceRef="complianceOfficerReview" targetRef="complianceDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowToNotifyStakeholders" sourceRef="blockDeploymentPermanently" targetRef="notifyStakeholders"></sequenceFlow>
+    <sequenceFlow id="flowToEndBlocked" sourceRef="notifyStakeholders" targetRef="endBlocked"></sequenceFlow>
+    <sequenceFlow id="flowToVerifyModifications" sourceRef="defineModifications" targetRef="verifyModifications"></sequenceFlow>
+    <sequenceFlow id="flowToModificationGateway" sourceRef="verifyModifications" targetRef="modificationGateway"></sequenceFlow>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_prohibited_system_detection_workflow">
+    <bpmndi:BPMNPlane id="BPMNPlane_prohibited_system_detection_workflow" bpmnElement="prohibited-system-detection-workflow">
+      <bpmndi:BPMNShape id="BPMNShape_prohibitedSystemDetectedStart" bpmnElement="prohibitedSystemDetectedStart">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDetection" bpmnElement="reviewDetection">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDecisionGateway" bpmnElement="reviewDecisionGateway">
+        <omgdc:Bounds x="175" y="435" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_unblockDeployment" bpmnElement="unblockDeployment">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endResolved" bpmnElement="endResolved">
+        <omgdc:Bounds x="182" y="1702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_complianceOfficerReview" bpmnElement="complianceOfficerReview">
+        <omgdc:Bounds x="350" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_complianceDecisionGateway" bpmnElement="complianceDecisionGateway">
+        <omgdc:Bounds x="175" y="795" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_blockDeploymentPermanently" bpmnElement="blockDeploymentPermanently">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyStakeholders" bpmnElement="notifyStakeholders">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endBlocked" bpmnElement="endBlocked">
+        <omgdc:Bounds x="182" y="1342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_defineModifications" bpmnElement="defineModifications">
+        <omgdc:Bounds x="350" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyModifications" bpmnElement="verifyModifications">
+        <omgdc:Bounds x="350" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_modificationGateway" bpmnElement="modificationGateway">
+        <omgdc:Bounds x="375" y="1335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_unblockAndRecheck" bpmnElement="unblockAndRecheck">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFalsePositive" bpmnElement="flowFalsePositive">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConfirmedProhibited" bpmnElement="flowConfirmedProhibited">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="350" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowBlockPermanently" bpmnElement="flowBlockPermanently">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRequireModification" bpmnElement="flowRequireModification">
+        <omgdi:waypoint x="225" y="820" />
+        <omgdi:waypoint x="350" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowModificationsOK" bpmnElement="flowModificationsOK">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowModificationsRejected" bpmnElement="flowModificationsRejected">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="350" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToReviewDetection" bpmnElement="flowToReviewDetection">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToReviewDecision" bpmnElement="flowToReviewDecision">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="175" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndResolved" bpmnElement="flowToEndResolved">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="182" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToComplianceDecision" bpmnElement="flowToComplianceDecision">
+        <omgdi:waypoint x="450" y="640" />
+        <omgdi:waypoint x="175" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToNotifyStakeholders" bpmnElement="flowToNotifyStakeholders">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndBlocked" bpmnElement="flowToEndBlocked">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="182" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToVerifyModifications" bpmnElement="flowToVerifyModifications">
+        <omgdi:waypoint x="450" y="1000" />
+        <omgdi:waypoint x="350" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToModificationGateway" bpmnElement="flowToModificationGateway">
+        <omgdi:waypoint x="450" y="1180" />
+        <omgdi:waypoint x="375" y="1360" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

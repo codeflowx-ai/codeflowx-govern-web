@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/models">
+  
+  <process id="adapter_creation_approval_v1" name="Adapter Creation Approval V1 (Art. 53)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event -->
+    <startEvent id="requestAdapterStart" name="Request Adapter Creation">
+      <outgoing>flowToDefineParams</outgoing>
+    </startEvent>
+    
+    <!-- User Task: Define Adapter Parameters -->
+    <userTask id="defineAdapterParameters" name="Define Adapter Parameters" 
+              activiti:candidateGroups="ml-engineers,data-scientists" 
+              activiti:formKey="define-adapter-parameters-form">
+      <incoming>flowToDefineParams</incoming>
+      <incoming>flowRetryParams</incoming>
+      <outgoing>flowToValidateGpai</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Validate GPAI Compliance (Art. 53) -->
+    <serviceTask id="validateGpaiCompliance" name="Validate GPAI Compliance (Art. 53)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.adapter.ValidateGpaiComplianceDelegate">
+      <incoming>flowToValidateGpai</incoming>
+      <outgoing>flowToGpaiGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: GPAI Compliant? -->
+    <exclusiveGateway id="gpaiCompliantGateway" name="GPAI Compliant?">
+      <incoming>flowToGpaiGateway</incoming>
+      <outgoing>flowGpaiCompliant</outgoing>
+      <outgoing>flowGpaiNonCompliant</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Fix Compliance Gaps -->
+    <userTask id="fixComplianceGaps" name="Fix Compliance Gaps (Art. 53.1.c)" 
+              activiti:candidateGroups="compliance-officers,ml-engineers" 
+              activiti:formKey="fix-compliance-gaps-form">
+      <incoming>flowGpaiNonCompliant</incoming>
+      <outgoing>flowFromFixGaps</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Fix Decision -->
+    <exclusiveGateway id="fixDecisionGateway" name="Decision?">
+      <incoming>flowFromFixGaps</incoming>
+      <outgoing>flowRetryParams</outgoing>
+      <outgoing>flowCancelFromGaps</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowRetryParams" name="Retry" sourceRef="fixDecisionGateway" targetRef="defineAdapterParameters">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${gapsDecision == 'RETRY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Cancelled from gaps -->
+    <endEvent id="endCancelledFromGaps" name="Cancelled (Compliance)">
+      <incoming>flowCancelFromGaps</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancelFromGaps" name="Cancel" sourceRef="fixDecisionGateway" targetRef="endCancelledFromGaps">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${gapsDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Estimate Cost/CO2/Time -->
+    <serviceTask id="estimateAdapterCost" name="Estimate Cost/CO2/Time" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.adapter.EstimateAdapterCostDelegate">
+      <incoming>flowGpaiCompliant</incoming>
+      <outgoing>flowToCompare</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Compare vs Fine-Tuning -->
+    <serviceTask id="compareAdapterVsFineTuning" name="Compare Adapter vs Fine-Tuning" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.adapter.CompareAdapterVsFineTuningDelegate">
+      <incoming>flowToCompare</incoming>
+      <outgoing>flowToReview</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Review and Approve -->
+    <userTask id="reviewAndApprove" name="Review and Approve Adapter" 
+              activiti:candidateGroups="ml-engineers,tech-leads" 
+              activiti:formKey="review-adapter-approval-form">
+      <incoming>flowToReview</incoming>
+      <outgoing>flowToApprovedGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Approved? -->
+    <exclusiveGateway id="approvedGateway" name="Approved?">
+      <incoming>flowToApprovedGateway</incoming>
+      <outgoing>flowApproved</outgoing>
+      <outgoing>flowModify</outgoing>
+      <outgoing>flowReject</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Loop: Modify -->
+    <sequenceFlow id="flowModify" name="Modify" sourceRef="approvedGateway" targetRef="defineAdapterParameters">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvalDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Rejected -->
+    <endEvent id="endAdapterRejected" name="Adapter Rejected">
+      <incoming>flowReject</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowReject" name="Reject" sourceRef="approvedGateway" targetRef="endAdapterRejected">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvalDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Create Adapter Record -->
+    <serviceTask id="createAdapterRecord" name="Create Adapter Record (Model)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.adapter.CreateAdapterRecordDelegate">
+      <incoming>flowApproved</incoming>
+      <outgoing>flowToTriggerTraining</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Trigger Adapter Training Job -->
+    <serviceTask id="triggerAdapterTrainingJob" name="Trigger Adapter Training Job" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.adapter.TriggerAdapterTrainingJobDelegate">
+      <incoming>flowToTriggerTraining</incoming>
+      <outgoing>flowToEndApproved</outgoing>
+    </serviceTask>
+    
+    <!-- End: Adapter Approved -->
+    <endEvent id="endAdapterApproved" name="Adapter Approved & Queued">
+      <incoming>flowToEndApproved</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToDefineParams" sourceRef="requestAdapterStart" targetRef="defineAdapterParameters"></sequenceFlow>
+    <sequenceFlow id="flowToValidateGpai" sourceRef="defineAdapterParameters" targetRef="validateGpaiCompliance"></sequenceFlow>
+    <sequenceFlow id="flowToGpaiGateway" sourceRef="validateGpaiCompliance" targetRef="gpaiCompliantGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowGpaiCompliant" name="Yes" sourceRef="gpaiCompliantGateway" targetRef="estimateAdapterCost">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${gpaiCompliant == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowGpaiNonCompliant" name="No" sourceRef="gpaiCompliantGateway" targetRef="fixComplianceGaps">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${gpaiCompliant == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFromFixGaps" sourceRef="fixComplianceGaps" targetRef="fixDecisionGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToCompare" sourceRef="estimateAdapterCost" targetRef="compareAdapterVsFineTuning"></sequenceFlow>
+    <sequenceFlow id="flowToReview" sourceRef="compareAdapterVsFineTuning" targetRef="reviewAndApprove"></sequenceFlow>
+    <sequenceFlow id="flowToApprovedGateway" sourceRef="reviewAndApprove" targetRef="approvedGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowApproved" name="Approve" sourceRef="approvedGateway" targetRef="createAdapterRecord">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approvalDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToTriggerTraining" sourceRef="createAdapterRecord" targetRef="triggerAdapterTrainingJob"></sequenceFlow>
+    <sequenceFlow id="flowToEndApproved" sourceRef="triggerAdapterTrainingJob" targetRef="endAdapterApproved"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_adapter_creation_approval_v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_adapter_creation_approval_v1" bpmnElement="adapter_creation_approval_v1">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+
+

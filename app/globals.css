@@ -1,0 +1,1475 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables CSS para el Page Designer */
+:root {
+  --designer-canvas: #f8fafc;
+  --designer-grid: rgba(226, 232, 240, 0.4);
+  --designer-selection: #3b82f6;
+  --designer-hover: #dbeafe;
+}
+
+/* Sistema de temas CodeflowX */
+:root {
+  /* Variables por defecto (leka-default) */
+  --theme-primary: #3b82f6;
+  --theme-secondary: #64748b;
+  --theme-accent: #8b5cf6;
+  --theme-background: #ffffff;
+  --theme-surface: #f8fafc;
+  --theme-card: #ffffff;
+  --theme-popover: #ffffff;
+  --theme-text: #0f172a;
+  --theme-textSecondary: #475569;
+  --theme-textMuted: #64748b;
+  --theme-border: #e2e8f0;
+  --theme-borderLight: #f1f5f9;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-hover: #f1f5f9;
+  --theme-hoverLight: #f8fafc;
+  --theme-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --theme-shadowLight: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Tema Trekker Federation - Aplicación inmediata */
+.trekker-federation {
+  --theme-primary: #1e40af;
+  --theme-secondary: #3b82f6;
+  --theme-accent: #8b5cf6;
+  --theme-background: #0f172a;
+  --theme-surface: #1e293b;
+  --theme-card: #334155;
+  --theme-popover: #475569;
+  --theme-text: #f8fafc;
+  --theme-textSecondary: #cbd5e1;
+  --theme-textMuted: #94a3b8;
+  --theme-border: #475569;
+  --theme-borderLight: #64748b;
+  --theme-success: #10b981;
+  --theme-warning: #f59e0b;
+  --theme-error: #ef4444;
+  --theme-info: #3b82f6;
+  --theme-hover: #334155;
+  --theme-hoverLight: #475569;
+  --theme-shadow: 0 10px 15px -3px rgba(30, 64, 175, 0.3);
+  --theme-shadowLight: 0 4px 6px -1px rgba(30, 64, 175, 0.2);
+  /* Header, Sidebar y Footer con fondo negro */
+  --theme-header-background: #000000 !important;
+  --theme-sidebar-background: #000000 !important;
+  --theme-footer-background: #000000 !important;
+}
+
+/* Forzar fondo negro en trekker-federation - Estilos más específicos */
+html.trekker-federation header {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+html.trekker-federation header > * {
+  background-color: transparent !important;
+}
+
+/* Excepción: el menú desplegable debe mantener el fondo del header */
+html.trekker-federation header div[style*="absolute"],
+html.trekker-federation header .absolute {
+  background-color: var(--theme-header-background) !important;
+  background: var(--theme-header-background) !important;
+}
+
+/* Menú desplegable de módulos debe tener fondo del header - Más específico */
+html.trekker-federation header .header-dropdown-menu,
+html.trekker-federation header div.header-dropdown-menu,
+.trekker-federation header .header-dropdown-menu {
+  background-color: var(--theme-header-background) !important;
+  background: var(--theme-header-background) !important;
+}
+
+/* Para trekker-federation, forzar fondo negro en el menú */
+html.trekker-federation header .header-dropdown-menu,
+html.trekker-federation header div.header-dropdown-menu {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+html.trekker-federation aside {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+html.trekker-federation aside * {
+  background-color: transparent !important;
+}
+
+html.trekker-federation footer {
+  background-color: #000000 !important;
+  background: #000000 !important;
+}
+
+html.trekker-federation footer * {
+  background-color: transparent !important;
+}
+
+/* Aplicar fondo negro específicamente para trekker-federation */
+.trekker-federation header {
+  background-color: #000000 !important;
+}
+
+.trekker-federation header > *,
+.trekker-federation header > div,
+.trekker-federation header > div > * {
+  background-color: transparent !important;
+}
+
+.trekker-federation header button {
+  background-color: transparent !important;
+}
+
+.trekker-federation header button:hover {
+  background-color: var(--theme-header-hover) !important;
+}
+
+.trekker-federation aside {
+  background-color: #000000 !important;
+}
+
+.trekker-federation aside > *,
+.trekker-federation aside > div,
+.trekker-federation aside > div > * {
+  background-color: transparent !important;
+}
+
+.trekker-federation aside button {
+  background-color: transparent !important;
+}
+
+.trekker-federation aside button:hover {
+  background-color: var(--theme-sidebar-hover) !important;
+}
+
+.trekker-federation footer {
+  background-color: #000000 !important;
+}
+
+.trekker-federation footer > *,
+.trekker-federation footer > div,
+.trekker-federation footer > div > * {
+  background-color: transparent !important;
+}
+
+/* Prevención de Flash del Tema - Navegación */
+/* Ocultar contenido hasta que el tema esté aplicado */
+html:not(.trekker-federation):not(.trekker-vulcan):not(.trekker-klingon):not(
+    .trekker-romulan
+  ):not(.trekker-cardassian):not(.trekker-bajoran):not(.trekker-ferengi):not(
+    .trekker-klingon
+  ):not(.trekker-vulcan):not(.trekker-andorian):not(.trekker-tellarite):not(
+    .trekker-denobulan
+  ) {
+  visibility: hidden;
+}
+
+/* Prevenir flash durante navegación */
+html.trekker-federation,
+html.trekker-federation body {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  transition: none !important;
+}
+
+/* Aplicación inmediata del tema Trekker Federation */
+.trekker-federation body {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+.trekker-federation .bg-gray-50,
+.trekker-federation .bg-white {
+  background-color: #0f172a !important;
+}
+
+.trekker-federation .text-gray-600,
+.trekker-federation .text-gray-700,
+.trekker-federation .text-gray-800,
+.trekker-federation .text-gray-900 {
+  color: #f8fafc !important;
+}
+
+.trekker-federation .border-gray-200,
+.trekker-federation .border {
+  border-color: #475569 !important;
+}
+
+.trekker-federation .bg-white {
+  background-color: #334155 !important;
+}
+
+/* Estados de transición para navegación */
+.page-transition {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-transition.loaded {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Prevenir flash en elementos específicos */
+.trekker-federation header,
+.trekker-federation aside,
+.trekker-federation main,
+.trekker-federation footer {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+  transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+/* Aplicar variables del tema a todos los elementos */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    color 0.3s ease, box-shadow 0.3s ease;
+}
+
+body {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Componentes con variables del tema - Aplicación más específica */
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-slate-50,
+.bg-slate-100 {
+  background-color: var(--theme-card) !important;
+}
+
+.bg-gray-800,
+.bg-gray-900,
+.bg-slate-800,
+.bg-slate-900 {
+  background-color: var(--theme-surface) !important;
+}
+
+/* Textos - Aplicación más específica */
+.text-gray-900,
+.text-gray-800,
+.text-slate-900,
+.text-slate-800,
+.text-black,
+.text-white {
+  color: var(--theme-text) !important;
+}
+
+.text-gray-600,
+.text-gray-500,
+.text-slate-600,
+.text-slate-500,
+.text-gray-700,
+.text-slate-700 {
+  color: var(--theme-textSecondary) !important;
+}
+
+.text-gray-400,
+.text-slate-400,
+.text-gray-300,
+.text-slate-300 {
+  color: var(--theme-textMuted) !important;
+}
+
+/* Bordes */
+.border-gray-200,
+.border-gray-300,
+.border-slate-200,
+.border-slate-300,
+.border,
+.border-gray-100,
+.border-slate-100 {
+  border-color: var(--theme-border) !important;
+}
+
+/* Hover states */
+.hover\:bg-gray-50:hover,
+.hover\:bg-gray-100:hover,
+.hover\:bg-gray-700:hover,
+.hover\:bg-slate-700:hover {
+  background-color: var(--theme-hover) !important;
+}
+
+/* Botones y elementos interactivos */
+.bg-blue-600,
+.bg-blue-500,
+.bg-blue-700,
+.bg-green-600,
+.bg-green-500,
+.bg-red-600,
+.bg-red-500 {
+  background-color: var(--theme-primary) !important;
+}
+
+.bg-gray-600,
+.bg-slate-600 {
+  background-color: var(--theme-secondary) !important;
+}
+
+/* Sombras */
+.shadow-lg,
+.shadow,
+.shadow-md {
+  box-shadow: var(--theme-shadow) !important;
+}
+
+.shadow-sm {
+  box-shadow: var(--theme-shadowLight) !important;
+}
+
+/* Estados específicos */
+.text-green-600,
+.text-green-500 {
+  color: var(--theme-success) !important;
+}
+
+.text-yellow-600,
+.text-yellow-500 {
+  color: var(--theme-warning) !important;
+}
+
+.text-red-600,
+.text-red-500 {
+  color: var(--theme-error) !important;
+}
+
+.text-blue-600,
+.text-blue-500 {
+  color: var(--theme-info) !important;
+}
+
+/* Aplicación global para elementos sin clases específicas */
+div,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+label,
+button,
+input,
+textarea,
+select {
+  color: inherit;
+}
+
+/* Asegurar que los botones sean visibles */
+button,
+.btn,
+[role="button"] {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Asegurar que los inputs sean visibles */
+input,
+textarea,
+select {
+  color: var(--theme-text) !important;
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* HEADER ESPECÍFICO - Siempre visible */
+header,
+.header,
+[role="banner"] {
+  background-color: var(--theme-header-background) !important;
+  border-bottom-color: var(--theme-header-border) !important;
+}
+
+/* Textos del header - Siempre visibles */
+header .text-xl,
+header .text-lg,
+header .text-sm,
+header .text-xs,
+header h1,
+header h2,
+header h3,
+header h4,
+header h5,
+header h6,
+header span,
+header div {
+  color: var(--theme-header-text) !important;
+}
+
+/* Branding del header - Siempre visible */
+header .text-gray-900,
+header .text-gray-800,
+header .text-slate-900,
+header .text-slate-800 {
+  color: var(--theme-header-text) !important;
+  font-weight: 600 !important;
+}
+
+/* Mensaje de bienvenida - Siempre visible */
+header .text-lg.font-semibold {
+  color: var(--theme-header-text) !important;
+  font-weight: 600 !important;
+}
+
+/* Iconos del header - Siempre visibles */
+header img,
+header svg {
+  opacity: 1 !important;
+}
+
+/* Botones del header - Siempre visibles */
+header button,
+header .btn {
+  color: var(--theme-header-text) !important;
+  background-color: var(--theme-header-background) !important;
+  border-color: var(--theme-header-border) !important;
+}
+
+/* Hover del header */
+header button:hover,
+header .btn:hover {
+  background-color: var(--theme-header-hover) !important;
+}
+
+/* SIDEBAR ESPECÍFICO - Diferenciación visual */
+aside,
+.sidebar,
+[role="complementary"] {
+  background-color: var(--theme-sidebar-background) !important;
+  border-right-color: var(--theme-sidebar-border) !important;
+}
+
+/* Textos del sidebar */
+aside .text-gray-900,
+aside .text-gray-800,
+aside .text-slate-900,
+aside .text-slate-800,
+aside .text-gray-700,
+aside .text-slate-700,
+aside .text-gray-600,
+aside .text-slate-600,
+aside .text-gray-500,
+aside .text-slate-500,
+aside span,
+aside div,
+aside button {
+  color: var(--theme-sidebar-text) !important;
+}
+
+/* Botones del sidebar */
+aside button,
+aside .btn {
+  background-color: transparent !important;
+  border-color: transparent !important;
+}
+
+/* Hover del sidebar */
+aside button:hover,
+aside .btn:hover {
+  background-color: var(--theme-sidebar-hover) !important;
+}
+
+/* Estado activo del sidebar */
+aside button.active,
+aside .btn.active,
+aside button[aria-current="page"],
+aside .btn[aria-current="page"] {
+  background-color: var(--theme-sidebar-active) !important;
+  color: var(--theme-primary) !important;
+}
+
+/* Bordes del sidebar */
+aside .border-gray-100,
+aside .border-gray-200,
+aside .border-slate-100,
+aside .border-slate-200 {
+  border-color: var(--theme-sidebar-border) !important;
+}
+
+/* PÁGINAS DE CARGA Y ESTADOS INTERMEDIOS */
+/* Aplicar tema a todas las páginas, incluyendo carga */
+html,
+body,
+#__next,
+[data-nextjs-page] {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Estados de carga y transición */
+.loading,
+.loading-page,
+.page-loading {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Spinners y elementos de carga */
+.spinner,
+.loading-spinner,
+.loader {
+  color: var(--theme-primary) !important;
+}
+
+/* Páginas en blanco o de carga */
+.page-blank,
+.blank-page,
+.loading-screen {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Aplicar tema a elementos que se crean dinámicamente */
+*[class*="loading"],
+*[class*="spinner"],
+*[class*="loader"] {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Aplicar tema a elementos de transición y navegación */
+[data-nextjs-page],
+[data-nextjs-router-viewport] {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Aplicar tema a elementos de carga de Next.js */
+.nextjs-toast-errors-parent {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Aplicar tema a elementos de error y loading de Next.js */
+#__next-loading,
+.nextjs-loading-bar {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Layout del Page Designer */
+.page-designer-layout {
+  height: 100vh;
+  overflow: hidden; /* Prevenir scroll en toda la página */
+}
+
+.designer-main-content {
+  height: calc(100vh - 73px); /* Altura menos header */
+  overflow: hidden;
+}
+
+/* Componentes base del Page Designer */
+@layer components {
+  .designer-canvas {
+    background-color: var(--designer-canvas);
+    background-image: linear-gradient(var(--designer-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--designer-grid) 1px, transparent 1px);
+    background-size: 20px 20px;
+    @apply border border-gray-200 rounded-lg;
+  }
+
+  .designer-component {
+    @apply border-2 border-transparent rounded-md transition-all duration-200;
+  }
+
+  .designer-component:hover {
+    @apply border-blue-200 shadow-sm;
+  }
+
+  .designer-component.selected {
+    @apply border-blue-500 shadow-lg ring-2 ring-blue-200;
+  }
+
+  .designer-toolbar {
+    @apply bg-white border-r border-gray-200 shadow-sm;
+    height: calc(100vh - 73px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .designer-properties {
+    @apply bg-white border-l border-gray-200 shadow-sm;
+    height: calc(100vh - 73px);
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  .designer-canvas-container {
+    height: calc(100vh - 73px);
+    overflow: auto;
+  }
+
+  .component-palette-item {
+    @apply p-3 border rounded-lg cursor-pointer transition-all duration-200 bg-white border-gray-200;
+  }
+
+  .component-palette-item:hover {
+    @apply shadow-md transform scale-105;
+  }
+
+  /* Estilos específicos por color */
+  .palette-blue {
+    @apply bg-blue-50 border-blue-200 hover:bg-blue-100;
+  }
+  .palette-blue .icon {
+    @apply text-blue-600;
+  }
+
+  .palette-green {
+    @apply bg-green-50 border-green-200 hover:bg-green-100;
+  }
+  .palette-green .icon {
+    @apply text-green-600;
+  }
+
+  .palette-purple {
+    @apply bg-purple-50 border-purple-200 hover:bg-purple-100;
+  }
+  .palette-purple .icon {
+    @apply text-purple-600;
+  }
+
+  .palette-indigo {
+    @apply bg-indigo-50 border-indigo-200 hover:bg-indigo-100;
+  }
+  .palette-indigo .icon {
+    @apply text-indigo-600;
+  }
+
+  .palette-gray {
+    @apply bg-gray-50 border-gray-200 hover:bg-gray-100;
+  }
+  .palette-gray .icon {
+    @apply text-gray-600;
+  }
+
+  .palette-orange {
+    @apply bg-orange-50 border-orange-200 hover:bg-orange-100;
+  }
+  .palette-orange .icon {
+    @apply text-orange-600;
+  }
+
+  .palette-pink {
+    @apply bg-pink-50 border-pink-200 hover:bg-pink-100;
+  }
+  .palette-pink .icon {
+    @apply text-pink-600;
+  }
+
+  .palette-slate {
+    @apply bg-slate-50 border-slate-200 hover:bg-slate-100;
+  }
+  .palette-slate .icon {
+    @apply text-slate-600;
+  }
+
+  .palette-red {
+    @apply bg-red-50 border-red-200 hover:bg-red-100;
+  }
+  .palette-red .icon {
+    @apply text-red-600;
+  }
+
+  .palette-yellow {
+    @apply bg-yellow-50 border-yellow-200 hover:bg-yellow-100;
+  }
+  .palette-yellow .icon {
+    @apply text-yellow-600;
+  }
+}
+
+/* Utilidades específicas para Drag & Drop */
+@layer utilities {
+  .drag-preview {
+    @apply opacity-70 rotate-2 scale-110 shadow-xl;
+  }
+
+  .drop-zone-active {
+    @apply bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg;
+  }
+
+  .drop-zone-hover {
+    @apply bg-blue-100 border-blue-400;
+  }
+}
+
+/* Cursores de redimensionamiento */
+.cursor-nw-resize {
+  cursor: nw-resize;
+}
+.cursor-ne-resize {
+  cursor: ne-resize;
+}
+.cursor-sw-resize {
+  cursor: sw-resize;
+}
+.cursor-se-resize {
+  cursor: se-resize;
+}
+.cursor-n-resize {
+  cursor: n-resize;
+}
+.cursor-s-resize {
+  cursor: s-resize;
+}
+.cursor-w-resize {
+  cursor: w-resize;
+}
+.cursor-e-resize {
+  cursor: e-resize;
+}
+
+/* Grid overlay para snap */
+.grid-overlay {
+  background-image: linear-gradient(
+      rgba(59, 130, 246, 0.1) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+/* Scroll personalizado para properties panel */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Slider personalizado para range inputs */
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: #3b82f6;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejorar el scroll del properties panel */
+.designer-properties {
+  @apply bg-white border-l border-gray-200 shadow-sm;
+  height: calc(100vh - 73px);
+  overflow: hidden; /* El scroll lo maneja el contenido interno */
+}
+
+/* Sticky headers en grupos de propiedades */
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* src/app/globals.css - Agregar al final */
+
+/* AI Playground Specific Styles with Tailwind 3.14 */
+
+/* Estilos del Playground */
+.playground-container {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.playground-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr 350px;
+  gap: 20px;
+  height: calc(100vh - 80px);
+  padding: 20px;
+}
+
+@media (max-width: 1200px) {
+  .playground-grid {
+    grid-template-columns: 250px 1fr 300px;
+  }
+}
+
+@media (max-width: 768px) {
+  .playground-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+/* Custom slider styles */
+.slider {
+  background: linear-gradient(to right, #e5e7eb 0%, #e5e7eb 100%);
+}
+
+.slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-moz-range-thumb {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+/* Animaciones para el playground */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.response-item {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes spin-gradient {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-gradient {
+  background: conic-gradient(from 0deg, #3b82f6, #8b5cf6, #06b6d4, #3b82f6);
+  animation: spin-gradient 1s linear infinite;
+}
+
+/* Efectos hover mejorados */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Texto con gradiente */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradient-shift 3s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Animación de pulso lento */
+.pulse-slow {
+  animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Scrollbar personalizado para el playground */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(102, 126, 234, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(102, 126, 234, 0.5);
+}
+
+/* Utilidades de texto */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Efecto glassmorphism */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Animación flotante */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Efectos de glow */
+.glow-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+.glow-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+.glow-green {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+/* Indicador de typing */
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #6b7280;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@keyframes typing {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Animación de slide in */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Toast notifications */
+.toast-success {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-radius: 8px;
+  padding: 12px 16px;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Estilos específicos del playground */
+.playground-panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.playground-message {
+  animation: fadeInUp 0.3s ease;
+}
+
+.playground-message.user {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  margin-left: 20%;
+  margin-right: 5%;
+  border-radius: 18px 18px 4px 18px;
+}
+
+.playground-message.assistant {
+  background: white;
+  border: 1px solid #e5e7eb;
+  margin-right: 20%;
+  margin-left: 5%;
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.playground-streaming {
+  animation: pulse 1.5s infinite;
+}
+
+.playground-config-item {
+  transition: all 0.2s ease;
+}
+
+.playground-config-item:hover {
+  background: rgba(102, 126, 234, 0.05);
+  transform: translateX(4px);
+}
+
+.playground-document-item {
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.playground-document-item:hover {
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.playground-scraping-job {
+  transition: all 0.2s ease;
+}
+
+.playground-scraping-job:hover {
+  background: rgba(16, 185, 129, 0.05);
+  transform: translateY(-1px);
+}
+
+/* Responsive design para el playground */
+@media (max-width: 1024px) {
+  .playground-grid {
+    grid-template-columns: 250px 1fr 300px;
+    gap: 15px;
+    padding: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .playground-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .playground-message.user,
+  .playground-message.assistant {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
+/* Estilos para el modo oscuro (si se implementa) */
+@media (prefers-color-scheme: dark) {
+  .playground-panel {
+    background: rgba(17, 24, 39, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .playground-message.assistant {
+    background: #1f2937;
+    border-color: #374151;
+    color: #f9fafb;
+  }
+}
+
+/* Importar Bootstrap al final para evitar conflictos */
+@import "bootstrap/dist/css/bootstrap.min.css";
+
+/* ===== ESTILOS DE TABLAS CON TEMA ===== */
+/* Sobrescribir estilos de Bootstrap para usar variables del tema */
+.table,
+.table > :not(caption) > * > * {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.table-hover > tbody > tr:hover > *,
+.table-hover > tbody > tr:hover {
+  background-color: var(--theme-hover) !important;
+  color: var(--theme-text) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  background-color: var(--theme-card) !important;
+  color: var(--theme-text) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(even) > * {
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+}
+
+.table thead th {
+  background-color: var(--theme-surface) !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.table tbody td {
+  background-color: transparent !important;
+  color: var(--theme-text) !important;
+  border-color: var(--theme-border) !important;
+}
+
+.table tbody tr {
+  background-color: transparent !important;
+}
+
+.table tbody tr:hover {
+  background-color: var(--theme-hover) !important;
+}
+
+/* BODY Y CONTENIDO PRINCIPAL - Diferenciación visual */
+body,
+main,
+.main-content,
+[role="main"] {
+  background-color: var(--theme-background) !important;
+  color: var(--theme-text) !important;
+}
+
+/* Contenedores principales */
+.container,
+.page-container,
+.content-wrapper {
+  background-color: var(--theme-background) !important;
+}
+
+/* Cards y contenedores de contenido */
+.card,
+.bg-white,
+.bg-gray-50,
+.bg-gray-100,
+.bg-slate-50,
+.bg-slate-100 {
+  background-color: var(--theme-card) !important;
+  border-color: var(--theme-border) !important;
+}
+
+/* Superficies y fondos secundarios */
+.bg-gray-800,
+.bg-gray-900,
+.bg-slate-800,
+.bg-slate-900 {
+  background-color: var(--theme-surface) !important;
+}
+
+/* Textos del contenido principal */
+.text-gray-900,
+.text-gray-800,
+.text-slate-900,
+.text-slate-800,
+.text-black,
+.text-white {
+  color: var(--theme-text) !important;
+}
+
+.text-gray-600,
+.text-gray-500,
+.text-slate-600,
+.text-slate-500,
+.text-gray-700,
+.text-slate-700 {
+  color: var(--theme-textSecondary) !important;
+}
+
+.text-gray-400,
+.text-slate-400,
+.text-gray-300,
+.text-slate-300 {
+  color: var(--theme-textMuted) !important;
+}
+
+/* ===== ANIMACIONES Y EFECTOS VISUALES ===== */
+
+/* Animación de entrada desde abajo */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación de entrada desde la izquierda */
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animación de entrada desde la derecha */
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Animación de escala suave */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animación de rotación suave */
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+/* Animación de pulso suave */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Animación de brillo */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Clases de utilidad para animaciones */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.6s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.5s ease-out forwards;
+}
+
+.animate-rotate-in {
+  animation: rotateIn 0.6s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Efectos de hover mejorados */
+.hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Efecto de brillo en hover */
+.hover-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.hover-shine::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.hover-shine:hover::before {
+  left: 100%;
+}
+
+/* Efectos de glassmorphism */
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* ===== ESTILOS PARA TREMOR CHARTS ===== */
+/* Asegurar que los gráficos de Tremor se vean correctamente */
+.recharts-wrapper,
+.recharts-surface {
+  color: var(--theme-text) !important;
+}
+
+/* Estilos para Tremor en modo oscuro */
+.trekker-federation .recharts-cartesian-axis-tick-value,
+.trekker-federation .recharts-legend-item-text,
+.trekker-federation .recharts-tooltip-label {
+  fill: #f8fafc !important;
+  color: #f8fafc !important;
+}
+
+/* Asegurar que los textos de los ejes sean visibles */
+.recharts-cartesian-axis-tick-value {
+  fill: var(--theme-text) !important;
+}
+
+.recharts-legend-item-text {
+  fill: var(--theme-text) !important;
+}
+
+.recharts-tooltip-label {
+  color: var(--theme-text) !important;
+}
+
+/* Asegurar que las líneas de los gráficos sean visibles */
+.recharts-cartesian-grid line {
+  stroke: var(--theme-border) !important;
+  opacity: 0.3;
+}
+
+/* Estilos específicos para Tremor - Forzar colores visibles */
+[data-tremor-chart] {
+  color: var(--theme-text) !important;
+}
+
+[data-tremor-chart] text {
+  fill: var(--theme-text) !important;
+}
+
+[data-tremor-chart] .tremor-BarChart-bar,
+[data-tremor-chart] .tremor-AreaChart-area,
+[data-tremor-chart] .tremor-DonutChart-arc {
+  opacity: 1 !important;
+}
+
+/* Forzar colores en modo oscuro para Tremor */
+.trekker-federation [data-tremor-chart] text {
+  fill: #f8fafc !important;
+}
+
+.trekker-federation .recharts-cartesian-axis-tick-value {
+  fill: #f8fafc !important;
+}
+
+.trekker-federation .recharts-legend-item-text {
+  fill: #f8fafc !important;
+}

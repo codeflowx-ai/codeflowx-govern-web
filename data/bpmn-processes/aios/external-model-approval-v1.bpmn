@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://codeflowx.com/govern/aios">
+    <process id="external_model_approval_v1"
+             name="External Model Approval Workflow"
+             isExecutable="true">
+
+        <startEvent id="start_external_model" name="External Model Request">
+            <outgoing>flow_start_classify</outgoing>
+        </startEvent>
+
+        <serviceTask id="task_classify_risk"
+                     name="Classify External Model Risk"
+                     camunda:delegateExpression="#{externalModelRiskClassificationDelegate}">
+            <!-- @todo implement client for leka-risk-evaluator -->
+            <incoming>flow_start_classify</incoming>
+            <outgoing>flow_classify_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_high_risk" name="High Risk?">
+            <incoming>flow_classify_gateway</incoming>
+            <outgoing>flow_highrisk_yes</outgoing>
+            <outgoing>flow_highrisk_no</outgoing>
+        </exclusiveGateway>
+
+        <serviceTask id="task_launch_fria"
+                     name="Launch FRIA Process"
+                     camunda:delegateExpression="#{launchFriaForExternalModelDelegate}">
+            <incoming>flow_highrisk_yes</incoming>
+            <outgoing>flow_fria_to_validation</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_validate_documentation"
+                     name="Validate Technical Documentation"
+                     camunda:delegateExpression="#{validateExternalDocumentationDelegate}">
+            <incoming>flow_highrisk_no</incoming>
+            <incoming>flow_fria_to_validation</incoming>
+            <outgoing>flow_validation_to_rules</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_external_rules"
+                     name="Approval Decision"
+                     camunda:delegateExpression="#{externalModelApprovalRulesDelegate}">
+            <incoming>flow_validation_to_rules</incoming>
+            <outgoing>flow_rules_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_external_decision" name="Decision">
+            <incoming>flow_rules_gateway</incoming>
+            <outgoing>flow_decision_approve</outgoing>
+            <outgoing>flow_decision_conditional</outgoing>
+            <outgoing>flow_decision_reject</outgoing>
+        </exclusiveGateway>
+
+        <serviceTask id="task_register_external_model"
+                     name="Register External Model"
+                     camunda:delegateExpression="#{registerExternalModelDelegate}">
+            <incoming>flow_decision_approve</incoming>
+            <outgoing>flow_register_end</outgoing>
+        </serviceTask>
+
+        <userTask id="task_external_hitl"
+                  name="External Model HITL Review"
+                  camunda:formKey="zul:aios/external_model_hitl_review.zul"
+                  camunda:candidateGroups="AIOS_ADMIN">
+            <incoming>flow_decision_conditional</incoming>
+            <outgoing>flow_hitl_end</outgoing>
+        </userTask>
+
+        <serviceTask id="task_notify_vendor"
+                     name="Notify External Vendor"
+                     camunda:delegateExpression="#{notifyExternalVendorDelegate}">
+            <incoming>flow_decision_reject</incoming>
+            <outgoing>flow_notify_end</outgoing>
+        </serviceTask>
+
+        <endEvent id="end_registered" name="External Model Registered">
+            <incoming>flow_register_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_hitl" name="Conditional Review">
+            <incoming>flow_hitl_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_rejected" name="Rejected">
+            <incoming>flow_notify_end</incoming>
+        </endEvent>
+
+        <sequenceFlow id="flow_start_classify" sourceRef="start_external_model" targetRef="task_classify_risk"/>
+        <sequenceFlow id="flow_classify_gateway" sourceRef="task_classify_risk" targetRef="gateway_high_risk"/>
+        <sequenceFlow id="flow_highrisk_yes" sourceRef="gateway_high_risk" targetRef="task_launch_fria">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskLevel == 'HIGH'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_highrisk_no" sourceRef="gateway_high_risk" targetRef="task_validate_documentation">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskLevel != 'HIGH'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_fria_to_validation" sourceRef="task_launch_fria" targetRef="task_validate_documentation"/>
+        <sequenceFlow id="flow_validation_to_rules" sourceRef="task_validate_documentation" targetRef="task_external_rules"/>
+        <sequenceFlow id="flow_rules_gateway" sourceRef="task_external_rules" targetRef="gateway_external_decision"/>
+        <sequenceFlow id="flow_decision_approve" sourceRef="gateway_external_decision" targetRef="task_register_external_model">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${externalDecision == 'APPROVE'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_conditional" sourceRef="gateway_external_decision" targetRef="task_external_hitl">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${externalDecision == 'CONDITIONAL'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_reject" sourceRef="gateway_external_decision" targetRef="task_notify_vendor">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${externalDecision == 'REJECT'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_register_end" sourceRef="task_register_external_model" targetRef="end_registered"/>
+        <sequenceFlow id="flow_hitl_end" sourceRef="task_external_hitl" targetRef="end_hitl"/>
+        <sequenceFlow id="flow_notify_end" sourceRef="task_notify_vendor" targetRef="end_rejected"/>
+    </process>
+</definitions>
+
+

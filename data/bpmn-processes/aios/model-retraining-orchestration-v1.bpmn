@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/retraining">
+  <process id="model-retraining-orchestration-v1" name="Model Retraining Orchestration V1" isExecutable="true" version="1.0">
+    <startEvent id="startRetraining" name="Start Retraining">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <parallelGateway id="parallelPrepare" name="Parallel Prepare">
+      <incoming>flow1</incoming>
+      <outgoing>flowToData</outgoing>
+      <outgoing>flowToInfra</outgoing>
+    </parallelGateway>
+    <serviceTask id="prepareData" name="Prepare Training Data" flowable:class="com.codeflowx.govern.workflow.delegates.PrepareTrainingDataDelegate">
+      <incoming>flowToData</incoming>
+      <outgoing>flowFromData</outgoing>
+    </serviceTask>
+    <serviceTask id="validateInfrastructure" name="Validate Infrastructure" flowable:class="com.codeflowx.govern.workflow.delegates.ValidateInfrastructureDelegate">
+      <incoming>flowToInfra</incoming>
+      <outgoing>flowFromInfra</outgoing>
+    </serviceTask>
+    <parallelGateway id="parallelMerge" name="Parallel Merge">
+      <incoming>flowFromData</incoming>
+      <incoming>flowFromInfra</incoming>
+      <outgoing>flow2</outgoing>
+    </parallelGateway>
+    <businessRuleTask id="decideRetrainingStrategy" name="Decide Retraining Strategy" flowable:ruleVariablesInput="${modelRetrainingFact}" flowable:resultVariable="retrainingResult">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </businessRuleTask>
+    <exclusiveGateway id="decisionGateway" name="Decision?">
+      <incoming>flow3</incoming>
+      <outgoing>flowSkip</outgoing>
+      <outgoing>flowRetrain</outgoing>
+      <outgoing>flowApproval</outgoing>
+    </exclusiveGateway>
+    <userTask id="approvalTask" name="Approve Retraining" flowable:candidateGroups="ml-engineers,governance-admins" flowable:formKey="retraining-approval-form">
+      <incoming>flowApproval</incoming>
+      <outgoing>flowFromApproval</outgoing>
+    </userTask>
+    <serviceTask id="executeRetraining" name="Execute Retraining" flowable:async="true" flowable:class="com.codeflowx.govern.workflow.delegates.ExecuteRetrainingDelegate">
+      <incoming>flowRetrain</incoming>
+      <incoming>flowFromApproval</incoming>
+      <outgoing>flow4</outgoing>
+    </serviceTask>
+    <serviceTask id="evaluateNewModel" name="Evaluate New Model" flowable:class="com.codeflowx.govern.workflow.delegates.EvaluateNewModelDelegate">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="performanceGateway" name="Better Performance?">
+      <incoming>flow5</incoming>
+      <outgoing>flowBetter</outgoing>
+      <outgoing>flowWorse</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="setupABTesting" name="Setup A/B Testing" flowable:class="com.codeflowx.govern.workflow.delegates.SetupABTestingDelegate">
+      <incoming>flowBetter</incoming>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    <serviceTask id="monitorABTest" name="Monitor A/B Test" flowable:class="com.codeflowx.govern.workflow.delegates.MonitorABTestDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+    <exclusiveGateway id="abTestGateway" name="A/B Test Success?">
+      <incoming>flow7</incoming>
+      <outgoing>flowSuccess</outgoing>
+      <outgoing>flowFailed</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="promoteToProduction" name="Promote to Production" flowable:class="com.codeflowx.govern.workflow.delegates.PromoteModelDelegate">
+      <incoming>flowSuccess</incoming>
+      <outgoing>flowToSuccess</outgoing>
+    </serviceTask>
+    <serviceTask id="rollbackModel" name="Rollback Model" flowable:class="com.codeflowx.govern.workflow.delegates.RollbackModelDelegate">
+      <incoming>flowWorse</incoming>
+      <incoming>flowFailed</incoming>
+      <outgoing>flowToFailure</outgoing>
+    </serviceTask>
+    <serviceTask id="notifySkip" name="Notify Skip" flowable:class="com.codeflowx.govern.workflow.delegates.NotifyRetrainingSkipDelegate">
+      <incoming>flowSkip</incoming>
+      <outgoing>flowToSkipped</outgoing>
+    </serviceTask>
+    <endEvent id="endSuccess" name="Retraining Success">
+      <incoming>flowToSuccess</incoming>
+    </endEvent>
+    <endEvent id="endFailure" name="Retraining Failed">
+      <incoming>flowToFailure</incoming>
+    </endEvent>
+    <endEvent id="endSkipped" name="Retraining Skipped">
+      <incoming>flowToSkipped</incoming>
+    </endEvent>
+    <boundaryEvent id="retrainingTimeout" name="Timeout" attachedToRef="executeRetraining" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT6H</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flowTimeout</outgoing>
+    </boundaryEvent>
+    <serviceTask id="handleTimeout" name="Handle Timeout" flowable:class="com.codeflowx.govern.workflow.delegates.HandleRetrainingTimeoutDelegate">
+      <incoming>flowTimeout</incoming>
+      <outgoing>flowTimeoutToEnd</outgoing>
+    </serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startRetraining" targetRef="parallelPrepare"></sequenceFlow>
+    <sequenceFlow id="flowToData" sourceRef="parallelPrepare" targetRef="prepareData"></sequenceFlow>
+    <sequenceFlow id="flowToInfra" sourceRef="parallelPrepare" targetRef="validateInfrastructure"></sequenceFlow>
+    <sequenceFlow id="flowFromData" sourceRef="prepareData" targetRef="parallelMerge"></sequenceFlow>
+    <sequenceFlow id="flowFromInfra" sourceRef="validateInfrastructure" targetRef="parallelMerge"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="parallelMerge" targetRef="decideRetrainingStrategy"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="decideRetrainingStrategy" targetRef="decisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowSkip" name="SKIP" sourceRef="decisionGateway" targetRef="notifySkip">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retrainingResult.decision == 'SKIP'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRetrain" name="AUTO_RETRAIN" sourceRef="decisionGateway" targetRef="executeRetraining">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retrainingResult.decision == 'INCREMENTAL_RETRAIN' || retrainingResult.decision == 'FULL_RETRAIN'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowApproval" name="HITL_REQUIRED" sourceRef="decisionGateway" targetRef="approvalTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retrainingResult.decision == 'HITL_REQUIRED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowFromApproval" sourceRef="approvalTask" targetRef="executeRetraining"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="executeRetraining" targetRef="evaluateNewModel"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="evaluateNewModel" targetRef="performanceGateway"></sequenceFlow>
+    <sequenceFlow id="flowBetter" name="Better" sourceRef="performanceGateway" targetRef="setupABTesting">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${newModelBetter}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowWorse" name="Worse" sourceRef="performanceGateway" targetRef="rollbackModel">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!newModelBetter}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="setupABTesting" targetRef="monitorABTest"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="monitorABTest" targetRef="abTestGateway"></sequenceFlow>
+    <sequenceFlow id="flowSuccess" name="Success" sourceRef="abTestGateway" targetRef="promoteToProduction">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${abTestSuccess}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowFailed" name="Failed" sourceRef="abTestGateway" targetRef="rollbackModel">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!abTestSuccess}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowToSuccess" sourceRef="promoteToProduction" targetRef="endSuccess"></sequenceFlow>
+    <sequenceFlow id="flowToFailure" sourceRef="rollbackModel" targetRef="endFailure"></sequenceFlow>
+    <sequenceFlow id="flowToSkipped" sourceRef="notifySkip" targetRef="endSkipped"></sequenceFlow>
+    <sequenceFlow id="flowTimeout" sourceRef="retrainingTimeout" targetRef="handleTimeout"></sequenceFlow>
+    <sequenceFlow id="flowTimeoutToEnd" sourceRef="handleTimeout" targetRef="endFailure"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_model-retraining-orchestration-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_model-retraining-orchestration-v1" bpmnElement="model-retraining-orchestration-v1">
+      <bpmndi:BPMNShape id="BPMNShape_startRetraining" bpmnElement="startRetraining">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelPrepare" bpmnElement="parallelPrepare">
+        <omgdc:Bounds height="50.0" width="50.0" x="150.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_prepareData" bpmnElement="prepareData">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_validateInfrastructure" bpmnElement="validateInfrastructure">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_parallelMerge" bpmnElement="parallelMerge">
+        <omgdc:Bounds height="50.0" width="50.0" x="400.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_decideRetrainingStrategy" bpmnElement="decideRetrainingStrategy">
+        <omgdc:Bounds height="80.0" width="100.0" x="500.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_decisionGateway" bpmnElement="decisionGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="650.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approvalTask" bpmnElement="approvalTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="750.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeRetraining" bpmnElement="executeRetraining">
+        <omgdc:Bounds height="80.0" width="100.0" x="900.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_evaluateNewModel" bpmnElement="evaluateNewModel">
+        <omgdc:Bounds height="80.0" width="100.0" x="1050.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_performanceGateway" bpmnElement="performanceGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="1200.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_setupABTesting" bpmnElement="setupABTesting">
+        <omgdc:Bounds height="80.0" width="100.0" x="1300.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_monitorABTest" bpmnElement="monitorABTest">
+        <omgdc:Bounds height="80.0" width="100.0" x="1450.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_abTestGateway" bpmnElement="abTestGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="1600.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_promoteToProduction" bpmnElement="promoteToProduction">
+        <omgdc:Bounds height="80.0" width="100.0" x="1700.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rollbackModel" bpmnElement="rollbackModel">
+        <omgdc:Bounds height="80.0" width="100.0" x="1300.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifySkip" bpmnElement="notifySkip">
+        <omgdc:Bounds height="80.0" width="100.0" x="750.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endSuccess" bpmnElement="endSuccess">
+        <omgdc:Bounds height="35.0" width="35.0" x="1850.0" y="182.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endFailure" bpmnElement="endFailure">
+        <omgdc:Bounds height="35.0" width="35.0" x="1450.0" y="362.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endSkipped" bpmnElement="endSkipped">
+        <omgdc:Bounds height="35.0" width="35.0" x="900.0" y="102.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_retrainingTimeout" bpmnElement="retrainingTimeout">
+        <omgdc:Bounds height="30.0" width="30.0" x="950.0" y="292.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_handleTimeout" bpmnElement="handleTimeout">
+        <omgdc:Bounds height="80.0" width="100.0" x="1000.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToData" bpmnElement="flowToData">
+        <omgdi:waypoint x="175.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToInfra" bpmnElement="flowToInfra">
+        <omgdi:waypoint x="175.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromData" bpmnElement="flowFromData">
+        <omgdi:waypoint x="350.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="242.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromInfra" bpmnElement="flowFromInfra">
+        <omgdi:waypoint x="350.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="292.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="450.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="600.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSkip" bpmnElement="flowSkip">
+        <omgdi:waypoint x="675.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="675.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetrain" bpmnElement="flowRetrain">
+        <omgdi:waypoint x="700.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproval" bpmnElement="flowApproval">
+        <omgdi:waypoint x="675.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="675.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromApproval" bpmnElement="flowFromApproval">
+        <omgdi:waypoint x="850.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="1000.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1050.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="1150.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowBetter" bpmnElement="flowBetter">
+        <omgdi:waypoint x="1225.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowWorse" bpmnElement="flowWorse">
+        <omgdi:waypoint x="1225.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="1400.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1450.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="1550.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1600.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSuccess" bpmnElement="flowSuccess">
+        <omgdi:waypoint x="1650.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1700.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFailed" bpmnElement="flowFailed">
+        <omgdi:waypoint x="1625.0" y="225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1350.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSuccess" bpmnElement="flowToSuccess">
+        <omgdi:waypoint x="1800.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1850.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToFailure" bpmnElement="flowToFailure">
+        <omgdi:waypoint x="1400.0" y="380.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1450.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSkipped" bpmnElement="flowToSkipped">
+        <omgdi:waypoint x="850.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTimeout" bpmnElement="flowTimeout">
+        <omgdi:waypoint x="965.0" y="307.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="460.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTimeoutToEnd" bpmnElement="flowTimeoutToEnd">
+        <omgdi:waypoint x="1100.0" y="460.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1467.5" y="397.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
