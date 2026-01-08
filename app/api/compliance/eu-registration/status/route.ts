@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 
 /**
  * GET /api/compliance/eu-registration/status
@@ -7,7 +7,7 @@ import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
  * Obtiene el listado de todos los registros UE con sus estados
  *
  * Backend: codeflowx-governance-eu-registration-service
- * Endpoint: GET /api/v1/eu-registrations/status?projectId={projectId}&status={status}&type={type}
+ * Endpoint: GET /web/api/v1/compliance/eu-registrations/status?projectId={projectId}&status={status}&type={type}
  * Business Service: EuRegistrationService.findAll() con filtros
  */
 export async function GET(request: NextRequest) {
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
     if (type && type !== "ALL") queryParams.append("type", type);
 
     const queryString = queryParams.toString();
-    const url = `${BFF_BASE_URL}/api/v1/eu-registrations/status${queryString ? `?${queryString}` : ""}`;
+    const url = `${GATEWAY_WEB_BASE}/compliance/eu-registrations/status${queryString ? `?${queryString}` : ""}`;
 
     // Llamada real al backend
     const response = await fetch(url, {
@@ -119,6 +119,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-
-
-

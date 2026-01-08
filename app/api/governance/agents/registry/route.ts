@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
 import { USE_MOCK } from "@/app/config/mock";
 
-const BFF_BASE_URL = process.env.BFF_BASE_URL || "http://localhost:8084";
+const GATEWAY_WEB_BASE = process.env.GATEWAY_WEB_BASE || 'http://localhost:8080';
 
 // Mock data para agents
 const mockAgents = [
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/governance/agents/registry`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/governance/agents/registry`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     body = await request.json();
 
     // Llamar al BFF real
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/governance/agents/registry`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/governance/agents/registry`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

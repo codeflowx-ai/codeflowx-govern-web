@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 import { mockHitlData } from "@/app/(app)/governance/data/mockHitl";
 
 /**
@@ -13,7 +13,7 @@ import { mockHitlData } from "@/app/(app)/governance/data/mockHitl";
  * - type: Filtrar por tipo de entidad (Agent, Model, Prompt)
  *
  * Microservicio backend esperado: codeflowx-governance-hitl-service
- * Endpoint backend: GET /api/v1/hitl/interventions?projectId={projectId}&status={status}&type={type}
+ * Endpoint backend: GET /web/api/v1/compliance/hitl/interventions?projectId={projectId}&status={status}&type={type}
  */
 export async function GET(request: NextRequest) {
   try {
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Modo PRODUCCIÓN: Llamar al BFF que enruta al microservicio
-    const backendUrl = new URL(`${BFF_BASE_URL}/api/v1/hitl/interventions`);
+    // Modo PRODUCCIÓN: Llamar al gateway-web que enruta al BFF
+    const backendUrl = new URL(`${GATEWAY_WEB_BASE}/compliance/hitl/interventions`);
     if (projectId) backendUrl.searchParams.set("projectId", projectId);
     if (status) backendUrl.searchParams.set("status", status);
     if (type) backendUrl.searchParams.set("type", type);
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
  * - userId: ID del usuario que toma la decisión
  *
  * Microservicio backend esperado: codeflowx-governance-hitl-service
- * Endpoint backend: POST /api/v1/hitl/interventions
+ * Endpoint backend: POST /web/api/v1/compliance/hitl/interventions
  */
 export async function POST(request: NextRequest) {
   try {
@@ -150,8 +150,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Modo PRODUCCIÓN: Llamar al BFF que enruta al microservicio
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/hitl/interventions`, {
+    // Modo PRODUCCIÓN: Llamar al gateway-web que enruta al BFF
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/hitl/interventions`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

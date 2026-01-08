@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import { mockQmsData } from "@/app/(app)/governance/data/mockQms";
 
 /**
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Llamada real al backend
-    // El backend debería tener un endpoint: POST /api/v1/qms/review
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/qms/review`, {
+    // El backend debería tener un endpoint: POST /web/api/v1/compliance/qms/review
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/qms/review`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

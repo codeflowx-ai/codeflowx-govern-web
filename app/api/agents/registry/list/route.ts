@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { NextRequest } from "next/server";
-
-const BFF_BASE_URL = process.env.BFF_BASE_URL || "http://localhost:8084";
+import { GATEWAY_WEB_BASE } from "@/app/config/mock";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +11,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search") || null;
 
     // Construir URL con query params
-    let url = `${BFF_BASE_URL}/api/v1/governance/agents/registry/list?page=${page}&size=${size}`;
+    let url = `${GATEWAY_WEB_BASE}/governance/agents/registry/list?page=${page}&size=${size}`;
     if (status) url += `&status=${status}`;
     if (search) url += `&search=${search}`;
 

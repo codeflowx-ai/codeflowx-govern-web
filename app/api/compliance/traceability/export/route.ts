@@ -22,7 +22,7 @@ export interface ExportRequest {
  * En modo PRODUCCIÓN: Llama al microservicio de backend
  *
  * Microservicio backend esperado: codeflowx-governance-traceability-service
- * Endpoint backend: POST /api/v1/traceability/export
+ * Endpoint backend: POST /web/api/v1/compliance/traceability/export
  */
 export async function POST(request: NextRequest) {
   try {
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Modo PRODUCCIÓN: Llamar al microservicio de backend
-    const backendUrl = `${config.backendUrl}/api/v1/traceability/export`;
+    const backendUrl = `${config.backendUrl}/web/api/v1/compliance/traceability/export`;
     const authHeader = request.headers.get("authorization");
 
     const response = await fetch(backendUrl, {

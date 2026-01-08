@@ -39,29 +39,44 @@ if (isDevelopment && typeof console !== 'undefined') {
 }
 
 /**
- * URL base del backend
- * Por defecto apunta a localhost, pero puede configurarse mediante variable de entorno
+ * URL base del gateway-web
+ * El gateway-web es el punto de entrada único para todas las peticiones del frontend
+ * Prefijo: /web/api/v1
  */
-export const BACKEND_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
+export const GATEWAY_WEB_URL = process.env.NEXT_PUBLIC_GATEWAY_WEB_URL || 'http://localhost:8080';
+export const GATEWAY_WEB_BASE = `${GATEWAY_WEB_URL}/web/api/v1`;
 
 /**
- * URL base del BFF (Backend for Frontend)
- * El BFF es el punto de entrada para los microservicios de negocio
+ * URL base del backend (DEPRECATED - usar GATEWAY_WEB_URL)
+ * @deprecated Usar GATEWAY_WEB_URL en su lugar
+ */
+export const BACKEND_BASE_URL = GATEWAY_WEB_URL;
+
+/**
+ * URL base del BFF (DEPRECATED - usar GATEWAY_WEB_URL)
+ * @deprecated Usar GATEWAY_WEB_URL con prefijo /web/api/v1 en su lugar
  */
 export const BFF_BASE_URL = process.env.NEXT_PUBLIC_BFF_URL || 'http://localhost:8090';
 
 /**
  * Configuración de endpoints del backend
- * Todos los endpoints apuntan al BFF que enruta a los microservicios correspondientes
+ * Todos los endpoints deben usar el gateway-web: /web/api/v1/...
  */
 export const BACKEND_ENDPOINTS = {
   // Compliance endpoints
   compliance: {
     hitl: {
-      dashboard: `${BFF_BASE_URL}/api/v1/hitl/dashboard`,
-      interventions: `${BFF_BASE_URL}/api/v1/hitl/interventions`,
-      config: `${BFF_BASE_URL}/api/v1/hitl/config`,
-      decisions: `${BFF_BASE_URL}/api/v1/hitl/decisions`,
+      dashboard: `${GATEWAY_WEB_BASE}/compliance/hitl/dashboard`,
+      interventions: `${GATEWAY_WEB_BASE}/compliance/hitl/interventions`,
+      config: `${GATEWAY_WEB_BASE}/compliance/hitl/config`,
+      decisions: `${GATEWAY_WEB_BASE}/compliance/hitl/decisions`,
+    },
+    assessments: {
+      list: `${GATEWAY_WEB_BASE}/compliance/compliance-assessments`,
+      byId: (id: number) => `${GATEWAY_WEB_BASE}/compliance/compliance-assessments/${id}`,
+      byProject: (projectId: number) => `${GATEWAY_WEB_BASE}/compliance/compliance-assessments/project/${projectId}`,
+      metrics: `${GATEWAY_WEB_BASE}/compliance/compliance-assessments/metrics`,
+      scoreDistribution: `${GATEWAY_WEB_BASE}/compliance/compliance-assessments/metrics/score-distribution`,
     },
   },
 };

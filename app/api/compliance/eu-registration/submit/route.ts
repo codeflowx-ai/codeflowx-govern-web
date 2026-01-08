@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 
 /**
  * POST /api/compliance/eu-registration/submit
@@ -7,7 +7,7 @@ import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
  * Envía el registro a la Base de Datos UE según Art. 49 y Anexo VIII
  *
  * Backend: codeflowx-governance-eu-registration-service
- * Endpoint: POST /api/v1/eu-registrations/{registrationId}/submit
+ * Endpoint: POST /web/api/v1/compliance/eu-registrations/{registrationId}/submit
  * Business Service: EuRegistrationBusinessService.submitToEuDatabase()
  *
  * Nota: El método submitToEuDatabase() genera el payload JSON según Anexo VIII
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Llamada real al backend
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/eu-registrations/${registrationId}/submit`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/eu-registrations/${registrationId}/submit`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

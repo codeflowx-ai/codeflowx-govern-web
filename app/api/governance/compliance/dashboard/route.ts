@@ -28,8 +28,8 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const bffUrl = process.env.NEXT_PUBLIC_BFF_COMPLIANCE_URL || 'http://localhost:8083';
-  const response = await fetch(`${bffUrl}/api/v1/compliance/dashboard/metrics`, {
+  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_WEB_URL || 'http://localhost:8080';
+  const response = await fetch(`${gatewayUrl}/api/v1/compliance/dashboard/metrics`, {
     headers: {
       'Content-Type': 'application/json',
     },

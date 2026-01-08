@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { USE_MOCK } from "@/app/config/mock";
 
-const BACKEND_BASE_URL_RULES = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8083";
+const BACKEND_BASE_URL_RULES = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8080';
 
 // Mock data para desarrollo
 const mockRules = [
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const response = await fetch(`${BACKEND_BASE_URL_RULES}/api/v1/governance/rules`, {
+    const response = await fetch(`${BACKEND_BASE_URL_RULES}/web/api/v1/governance/rules`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const response = await fetch(`${BACKEND_BASE_URL_RULES}/api/v1/governance/rules`, {
+    const response = await fetch(`${BACKEND_BASE_URL_RULES}/web/api/v1/governance/rules`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

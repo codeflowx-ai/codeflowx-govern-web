@@ -102,14 +102,14 @@ export async function GET(request: NextRequest) {
     }
 
     // Llamada real al backend
-    const bffBaseUrl = process.env.BFF_BASE_URL || "http://localhost:8080";
+    const bffBaseUrl = process.env.GATEWAY_WEB_BASE || "http://localhost:8080";
     const params = new URLSearchParams();
     params.append("page", String(page));
     params.append("size", String(size));
     if (status) params.append("status", status);
     if (search) params.append("search", search);
 
-    const response = await fetch(`${bffBaseUrl}/api/v1/qms/projects?${params.toString()}`);
+    const response = await fetch(`${bffBaseUrl}/web/api/v1/compliance/qms/projects?${params.toString()}`);
 
     if (!response.ok) {
       throw new Error(`Backend responded with status ${response.status}`);

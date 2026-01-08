@@ -7,8 +7,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(mockData.mockConformityMetrics);
   }
 
-  const bffUrl = process.env.NEXT_PUBLIC_BFF_COMPLIANCE_URL || 'http://localhost:8083';
-  const response = await fetch(`${bffUrl}/api/v1/compliance-assessments/metrics`, {
+  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_WEB_URL || 'http://localhost:8080';
+  const response = await fetch(`${gatewayUrl}/web/api/v1/compliance/compliance-assessments/metrics`, {
     headers: {
       'Content-Type': 'application/json',
     },

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import { mockImmutableLogs, type ImmutableLog } from "@/app/(app)/governance/data/mockImmutableLogs";
 
 export interface ImmutableLogSearchCriteria {
@@ -23,7 +23,7 @@ export interface ImmutableLogSearchCriteria {
  * Busca logs inmutables según criterios de búsqueda
  *
  * Backend: codeflowx-governance-immutable-logs-service
- * Endpoint: POST /api/v1/immutable-logs/search
+ * Endpoint: POST /web/api/v1/compliance/immutable-logs/search
  */
 export async function POST(request: NextRequest) {
   try {
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Llamada real al backend
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/immutable-logs/search`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/immutable-logs/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

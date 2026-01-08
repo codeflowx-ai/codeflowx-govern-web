@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 
 /**
  * GET /api/compliance/fria/assessments
@@ -7,7 +7,7 @@ import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
  * Lista todas las evaluaciones FRIA con filtros opcionales
  *
  * Backend: codeflowx-governance-fria-service
- * Endpoint: GET /api/v1/fria/assessments
+ * Endpoint: GET /web/api/v1/compliance/fria/assessments
  */
 export async function GET(request: NextRequest) {
   try {
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
     // Llamada real al backend
     const searchParams = request.nextUrl.searchParams;
     const queryString = searchParams.toString();
-    const url = `${BFF_BASE_URL}/api/v1/fria/assessments${queryString ? `?${queryString}` : ""}`;
+    const url = `${GATEWAY_WEB_BASE}/compliance/fria/assessments${queryString ? `?${queryString}` : ""}`;
 
     const response = await fetch(url, {
       method: "GET",

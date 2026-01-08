@@ -204,7 +204,7 @@ const mockIntegrations: DatabaseIntegration[] = [
 export async function GET(request: NextRequest) {
   try {
     // En producción, aquí se haría la llamada al BFF
-    // const response = await fetch(`${BFF_URL}/api/v1/governance/data/integrations`);
+    // const response = await fetch(`${BFF_URL}/web/api/v1/governance/data/integrations`);
     // return NextResponse.json(await response.json());
 
     return NextResponse.json(mockIntegrations);
@@ -219,7 +219,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // En producción, aquí se haría la llamada al BFF
-    // const response = await fetch(`${BFF_URL}/api/v1/governance/data/integrations`, {
+    // const response = await fetch(`${BFF_URL}/web/api/v1/governance/data/integrations`, {
     //   method: "POST",
     //   headers: { "Content-Type": "application/json" },
     //   body: JSON.stringify(body),

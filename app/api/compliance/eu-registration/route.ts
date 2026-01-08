@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 
 /**
  * POST /api/compliance/eu-registration
@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Llamada real al backend
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/eu-registrations/section`, {
+    // Llamada real al backend vía gateway-web
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/eu-registrations/section`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -130,8 +130,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Llamada real al backend
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/eu-registrations?projectId=${projectId}`, {
+    // Llamada real al backend vía gateway-web
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/eu-registrations?projectId=${projectId}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

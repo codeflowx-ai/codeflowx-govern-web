@@ -26,7 +26,7 @@ export interface TraceabilitySearchCriteria {
  * En modo PRODUCCIÓN: Llama al microservicio de backend
  *
  * Microservicio backend esperado: codeflowx-governance-traceability-service
- * Endpoint backend: GET /api/v1/traceability?entityType={type}&entityId={id}
+ * Endpoint backend: GET /web/api/v1/compliance/traceability?entityType={type}&entityId={id}
  */
 export async function GET(request: NextRequest) {
   try {
@@ -68,8 +68,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Modo PRODUCCIÓN: Llamar al microservicio de backend
-    const backendUrl = new URL(`${config.backendUrl}/api/v1/traceability`);
+    // Modo PRODUCCIÓN: Llamar al gateway-web que enruta al BFF
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_WEB_URL || 'http://localhost:8080';
+    const backendUrl = new URL(`${gatewayUrl}/web/api/v1/compliance/traceability`);
     if (entityType) {
       backendUrl.searchParams.set("entityType", entityType);
     }
@@ -126,7 +127,7 @@ export async function GET(request: NextRequest) {
  * En modo PRODUCCIÓN: Llama al microservicio de backend
  *
  * Microservicio backend esperado: codeflowx-governance-traceability-service
- * Endpoint backend: POST /api/v1/traceability/search
+ * Endpoint backend: POST /web/api/v1/compliance/traceability/search
  */
 export async function POST(request: NextRequest) {
   try {
@@ -186,8 +187,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Modo PRODUCCIÓN: Llamar al microservicio de backend
-    const backendUrl = `${config.backendUrl}/api/v1/traceability/search`;
+    // Modo PRODUCCIÓN: Llamar al gateway-web que enruta al BFF
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_WEB_URL || 'http://localhost:8080';
+    const backendUrl = `${gatewayUrl}/web/api/v1/compliance/traceability/search`;
     const authHeader = request.headers.get("authorization");
 
     const response = await fetch(backendUrl, {

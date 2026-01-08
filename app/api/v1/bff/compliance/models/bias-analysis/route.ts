@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 
 export async function GET(request: NextRequest) {
   if (USE_MOCK) {
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
   const queryString = searchParams.toString();
 
   const response = await fetch(
-    `${BFF_BASE_URL}/api/v1/bff/compliance/models/bias-analysis${queryString ? `?${queryString}` : ""}`,
+    `${GATEWAY_WEB_BASE}/api/v1/bff/compliance/models/bias-analysis${queryString ? `?${queryString}` : ""}`,
     {
       headers: {
         "Content-Type": "application/json",

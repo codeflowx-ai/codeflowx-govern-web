@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PROMPTS_SERVICE_URL = process.env.PROMPTS_SERVICE_URL || "http://localhost:8084";
+const PROMPTS_SERVICE_URL = process.env.PROMPTS_SERVICE_URL || 'http://localhost:8080';
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get("search");
 
     // Construir URL con query params
-    const url = new URL(`${PROMPTS_SERVICE_URL}/api/v1/governance/prompts`);
+    const url = new URL(`${PROMPTS_SERVICE_URL}/web/api/v1/governance/prompts`);
     url.searchParams.set("page", page);
     url.searchParams.set("size", size);
     if (projectId) url.searchParams.set("projectId", projectId);
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    const response = await fetch(`${PROMPTS_SERVICE_URL}/api/v1/governance/prompts`, {
+    const response = await fetch(`${PROMPTS_SERVICE_URL}/web/api/v1/governance/prompts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

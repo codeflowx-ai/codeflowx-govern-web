@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import {
   mockImmutableLogs,
   mockIntegrityVerification,
@@ -13,7 +13,7 @@ import {
  * Verifica la integridad de la hash chain en un rango de logs
  *
  * Backend: codeflowx-governance-immutable-logs-service
- * Endpoint: POST /api/v1/immutable-logs/verify-integrity
+ * Endpoint: POST /web/api/v1/compliance/immutable-logs/verify-integrity
  */
 export async function POST(request: NextRequest) {
   try {
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Llamada real al backend
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/immutable-logs/verify-integrity`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/immutable-logs/verify-integrity`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

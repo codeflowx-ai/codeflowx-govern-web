@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const bffUrl = process.env.NEXT_PUBLIC_BFF_TELEMETRY_URL || 'http://localhost:8084';
+  const gatewayUrl = process.env.NEXT_PUBLIC_BFF_TELEMETRY_URL || 'http://localhost:8080';
   const searchParams = request.nextUrl.searchParams;
   const startTime = searchParams.get('startTime');
   const endTime = searchParams.get('endTime');
@@ -118,7 +118,7 @@ export async function GET(request: NextRequest) {
   if (startTime) queryParams.append('startTime', startTime);
   if (endTime) queryParams.append('endTime', endTime);
 
-  const response = await fetch(`${bffUrl}/api/v1/telemetry/kpis${queryParams.toString() ? `?${queryParams.toString()}` : ''}`, {
+  const response = await fetch(`${gatewayUrl}/api/v1/telemetry/kpis${queryParams.toString() ? `?${queryParams.toString()}` : ''}`, {
     headers: {
       'Content-Type': 'application/json',
     },

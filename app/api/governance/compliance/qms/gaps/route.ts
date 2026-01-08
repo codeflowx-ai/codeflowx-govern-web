@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import { mockQmsData } from "@/app/(app)/governance/data/mockQms";
 
 /**
@@ -34,9 +34,9 @@ export async function GET(request: NextRequest) {
     }
 
     // Llamada real al backend
-    // El backend debería tener un endpoint: GET /api/v1/qms/gaps?projectId={projectId}
+    // El backend debería tener un endpoint: GET /web/api/v1/compliance/qms/gaps?projectId={projectId}
     const response = await fetch(
-      `${BFF_BASE_URL}/api/v1/qms/gaps?projectId=${projectId}`,
+      `${GATEWAY_WEB_BASE}/compliance/qms/gaps?projectId=${projectId}`,
       {
         method: "GET",
         headers: {

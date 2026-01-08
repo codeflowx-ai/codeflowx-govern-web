@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import { mockImmutableLogs } from "@/app/(app)/governance/data/mockImmutableLogs";
 
 export const dynamic = "force-dynamic";
@@ -43,7 +43,7 @@ export async function GET(
       });
     }
 
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/immutable-logs/${id}`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/immutable-logs/${id}`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
     });

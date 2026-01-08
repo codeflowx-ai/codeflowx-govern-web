@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 import { mockHitlData } from "@/app/(app)/governance/data/mockHitl";
 
 /**
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Modo PRODUCCIÓN: Llamar al BFF que enruta al microservicio
-    const backendUrl = new URL(`${BFF_BASE_URL}/api/v1/hitl/dashboard`);
+    // Modo PRODUCCIÓN: Llamar al gateway-web que enruta al BFF
+    const backendUrl = new URL(`${GATEWAY_WEB_BASE}/compliance/hitl/dashboard`);
     if (projectId) {
       backendUrl.searchParams.set("projectId", projectId);
     }

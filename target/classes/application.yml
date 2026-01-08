@@ -1,0 +1,136 @@
+management:
+ endpoints:
+   web:
+     base-path: /actuator
+     exposure:
+      include: health,info,metrics
+     health:
+       show-details: always
+   enabled-by-default: false
+   health:
+     enabled: true
+   info:
+     enabled: true
+   metrics:
+     enabled:true
+server:
+     servlet:
+        context-path: /
+jetty:
+   threads:
+     min: 10
+     max: 100
+     idle-timeout: 120000
+zk:
+  springboot-packaging: war
+  homepage: index
+  
+  
+suinsit:
+  mail:
+   proveedor: mailjet
+   clave:
+     api: 65efe0802e4428cc1a8f20a1b9010a31
+     secret: 1693bfbfb9eb17a14ccd1f7d9ba721cf
+   email:
+     support: soporte@suinsit.cloud
+     name: Soporte Suinsit      
+  security:
+     whilelist: /chat-bot.zhtml, /healthz,/actuator/**, /login.zhtml, /login.zhtml?logout, /template/**
+     blacklist: /chat-text-individual.zul,/desktop/**,/portal/**,/console/**
+     scope: aplicacion,sistema 
+     roles: developer
+  desktop:
+      ctx: /console
+      page: index.zhtml
+  portal:
+      page: apps.zhtml
+      ctx: /portal
+  studio:
+      creatUser: false
+  application:
+     server:
+       host: console.suinsit.ai
+     product: ${SUINSIT_PRODUCT}
+     name: nova
+     version: 1.0.0
+     micros:
+       suinless:
+         baseUrl: ${SUINLESS_ENDPOINT}
+         paths:
+          rule-designer: /evalAI/ruleDesigner
+          documen-designer: /evalAI/documenDesigner
+          eval-text: /evalAI/evalText
+          traslator: /evalAI/traslate
+          extractor: /evalAI/extracte
+          defineWithXML: /evalAI/defineWithXML
+          assistant: /evalAI/assistant
+          ptraining: /message
+          pimage: /image
+          chat:  /chat/stream 
+          chatImage: /messageImage
+       security:
+         baseUrl: http://localhost:9000/v1/
+         paths:
+           licence: /licence/{customerID} 
+  
+spring:
+  jetty:
+    max-http-form-post-size: 2MB
+    connection-idle-timeout: 180000
+  application:
+    name: leka-web-app
+  main:
+    web-application-type: servlet
+    banner-mode: off
+    lazy-initialization: false
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration
+      # No necesitamos excluir Flowable - usamos solo librerías core sin starters  
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  mvc:
+    async:
+      request-timeout: 30000
+    allow-bean-definition-overriding: true
+  datasource:
+    url: ${SUINSIT_BBDD_URL}
+    username: ${SUINSIT_BBDD_USERNAME}
+    password: ${SUINSIT_BBDD_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      auto-commit: true
+      connection-timeout: 100000
+      idle-timeout: 600000
+      max-lifetime: 90000
+      maximum-pool-size: 40
+      minimum-idle: 10
+      pool-name: SUINSIT_DS_0
+  rabbitmq:
+    host: ${AMQ_HOST}
+    port: ${AMQ_PORT}
+    username: ${AMQ_USER}
+    password: ${AMQ_PASSWORD}  
+  kafka:
+     bootstrap-servers: ${KAFKA_SERVER:51.68.86.22:31807}
+     
+# BPMN Microservice Configuration
+bpmn:
+  service:
+    # URL del microservicio BPMN (cuando esté desplegado)
+    url: http://codeflowx-bpmn-service:8081
+    # Modo MOCK para demos (sin microservicio real)
+    mock-mode: true
+    
+# Flowable Engine (DESHABILITADO para demo)
+# Flowable habilitado temporalmente para crear schema 6.8.1
+flowable:
+  enabled: true
+  database-schema-update: true  # Crea tablas automáticamente
+  async-executor-activate: false  # Desactivar para demo
+  # No cargar procesos BPMN aún (se cargarán en microservicio futuro)
+  process-definition-location-prefix: classpath*:/processes-disabled/

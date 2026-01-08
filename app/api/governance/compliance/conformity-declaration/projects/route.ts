@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 
 const USE_MOCK_LOCAL = process.env.USE_MOCK === "true" || process.env.NODE_ENV === "development";
 
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
     if (search) params.append("search", search);
 
     const response = await fetch(
-      `${BFF_BASE_URL}/api/v1/conformity-declaration/projects?${params.toString()}`,
+      `${GATEWAY_WEB_BASE}/compliance/conformity-declaration/projects?${params.toString()}`,
       {
         method: "GET",
         headers: {

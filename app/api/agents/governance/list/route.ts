@@ -63,9 +63,9 @@ export async function GET() {
   }
 
   // Si no está en modo mock, llamar al backend real
-  const bffUrl = process.env.BFF_BASE_URL || "http://localhost:8084";
+  const gatewayUrl = process.env.GATEWAY_WEB_BASE || 'http://localhost:8080';
   try {
-    const response = await fetch(`${bffUrl}/api/v1/agents/governance/list`, {
+    const response = await fetch(`${gatewayUrl}/api/v1/agents/governance/list`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

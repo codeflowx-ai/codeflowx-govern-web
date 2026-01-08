@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from "@/app/config/mock";
 import { mockModelsSummary } from "@/app/(app)/governance/data/mockTechnicalDocs";
 
 /**
@@ -8,7 +8,7 @@ import { mockModelsSummary } from "@/app/(app)/governance/data/mockTechnicalDocs
  * Lista todos los modelos con resumen de documentación técnica
  *
  * Backend: codeflowx-governance-technical-docs-service
- * Endpoint: GET /api/v1/technical-docs
+ * Endpoint: GET /web/api/v1/compliance/technical-docs
  */
 export async function GET(request: NextRequest) {
   try {
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
     if (filterScore) queryParams.append("filterScore", filterScore);
     if (filterCompleteness) queryParams.append("filterCompleteness", filterCompleteness);
 
-    const url = `${BFF_BASE_URL}/api/v1/technical-docs${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    const url = `${GATEWAY_WEB_BASE}/compliance/technical-docs${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
     const response = await fetch(url, {
       method: "GET",
       headers: {

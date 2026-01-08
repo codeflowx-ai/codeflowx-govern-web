@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 import { mockHitlData } from "@/app/(app)/governance/data/mockHitl";
 
 /**
@@ -11,7 +11,7 @@ import { mockHitlData } from "@/app/(app)/governance/data/mockHitl";
  * - projectId: Filtrar por proyecto (opcional)
  *
  * Microservicio backend esperado: codeflowx-governance-hitl-service
- * Endpoint backend: GET /api/v1/hitl/config?projectId={projectId}
+ * Endpoint backend: GET /web/api/v1/compliance/hitl/config?projectId={projectId}
  */
 export async function GET(request: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Modo PRODUCCIÓN: Llamar al BFF que enruta al microservicio
-    const backendUrl = new URL(`${BFF_BASE_URL}/api/v1/hitl/config`);
+    const backendUrl = new URL(`${GATEWAY_WEB_BASE}/compliance/hitl/config`);
     if (projectId) {
       backendUrl.searchParams.set("projectId", projectId);
     }
@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
  * - escalationHours: Horas para escalación
  *
  * Microservicio backend esperado: codeflowx-governance-hitl-service
- * Endpoint backend: POST /api/v1/hitl/config
+ * Endpoint backend: POST /web/api/v1/compliance/hitl/config
  */
 export async function POST(request: NextRequest) {
   try {
@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Modo PRODUCCIÓN: Llamar al BFF que enruta al microservicio
-    const response = await fetch(`${BFF_BASE_URL}/api/v1/hitl/config`, {
+    const response = await fetch(`${GATEWAY_WEB_BASE}/compliance/hitl/config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -212,11 +212,11 @@ export async function GET(request: NextRequest) {
   }
 
   // Si no está en modo mock, llamar al backend real
-  const bffUrl = process.env.NEXT_PUBLIC_BFF_GOVERNANCE_URL || 'http://localhost:8082';
+  const gatewayUrl = process.env.NEXT_PUBLIC_BFF_GOVERNANCE_URL || 'http://localhost:8082';
   const searchParams = request.nextUrl.searchParams;
   const queryString = searchParams.toString();
 
-  const response = await fetch(`${bffUrl}/api/v1/governance/data/origins${queryString ? `?${queryString}` : ''}`, {
+  const response = await fetch(`${gatewayUrl}/web/api/v1/governance/data/origins${queryString ? `?${queryString}` : ''}`, {
     headers: {
       'Content-Type': 'application/json',
     },
@@ -274,10 +274,10 @@ export async function POST(request: NextRequest) {
   }
 
   // Si no está en modo mock, llamar al backend real
-  const bffUrl = process.env.NEXT_PUBLIC_BFF_GOVERNANCE_URL || 'http://localhost:8082';
+  const gatewayUrl = process.env.NEXT_PUBLIC_BFF_GOVERNANCE_URL || 'http://localhost:8082';
   const body = await request.json();
 
-  const response = await fetch(`${bffUrl}/api/v1/governance/data/origins`, {
+  const response = await fetch(`${gatewayUrl}/web/api/v1/governance/data/origins`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

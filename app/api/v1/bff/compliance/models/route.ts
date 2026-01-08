@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { USE_MOCK, BFF_BASE_URL } from "@/app/config/mock";
+import { USE_MOCK, GATEWAY_WEB_BASE } from '@/app/config/mock';
 
 export async function GET(request: NextRequest) {
   if (USE_MOCK) {
@@ -143,7 +143,7 @@ export async function GET(request: NextRequest) {
   const queryString = searchParams.toString();
 
   const response = await fetch(
-    `${BFF_BASE_URL}/api/v1/bff/compliance/models${queryString ? `?${queryString}` : ""}`,
+    `${GATEWAY_WEB_BASE}/api/v1/bff/compliance/models${queryString ? `?${queryString}` : ""}`,
     {
       headers: {
         "Content-Type": "application/json",
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
 
   // Si no está en modo mock, llamar al backend real
   const body = await request.json();
-  const response = await fetch(`${BFF_BASE_URL}/api/v1/bff/compliance/models`, {
+  const response = await fetch(`${GATEWAY_WEB_BASE}/api/v1/bff/compliance/models`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
