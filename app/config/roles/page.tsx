@@ -1,0 +1,582 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { Input } from "@/components/ui/input";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  AlertCircle,
+  CheckCircle,
+  Download,
+  Edit,
+  Eye,
+  EyeOff,
+  Plus,
+  RotateCcw,
+  Save,
+  Settings,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  roleConfigs as defaultRoleConfigs,
+  type RoleConfig,
+} from "../role-redirects";
+
+// Páginas disponibles para redirección
+const availablePages = [
+  { value: "/dashboard", label: "Dashboard Principal" },
+  { value: "/admin", label: "Panel de Administración" },
+  { value: "/code-playground", label: "Code Playground" },
+  { value: "/playground/chat", label: "AI Chat" },
+  { value: "/playground/images", label: "Generación de Imágenes" },
+  { value: "/playground/rag", label: "RAG & Documentos" },
+  { value: "/playground/translation", label: "Traducción" },
+  { value: "/playground/smart-routing", label: "Smart Routing" },
+  { value: "/playground/voice", label: "Voz & Audio" },
+  { value: "/plugins", label: "Plugins" },
+  { value: "/model-management", label: "Model Management" },
+  { value: "/technology-management", label: "Technology Management" },
+  { value: "/serving", label: "Serving" },
+  { value: "/projects", label: "Proyectos" },
+  { value: "/training-center", label: "Training Center" },
+  { value: "/team", label: "Equipo" },
+];
+
+interface EditingRole {
+  key: string;
+  config: RoleConfig;
+}
+
+const STORAGE_KEY = "roleConfigurations";
+
+export default function RolesPage() {
+  const [roles, setRoles] =
+    useState<Record<string, RoleConfig>>(defaultRoleConfigs);
+  const [editingRole, setEditingRole] = useState<EditingRole | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
+  // Cargar configuración guardada al montar el componente
+  useEffect(() => {
+    const savedConfig = localStorage.getItem(STORAGE_KEY);
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig);
+        setRoles(parsedConfig);
+      } catch (error) {
+        console.error("Error al cargar configuración de roles:", error);
+        // Si hay error, usar configuración por defecto
+        setRoles(defaultRoleConfigs);
+      }
+    }
+  }, []);
+
+  // Guardar configuración cuando cambie
+  const saveConfiguration = (newRoles: Record<string, RoleConfig>) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newRoles));
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 3000);
+    } catch (error) {
+      console.error("Error al guardar configuración:", error);
+    }
+  };
+
+  const handleEdit = (roleKey: string) => {
+    const config = roles[roleKey];
+    if (config) {
+      setEditingRole({ key: roleKey, config: { ...config } });
+    }
+  };
+
+  const handleSave = () => {
+    if (editingRole) {
+      let updatedRoles;
+
+      if (editingRole.key === "") {
+        // Crear nuevo rol
+        const newKey = `role_${Date.now()}`;
+        updatedRoles = {
+          ...roles,
+          [newKey]: editingRole.config,
+        };
+      } else {
+        // Editar rol existente
+        updatedRoles = {
+          ...roles,
+          [editingRole.key]: editingRole.config,
+        };
+      }
+
+      setRoles(updatedRoles);
+      saveConfiguration(updatedRoles);
+      setEditingRole(null);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditingRole(null);
+  };
+
+  const handleDelete = (roleKey: string) => {
+    const newRoles = { ...roles };
+    delete newRoles[roleKey];
+    setRoles(newRoles);
+    saveConfiguration(newRoles);
+  };
+
+  const handleToggleActive = (roleKey: string) => {
+    const updatedRoles = {
+      ...roles,
+      [roleKey]: {
+        ...roles[roleKey],
+        isActive: !roles[roleKey].isActive,
+      },
+    };
+    setRoles(updatedRoles);
+    saveConfiguration(updatedRoles);
+  };
+
+  const handleExport = () => {
+    try {
+      const dataStr = JSON.stringify(roles, null, 2);
+      const dataBlob = new Blob([dataStr], { type: "application/json" });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `role-configuration-${
+        new Date().toISOString().split("T")[0]
+      }.json`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error al exportar configuración:", error);
+    }
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const importedConfig = JSON.parse(e.target?.result as string);
+          setRoles(importedConfig);
+          saveConfiguration(importedConfig);
+        } catch (error) {
+          console.error("Error al importar configuración:", error);
+          alert(
+            "Error al importar el archivo. Verifica que sea un archivo JSON válido."
+          );
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleReset = () => {
+    if (
+      confirm(
+        "¿Estás seguro de que quieres restaurar la configuración por defecto? Esto eliminará todos los cambios personalizados."
+      )
+    ) {
+      setRoles(defaultRoleConfigs);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
+
+  const getPageLabel = (path: string) => {
+    const page = availablePages.find((p) => p.value === path);
+    return page?.label || path;
+  };
+
+  return (
+    <div className="w-full p-6 space-y-6">
+      
+      <div className="flex justify-between items-start">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Configuración de Roles
+          </h1>
+          <p className="text-gray-600">
+            Administra los roles del sistema y define sus páginas de inicio
+          </p>
+          {/* Banner de Desarrollo - Versión 1.0.0 Operativa */}
+          <DevelopmentBanner
+            type="operational"
+            customText="✅ Versión 1.0.0 - Operativa"
+            showEarlyAdopterButton={false}
+            className="justify-start"
+          />
+        </div>
+        <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() =>
+              setEditingRole({
+                key: "",
+                config: {
+                  name: "",
+                  description: "",
+                  defaultRedirect: "/dashboard",
+                  color: "bg-blue-100 text-blue-700",
+                  isActive: true,
+                },
+              })
+            }
+            className="text-green-600 hover:text-green-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Nuevo Rol
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleReset}
+            className="text-orange-600 hover:text-orange-700"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Restaurar
+          </Button>
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="h-4 w-4 mr-2" />
+            Exportar
+          </Button>
+          <Button
+            variant="outline"
+            className="cursor-pointer"
+            onClick={() => document.getElementById("file-input")?.click()}
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Importar
+          </Button>
+          <input
+            id="file-input"
+            type="file"
+            accept=".json"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </div>
+      </div>
+
+      {/* Mensaje de éxito */}
+      {showSuccessMessage && (
+        <div className="bg-green-50 border border-green-200 rounded-md p-4">
+          <div className="flex items-center">
+            <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
+            <p className="text-green-800">
+              Configuración guardada exitosamente
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Roles</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {Object.keys(roles).length}
+                </p>
+              </div>
+              <Settings className="h-8 w-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Roles Activos
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  {Object.values(roles).filter((r) => r.isActive).length}
+                </p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Roles Inactivos
+                </p>
+                <p className="text-2xl font-bold text-red-600">
+                  {Object.values(roles).filter((r) => !r.isActive).length}
+                </p>
+              </div>
+              <AlertCircle className="h-8 w-8 text-red-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Páginas Únicas
+                </p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {
+                    new Set(Object.values(roles).map((r) => r.defaultRedirect))
+                      .size
+                  }
+                </p>
+              </div>
+              <Settings className="h-8 w-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lista de Roles */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Object.entries(roles).map(([roleKey, config]) => (
+          <Card
+            key={roleKey}
+            className={`${!config.isActive ? "opacity-60" : ""} h-full`}
+          >
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <Badge className={config.color}>{config.name}</Badge>
+                  {!config.isActive && (
+                    <Badge variant="outline" className="text-gray-500">
+                      Inactivo
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleToggleActive(roleKey)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    {config.isActive ? (
+                      <Eye className="h-4 w-4" />
+                    ) : (
+                      <EyeOff className="h-4 w-4" />
+                    )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(roleKey)}
+                    className="text-blue-600 hover:text-blue-700"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleDelete(roleKey)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Descripción:</p>
+                <p className="text-sm text-gray-900">{config.description}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Página de Inicio:</p>
+                <Badge variant="outline" className="text-blue-600">
+                  {getPageLabel(config.defaultRedirect)}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Clave del Rol:</p>
+                <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                  {roleKey}
+                </code>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Modal de Edición */}
+      {editingRole && (
+        <SimpleModal
+          isOpen={!!editingRole}
+          onClose={handleCancel}
+          title={
+            editingRole?.key === ""
+              ? "Crear Nuevo Rol"
+              : `Editar Rol: ${editingRole?.config.name}`
+          }
+          maxWidth="max-w-lg"
+        >
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre del Rol
+              </label>
+              <Input
+                value={editingRole.config.name}
+                onChange={(e) =>
+                  setEditingRole((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          config: {
+                            ...prev.config,
+                            name: e.target.value,
+                          },
+                        }
+                      : null
+                  )
+                }
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Descripción
+              </label>
+              <Textarea
+                value={editingRole.config.description}
+                onChange={(e) =>
+                  setEditingRole((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          config: {
+                            ...prev.config,
+                            description: e.target.value,
+                          },
+                        }
+                      : null
+                  )
+                }
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Página de Inicio
+              </label>
+              <select
+                value={editingRole.config.defaultRedirect}
+                onChange={(e) =>
+                  setEditingRole((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          config: {
+                            ...prev.config,
+                            defaultRedirect: e.target.value,
+                          },
+                        }
+                      : null
+                  )
+                }
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
+              >
+                {availablePages.map((page) => (
+                  <option key={page.value} value={page.value}>
+                    {page.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Color del Badge
+              </label>
+              <select
+                value={editingRole.config.color}
+                onChange={(e) =>
+                  setEditingRole((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          config: {
+                            ...prev.config,
+                            color: e.target.value,
+                          },
+                        }
+                      : null
+                  )
+                }
+                className="w-full border border-gray-300 rounded-md px-3 py-2"
+              >
+                <option value="bg-red-100 text-red-700">Rojo</option>
+                <option value="bg-blue-100 text-blue-700">Azul</option>
+                <option value="bg-green-100 text-green-700">Verde</option>
+                <option value="bg-yellow-100 text-yellow-700">Amarillo</option>
+                <option value="bg-purple-100 text-purple-700">Púrpura</option>
+                <option value="bg-indigo-100 text-indigo-700">Índigo</option>
+                <option value="bg-pink-100 text-pink-700">Rosa</option>
+                <option value="bg-gray-100 text-gray-700">Gris</option>
+                <option value="bg-cyan-100 text-cyan-700">Cian</option>
+                <option value="bg-orange-100 text-orange-700">Naranja</option>
+                <option value="bg-emerald-100 text-emerald-700">
+                  Esmeralda
+                </option>
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="isActive"
+                checked={editingRole.config.isActive}
+                onChange={(e) =>
+                  setEditingRole((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          config: {
+                            ...prev.config,
+                            isActive: e.target.checked,
+                          },
+                        }
+                      : null
+                  )
+                }
+                className="rounded border-gray-300"
+              />
+              <label htmlFor="isActive" className="text-sm text-gray-700">
+                Rol Activo
+              </label>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+            <Button
+              onClick={handleSave}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Guardar
+            </Button>
+            <Button variant="outline" onClick={handleCancel} className="mr-3">
+              <X className="h-4 w-4 mr-2" />
+              Cancelar
+            </Button>
+          </div>
+        </SimpleModal>
+      )}
+    </div>
+  );
+}

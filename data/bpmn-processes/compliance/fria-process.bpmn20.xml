@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:flowable="http://flowable.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="fria_process" name="FRIA Process (Art. 27)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event -->
+    <startEvent id="initiateFriaStart" name="Initiate FRIA">
+      <outgoing>flowToFriaWizard</outgoing>
+    </startEvent>
+    
+    <!-- User Task: FRIA Wizard 6 pasos (Art. 27.1 a-f) -->
+    <userTask id="friaWizardSteps" name="FRIA Wizard (Art. 27.1 a-f)" 
+              flowable:candidateGroups="deployer,deployment-manager,compliance-officers" 
+              flowable:formKey="fria-wizard-form">
+      <incoming>flowToFriaWizard</incoming>
+      <incoming>flowRetryWizard</incoming>
+      <outgoing>flowToGenerateDoc</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Generate FRIA Document -->
+    <serviceTask id="generateFriaDocument" name="Generate FRIA Document" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.GenerateFriaDocumentDelegate">
+      <incoming>flowToGenerateDoc</incoming>
+      <outgoing>flowToDocGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: FRIA Complete? -->
+    <exclusiveGateway id="friaCompleteGateway" name="FRIA Complete?">
+      <incoming>flowToDocGateway</incoming>
+      <outgoing>flowFriaComplete</outgoing>
+      <outgoing>flowFriaIncomplete</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Complete Missing Elements -->
+    <userTask id="completeMissingElements" name="Complete Missing Elements" 
+              flowable:candidateGroups="deployer,compliance-officers" 
+              flowable:formKey="complete-missing-elements-form">
+      <incoming>flowFriaIncomplete</incoming>
+      <outgoing>flowRetryWizard</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowRetryWizard" sourceRef="completeMissingElements" targetRef="friaWizardSteps"></sequenceFlow>
+    
+    <!-- Service Task: Analyze Fundamental Rights Impact -->
+    <serviceTask id="analyzeFundamentalRights" name="Analyze Fundamental Rights Impact" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.AnalyzeFundamentalRightsDelegate">
+      <incoming>flowFriaComplete</incoming>
+      <outgoing>flowToHighImpactGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: High Impact? -->
+    <exclusiveGateway id="highImpactGateway" name="High Impact?">
+      <incoming>flowToHighImpactGateway</incoming>
+      <outgoing>flowHighImpact</outgoing>
+      <outgoing>flowMediumLowImpact</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Enhanced Review (si high impact) -->
+    <userTask id="enhancedReview" name="Enhanced Review (High Impact)" 
+              flowable:candidateGroups="ethics-committee,legal,compliance-officers" 
+              flowable:formKey="enhanced-review-form">
+      <incoming>flowHighImpact</incoming>
+      <outgoing>flowToReviewDecision</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Review Decision -->
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision?">
+      <incoming>flowToReviewDecision</incoming>
+      <outgoing>flowApproveReview</outgoing>
+      <outgoing>flowRejectReview</outgoing>
+      <outgoing>flowModifySystem</outgoing>
+    </exclusiveGateway>
+    
+    <!-- End: Deployment Blocked -->
+    <endEvent id="endDeploymentBlocked" name="Deployment Blocked">
+      <incoming>flowRejectReview</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowRejectReview" name="Reject" sourceRef="reviewDecisionGateway" targetRef="endDeploymentBlocked">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Define Modifications -->
+    <userTask id="defineModifications" name="Define System Modifications" 
+              flowable:candidateGroups="deployer,tech-team" 
+              flowable:formKey="define-modifications-form">
+      <incoming>flowModifySystem</incoming>
+      <outgoing>flowLoopModifications</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowModifySystem" name="Modify" sourceRef="reviewDecisionGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowLoopModifications" sourceRef="defineModifications" targetRef="friaWizardSteps"></sequenceFlow>
+    
+    <!-- Merge flows (enhanced review approved o medium/low impact) -->
+    <exclusiveGateway id="mergeToDeployerApproval" name="Merge">
+      <incoming>flowApproveReview</incoming>
+      <incoming>flowMediumLowImpact</incoming>
+      <outgoing>flowToDeployerApproval</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowApproveReview" name="Approve" sourceRef="reviewDecisionGateway" targetRef="mergeToDeployerApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Deployer Approval -->
+    <userTask id="deployerApproval" name="Deployer Approval" 
+              flowable:candidateGroups="deployer,deployment-manager" 
+              flowable:formKey="deployer-approval-form">
+      <incoming>flowToDeployerApproval</incoming>
+      <outgoing>flowToProceedGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Proceed? -->
+    <exclusiveGateway id="proceedGateway" name="Proceed?">
+      <incoming>flowToProceedGateway</incoming>
+      <outgoing>flowProceed</outgoing>
+      <outgoing>flowCancel</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Cancel Deployment -->
+    <serviceTask id="cancelDeployment" name="Cancel Deployment" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.CancelDeploymentDelegate">
+      <incoming>flowCancel</incoming>
+      <outgoing>flowToEndCancelled</outgoing>
+    </serviceTask>
+    
+    <!-- End: Deployment Cancelled -->
+    <endEvent id="endDeploymentCancelled" name="Deployment Cancelled">
+      <incoming>flowToEndCancelled</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancel" name="Cancel" sourceRef="proceedGateway" targetRef="cancelDeployment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${proceedWithDeployment == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Parallel: Notify Authority + Register + Update Project -->
+    <parallelGateway id="finalActionsParallelGateway" name="Final Actions">
+      <incoming>flowProceed</incoming>
+      <outgoing>flowToNotifyAuthority</outgoing>
+      <outgoing>flowToRegisterFria</outgoing>
+      <outgoing>flowToUpdateProject</outgoing>
+    </parallelGateway>
+    
+    <sequenceFlow id="flowProceed" name="Proceed" sourceRef="proceedGateway" targetRef="finalActionsParallelGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${proceedWithDeployment == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Notify Market Surveillance Authority (Art. 27.3) -->
+    <serviceTask id="notifyAuthorityFria" name="Notify Authority (Art. 27.3)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.NotifyAuthorityFriaDelegate">
+      <incoming>flowToNotifyAuthority</incoming>
+      <outgoing>flowFromNotifyAuthority</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Register FRIA in Database -->
+    <serviceTask id="registerFria" name="Register FRIA in Database" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.RegisterFriaDelegate">
+      <incoming>flowToRegisterFria</incoming>
+      <outgoing>flowFromRegisterFria</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Update Project Status -->
+    <serviceTask id="updateProjectFriaStatus" name="Update Project FRIA Status" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.fria.UpdateProjectFriaStatusDelegate">
+      <incoming>flowToUpdateProject</incoming>
+      <outgoing>flowFromUpdateProject</outgoing>
+    </serviceTask>
+    
+    <!-- Join Final Actions -->
+    <parallelGateway id="joinFinalActions" name="Join">
+      <incoming>flowFromNotifyAuthority</incoming>
+      <incoming>flowFromRegisterFria</incoming>
+      <incoming>flowFromUpdateProject</incoming>
+      <outgoing>flowToEndComplete</outgoing>
+    </parallelGateway>
+    
+    <!-- End: FRIA Completed & Notified -->
+    <endEvent id="endFriaComplete" name="FRIA Completed & Notified">
+      <incoming>flowToEndComplete</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToFriaWizard" sourceRef="initiateFriaStart" targetRef="friaWizardSteps"></sequenceFlow>
+    <sequenceFlow id="flowToGenerateDoc" sourceRef="friaWizardSteps" targetRef="generateFriaDocument"></sequenceFlow>
+    <sequenceFlow id="flowToDocGateway" sourceRef="generateFriaDocument" targetRef="friaCompleteGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowFriaComplete" name="Yes" sourceRef="friaCompleteGateway" targetRef="analyzeFundamentalRights">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${friaComplete == true && friaComplianceScore >= 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFriaIncomplete" name="No" sourceRef="friaCompleteGateway" targetRef="completeMissingElements">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${friaComplete == false || friaComplianceScore < 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToHighImpactGateway" sourceRef="analyzeFundamentalRights" targetRef="highImpactGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowHighImpact" name="High" sourceRef="highImpactGateway" targetRef="enhancedReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${impactSeverity == 'HIGH'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowMediumLowImpact" name="Medium/Low" sourceRef="highImpactGateway" targetRef="mergeToDeployerApproval">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${impactSeverity == 'MEDIUM' || impactSeverity == 'LOW'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToReviewDecision" sourceRef="enhancedReview" targetRef="reviewDecisionGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToDeployerApproval" sourceRef="mergeToDeployerApproval" targetRef="deployerApproval"></sequenceFlow>
+    <sequenceFlow id="flowToProceedGateway" sourceRef="deployerApproval" targetRef="proceedGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToNotifyAuthority" sourceRef="finalActionsParallelGateway" targetRef="notifyAuthorityFria"></sequenceFlow>
+    <sequenceFlow id="flowToRegisterFria" sourceRef="finalActionsParallelGateway" targetRef="registerFria"></sequenceFlow>
+    <sequenceFlow id="flowToUpdateProject" sourceRef="finalActionsParallelGateway" targetRef="updateProjectFriaStatus"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromNotifyAuthority" sourceRef="notifyAuthorityFria" targetRef="joinFinalActions"></sequenceFlow>
+    <sequenceFlow id="flowFromRegisterFria" sourceRef="registerFria" targetRef="joinFinalActions"></sequenceFlow>
+    <sequenceFlow id="flowFromUpdateProject" sourceRef="updateProjectFriaStatus" targetRef="joinFinalActions"></sequenceFlow>
+    
+    <sequenceFlow id="flowToEndComplete" sourceRef="joinFinalActions" targetRef="endFriaComplete"></sequenceFlow>
+    <sequenceFlow id="flowToEndCancelled" sourceRef="cancelDeployment" targetRef="endDeploymentCancelled"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_fria_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_fria_process" bpmnElement="fria_process">
+      <bpmndi:BPMNShape id="BPMNShape_initiateFriaStart" bpmnElement="initiateFriaStart">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_friaWizardSteps" bpmnElement="friaWizardSteps">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateFriaDocument" bpmnElement="generateFriaDocument">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_friaCompleteGateway" bpmnElement="friaCompleteGateway">
+        <omgdc:Bounds x="175" y="615" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_completeMissingElements" bpmnElement="completeMissingElements">
+        <omgdc:Bounds x="350" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_analyzeFundamentalRights" bpmnElement="analyzeFundamentalRights">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_highImpactGateway" bpmnElement="highImpactGateway">
+        <omgdc:Bounds x="175" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_enhancedReview" bpmnElement="enhancedReview">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDecisionGateway" bpmnElement="reviewDecisionGateway">
+        <omgdc:Bounds x="175" y="1335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endDeploymentBlocked" bpmnElement="endDeploymentBlocked">
+        <omgdc:Bounds x="182" y="1522" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_defineModifications" bpmnElement="defineModifications">
+        <omgdc:Bounds x="350" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mergeToDeployerApproval" bpmnElement="mergeToDeployerApproval">
+        <omgdc:Bounds x="375" y="1155" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_deployerApproval" bpmnElement="deployerApproval">
+        <omgdc:Bounds x="350" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_proceedGateway" bpmnElement="proceedGateway">
+        <omgdc:Bounds x="575" y="1515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_cancelDeployment" bpmnElement="cancelDeployment">
+        <omgdc:Bounds x="150" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endDeploymentCancelled" bpmnElement="endDeploymentCancelled">
+        <omgdc:Bounds x="182" y="1882" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalActionsParallelGateway" bpmnElement="finalActionsParallelGateway">
+        <omgdc:Bounds x="375" y="1695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyAuthorityFria" bpmnElement="notifyAuthorityFria">
+        <omgdc:Bounds x="350" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_registerFria" bpmnElement="registerFria">
+        <omgdc:Bounds x="550" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_updateProjectFriaStatus" bpmnElement="updateProjectFriaStatus">
+        <omgdc:Bounds x="750" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_joinFinalActions" bpmnElement="joinFinalActions">
+        <omgdc:Bounds x="175" y="2055" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endFriaComplete" bpmnElement="endFriaComplete">
+        <omgdc:Bounds x="182" y="2242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetryWizard" bpmnElement="flowRetryWizard">
+        <omgdi:waypoint x="450" y="820" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejectReview" bpmnElement="flowRejectReview">
+        <omgdi:waypoint x="225" y="1360" />
+        <omgdi:waypoint x="182" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowModifySystem" bpmnElement="flowModifySystem">
+        <omgdi:waypoint x="225" y="1360" />
+        <omgdi:waypoint x="350" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowLoopModifications" bpmnElement="flowLoopModifications">
+        <omgdi:waypoint x="450" y="1540" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproveReview" bpmnElement="flowApproveReview">
+        <omgdi:waypoint x="225" y="1360" />
+        <omgdi:waypoint x="375" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCancel" bpmnElement="flowCancel">
+        <omgdi:waypoint x="625" y="1540" />
+        <omgdi:waypoint x="150" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowProceed" bpmnElement="flowProceed">
+        <omgdi:waypoint x="625" y="1540" />
+        <omgdi:waypoint x="375" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToFriaWizard" bpmnElement="flowToFriaWizard">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToGenerateDoc" bpmnElement="flowToGenerateDoc">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDocGateway" bpmnElement="flowToDocGateway">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="175" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFriaComplete" bpmnElement="flowFriaComplete">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFriaIncomplete" bpmnElement="flowFriaIncomplete">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="350" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToHighImpactGateway" bpmnElement="flowToHighImpactGateway">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowHighImpact" bpmnElement="flowHighImpact">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowMediumLowImpact" bpmnElement="flowMediumLowImpact">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="375" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToReviewDecision" bpmnElement="flowToReviewDecision">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="175" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDeployerApproval" bpmnElement="flowToDeployerApproval">
+        <omgdi:waypoint x="425" y="1180" />
+        <omgdi:waypoint x="350" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToProceedGateway" bpmnElement="flowToProceedGateway">
+        <omgdi:waypoint x="450" y="1360" />
+        <omgdi:waypoint x="575" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToNotifyAuthority" bpmnElement="flowToNotifyAuthority">
+        <omgdi:waypoint x="425" y="1720" />
+        <omgdi:waypoint x="350" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRegisterFria" bpmnElement="flowToRegisterFria">
+        <omgdi:waypoint x="425" y="1720" />
+        <omgdi:waypoint x="550" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToUpdateProject" bpmnElement="flowToUpdateProject">
+        <omgdi:waypoint x="425" y="1720" />
+        <omgdi:waypoint x="750" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromNotifyAuthority" bpmnElement="flowFromNotifyAuthority">
+        <omgdi:waypoint x="450" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromRegisterFria" bpmnElement="flowFromRegisterFria">
+        <omgdi:waypoint x="650" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromUpdateProject" bpmnElement="flowFromUpdateProject">
+        <omgdi:waypoint x="850" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndComplete" bpmnElement="flowToEndComplete">
+        <omgdi:waypoint x="225" y="2080" />
+        <omgdi:waypoint x="182" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndCancelled" bpmnElement="flowToEndCancelled">
+        <omgdi:waypoint x="250" y="1720" />
+        <omgdi:waypoint x="182" y="1900" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

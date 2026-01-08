@@ -1,0 +1,51 @@
+package com.codeflowx.govern.workflow.drools.aios.runtime;
+
+import com.codeflowx.govern.workflow.drools.facts.RuntimeHealthFact;
+
+global org.slf4j.Logger logger;
+
+rule "Runtime Healthy"
+    ruleflow-group "ai-runtime-health"
+    when
+        $fact : RuntimeHealthFact(
+            healthState == null,
+            safeLatency() < 200,
+            safeErrorRate() < 0.01,
+            safeDriftIndicator() < 0.2,
+            safeCompliance() >= 90
+        )
+    then
+        logger.info("🟢 [Drools] Runtime {} en estado GREEN", $fact.getRuntimeId());
+        $fact.setHealthState("GREEN");
+        $fact.setJustification("KPIs dentro de umbrales normales");
+        update($fact);
+end
+
+rule "Runtime Warning"
+    ruleflow-group "ai-runtime-health"
+    when
+        $fact : RuntimeHealthFact(
+            healthState == null,
+            (safeLatency() >= 200 && safeLatency() < 400)
+            ||
+            (safeErrorRate() >= 0.01 && safeErrorRate() < 0.05)
+            ||
+            (safeDriftIndicator() >= 0.2 && safeDriftIndicator() < 0.4)
+        )
+    then
+        logger.warn("🟡 [Drools] Runtime {} en estado YELLOW", $fact.getRuntimeId());
+        $fact.setHealthState("YELLOW");
+        $fact.setJustification("KPIs fuera de rango óptimo, requiere seguimiento");
+        update($fact);
+end
+
+rule "Runtime Critical"
+    ruleflow-group "ai-runtime-health"
+    when
+        $fact : RuntimeHealthFact(healthState == null)
+    then
+        logger.error("🔴 [Drools] Runtime {} en estado RED", $fact.getRuntimeId());
+        $fact.setHealthState("RED");
+        $fact.setJustification("KPIs críticos detectados");
+        update($fact);
+end

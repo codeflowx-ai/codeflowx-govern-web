@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/compliance">
+
+  <process id="prohibited-system-detection-workflow" name="Prohibited System Detection Workflow (Art. 5)" isExecutable="true" version="1.0">
+
+    <!-- Start Event -->
+    <startEvent id="prohibitedSystemDetectedStart" name="Prohibited System Detected">
+      <outgoing>flowToReviewDetection</outgoing>
+    </startEvent>
+
+    <!-- User Task: Review Detection -->
+    <userTask id="reviewDetection" name="Review Prohibited System Detection"
+              activiti:candidateGroups="compliance-officers,deployment-manager,legal"
+              activiti:formKey="prohibited-system-review-form">
+      <incoming>flowToReviewDetection</incoming>
+      <outgoing>flowToReviewDecision</outgoing>
+    </userTask>
+
+    <!-- Gateway: Review Decision -->
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision?">
+      <incoming>flowToReviewDecision</incoming>
+      <outgoing>flowFalsePositive</outgoing>
+      <outgoing>flowConfirmedProhibited</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Unblock Deployment (False Positive) -->
+    <serviceTask id="unblockDeployment" name="Unblock Deployment"
+                 activiti:class="com.codeflowx.govern.workflow.delegates.compliance.UnblockDeploymentDelegate">
+      <incoming>flowFalsePositive</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+
+    <!-- End: Resolved (False Positive) -->
+    <endEvent id="endResolved" name="Resolved (False Positive)">
+      <incoming>flowToEndResolved</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowFalsePositive" name="False Positive" sourceRef="reviewDecisionGateway" targetRef="unblockDeployment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'FALSE_POSITIVE'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- User Task: Compliance Officer Review (Confirmed) -->
+    <userTask id="complianceOfficerReview" name="Compliance Officer Review"
+              activiti:candidateGroups="compliance-officers,legal"
+              activiti:formKey="compliance-officer-review-form">
+      <incoming>flowConfirmedProhibited</incoming>
+      <outgoing>flowToComplianceDecision</outgoing>
+    </userTask>
+
+    <sequenceFlow id="flowConfirmedProhibited" name="Confirmed Prohibited" sourceRef="reviewDecisionGateway" targetRef="complianceOfficerReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'CONFIRMED'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Gateway: Compliance Decision -->
+    <exclusiveGateway id="complianceDecisionGateway" name="Compliance Decision?">
+      <incoming>flowToComplianceDecision</incoming>
+      <outgoing>flowBlockPermanently</outgoing>
+      <outgoing>flowRequireModification</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Block Deployment Permanently -->
+    <serviceTask id="blockDeploymentPermanently" name="Block Deployment Permanently"
+                 activiti:class="com.codeflowx.govern.workflow.delegates.compliance.BlockDeploymentPermanentlyDelegate">
+      <incoming>flowBlockPermanently</incoming>
+      <outgoing>flowToNotifyStakeholders</outgoing>
+    </serviceTask>
+
+    <!-- Service Task: Notify Stakeholders -->
+    <serviceTask id="notifyStakeholders" name="Notify Stakeholders"
+                 activiti:class="com.codeflowx.govern.workflow.delegates.compliance.NotifyStakeholdersDelegate">
+      <incoming>flowToNotifyStakeholders</incoming>
+      <outgoing>flowToEndBlocked</outgoing>
+    </serviceTask>
+
+    <!-- End: Deployment Blocked -->
+    <endEvent id="endBlocked" name="Deployment Blocked">
+      <incoming>flowToEndBlocked</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowBlockPermanently" name="Block Permanently" sourceRef="complianceDecisionGateway" targetRef="blockDeploymentPermanently">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${complianceDecision == 'BLOCK'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- User Task: Define System Modifications -->
+    <userTask id="defineModifications" name="Define System Modifications"
+              activiti:candidateGroups="deployer,tech-team"
+              activiti:formKey="define-modifications-form">
+      <incoming>flowRequireModification</incoming>
+      <outgoing>flowToVerifyModifications</outgoing>
+    </userTask>
+
+    <sequenceFlow id="flowRequireModification" name="Require Modifications" sourceRef="complianceDecisionGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${complianceDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Service Task: Verify Modifications -->
+    <serviceTask id="verifyModifications" name="Verify Modifications"
+                 activiti:class="com.codeflowx.govern.workflow.delegates.compliance.VerifyModificationsDelegate">
+      <incoming>flowToVerifyModifications</incoming>
+      <outgoing>flowToModificationGateway</outgoing>
+    </serviceTask>
+
+    <!-- Gateway: Modifications Verified? -->
+    <exclusiveGateway id="modificationGateway" name="Modifications Verified?">
+      <incoming>flowToModificationGateway</incoming>
+      <outgoing>flowModificationsOK</outgoing>
+      <outgoing>flowModificationsRejected</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Unblock and Re-check -->
+    <serviceTask id="unblockAndRecheck" name="Unblock and Re-check Prohibited Systems"
+                 activiti:class="com.codeflowx.govern.workflow.delegates.compliance.UnblockAndRecheckDelegate">
+      <incoming>flowModificationsOK</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+
+    <sequenceFlow id="flowModificationsOK" name="OK" sourceRef="modificationGateway" targetRef="unblockAndRecheck">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${modificationsVerified == true}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Loop back to define modifications -->
+    <sequenceFlow id="flowModificationsRejected" name="Rejected" sourceRef="modificationGateway" targetRef="defineModifications">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${modificationsVerified == false}]]></conditionExpression>
+    </sequenceFlow>
+
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToReviewDetection" sourceRef="prohibitedSystemDetectedStart" targetRef="reviewDetection"></sequenceFlow>
+    <sequenceFlow id="flowToReviewDecision" sourceRef="reviewDetection" targetRef="reviewDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowToEndResolved" sourceRef="unblockAndRecheck" targetRef="endResolved"></sequenceFlow>
+    <sequenceFlow id="flowToComplianceDecision" sourceRef="complianceOfficerReview" targetRef="complianceDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowToNotifyStakeholders" sourceRef="blockDeploymentPermanently" targetRef="notifyStakeholders"></sequenceFlow>
+    <sequenceFlow id="flowToEndBlocked" sourceRef="notifyStakeholders" targetRef="endBlocked"></sequenceFlow>
+    <sequenceFlow id="flowToVerifyModifications" sourceRef="defineModifications" targetRef="verifyModifications"></sequenceFlow>
+    <sequenceFlow id="flowToModificationGateway" sourceRef="verifyModifications" targetRef="modificationGateway"></sequenceFlow>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_prohibited_system_detection_workflow">
+    <bpmndi:BPMNPlane id="BPMNPlane_prohibited_system_detection_workflow" bpmnElement="prohibited-system-detection-workflow">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

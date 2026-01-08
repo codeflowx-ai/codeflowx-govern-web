@@ -1,0 +1,1228 @@
+// app/config/users/page.tsx
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+import {
+  Building,
+  CheckCircle,
+  Clock,
+  Download,
+  Edit,
+  Eye,
+  EyeOff,
+  Filter,
+  Phone,
+  Plus,
+  RefreshCw,
+  Save,
+  Shield,
+  Trash2,
+  Upload,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
+
+// --- INTERFACES ACTUALIZADAS SEGÚN EL CORE ---
+interface Department {
+  id: number;
+  name: string;
+  description: string;
+  code: string;
+  managerId?: number;
+  parentDepartmentId?: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password?: string; // Solo para creación/edición
+  isActive: boolean;
+  profileImage?: string;
+  phone?: string;
+  timezone: string;
+  language: string;
+  departmentId?: number;
+  department?: Department;
+  roles: string[];
+  createdAt: string;
+  updatedAt: string;
+  lastLogin?: string;
+}
+
+// Roles disponibles según el core
+const ALL_ROLES = [
+  "admin",
+  "developer",
+  "viewer",
+  "business_analytics",
+  "ai_analytics",
+  "ai_developer",
+  "devops",
+  "project_manager",
+  "architect",
+  "ai_architect",
+] as const;
+
+// Departamentos mock según el core
+const mockDepartments: Department[] = [
+  {
+    id: 1,
+    name: "Administración",
+    description: "Departamento de administración general del sistema",
+    code: "ADMIN",
+    managerId: 1,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 2,
+    name: "Desarrollo",
+    description: "Departamento de desarrollo de software",
+    code: "DEV",
+    managerId: 2,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 3,
+    name: "Consultoría",
+    description: "Departamento de consultoría y asesoramiento",
+    code: "CONS",
+    managerId: 3,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 4,
+    name: "Analytics",
+    description: "Departamento de análisis de negocio",
+    code: "ANAL",
+    managerId: 4,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 5,
+    name: "AI & ML",
+    description: "Departamento de Inteligencia Artificial y Machine Learning",
+    code: "AIML",
+    managerId: 5,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 6,
+    name: "DevOps",
+    description: "Departamento de operaciones de desarrollo",
+    code: "DEVOPS",
+    managerId: 6,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+  {
+    id: 7,
+    name: "Gestión de Proyectos",
+    description: "Departamento de gestión y coordinación de proyectos",
+    code: "PM",
+    managerId: 7,
+    isActive: true,
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+  },
+];
+
+// Usuarios mock actualizados según el core
+const mockUsers: User[] = [
+  {
+    id: "1",
+    firstName: "Admin",
+    lastName: "User",
+    email: "admin@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0123",
+    timezone: "UTC",
+    language: "en",
+    departmentId: 1,
+    department: mockDepartments[0],
+    roles: ["admin"],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-15T00:00:00Z",
+    lastLogin: "2024-01-20T10:00:00Z",
+  },
+  {
+    id: "2",
+    firstName: "Developer",
+    lastName: "User",
+    email: "dev@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0124",
+    timezone: "America/New_York",
+    language: "en",
+    departmentId: 2,
+    department: mockDepartments[1],
+    roles: ["developer"],
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-20T00:00:00Z",
+    lastLogin: "2024-01-20T09:00:00Z",
+  },
+  {
+    id: "3",
+    firstName: "John",
+    lastName: "Smith",
+    email: "john@company.com",
+    isActive: false,
+    profileImage: "",
+    phone: "+1-555-0125",
+    timezone: "Europe/London",
+    language: "en",
+    departmentId: 3,
+    department: mockDepartments[2],
+    roles: ["viewer"],
+    createdAt: "2024-02-01T00:00:00Z",
+    updatedAt: "2024-02-01T00:00:00Z",
+    lastLogin: "2024-01-13T00:00:00Z",
+  },
+  {
+    id: "4",
+    firstName: "Business",
+    lastName: "Analytics",
+    email: "business@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0126",
+    timezone: "America/Chicago",
+    language: "en",
+    departmentId: 4,
+    department: mockDepartments[3],
+    roles: ["business_analytics"],
+    createdAt: "2024-01-25T00:00:00Z",
+    updatedAt: "2024-01-25T00:00:00Z",
+    lastLogin: "2024-01-20T07:00:00Z",
+  },
+  {
+    id: "5",
+    firstName: "AI",
+    lastName: "Analytics",
+    email: "ai@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0127",
+    timezone: "America/Los_Angeles",
+    language: "en",
+    departmentId: 5,
+    department: mockDepartments[4],
+    roles: ["ai_analytics"],
+    createdAt: "2024-01-28T00:00:00Z",
+    updatedAt: "2024-01-28T00:00:00Z",
+    lastLogin: "2024-01-20T05:00:00Z",
+  },
+  {
+    id: "6",
+    firstName: "DevOps",
+    lastName: "User",
+    email: "devops@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0128",
+    timezone: "UTC",
+    language: "en",
+    departmentId: 6,
+    department: mockDepartments[5],
+    roles: ["devops"],
+    createdAt: "2024-02-05T00:00:00Z",
+    updatedAt: "2024-02-05T00:00:00Z",
+    lastLogin: "2024-01-20T11:00:00Z",
+  },
+  {
+    id: "7",
+    firstName: "Project",
+    lastName: "Manager",
+    email: "pm@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0129",
+    timezone: "America/New_York",
+    language: "en",
+    departmentId: 7,
+    department: mockDepartments[6],
+    roles: ["project_manager"],
+    createdAt: "2024-02-10T00:00:00Z",
+    updatedAt: "2024-02-10T00:00:00Z",
+    lastLogin: "2024-01-20T08:00:00Z",
+  },
+  {
+    id: "8",
+    firstName: "Sarah",
+    lastName: "Johnson",
+    email: "sarah@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0130",
+    timezone: "Europe/Paris",
+    language: "fr",
+    departmentId: 4,
+    department: mockDepartments[3],
+    roles: ["business_analytics", "viewer"],
+    createdAt: "2024-01-30T00:00:00Z",
+    updatedAt: "2024-01-30T00:00:00Z",
+    lastLogin: "2024-01-20T06:00:00Z",
+  },
+  {
+    id: "9",
+    firstName: "Michael",
+    lastName: "Chen",
+    email: "michael@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0131",
+    timezone: "Asia/Tokyo",
+    language: "ja",
+    departmentId: 5,
+    department: mockDepartments[4],
+    roles: ["ai_analytics", "developer"],
+    createdAt: "2024-02-01T00:00:00Z",
+    updatedAt: "2024-02-01T00:00:00Z",
+    lastLogin: "2024-01-20T10:00:00Z",
+  },
+  {
+    id: "10",
+    firstName: "Emily",
+    lastName: "Rodriguez",
+    email: "emily@company.com",
+    isActive: true,
+    profileImage: "",
+    phone: "+1-555-0132",
+    timezone: "America/Mexico_City",
+    language: "es",
+    departmentId: 7,
+    department: mockDepartments[6],
+    roles: ["project_manager", "business_analytics"],
+    createdAt: "2024-02-03T00:00:00Z",
+    updatedAt: "2024-02-03T00:00:00Z",
+    lastLogin: "2024-01-20T09:00:00Z",
+  },
+];
+
+// Timezones disponibles
+const AVAILABLE_TIMEZONES = [
+  "UTC",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+];
+
+// Idiomas disponibles
+const AVAILABLE_LANGUAGES = [
+  { code: "en", name: "English" },
+  { code: "es", name: "Español" },
+  { code: "fr", name: "Français" },
+  { code: "de", name: "Deutsch" },
+  { code: "ja", name: "日本語" },
+  { code: "zh", name: "中文" },
+];
+
+import UmamiTracker from "@/components/analytics/UmamiTracker";
+export default function UsersPage() {
+  const [users, setUsers] = useState<User[]>(mockUsers);
+  const [departments] = useState<Department[]>(mockDepartments);
+  const [showModal, setShowModal] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(
+    null
+  );
+  const [showPasswordModal, setShowPasswordModal] = useState<string | null>(
+    null
+  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterDepartment, setFilterDepartment] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterRole, setFilterRole] = useState<string>("all");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Estado del formulario actualizado
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phone: "",
+    timezone: "UTC",
+    language: "en",
+    departmentId: undefined as number | undefined,
+    roles: ["developer"] as string[],
+    isActive: true,
+  });
+
+  // Estado para cambio de contraseña
+  const [passwordData, setPasswordData] = useState({
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  // Filtrar usuarios
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch =
+      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesDepartment =
+      filterDepartment === "all" ||
+      user.departmentId?.toString() === filterDepartment;
+
+    const matchesStatus =
+      filterStatus === "all" || user.isActive.toString() === filterStatus;
+
+    const matchesRole = filterRole === "all" || user.roles.includes(filterRole);
+
+    return matchesSearch && matchesDepartment && matchesStatus && matchesRole;
+  });
+
+  const handleCreate = () => {
+    setEditingUser(null);
+    setFormData({
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      phone: "",
+      timezone: "UTC",
+      language: "en",
+      departmentId: undefined,
+      roles: ["developer"],
+      isActive: true,
+    });
+    setShowModal(true);
+  };
+
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      password: "", // No mostrar contraseña actual
+      phone: user.phone || "",
+      timezone: user.timezone,
+      language: user.language,
+      departmentId: user.departmentId,
+      roles: user.roles,
+      isActive: user.isActive,
+    });
+    setShowModal(true);
+  };
+
+  const handleSave = () => {
+    if (editingUser) {
+      // Editar usuario existente
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.id === editingUser.id
+            ? {
+                ...user,
+                ...formData,
+                updatedAt: new Date().toISOString(),
+              }
+            : user
+        )
+      );
+    } else {
+      // Crear nuevo usuario
+      const newUser: User = {
+        id: Date.now().toString(),
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        isActive: formData.isActive,
+        profileImage: "",
+        phone: formData.phone,
+        timezone: formData.timezone,
+        language: formData.language,
+        departmentId: formData.departmentId,
+        department: departments.find((d) => d.id === formData.departmentId),
+        roles: formData.roles,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastLogin: undefined,
+      };
+      setUsers((prev) => [...prev, newUser]);
+    }
+    setShowModal(false);
+  };
+
+  const handleDelete = (userId: string) => {
+    setUsers((prev) => prev.filter((user) => user.id !== userId));
+    setShowDeleteConfirm(null);
+  };
+
+  const handlePasswordChange = (userId: string) => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
+
+    setUsers((prev) =>
+      prev.map((user) =>
+        user.id === userId
+          ? { ...user, updatedAt: new Date().toISOString() }
+          : user
+      )
+    );
+
+    setPasswordData({ newPassword: "", confirmPassword: "" });
+    setShowPasswordModal(null);
+  };
+
+  const handleResetPassword = (userId: string) => {
+    // Simular reset de contraseña
+    alert(`Contraseña reset para usuario ${userId}`);
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-red-100 text-red-700";
+      case "developer":
+        return "bg-blue-100 text-blue-700";
+      case "viewer":
+        return "bg-gray-100 text-gray-700";
+      case "business_analytics":
+        return "bg-purple-100 text-purple-700";
+      case "ai_analytics":
+        return "bg-indigo-100 text-indigo-700";
+      case "ai_developer":
+        return "bg-cyan-100 text-cyan-700";
+      case "devops":
+        return "bg-orange-100 text-orange-700";
+      case "project_manager":
+        return "bg-green-100 text-green-700";
+      case "architect":
+        return "bg-emerald-100 text-emerald-700";
+      case "ai_architect":
+        return "bg-pink-100 text-pink-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getStatusColor = (isActive: boolean) => {
+    return isActive
+      ? "bg-green-100 text-green-700"
+      : "bg-yellow-100 text-yellow-700";
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("es-ES", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInHours = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+    );
+
+    if (diffInHours < 1) return "Hace menos de 1 hora";
+    if (diffInHours < 24) return `Hace ${diffInHours} horas`;
+    if (diffInHours < 168) return `Hace ${Math.floor(diffInHours / 24)} días`;
+    return `Hace ${Math.floor(diffInHours / 168)} semanas`;
+  };
+
+  return (
+    <div className="p-6 space-y-6">
+      <UmamiTracker />
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-gray-900">
+            👥 Gestión de Usuarios
+          </h1>
+          <p className="text-gray-600">
+            Gestiona usuarios, departamentos y permisos del sistema
+          </p>
+          {/* Banner de Desarrollo - Versión 1.0.0 Operativa */}
+          <DevelopmentBanner
+            type="operational"
+            customText="✅ Versión 1.0.0 - Operativa"
+            showEarlyAdopterButton={false}
+            className="justify-start"
+          />
+        </div>
+        <div className="flex space-x-3">
+          <Button variant="outline" onClick={() => {}}>
+            <Download className="w-4 h-4 mr-2" />
+            Exportar
+          </Button>
+          <Button variant="outline" onClick={() => {}}>
+            <Upload className="w-4 h-4 mr-2" />
+            Importar
+          </Button>
+          <Button onClick={handleCreate}>
+            <Plus className="w-4 h-4 mr-2" />
+            Nuevo Usuario
+          </Button>
+        </div>
+      </div>
+
+      {/* Filtros y búsqueda */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="w-4 h-4" />
+            Filtros y Búsqueda
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Búsqueda
+              </label>
+              <Input
+                placeholder="Buscar por nombre, email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Departamento
+              </label>
+              <Select
+                value={filterDepartment}
+                onValueChange={setFilterDepartment}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los departamentos" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los departamentos</SelectItem>
+                  {departments.map((dept) => (
+                    <SelectItem key={dept.id} value={dept.id.toString()}>
+                      {dept.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Estado
+              </label>
+              <Select value={filterStatus} onValueChange={setFilterStatus}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los estados" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="true">Activo</SelectItem>
+                  <SelectItem value="false">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Rol
+              </label>
+              <Select value={filterRole} onValueChange={setFilterRole}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Todos los roles" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los roles</SelectItem>
+                  {ALL_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {role.replace("_", " ")}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Estadísticas */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Usuarios
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {users.length}
+                </p>
+              </div>
+              <Users className="w-8 h-8 text-blue-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Usuarios Activos
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  {users.filter((u) => u.isActive).length}
+                </p>
+              </div>
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Departamentos
+                </p>
+                <p className="text-2xl font-bold text-purple-600">
+                  {departments.length}
+                </p>
+              </div>
+              <Building className="w-8 h-8 text-purple-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Último Acceso
+                </p>
+                <p className="text-sm font-medium text-gray-900">
+                  {users.length > 0
+                    ? getTimeAgo(users[0].lastLogin || users[0].createdAt)
+                    : "N/A"}
+                </p>
+              </div>
+              <Clock className="w-8 h-8 text-orange-600" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Users Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Lista de Usuarios</CardTitle>
+          <CardDescription>
+            {filteredUsers.length} de {users.length} usuarios mostrados
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Usuario
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Departamento
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Roles
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Estado
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Último acceso
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredUsers.map((user) => (
+                  <tr key={user.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                          <span className="text-sm font-medium text-gray-700">
+                            {user.firstName[0]}
+                            {user.lastName[0]}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.firstName} {user.lastName}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {user.email}
+                          </div>
+                          <div className="text-xs text-gray-400 flex items-center gap-2">
+                            <Phone className="w-3 h-3" />
+                            {user.phone || "Sin teléfono"}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {user.department ? (
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.department.name}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {user.department.code}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">Sin departamento</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {user.roles.map((role) => (
+                          <Badge
+                            key={role}
+                            variant="secondary"
+                            className={getRoleColor(role)}
+                          >
+                            {role.replace("_", " ")}
+                          </Badge>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge
+                        variant="secondary"
+                        className={getStatusColor(user.isActive)}
+                      >
+                        {user.isActive ? "Activo" : "Inactivo"}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {user.lastLogin ? getTimeAgo(user.lastLogin) : "Nunca"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEdit(user)}
+                        >
+                          <Edit className="w-3 h-3 mr-1" />
+                          Editar
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowPasswordModal(user.id)}
+                        >
+                          <Shield className="w-3 h-3 mr-1" />
+                          Contraseña
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleResetPassword(user.id)}
+                        >
+                          <RefreshCw className="w-3 h-3 mr-1" />
+                          Reset
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setShowDeleteConfirm(user.id)}
+                          disabled={user.roles.includes("admin")}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Eliminar
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Modal de crear/editar usuario */}
+      <SimpleModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title={editingUser ? "Editar Usuario" : "Nuevo Usuario"}
+        maxWidth="max-w-2xl"
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre *
+            </label>
+            <Input
+              value={formData.firstName}
+              onChange={(e) =>
+                setFormData({ ...formData, firstName: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Apellido *
+            </label>
+            <Input
+              value={formData.lastName}
+              onChange={(e) =>
+                setFormData({ ...formData, lastName: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email *
+            </label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Teléfono
+            </label>
+            <Input
+              value={formData.phone}
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+              placeholder="+1-555-0123"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Departamento
+            </label>
+            <Select
+              value={formData.departmentId?.toString() || ""}
+              onValueChange={(value) =>
+                setFormData({
+                  ...formData,
+                  departmentId: value ? parseInt(value) : undefined,
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar departamento" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((dept) => (
+                  <SelectItem key={dept.id} value={dept.id.toString()}>
+                    {dept.name} ({dept.code})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Zona Horaria
+            </label>
+            <Select
+              value={formData.timezone}
+              onValueChange={(value) =>
+                setFormData({ ...formData, timezone: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_TIMEZONES.map((tz) => (
+                  <SelectItem key={tz} value={tz}>
+                    {tz}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Idioma
+            </label>
+            <Select
+              value={formData.language}
+              onValueChange={(value) =>
+                setFormData({ ...formData, language: value })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {AVAILABLE_LANGUAGES.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    {lang.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Estado
+            </label>
+            <Select
+              value={formData.isActive.toString()}
+              onValueChange={(value) =>
+                setFormData({ ...formData, isActive: value === "true" })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="true">Activo</SelectItem>
+                <SelectItem value="false">Inactivo</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {!editingUser && (
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contraseña *
+            </label>
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Roles *
+          </label>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+            {ALL_ROLES.map((role) => (
+              <label key={role} className="flex items-center space-x-2">
+                <Checkbox
+                  checked={formData.roles.includes(role)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setFormData({
+                        ...formData,
+                        roles: [...formData.roles, role],
+                      });
+                    } else {
+                      setFormData({
+                        ...formData,
+                        roles: formData.roles.filter((r) => r !== role),
+                      });
+                    }
+                  }}
+                />
+                <span className="text-sm">{role.replace("_", " ")}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={
+              formData.roles.length === 0 ||
+              !formData.firstName ||
+              !formData.lastName ||
+              !formData.email ||
+              (!editingUser && !formData.password)
+            }
+          >
+            <Save className="w-4 h-4 mr-2" />
+            Guardar
+          </Button>
+        </div>
+      </SimpleModal>
+
+      {/* Modal de cambio de contraseña */}
+      <SimpleModal
+        isOpen={!!showPasswordModal}
+        onClose={() => {
+          setShowPasswordModal(null);
+          setPasswordData({ newPassword: "", confirmPassword: "" });
+        }}
+        title="Cambiar Contraseña"
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nueva Contraseña
+            </label>
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                value={passwordData.newPassword}
+                onChange={(e) =>
+                  setPasswordData({
+                    ...passwordData,
+                    newPassword: e.target.value,
+                  })
+                }
+                required
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Confirmar Contraseña
+            </label>
+            <Input
+              type="password"
+              value={passwordData.confirmPassword}
+              onChange={(e) =>
+                setPasswordData({
+                  ...passwordData,
+                  confirmPassword: e.target.value,
+                })
+              }
+              required
+            />
+          </div>
+        </div>
+        <div className="flex justify-end gap-3 mt-6">
+          <Button
+            variant="outline"
+            onClick={() => {
+              setShowPasswordModal(null);
+              setPasswordData({ newPassword: "", confirmPassword: "" });
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={() => handlePasswordChange(showPasswordModal)}
+            disabled={
+              !passwordData.newPassword || !passwordData.confirmPassword
+            }
+          >
+            Cambiar Contraseña
+          </Button>
+        </div>
+      </SimpleModal>
+
+      {/* Modal de confirmación de borrado */}
+      <SimpleModal
+        isOpen={!!showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(null)}
+        title="¿Eliminar Usuario?"
+        maxWidth="max-w-sm"
+      >
+        <p className="mb-6 text-gray-600">Esta acción no se puede deshacer.</p>
+        <div className="flex justify-end gap-3">
+          <Button variant="outline" onClick={() => setShowDeleteConfirm(null)}>
+            Cancelar
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleDelete(showDeleteConfirm)}
+          >
+            <Trash2 className="w-4 h-4 mr-2" />
+            Eliminar
+          </Button>
+        </div>
+      </SimpleModal>
+    </div>
+  );
+}

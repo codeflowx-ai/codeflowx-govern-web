@@ -1,0 +1,48 @@
+package com.codeflowx.govern.workflow.drools.aios.marketplace;
+
+import com.codeflowx.govern.workflow.drools.facts.MarketplacePublicationFact;
+
+global org.slf4j.Logger logger;
+
+rule "Marketplace Public"
+    ruleflow-group "ai-marketplace-publish"
+    when
+        $fact : MarketplacePublicationFact(
+            publicationDecision == null,
+            !criticalFindings(),
+            hasLegalApproval(),
+            safeScore() >= 85,
+            safeOpenIncidents() == 0
+        )
+    then
+        logger.info("🟢 [Drools] Componente {} → PUBLIC", $fact.getComponentId());
+        $fact.setPublicationDecision("PUBLIC");
+        $fact.setJustification("Score alto y sin findings críticos/incidentess");
+        update($fact);
+end
+
+rule "Marketplace Restricted"
+    ruleflow-group "ai-marketplace-publish"
+    when
+        $fact : MarketplacePublicationFact(
+            publicationDecision == null,
+            safeScore() >= 65,
+            hasLegalApproval() == true
+        )
+    then
+        logger.warn("🟡 [Drools] Componente {} → RESTRICTED", $fact.getComponentId());
+        $fact.setPublicationDecision("RESTRICTED");
+        $fact.setJustification("Score medio o incidentes abiertos, requiere controles adicionales");
+        update($fact);
+end
+
+rule "Marketplace Denied"
+    ruleflow-group "ai-marketplace-publish"
+    when
+        $fact : MarketplacePublicationFact(publicationDecision == null)
+    then
+        logger.error("🔴 [Drools] Componente {} → DENIED", $fact.getComponentId());
+        $fact.setPublicationDecision("DENIED");
+        $fact.setJustification("Certificaciones incompletas o hallazgos críticos");
+        update($fact);
+end

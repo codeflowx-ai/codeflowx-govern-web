@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="eu_database_registration_process" name="EU Database Registration (Art. 49)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event: Registration Required -->
+    <startEvent id="registrationRequiredStart" name="Registration Required">
+      <outgoing>flowToDetermineType</outgoing>
+    </startEvent>
+    
+    <!-- Service Task: Determine Registration Type -->
+    <serviceTask id="determineRegistrationType" name="Determine Registration Type (Annex VIII)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.DetermineRegistrationTypeDelegate">
+      <incoming>flowToDetermineType</incoming>
+      <outgoing>flowToTypeGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Registration Type? -->
+    <exclusiveGateway id="registrationTypeGateway" name="Registration Type?">
+      <incoming>flowToTypeGateway</incoming>
+      <outgoing>flowSectionA</outgoing>
+      <outgoing>flowSectionB</outgoing>
+      <outgoing>flowSectionC</outgoing>
+      <outgoing>flowMultiple</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Fill Registration Form (adaptado según sección) -->
+    <userTask id="fillRegistrationForm" name="Fill Registration Form (Annex VIII)" 
+              activiti:candidateGroups="compliance-officers,legal" 
+              activiti:formKey="eu-registration-form">
+      <incoming>flowSectionA</incoming>
+      <incoming>flowSectionB</incoming>
+      <incoming>flowSectionC</incoming>
+      <incoming>flowMultiple</incoming>
+      <incoming>flowRetryForm</incoming>
+      <outgoing>flowToValidate</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Validate Registration Data -->
+    <serviceTask id="validateRegistrationData" name="Validate Registration Data" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.ValidateRegistrationDataDelegate">
+      <incoming>flowToValidate</incoming>
+      <outgoing>flowToValidGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Valid? -->
+    <exclusiveGateway id="validGateway" name="Valid?">
+      <incoming>flowToValidGateway</incoming>
+      <outgoing>flowValid</outgoing>
+      <outgoing>flowInvalid</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Fix Validation Errors -->
+    <userTask id="fixValidationErrors" name="Fix Validation Errors" 
+              activiti:candidateGroups="compliance-officers" 
+              activiti:formKey="fix-validation-errors-form">
+      <incoming>flowInvalid</incoming>
+      <outgoing>flowRetryForm</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowRetryForm" sourceRef="fixValidationErrors" targetRef="fillRegistrationForm"></sequenceFlow>
+    
+    <!-- Service Task: Generate Registration Package -->
+    <serviceTask id="generateRegistrationPackage" name="Generate Registration Package" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.GenerateRegistrationPackageDelegate">
+      <incoming>flowValid</incoming>
+      <outgoing>flowToReviewPackage</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Review Registration Package -->
+    <userTask id="reviewRegistrationPackage" name="Review Registration Package" 
+              activiti:candidateGroups="compliance-officers,legal,management" 
+              activiti:formKey="review-registration-package-form">
+      <incoming>flowToReviewPackage</incoming>
+      <outgoing>flowToSubmitGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Submit? -->
+    <exclusiveGateway id="submitGateway" name="Submit?">
+      <incoming>flowToSubmitGateway</incoming>
+      <outgoing>flowSubmit</outgoing>
+      <outgoing>flowModify</outgoing>
+      <outgoing>flowCancelRegistration</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Loop: Modify -->
+    <sequenceFlow id="flowModify" name="Modify" sourceRef="submitGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'MODIFY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Registration Cancelled -->
+    <endEvent id="endRegistrationCancelled" name="Registration Cancelled">
+      <incoming>flowCancelRegistration</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancelRegistration" name="Cancel" sourceRef="submitGateway" targetRef="endRegistrationCancelled">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Submit to EU Database API -->
+    <serviceTask id="submitToEuDatabase" name="Submit to EU Database API (Art. 49)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.SubmitToEuDatabaseDelegate">
+      <incoming>flowSubmit</incoming>
+      <outgoing>flowToSuccessGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Submission Success? -->
+    <exclusiveGateway id="submissionSuccessGateway" name="Submission Success?">
+      <incoming>flowToSuccessGateway</incoming>
+      <outgoing>flowSuccess</outgoing>
+      <outgoing>flowFailure</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Update Project (Success) -->
+    <serviceTask id="updateProjectRegistration" name="Update Project Registration" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.UpdateProjectRegistrationDelegate">
+      <incoming>flowSuccess</incoming>
+      <outgoing>flowToEndSuccess</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Log Error & Retry -->
+    <serviceTask id="logErrorAndRetry" name="Log Error & Retry" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.euregistration.LogRegistrationErrorDelegate">
+      <incoming>flowFailure</incoming>
+      <outgoing>flowToRetryGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Retry? -->
+    <exclusiveGateway id="retryGateway" name="Retry?">
+      <incoming>flowToRetryGateway</incoming>
+      <outgoing>flowRetrySubmit</outgoing>
+      <outgoing>flowManualIntervention</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Loop: Retry submission (max 3 attempts) -->
+    <sequenceFlow id="flowRetrySubmit" name="Retry" sourceRef="retryGateway" targetRef="submitToEuDatabase">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retryAttempts < 3}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- User Task: Manual Resolution -->
+    <userTask id="manualResolution" name="Manual Resolution" 
+              activiti:candidateGroups="compliance-officers,tech-team" 
+              activiti:formKey="manual-resolution-form">
+      <incoming>flowManualIntervention</incoming>
+      <outgoing>flowToEndManual</outgoing>
+    </userTask>
+    
+    <sequenceFlow id="flowManualIntervention" name="Manual" sourceRef="retryGateway" targetRef="manualResolution">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${retryAttempts >= 3}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End Events -->
+    <endEvent id="endRegistrationComplete" name="Registration Complete">
+      <incoming>flowToEndSuccess</incoming>
+    </endEvent>
+    
+    <endEvent id="endManualResolution" name="Manual Intervention Required">
+      <incoming>flowToEndManual</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToDetermineType" sourceRef="registrationRequiredStart" targetRef="determineRegistrationType"></sequenceFlow>
+    <sequenceFlow id="flowToTypeGateway" sourceRef="determineRegistrationType" targetRef="registrationTypeGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSectionA" name="Section A (13 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_A'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowSectionB" name="Section B (9 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_B'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowSectionC" name="Section C (5 fields)" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'SECTION_C'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowMultiple" name="Multiple Sections" sourceRef="registrationTypeGateway" targetRef="fillRegistrationForm">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${registrationType == 'MULTIPLE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToValidate" sourceRef="fillRegistrationForm" targetRef="validateRegistrationData"></sequenceFlow>
+    <sequenceFlow id="flowToValidGateway" sourceRef="validateRegistrationData" targetRef="validGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowValid" name="Yes" sourceRef="validGateway" targetRef="generateRegistrationPackage">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationPassed == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowInvalid" name="No" sourceRef="validGateway" targetRef="fixValidationErrors">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationPassed == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToReviewPackage" sourceRef="generateRegistrationPackage" targetRef="reviewRegistrationPackage"></sequenceFlow>
+    <sequenceFlow id="flowToSubmitGateway" sourceRef="reviewRegistrationPackage" targetRef="submitGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSubmit" name="Submit" sourceRef="submitGateway" targetRef="submitToEuDatabase">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submitDecision == 'SUBMIT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToSuccessGateway" sourceRef="submitToEuDatabase" targetRef="submissionSuccessGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSuccess" name="Success" sourceRef="submissionSuccessGateway" targetRef="updateProjectRegistration">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submissionSuccess == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFailure" name="Failure" sourceRef="submissionSuccessGateway" targetRef="logErrorAndRetry">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${submissionSuccess == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToRetryGateway" sourceRef="logErrorAndRetry" targetRef="retryGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToEndSuccess" sourceRef="updateProjectRegistration" targetRef="endRegistrationComplete"></sequenceFlow>
+    <sequenceFlow id="flowToEndManual" sourceRef="manualResolution" targetRef="endManualResolution"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_eu_database_registration_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_eu_database_registration_process" bpmnElement="eu_database_registration_process">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

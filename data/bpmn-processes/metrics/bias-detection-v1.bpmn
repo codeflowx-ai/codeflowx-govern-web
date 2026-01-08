@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/test">
+  <process id="bias-detection-v1" name="Bias Detection V1" isExecutable="true" flowable:candidateStarterGroups="ml-engineers,data-scientists,governance-admins" version="1.0">
+    <startEvent id="startBiasDetection" name="Start Bias Detection"></startEvent>
+    <serviceTask id="prepareDemographicData" name="Prepare Demographic Data" flowable:delegateExpression="${prepareDemographicDataDelegate}"></serviceTask>
+    <serviceTask id="executeBiasDetection" name="Execute Bias Detection" flowable:delegateExpression="${executeBiasDetectionDelegate}"></serviceTask>
+    <businessRuleTask id="calculateBiasScore" name="Calculate Bias Score (Drools)" flowable:ruleVariablesInput="${biasDetectionFact}" flowable:resultVariable="biasResult"></businessRuleTask>
+    <exclusiveGateway id="biasDecisionGateway" name="Bias Decision Gateway"></exclusiveGateway>
+    <serviceTask id="autoApproveNoBias" name="Auto Approve (No Bias)" flowable:delegateExpression="${autoApproveNoBiasDelegate}"></serviceTask>
+    <userTask id="reviewDetectedBiases" name="Review Detected Biases" flowable:candidateGroups="ml-engineers,data-scientists,governance-admins" flowable:formKey="console/bpmn/bias-review-form.zul"></userTask>
+    <serviceTask id="rejectBiasedModel" name="Reject Biased Model" flowable:delegateExpression="${rejectBiasedModelDelegate}"></serviceTask>
+    <exclusiveGateway id="reviewerActionGateway" name="Reviewer Action Gateway"></exclusiveGateway>
+    <serviceTask id="acceptResidualRisk" name="Accept Residual Risk" flowable:delegateExpression="${acceptResidualRiskDelegate}"></serviceTask>
+    <serviceTask id="generateMitigationRecommendations" name="Generate Mitigation Recommendations" flowable:delegateExpression="${generateMitigationRecommendationsDelegate}"></serviceTask>
+    <serviceTask id="rejectModelForBias" name="Reject Model for Bias" flowable:delegateExpression="${rejectBiasedModelDelegate}"></serviceTask>
+    <serviceTask id="notifyBiasResults" name="Notify Bias Results" flowable:delegateExpression="${notifyBiasAnalysisDelegate}"></serviceTask>
+    <endEvent id="endBiasDetection" name="End Bias Detection"></endEvent>
+    <boundaryEvent id="biasReviewTimer" name="Bias Review Timer (24h)" attachedToRef="reviewDetectedBiases" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P1D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="biasUrgentDecision" name="URGENT: Bias Decision (SLA)" flowable:candidateGroups="governance-leads,ml-leads" flowable:formKey="console/bpmn/bias-urgent-decision-form.zul" flowable:priority="95"></userTask>
+    <sequenceFlow id="flow1" sourceRef="startBiasDetection" targetRef="prepareDemographicData"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="prepareDemographicData" targetRef="executeBiasDetection"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="executeBiasDetection" targetRef="calculateBiasScore"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="calculateBiasScore" targetRef="biasDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow5" name="NO_BIAS" sourceRef="biasDecisionGateway" targetRef="autoApproveNoBias">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${biasResult.decision == 'NO_BIAS'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" name="BIAS_DETECTED" sourceRef="biasDecisionGateway" targetRef="reviewDetectedBiases">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${biasResult.decision == 'BIAS_DETECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="CRITICAL_BIAS" sourceRef="biasDecisionGateway" targetRef="rejectBiasedModel">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${biasResult.decision == 'CRITICAL_BIAS'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="autoApproveNoBias" targetRef="notifyBiasResults"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="reviewDetectedBiases" targetRef="reviewerActionGateway"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="rejectBiasedModel" targetRef="endBiasDetection"></sequenceFlow>
+    <sequenceFlow id="flow11" name="ACCEPT_RISK" sourceRef="reviewerActionGateway" targetRef="acceptResidualRisk">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 'accept' || action == 'ACCEPT_RISK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" name="MITIGATE" sourceRef="reviewerActionGateway" targetRef="generateMitigationRecommendations">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 'mitigate' || action == 'MITIGATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" name="REJECT" sourceRef="reviewerActionGateway" targetRef="rejectModelForBias">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action == 'reject' || action == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="acceptResidualRisk" targetRef="notifyBiasResults"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="generateMitigationRecommendations" targetRef="notifyBiasResults"></sequenceFlow>
+    <sequenceFlow id="flow19" sourceRef="rejectModelForBias" targetRef="endBiasDetection"></sequenceFlow>
+    <sequenceFlow id="flow20" sourceRef="notifyBiasResults" targetRef="endBiasDetection"></sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="biasReviewTimer" targetRef="biasUrgentDecision"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="biasUrgentDecision" targetRef="reviewerActionGateway"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_bias-detection-v1">
+    <bpmndi:BPMNPlane bpmnElement="bias-detection-v1" id="BPMNPlane_bias-detection-v1">
+      <bpmndi:BPMNShape bpmnElement="startBiasDetection" id="BPMNShape_startBiasDetection">
+        <omgdc:Bounds height="35.0" width="35.0" x="120.0" y="305.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="prepareDemographicData" id="BPMNShape_prepareDemographicData">
+        <omgdc:Bounds height="80.0" width="100.0" x="220.0" y="282.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="executeBiasDetection" id="BPMNShape_executeBiasDetection">
+        <omgdc:Bounds height="80.0" width="100.0" x="380.0" y="282.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="calculateBiasScore" id="BPMNShape_calculateBiasScore">
+        <omgdc:Bounds height="80.0" width="100.0" x="540.0" y="282.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="biasDecisionGateway" id="BPMNShape_biasDecisionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="720.0" y="292.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="autoApproveNoBias" id="BPMNShape_autoApproveNoBias">
+        <omgdc:Bounds height="80.0" width="100.0" x="790.0" y="148.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewDetectedBiases" id="BPMNShape_reviewDetectedBiases">
+        <omgdc:Bounds height="80.0" width="100.0" x="893.0" y="273.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="biasReviewTimer" id="BPMNShape_biasReviewTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="941.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectBiasedModel" id="BPMNShape_rejectBiasedModel">
+        <omgdc:Bounds height="80.0" width="100.0" x="841.0" y="484.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewerActionGateway" id="BPMNShape_reviewerActionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1119.0" y="282.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="acceptResidualRisk" id="BPMNShape_acceptResidualRisk">
+        <omgdc:Bounds height="80.0" width="100.0" x="1280.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="generateMitigationRecommendations" id="BPMNShape_generateMitigationRecommendations">
+        <omgdc:Bounds height="88.0" width="121.0" x="1320.0" y="279.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rejectModelForBias" id="BPMNShape_rejectModelForBias">
+        <omgdc:Bounds height="80.0" width="100.0" x="1331.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notifyBiasResults" id="BPMNShape_notifyBiasResults">
+        <omgdc:Bounds height="80.0" width="100.0" x="1510.0" y="227.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endBiasDetection" id="BPMNShape_endBiasDetection">
+        <omgdc:Bounds height="35.0" width="35.0" x="1720.0" y="442.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="biasUrgentDecision" id="BPMNShape_biasUrgentDecision">
+        <omgdc:Bounds height="80.0" width="100.0" x="921.0" y="48.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="155.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="322.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="320.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="322.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="480.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="322.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="640.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="720.0" y="312.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="740.0" y="292.0"></omgdi:waypoint>
+        <omgdi:waypoint x="739.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="790.0" y="188.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="740.0" y="246.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="760.0" y="312.0"></omgdi:waypoint>
+        <omgdi:waypoint x="893.0" y="313.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="769.0" y="314.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="740.0" y="332.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="523.0"></omgdi:waypoint>
+        <omgdi:waypoint x="841.0" y="524.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="739.0" y="410.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="890.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1559.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1560.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="993.0" y="313.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1119.0" y="302.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="941.0" y="524.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1737.0" y="524.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1737.0" y="477.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="1139.0" y="282.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1227.0" y="222.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1330.0" y="160.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1212.0" y="226.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="1159.0" y="302.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1320.0" y="323.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1181.0" y="327.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="1139.0" y="322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1139.0" y="450.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1331.0" y="460.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="1159.0" y="419.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="1330.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1560.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="1441.0" y="323.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1560.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="1431.0" y="460.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1720.0" y="459.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="1610.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1737.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1737.0" y="442.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="956.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="971.0" y="128.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="1021.0" y="88.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1139.0" y="88.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1139.0" y="282.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

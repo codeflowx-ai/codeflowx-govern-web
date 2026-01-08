@@ -1,0 +1,46 @@
+package com.codeflowx.govern.workflow.drools.aios.external;
+
+import com.codeflowx.govern.workflow.drools.facts.ExternalModelApprovalFact;
+
+global org.slf4j.Logger logger;
+
+rule "External Approve"
+    ruleflow-group "external-model-approval"
+    when
+        $fact : ExternalModelApprovalFact(
+            decision == null,
+            !"CRITICAL".equals(riskLevel),
+            safeDocumentationScore() >= 85,
+            (needsFria() == false || isFriaCompleted() == true)
+        )
+    then
+        logger.info("🟢 [Drools] External model {} approved", $fact.getExternalModelId());
+        $fact.setDecision("APPROVE");
+        $fact.setJustification("Documento técnico completo y riesgo controlado");
+        update($fact);
+end
+
+rule "External Conditional"
+    ruleflow-group "external-model-approval"
+    when
+        $fact : ExternalModelApprovalFact(
+            decision == null,
+            safeDocumentationScore() >= 70
+        )
+    then
+        logger.warn("🟡 [Drools] External model {} conditional", $fact.getExternalModelId());
+        $fact.setDecision("CONDITIONAL");
+        $fact.setJustification("Requiere revisión humana o completar FRIA");
+        update($fact);
+end
+
+rule "External Reject"
+    ruleflow-group "external-model-approval"
+    when
+        $fact : ExternalModelApprovalFact(decision == null)
+    then
+        logger.error("🔴 [Drools] External model {} rejected", $fact.getExternalModelId());
+        $fact.setDecision("REJECT");
+        $fact.setJustification("Riesgo crítico o documentación insuficiente");
+        update($fact);
+end

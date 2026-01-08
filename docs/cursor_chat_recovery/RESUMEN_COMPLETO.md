@@ -1,0 +1,352 @@
+﻿# Resumen Completo de Recuperacion de Chats/Agentes de Cursor
+
+## Fecha de exportacion: 2025-12-26 19:06:47
+
+## Total de Workspaces Exportados: 4
+
+### Workspace: 1766771161540
+- **Conversaciones/Composers**: 2
+- **Checkpoints**: 0
+- **Ubicacion**: $(1766771161540.FullName)
+
+### Workspace: 339b1d28ceef130c67a12d8146b259d9
+- **Conversaciones/Composers**: 29
+- **Checkpoints**: 54
+- **Ubicacion**: $(339b1d28ceef130c67a12d8146b259d9.FullName)
+
+### Workspace: bef7dc40111986446ddc3f799b7f9f22
+- **Conversaciones/Composers**: 6
+- **Checkpoints**: 12
+- **Ubicacion**: $(bef7dc40111986446ddc3f799b7f9f22.FullName)
+
+### Workspace: c4fe996a1d7dd8f9753e6d31b77c68a5
+- **Conversaciones/Composers**: 3
+- **Checkpoints**: 0
+- **Ubicacion**: $(c4fe996a1d7dd8f9753e6d31b77c68a5.FullName)
+
+## Totales Generales
+- **Total Conversaciones**: 40
+- **Total Checkpoints**: 66
+
+## Lista Completa de Conversaciones
+- **** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: chat
+  - Creada: 2025-12-09 13:24:24
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **** (Workspace: c4fe996a1d7dd8f9753e6d31b77c68a5)
+  - Modo: chat
+  - Creada: 2025-12-18 10:26:34
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **** (Workspace: c4fe996a1d7dd8f9753e6d31b77c68a5)
+  - Modo: agent
+  - Creada: 2025-12-23 18:08:07
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: chat
+  - Creada: 2025-12-23 18:10:31
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **** (Workspace: 1766771161540)
+  - Modo: chat
+  - Creada: 2025-12-26 18:46:02
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **** (Workspace: 1766771161540)
+  - Modo: agent
+  - Creada: 2025-12-26 18:46:02
+  - Ultima actualizacion: N/A
+  - Archivos modificados: 
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: 
+- **RecuperaciÃ³n de chats de agentes** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: agent
+  - Creada: 2025-12-26 18:51:50
+  - Ultima actualizacion: 2025-12-26 19:05:20
+  - Archivos modificados: 2
+  - Lineas agregadas: 122
+  - Lineas eliminadas: 2
+  - Subtitulo: export_all_workspaces.ps1, export_from_cursor_storage.js
+- **Projects module functional review** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: agent
+  - Creada: 2025-12-24 11:32:03
+  - Ultima actualizacion: 2025-12-24 12:01:13
+  - Archivos modificados: 1
+  - Lineas agregadas: 196
+  - Lineas eliminadas: 0
+  - Subtitulo: GUIA_DESARROLLO_PROJECTS_FULLSTACK.md
+- **IdentificaciÃ³n de un prompt** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: agent
+  - Creada: 2025-12-23 19:25:45
+  - Ultima actualizacion: 2025-12-24 11:09:52
+  - Archivos modificados: 4
+  - Lineas agregadas: 708
+  - Lineas eliminadas: 0
+  - Subtitulo: PROMPT_AGENTE_EVOLUCION_MODULO_AGENTES.md
+- **Governance document as prompt** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: agent
+  - Creada: 2025-12-23 19:43:12
+  - Ultima actualizacion: 2025-12-24 11:09:12
+  - Archivos modificados: 9
+  - Lineas agregadas: 590
+  - Lineas eliminadas: 3
+  - Subtitulo: DEVELOPER_GUIDE_BACKEND_PROMPTS.md, DEVELOPER_GUIDE_FRONTEND_PROMPTS.md, Prompt.java, PromptDto.java, PromptController.java
+- **Conversaciones no encontradas en workspace** (Workspace: bef7dc40111986446ddc3f799b7f9f22)
+  - Modo: agent
+  - Creada: 2025-12-23 18:10:31
+  - Ultima actualizacion: 2025-12-24 10:20:13
+  - Archivos modificados: 4
+  - Lineas agregadas: 633
+  - Lineas eliminadas: 0
+  - Subtitulo: PROMPT_MANTENIMIENTO_EVOLUCION_MODELS.md
+- **Gobierno de IA en Codeflowx** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-21 16:56:13
+  - Ultima actualizacion: 2025-12-21 19:26:38
+  - Archivos modificados: 1
+  - Lineas agregadas: 27
+  - Lineas eliminadas: 1
+  - Subtitulo: speech_gobierno_ia.txt
+- **Eliina de las** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-20 17:34:46
+  - Ultima actualizacion: 2025-12-20 17:49:40
+  - Archivos modificados: 4
+  - Lineas agregadas: 3
+  - Lineas eliminadas: 22
+  - Subtitulo: page.tsx, modules.ts, page.tsx, page.tsx
+- **FRONT_BACK_RAG** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-12 14:30:06
+  - Ultima actualizacion: 2025-12-20 17:30:43
+  - Archivos modificados: 24
+  - Lineas agregadas: 7198
+  - Lineas eliminadas: 472
+  - Subtitulo: odsImpactService.ts, telemetryService.ts, governanceService.ts, mock.ts, route.ts
+- **END_FRONT_BACK_DATASET** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 10:08:35
+  - Ultima actualizacion: 2025-12-20 10:07:07
+  - Archivos modificados: 186
+  - Lineas agregadas: 42848
+  - Lineas eliminadas: 507
+  - Subtitulo: GUIA_MICROSERVICIOS_PYTHON.md, GUIA_DESARROLLO_FRONTEND.md, GUIA_DESARROLLO_NEGOCIO.md, GUIA_INTEGRACION_CONECTORES.md, GUIA_PROCESOS_BPMN.md
+- **Prompt sistema experimentos runs** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 07:25:13
+  - Ultima actualizacion: 2025-12-20 01:18:29
+  - Archivos modificados: 47
+  - Lineas agregadas: 13203
+  - Lineas eliminadas: 350
+  - Subtitulo: GUIA_IMPLEMENTACION_MICROSERVICIOS_PYTHON.md, GUIA_FUNCIONAL_TESTING.md, IMPLEMENTACION_AB_TEST_LLM_JUDGE.md, GovernanceTestingController.java, ABTestExecutionService.java
+- **BPMN designer functional prompt** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 08:46:48
+  - Ultima actualizacion: 2025-12-19 21:31:21
+  - Archivos modificados: 46
+  - Lineas agregadas: 10678
+  - Lineas eliminadas: 112
+  - Subtitulo: page.tsx, bpmn-styles.css, add-di-to-bpmn.js, package.json, add-di-to-bpmn-missing.js
+- **Documentos FAAS en codeflowx-govern-web** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-19 12:06:23
+  - Ultima actualizacion: 2025-12-19 13:06:53
+  - Archivos modificados: 2
+  - Lineas agregadas: 386
+  - Lineas eliminadas: 50
+  - Subtitulo: ARQUITECTURA_FRAMEWORKS_MODULARES.md, COMO_FUNCIONA_FAAS.md
+- **FRONT_BACK_AGENTES** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 19:04:50
+  - Ultima actualizacion: 2025-12-19 11:46:33
+  - Archivos modificados: 130
+  - Lineas agregadas: 35428
+  - Lineas eliminadas: 1015
+  - Subtitulo: ConfigurationTab.tsx, route.ts, AgentController.java, AgentServiceImpl.java, AgentService.java
+- **Errores del proyecto antes del build** (Workspace: c4fe996a1d7dd8f9753e6d31b77c68a5)
+  - Modo: agent
+  - Creada: 2025-12-18 10:26:34
+  - Ultima actualizacion: 2025-12-19 09:39:28
+  - Archivos modificados: 26
+  - Lineas agregadas: 917
+  - Lineas eliminadas: 100
+  - Subtitulo: page.tsx, page.tsx, page.tsx, tsconfig.json, BUILD-README.md
+- **DevOps and developer page configuration** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-17 08:31:19
+  - Ultima actualizacion: 2025-12-18 10:32:16
+  - Archivos modificados: 23
+  - Lineas agregadas: 1518
+  - Lineas eliminadas: 1263
+  - Subtitulo: codemirror-extensions.tsx, page-xml-generator.ts, page.tsx, tsconfig.json, page.tsx
+- **END_FRONT_BACK_MODELS** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 19:06:47
+  - Ultima actualizacion: 2025-12-17 12:26:38
+  - Archivos modificados: 96
+  - Lineas agregadas: 23875
+  - Lineas eliminadas: 103015
+  - Subtitulo: modules.ts, respuestas.md, page.tsx, tabs.tsx, page.tsx
+- **FRONT_BACK_SERVING** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 19:51:29
+  - Ultima actualizacion: 2025-12-17 11:38:31
+  - Archivos modificados: 6
+  - Lineas agregadas: 2867
+  - Lineas eliminadas: 122
+  - Subtitulo: modules.ts, page.tsx, page.tsx, page.tsx, GUIA_FUNCIONAL_SERVING.md
+- **FRONT_BACK_INFRAESTRUCTURA** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 19:52:39
+  - Ultima actualizacion: 2025-12-17 11:36:08
+  - Archivos modificados: 41
+  - Lineas agregadas: 2548
+  - Lineas eliminadas: 226
+  - Subtitulo: page.tsx, page.tsx, page.tsx, page.tsx, page.tsx
+- **FRONT_BACK_ANALITICA** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 20:38:26
+  - Ultima actualizacion: 2025-12-17 11:24:43
+  - Archivos modificados: 9
+  - Lineas agregadas: 2861
+  - Lineas eliminadas: 162
+  - Subtitulo: page.tsx, page.tsx, modules.ts, page.tsx, page.tsx
+- **FRONT_BACK_MONITORIZACION** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 20:37:06
+  - Ultima actualizacion: 2025-12-17 11:22:50
+  - Archivos modificados: 8
+  - Lineas agregadas: 3204
+  - Lineas eliminadas: 144
+  - Subtitulo: page.tsx, modules.ts, page.tsx, page.tsx, page.tsx
+- **Prompt de estado de formularios BPMN** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 08:36:24
+  - Ultima actualizacion: 2025-12-16 23:54:24
+  - Archivos modificados: 12
+  - Lineas agregadas: 4013
+  - Lineas eliminadas: 164
+  - Subtitulo: bpmn-forms.ts, page.tsx, page.tsx, page.tsx, modules.ts
+- **FRONT_BACK_GOVERNANZA** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 17:24:18
+  - Ultima actualizacion: 2025-12-16 23:43:20
+  - Archivos modificados: 10
+  - Lineas agregadas: 364
+  - Lineas eliminadas: 134
+  - Subtitulo: modules.ts, page.tsx, page.tsx, page.tsx, page.tsx
+- **FRONT_BACK_PROJECTS** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-14 10:04:01
+  - Ultima actualizacion: 2025-12-16 20:39:53
+  - Archivos modificados: 28
+  - Lineas agregadas: 8310
+  - Lineas eliminadas: 554
+  - Subtitulo: page.tsx, page.tsx, page.tsx, page.tsx, page.tsx
+- **Prompt de editor de reglas Drools** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 08:53:52
+  - Ultima actualizacion: 2025-12-16 15:47:22
+  - Archivos modificados: 37
+  - Lineas agregadas: 4213
+  - Lineas eliminadas: 99
+  - Subtitulo: RuleTester.tsx, fieldExtractor.ts, page.tsx, AppLayout.tsx, toast.tsx
+- **Parameter configuration implementation** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 11:35:41
+  - Ultima actualizacion: 2025-12-16 14:01:06
+  - Archivos modificados: 25
+  - Lineas agregadas: 2928
+  - Lineas eliminadas: 23
+  - Subtitulo: ParameterForm.tsx, modules.ts, page.tsx, ParameterValidation.tsx, JSONEditor.tsx
+- **END_FRONT_BACKEND_PROMPT** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 17:40:23
+  - Ultima actualizacion: 2025-12-16 08:58:54
+  - Archivos modificados: 25
+  - Lineas agregadas: 9348
+  - Lineas eliminadas: 17796
+  - Subtitulo: page.tsx, page.tsx, page.tsx, page.tsx, page.tsx
+- **Documentos relacionados con bpmn** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-16 08:10:11
+  - Ultima actualizacion: 2025-12-16 08:51:25
+  - Archivos modificados: 4
+  - Lineas agregadas: 2532
+  - Lineas eliminadas: 9
+  - Subtitulo: PROMPT_DROOLS_RULES_EDITOR.md, PROMPT_BPMN_DESIGNER_FUNCIONAL.md, ESTADO_FORMULARIOS_BPMN_MIGRACION.md, BPMN_FORM_MIGRATION.md
+- **CompilaciÃ³n de codeflowx-docs-portal** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-15 13:56:52
+  - Ultima actualizacion: 2025-12-15 14:08:32
+  - Archivos modificados: 3
+  - Lineas agregadas: 61
+  - Lineas eliminadas: 59
+  - Subtitulo: login.tsx, home.tsx, index.tsx
+- **DiseÃ±o de integraciones de proveedores externos** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-15 08:23:47
+  - Ultima actualizacion: 2025-12-15 11:39:39
+  - Archivos modificados: 82
+  - Lineas agregadas: 14103
+  - Lineas eliminadas: 80
+  - Subtitulo: GUIA_FUNCIONAL_INTEGRACIONES.md, pom.xml, ZendeskIntegrationProvider.java, pom.xml, FreshserviceIntegrationProvider.java
+- **END_PROMPT_TELEMETRIA** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 20:15:23
+  - Ultima actualizacion: 2025-12-13 19:20:56
+  - Archivos modificados: 51
+  - Lineas agregadas: 9253
+  - Lineas eliminadas: 91
+  - Subtitulo: DEVELOPER_GUIDE_FRONTEND_TELEMETRIA.md, DEVELOPER_GUIDE_BACKEND_TELEMETRIA.md, GUIA_USO_PANTALLAS_TELEMETRIA.md, GUIA_FUNCIONAL_TELEMETRIA.md, RealtimeGovernanceServiceImpl.java
+- **Inicio de la aplicaciÃ³n** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-13 11:47:23
+  - Ultima actualizacion: 2025-12-13 11:52:46
+  - Archivos modificados: 0
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: Read next.config.js, hs_err_pid39752.log, package.json
+- **EvaluaciÃ³n ODS con plataforma de cumplimiento** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 21:07:24
+  - Ultima actualizacion: 2025-12-12 17:06:28
+  - Archivos modificados: 71
+  - Lineas agregadas: 15991
+  - Lineas eliminadas: 186
+  - Subtitulo: application.yml, ResilienceConfig.java, ODSImpactServiceImpl.java, ODSImpactService.java, ODSImpactController.java
+- **Buscar documentaciÃ³n de faas y prompts** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-10 21:28:15
+  - Ultima actualizacion: 2025-12-10 21:30:43
+  - Archivos modificados: 0
+  - Lineas agregadas: 0
+  - Lineas eliminadas: 0
+  - Subtitulo: Read CASOS_USO_EU_AI_ACT_GUIA_SECTORIAL.md, PROMPT_COMPLIANCE_SECTOR.md, COMO_FUNCIONA_FAAS.md, PROMPTS_FAAS_METRICAS_UI.md, PROMPTS_FAAS_MICROS.md
+- **Instalar dependencias del proyecto** (Workspace: 339b1d28ceef130c67a12d8146b259d9)
+  - Modo: agent
+  - Creada: 2025-12-09 13:24:24
+  - Ultima actualizacion: 2025-12-10 17:14:04
+  - Archivos modificados: 1
+  - Lineas agregadas: 4
+  - Lineas eliminadas: 1
+  - Subtitulo: start-dev.ps1
+

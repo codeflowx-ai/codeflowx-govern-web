@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://codeflowx.com/govern/conformity">
+
+  <process id="internal-conformity-assessment-v1" name="Internal Conformity Assessment (AI Act Annex VI)" isExecutable="true" version="1.0">
+
+    <!-- Start Event -->
+    <startEvent id="startConformityAssessment" name="Start Conformity Assessment">
+      <outgoing>flowToRiskVerify</outgoing>
+    </startEvent>
+
+    <!-- Article 9: Risk Management -->
+    <serviceTask id="verifyRiskManagement" name="Verify Risk Management (Art. 9)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyRiskManagementDelegate">
+      <incoming>flowToRiskVerify</incoming>
+      <outgoing>flowToDataGov</outgoing>
+    </serviceTask>
+
+    <!-- Article 10: Data Governance -->
+    <serviceTask id="verifyDataGovernance" name="Verify Data Governance (Art. 10)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyDataGovernanceDelegate">
+      <incoming>flowToDataGov</incoming>
+      <outgoing>flowToDocumentation</outgoing>
+    </serviceTask>
+
+    <!-- Article 11: Technical Documentation -->
+    <serviceTask id="verifyDocumentation" name="Verify Technical Documentation (Art. 11)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyDocumentationDelegate">
+      <incoming>flowToDocumentation</incoming>
+      <outgoing>flowToRecordKeeping</outgoing>
+    </serviceTask>
+
+    <!-- Article 12: Record Keeping -->
+    <serviceTask id="verifyRecordKeeping" name="Verify Record-Keeping (Art. 12)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyRecordKeepingDelegate">
+      <incoming>flowToRecordKeeping</incoming>
+      <outgoing>flowToTransparency</outgoing>
+    </serviceTask>
+
+    <!-- Article 13: Transparency -->
+    <serviceTask id="verifyTransparency" name="Verify Transparency (Art. 13)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyTransparencyDelegate">
+      <incoming>flowToTransparency</incoming>
+      <outgoing>flowToHumanOversight</outgoing>
+    </serviceTask>
+
+    <!-- Article 14: Human Oversight -->
+    <serviceTask id="verifyHumanOversight" name="Verify Human Oversight (Art. 14)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyHumanOversightDelegate">
+      <incoming>flowToHumanOversight</incoming>
+      <outgoing>flowToAccuracy</outgoing>
+    </serviceTask>
+
+    <!-- Article 15: Accuracy & Robustness -->
+    <serviceTask id="verifyAccuracy" name="Verify Accuracy &amp; Robustness (Art. 15)"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyAccuracyDelegate">
+      <incoming>flowToAccuracy</incoming>
+      <outgoing>flowToCalculateScore</outgoing>
+    </serviceTask>
+
+    <!-- Business Rule Task: Calculate Compliance Score -->
+    <businessRuleTask id="calculateComplianceScore" name="Calculate Compliance Score (Drools)"
+                      flowable:ruleVariablesInput="${conformityAssessmentFact}"
+                      flowable:rules="conformity-assessment-scoring.drl">
+      <incoming>flowToCalculateScore</incoming>
+      <outgoing>flowToComplianceGateway</outgoing>
+    </businessRuleTask>
+
+    <!-- Gateway: Check if compliance passed -->
+    <exclusiveGateway id="compliancePassGateway" name="Compliance Passed?">
+      <incoming>flowToComplianceGateway</incoming>
+      <outgoing>flowPassed</outgoing>
+      <outgoing>flowFailed</outgoing>
+    </exclusiveGateway>
+
+    <!-- User Task: Human Review (for failed compliance) -->
+    <userTask id="humanReview" name="Human Review Required"
+              flowable:candidateGroups="compliance-officers"
+              flowable:formKey="conformity-review-form">
+      <incoming>flowFailed</incoming>
+      <outgoing>flowReviewDecision</outgoing>
+    </userTask>
+
+    <!-- Gateway: Review Decision -->
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision?">
+      <incoming>flowReviewDecision</incoming>
+      <outgoing>flowApproved</outgoing>
+      <outgoing>flowRejected</outgoing>
+    </exclusiveGateway>
+
+    <!-- Service Task: Generate Declaration (for passed/approved) -->
+    <serviceTask id="generateDeclaration" name="Generate Conformity Declaration"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.GenerateDeclarationDelegate">
+      <incoming>flowPassed</incoming>
+      <incoming>flowApproved</incoming>
+      <outgoing>flowToIssueDeclaration</outgoing>
+    </serviceTask>
+
+    <!-- Service Task: Issue Declaration -->
+    <serviceTask id="issueDeclaration" name="Issue Declaration"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.IssueDeclarationDelegate">
+      <incoming>flowToIssueDeclaration</incoming>
+      <outgoing>flowToEndSuccess</outgoing>
+    </serviceTask>
+
+    <!-- Service Task: Reject Assessment -->
+    <serviceTask id="rejectAssessment" name="Reject Assessment"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.RejectAssessmentDelegate">
+      <incoming>flowRejected</incoming>
+      <outgoing>flowToEndRejected</outgoing>
+    </serviceTask>
+
+    <!-- End Events -->
+    <endEvent id="assessmentCompleted" name="Assessment Completed">
+      <incoming>flowToEndSuccess</incoming>
+    </endEvent>
+
+    <endEvent id="assessmentRejected" name="Assessment Rejected">
+      <incoming>flowToEndRejected</incoming>
+    </endEvent>
+
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToRiskVerify" sourceRef="startConformityAssessment" targetRef="verifyRiskManagement"/>
+    <sequenceFlow id="flowToDataGov" sourceRef="verifyRiskManagement" targetRef="verifyDataGovernance"/>
+    <sequenceFlow id="flowToDocumentation" sourceRef="verifyDataGovernance" targetRef="verifyDocumentation"/>
+    <sequenceFlow id="flowToRecordKeeping" sourceRef="verifyDocumentation" targetRef="verifyRecordKeeping"/>
+    <sequenceFlow id="flowToTransparency" sourceRef="verifyRecordKeeping" targetRef="verifyTransparency"/>
+    <sequenceFlow id="flowToHumanOversight" sourceRef="verifyTransparency" targetRef="verifyHumanOversight"/>
+    <sequenceFlow id="flowToAccuracy" sourceRef="verifyHumanOversight" targetRef="verifyAccuracy"/>
+    <sequenceFlow id="flowToCalculateScore" sourceRef="verifyAccuracy" targetRef="calculateComplianceScore"/>
+    <sequenceFlow id="flowToComplianceGateway" sourceRef="calculateComplianceScore" targetRef="compliancePassGateway"/>
+
+    <sequenceFlow id="flowPassed" name="Pass (>=90%)" sourceRef="compliancePassGateway" targetRef="generateDeclaration">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${overallComplianceScore >= 90}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowFailed" name="Fail (<90%)" sourceRef="compliancePassGateway" targetRef="humanReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${overallComplianceScore < 90}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowReviewDecision" sourceRef="humanReview" targetRef="reviewDecisionGateway"/>
+
+    <sequenceFlow id="flowApproved" name="Approved" sourceRef="reviewDecisionGateway" targetRef="generateDeclaration">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'APPROVED'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowRejected" name="Rejected" sourceRef="reviewDecisionGateway" targetRef="rejectAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'REJECTED'}]]></conditionExpression>
+    </sequenceFlow>
+
+    <sequenceFlow id="flowToIssueDeclaration" sourceRef="generateDeclaration" targetRef="issueDeclaration"/>
+    <sequenceFlow id="flowToEndSuccess" sourceRef="issueDeclaration" targetRef="assessmentCompleted"/>
+    <sequenceFlow id="flowToEndRejected" sourceRef="rejectAssessment" targetRef="assessmentRejected"/>
+
+  </process>
+
+  <!-- BPMN Diagram (visual representation) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_internal-conformity-assessment-v1">
+    <bpmndi:BPMNPlane bpmnElement="internal-conformity-assessment-v1" id="BPMNPlane_internal-conformity-assessment-v1">
+      <bpmndi:BPMNShape id="BPMNShape_startConformityAssessment" bpmnElement="startConformityAssessment">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyRiskManagement" bpmnElement="verifyRiskManagement">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyDataGovernance" bpmnElement="verifyDataGovernance">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyDocumentation" bpmnElement="verifyDocumentation">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyRecordKeeping" bpmnElement="verifyRecordKeeping">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyTransparency" bpmnElement="verifyTransparency">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyHumanOversight" bpmnElement="verifyHumanOversight">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyAccuracy" bpmnElement="verifyAccuracy">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_calculateComplianceScore" bpmnElement="calculateComplianceScore">
+        <omgdc:Bounds x="145" y="1500" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_compliancePassGateway" bpmnElement="compliancePassGateway">
+        <omgdc:Bounds x="175" y="1695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_humanReview" bpmnElement="humanReview">
+        <omgdc:Bounds x="150" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewDecisionGateway" bpmnElement="reviewDecisionGateway">
+        <omgdc:Bounds x="175" y="2055" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateDeclaration" bpmnElement="generateDeclaration">
+        <omgdc:Bounds x="150" y="2220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_issueDeclaration" bpmnElement="issueDeclaration">
+        <omgdc:Bounds x="150" y="2400" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rejectAssessment" bpmnElement="rejectAssessment">
+        <omgdc:Bounds x="350" y="2220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assessmentCompleted" bpmnElement="assessmentCompleted">
+        <omgdc:Bounds x="182" y="2602" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assessmentRejected" bpmnElement="assessmentRejected">
+        <omgdc:Bounds x="382" y="2422" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRiskVerify" bpmnElement="flowToRiskVerify">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDataGov" bpmnElement="flowToDataGov">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDocumentation" bpmnElement="flowToDocumentation">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRecordKeeping" bpmnElement="flowToRecordKeeping">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToTransparency" bpmnElement="flowToTransparency">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToHumanOversight" bpmnElement="flowToHumanOversight">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToAccuracy" bpmnElement="flowToAccuracy">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToCalculateScore" bpmnElement="flowToCalculateScore">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="145" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToComplianceGateway" bpmnElement="flowToComplianceGateway">
+        <omgdi:waypoint x="255" y="1540" />
+        <omgdi:waypoint x="175" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFailed" bpmnElement="flowFailed">
+        <omgdi:waypoint x="225" y="1720" />
+        <omgdi:waypoint x="150" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReviewDecision" bpmnElement="flowReviewDecision">
+        <omgdi:waypoint x="250" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproved" bpmnElement="flowApproved">
+        <omgdi:waypoint x="225" y="2080" />
+        <omgdi:waypoint x="150" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejected" bpmnElement="flowRejected">
+        <omgdi:waypoint x="225" y="2080" />
+        <omgdi:waypoint x="350" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToIssueDeclaration" bpmnElement="flowToIssueDeclaration">
+        <omgdi:waypoint x="250" y="2260" />
+        <omgdi:waypoint x="150" y="2440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndSuccess" bpmnElement="flowToEndSuccess">
+        <omgdi:waypoint x="250" y="2440" />
+        <omgdi:waypoint x="182" y="2620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndRejected" bpmnElement="flowToEndRejected">
+        <omgdi:waypoint x="450" y="2260" />
+        <omgdi:waypoint x="382" y="2440" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>

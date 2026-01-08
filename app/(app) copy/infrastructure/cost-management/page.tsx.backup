@@ -1,0 +1,1133 @@
+"use client";
+
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card";
+import DevelopmentBanner from "@/components/ui/development-banner";
+import { Input } from "@/components/ui/input";
+import { SimpleModal } from "@/components/ui/SimpleModal";
+import {
+    AlertTriangle,
+    BarChart3,
+    Cloud,
+    DollarSign,
+    Download,
+    Plus,
+    Search,
+    TrendingDown,
+    TrendingUp,
+} from "lucide-react";
+import { useState } from "react";
+
+interface CostBreakdown {
+  id: number;
+  provider: string;
+  service: string;
+  resourceType: string;
+  region: string;
+  costPerHour: number;
+  costPerDay: number;
+  costPerMonth: number;
+  usageHours: number;
+  totalCost: number;
+  budget: number;
+  overBudget: boolean;
+  costTrend: "increasing" | "decreasing" | "stable";
+  lastUpdated: string;
+}
+
+interface CostAlert {
+  id: number;
+  name: string;
+  type:
+    | "budget_exceeded"
+    | "unusual_spike"
+    | "idle_resource"
+    | "cost_optimization";
+  severity: "low" | "medium" | "high" | "critical";
+  message: string;
+  resource: string;
+  currentCost: number;
+  threshold: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+interface CostOptimization {
+  id: number;
+  title: string;
+  description: string;
+  potentialSavings: number;
+  implementationEffort: "low" | "medium" | "high";
+  category:
+    | "resize"
+    | "reserved_instances"
+    | "spot_instances"
+    | "cleanup"
+    | "scheduling";
+  status: "pending" | "implemented" | "rejected";
+  createdAt: string;
+}
+
+interface Budget {
+  id: number;
+  name: string;
+  amount: number;
+  period: "daily" | "weekly" | "monthly" | "yearly";
+  spent: number;
+  remaining: number;
+  alertThreshold: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
+const mockCostBreakdown: CostBreakdown[] = [
+  {
+    id: 1,
+    provider: "AWS",
+    service: "EC2",
+    resourceType: "Compute Instances",
+    region: "us-east-1",
+    costPerHour: 0.25,
+    costPerDay: 6.0,
+    costPerMonth: 180.0,
+    usageHours: 720,
+    totalCost: 180.0,
+    budget: 200.0,
+    overBudget: false,
+    costTrend: "stable",
+    lastUpdated: "2024-01-15",
+  },
+  {
+    id: 2,
+    provider: "AWS",
+    service: "EKS",
+    resourceType: "Kubernetes Clusters",
+    region: "us-east-1",
+    costPerHour: 0.1,
+    costPerDay: 2.4,
+    costPerMonth: 72.0,
+    usageHours: 720,
+    totalCost: 72.0,
+    budget: 100.0,
+    overBudget: false,
+    costTrend: "decreasing",
+    lastUpdated: "2024-01-15",
+  },
+  {
+    id: 3,
+    provider: "Google Cloud",
+    service: "Compute Engine",
+    resourceType: "GPU Instances",
+    region: "us-central1",
+    costPerHour: 0.45,
+    costPerDay: 10.8,
+    costPerMonth: 324.0,
+    usageHours: 720,
+    totalCost: 324.0,
+    budget: 300.0,
+    overBudget: true,
+    costTrend: "increasing",
+    lastUpdated: "2024-01-15",
+  },
+  {
+    id: 4,
+    provider: "Azure",
+    service: "AKS",
+    resourceType: "Kubernetes Service",
+    region: "eastus",
+    costPerHour: 0.08,
+    costPerDay: 1.92,
+    costPerMonth: 57.6,
+    usageHours: 720,
+    totalCost: 57.6,
+    budget: 80.0,
+    overBudget: false,
+    costTrend: "stable",
+    lastUpdated: "2024-01-15",
+  },
+];
+
+const mockCostAlerts: CostAlert[] = [
+  {
+    id: 1,
+    name: "GPU Instance Over Budget",
+    type: "budget_exceeded",
+    severity: "high",
+    message:
+      "GPU instances in Google Cloud have exceeded monthly budget by $24.00",
+    resource: "gpu-training-01",
+    currentCost: 324.0,
+    threshold: 300.0,
+    isActive: true,
+    createdAt: "2024-01-15",
+  },
+  {
+    id: 2,
+    name: "Idle EC2 Instance Detected",
+    type: "idle_resource",
+    severity: "medium",
+    message: "EC2 instance i-1234567890abcdef0 has been idle for 48 hours",
+    resource: "i-1234567890abcdef0",
+    currentCost: 12.0,
+    threshold: 0.0,
+    isActive: true,
+    createdAt: "2024-01-14",
+  },
+  {
+    id: 3,
+    name: "Cost Spike Detected",
+    type: "unusual_spike",
+    severity: "medium",
+    message: "Unusual cost increase detected in EKS cluster costs",
+    resource: "prod-cluster-01",
+    currentCost: 72.0,
+    threshold: 60.0,
+    isActive: true,
+    createdAt: "2024-01-13",
+  },
+];
+
+const mockCostOptimizations: CostOptimization[] = [
+  {
+    id: 1,
+    title: "Resize GPU Instances",
+    description:
+      "Downsize GPU instances during low-usage periods to save costs",
+    potentialSavings: 120.0,
+    implementationEffort: "low",
+    category: "resize",
+    status: "pending",
+    createdAt: "2024-01-15",
+  },
+  {
+    id: 2,
+    title: "Convert to Spot Instances",
+    description:
+      "Convert non-critical workloads to spot instances for up to 70% savings",
+    potentialSavings: 85.0,
+    implementationEffort: "medium",
+    category: "spot_instances",
+    status: "pending",
+    createdAt: "2024-01-14",
+  },
+  {
+    id: 3,
+    title: "Purchase Reserved Instances",
+    description: "Purchase 1-year reserved instances for predictable workloads",
+    potentialSavings: 200.0,
+    implementationEffort: "low",
+    category: "reserved_instances",
+    status: "pending",
+    createdAt: "2024-01-13",
+  },
+  {
+    id: 4,
+    title: "Cleanup Unused Volumes",
+    description: "Remove unattached EBS volumes to reduce storage costs",
+    potentialSavings: 45.0,
+    implementationEffort: "low",
+    category: "cleanup",
+    status: "implemented",
+    createdAt: "2024-01-12",
+  },
+];
+
+const mockBudgets: Budget[] = [
+  {
+    id: 1,
+    name: "Monthly Infrastructure Budget",
+    amount: 800.0,
+    period: "monthly",
+    spent: 633.6,
+    remaining: 166.4,
+    alertThreshold: 700.0,
+    isActive: true,
+    createdAt: "2024-01-01",
+  },
+  {
+    id: 2,
+    name: "GPU Compute Budget",
+    amount: 400.0,
+    period: "monthly",
+    spent: 324.0,
+    remaining: 76.0,
+    alertThreshold: 350.0,
+    isActive: true,
+    createdAt: "2024-01-01",
+  },
+  {
+    id: 3,
+    name: "Kubernetes Budget",
+    amount: 200.0,
+    period: "monthly",
+    spent: 129.6,
+    remaining: 70.4,
+    alertThreshold: 180.0,
+    isActive: true,
+    createdAt: "2024-01-01",
+  },
+];
+
+import UmamiTracker from "@/components/analytics/UmamiTracker";
+export default function CostManagementPage() {
+  const [costBreakdown, setCostBreakdown] =
+    useState<CostBreakdown[]>(mockCostBreakdown);
+  const [costAlerts, setCostAlerts] = useState<CostAlert[]>(mockCostAlerts);
+  const [costOptimizations, setCostOptimizations] = useState<
+    CostOptimization[]
+  >(mockCostOptimizations);
+  const [budgets, setBudgets] = useState<Budget[]>(mockBudgets);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterProvider, setFilterProvider] = useState("all");
+  const [filterService, setFilterService] = useState("all");
+  const [showAddBudgetModal, setShowAddBudgetModal] = useState(false);
+  const [showAddAlertModal, setShowAddAlertModal] = useState(false);
+  const [newBudget, setNewBudget] = useState<Partial<Budget>>({});
+  const [newAlert, setNewAlert] = useState<Partial<CostAlert>>({});
+
+  const filteredCostBreakdown = costBreakdown.filter(
+    (cost) =>
+      cost.provider.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cost.service.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      cost.resourceType.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const totalMonthlyCost = costBreakdown.reduce(
+    (sum, cost) => sum + cost.costPerMonth,
+    0
+  );
+  const totalBudget = budgets.reduce((sum, budget) => sum + budget.amount, 0);
+  const totalSpent = budgets.reduce((sum, budget) => sum + budget.spent, 0);
+  const totalRemaining = totalBudget - totalSpent;
+  const overBudget = totalSpent > totalBudget;
+
+  const getCostTrendIcon = (trend: string) => {
+    switch (trend) {
+      case "increasing":
+        return <TrendingUp className="w-4 h-4 text-red-500" />;
+      case "decreasing":
+        return <TrendingDown className="w-4 h-4 text-green-500" />;
+      case "stable":
+        return <BarChart3 className="w-4 h-4 text-blue-500" />;
+      default:
+        return <BarChart3 className="w-4 h-4 text-gray-500" />;
+    }
+  };
+
+  const getCostTrendColor = (trend: string) => {
+    switch (trend) {
+      case "increasing":
+        return "text-red-600";
+      case "decreasing":
+        return "text-green-600";
+      case "stable":
+        return "text-blue-600";
+      default:
+        return "text-gray-600";
+    }
+  };
+
+  const getAlertSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return "bg-red-100 text-red-700";
+      case "high":
+        return "bg-orange-100 text-orange-700";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "low":
+        return "bg-blue-100 text-blue-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getOptimizationEffortColor = (effort: string) => {
+    switch (effort) {
+      case "low":
+        return "bg-green-100 text-green-700";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "high":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const getOptimizationStatusColor = (status: string) => {
+    switch (status) {
+      case "implemented":
+        return "bg-green-100 text-green-700";
+      case "pending":
+        return "bg-yellow-100 text-yellow-700";
+      case "rejected":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  const handleAddBudget = () => {
+    if (newBudget.name && newBudget.amount) {
+      const budget: Budget = {
+        id: budgets.length + 1,
+        name: newBudget.name,
+        amount: newBudget.amount,
+        period: newBudget.period || "monthly",
+        spent: 0,
+        remaining: newBudget.amount,
+        alertThreshold: newBudget.alertThreshold || newBudget.amount * 0.8,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      } as Budget;
+
+      setBudgets([...budgets, budget]);
+      setShowAddBudgetModal(false);
+      setNewBudget({});
+    }
+  };
+
+  const handleAddAlert = () => {
+    if (newAlert.name && newAlert.message) {
+      const alert: CostAlert = {
+        id: costAlerts.length + 1,
+        name: newAlert.name,
+        type: newAlert.type || "cost_optimization",
+        severity: newAlert.severity || "medium",
+        message: newAlert.message,
+        resource: newAlert.resource || "Unknown",
+        currentCost: newAlert.currentCost || 0,
+        threshold: newAlert.threshold || 0,
+        isActive: true,
+        createdAt: new Date().toISOString(),
+      } as CostAlert;
+
+      setCostAlerts([...costAlerts, alert]);
+      setShowAddAlertModal(false);
+      setNewAlert({});
+    }
+  };
+
+  const exportCostReport = () => {
+    const csvContent = [
+      [
+        "Provider",
+        "Service",
+        "Resource Type",
+        "Region",
+        "Cost/Hour",
+        "Cost/Day",
+        "Cost/Month",
+        "Total Cost",
+        "Budget",
+        "Over Budget",
+      ],
+      ...filteredCostBreakdown.map((cost) => [
+        cost.provider,
+        cost.service,
+        cost.resourceType,
+        cost.region,
+        cost.costPerHour.toString(),
+        cost.costPerDay.toString(),
+        cost.costPerMonth.toString(),
+        cost.totalCost.toString(),
+        cost.budget.toString(),
+        cost.overBudget ? "Yes" : "No",
+      ]),
+    ]
+      .map((row) => row.join(","))
+      .join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cost-report.csv";
+    a.click();
+  };
+
+  return (
+    <div className="w-full p-6 space-y-6">
+      <UmamiTracker />
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center space-x-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Cost Management
+            </h1>
+            <p className="text-gray-600 mt-2">
+              Análisis y gestión de costes de infraestructura
+            </p>
+          </div>
+          <DevelopmentBanner
+            type="operational"
+            customText="✅ Versión 1.1.0 - Desarrollo"
+            showEarlyAdopterButton={true}
+            className="justify-start"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowAddBudgetModal(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Budget
+          </Button>
+          <Button onClick={() => setShowAddAlertModal(true)} variant="outline">
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            Add Alert
+          </Button>
+          <Button onClick={exportCostReport} variant="outline">
+            <Download className="w-4 h-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
+      </div>
+
+      {/* Cost Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Monthly Cost
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  ${totalMonthlyCost.toFixed(2)}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Budget
+                </p>
+                <p className="text-2xl font-bold text-green-600">
+                  ${totalBudget.toFixed(2)}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-green-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-2xl font-bold text-orange-600">
+                  ${totalSpent.toFixed(2)}
+                </p>
+              </div>
+              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-600">Remaining</p>
+                <p
+                  className={`text-2xl font-bold ${
+                    overBudget ? "text-red-600" : "text-purple-600"
+                  }`}
+                >
+                  ${totalRemaining.toFixed(2)}
+                </p>
+              </div>
+              <div
+                className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                  overBudget ? "bg-red-100" : "bg-purple-100"
+                }`}
+              >
+                <TrendingDown
+                  className={`w-6 h-6 ${
+                    overBudget ? "text-red-600" : "text-purple-600"
+                  }`}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Cost Breakdown by Provider */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Cost Breakdown by Provider</CardTitle>
+              <CardDescription>
+                Desglose detallado de costes por proveedor y servicio
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Input
+                  placeholder="Buscar costes..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 w-64"
+                />
+              </div>
+              <select
+                value={filterProvider}
+                onChange={(e) => setFilterProvider(e.target.value)}
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="all">All Providers</option>
+                <option value="AWS">AWS</option>
+                <option value="Google Cloud">Google Cloud</option>
+                <option value="Azure">Azure</option>
+              </select>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Provider
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Service
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Resource Type
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Region
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Cost/Hour
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Cost/Month
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Budget
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Status
+                  </th>
+                  <th className="text-left py-3 px-6 font-medium text-gray-700">
+                    Trend
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredCostBreakdown.map((cost) => (
+                  <tr
+                    key={cost.id}
+                    className="border-b border-gray-100 hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        <Cloud className="w-4 h-4 text-blue-500" />
+                        <span className="font-medium">{cost.provider}</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge variant="outline">{cost.service}</Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">
+                          {cost.resourceType}
+                        </p>
+                        <p className="text-gray-500">{cost.usageHours}h used</p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge variant="secondary">{cost.region}</Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">
+                          ${cost.costPerHour.toFixed(3)}
+                        </p>
+                        <p className="text-gray-500">
+                          ${cost.costPerDay.toFixed(2)}/day
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">
+                          ${cost.costPerMonth.toFixed(2)}
+                        </p>
+                        <p className="text-gray-500">
+                          Total: ${cost.totalCost.toFixed(2)}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="text-sm">
+                        <p className="font-medium text-gray-900">
+                          ${cost.budget.toFixed(2)}
+                        </p>
+                        {cost.overBudget && (
+                          <Badge variant="danger" className="mt-1">
+                            Over Budget
+                          </Badge>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <Badge
+                        variant={cost.overBudget ? "destructive" : "default"}
+                      >
+                        {cost.overBudget ? "Over Budget" : "Within Budget"}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-2">
+                        {getCostTrendIcon(cost.costTrend)}
+                        <span
+                          className={`text-sm ${getCostTrendColor(
+                            cost.costTrend
+                          )}`}
+                        >
+                          {cost.costTrend}
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Cost Alerts and Optimizations */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Cost Alerts */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Cost Alerts</CardTitle>
+                <CardDescription>
+                  Alertas activas sobre costes y presupuestos
+                </CardDescription>
+              </div>
+              <Badge variant="outline" className="text-red-600">
+                {costAlerts.filter((alert) => alert.isActive).length} Active
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {costAlerts
+                .filter((alert) => alert.isActive)
+                .map((alert) => (
+                  <div key={alert.id} className="p-3 border rounded-lg">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <AlertTriangle className="w-4 h-4 text-red-500" />
+                          <Badge
+                            className={getAlertSeverityColor(alert.severity)}
+                          >
+                            {alert.severity.toUpperCase()}
+                          </Badge>
+                          <Badge variant="outline">
+                            {alert.type.replace("_", " ")}
+                          </Badge>
+                        </div>
+                        <h4 className="font-medium text-gray-900 mb-1">
+                          {alert.name}
+                        </h4>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {alert.message}
+                        </p>
+                        <div className="text-xs text-gray-500">
+                          Resource: {alert.resource} | Current: $
+                          {alert.currentCost} | Threshold: ${alert.threshold}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Cost Optimizations */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Cost Optimizations</CardTitle>
+                <CardDescription>
+                  Recomendaciones para reducir costes
+                </CardDescription>
+              </div>
+              <Badge variant="outline" className="text-green-600">
+                $
+                {costOptimizations
+                  .reduce((sum, opt) => sum + opt.potentialSavings, 0)
+                  .toFixed(0)}{" "}
+                Potential Savings
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {costOptimizations.map((optimization) => (
+                <div key={optimization.id} className="p-3 border rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <h4 className="font-medium text-gray-900">
+                      {optimization.title}
+                    </h4>
+                    <Badge
+                      className={getOptimizationStatusColor(
+                        optimization.status
+                      )}
+                    >
+                      {optimization.status}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    {optimization.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Badge
+                        className={getOptimizationEffortColor(
+                          optimization.implementationEffort
+                        )}
+                      >
+                        {optimization.implementationEffort} effort
+                      </Badge>
+                      <Badge variant="outline">
+                        {optimization.category.replace("_", " ")}
+                      </Badge>
+                    </div>
+                    <div className="text-sm font-medium text-green-600">
+                      Save ${optimization.potentialSavings.toFixed(0)}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Budgets */}
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Budget Management</CardTitle>
+              <CardDescription>
+                Presupuestos configurados y seguimiento de gastos
+              </CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {budgets.map((budget) => {
+              const usagePercentage = (budget.spent / budget.amount) * 100;
+              const isOverBudget = budget.spent > budget.amount;
+              const isNearLimit = usagePercentage > 80;
+
+              return (
+                <div key={budget.id} className="p-4 border rounded-lg">
+                  <div className="flex items-center justify-between mb-3">
+                    <h4 className="font-medium text-gray-900">{budget.name}</h4>
+                    <Badge
+                      variant={
+                        isOverBudget
+                          ? "destructive"
+                          : isNearLimit
+                          ? "warning"
+                          : "default"
+                      }
+                    >
+                      {budget.period}
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Budget:</span>
+                      <span className="font-medium">
+                        ${budget.amount.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Spent:</span>
+                      <span className="font-medium">
+                        ${budget.spent.toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Remaining:</span>
+                      <span
+                        className={`font-medium ${
+                          isOverBudget ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        ${budget.remaining.toFixed(2)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mb-3">
+                    <div className="flex justify-between text-xs text-gray-500 mb-1">
+                      <span>Usage</span>
+                      <span>{usagePercentage.toFixed(1)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full ${
+                          isOverBudget
+                            ? "bg-red-500"
+                            : isNearLimit
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
+                        }`}
+                        style={{ width: `${Math.min(usagePercentage, 100)}%` }}
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-gray-500">
+                    Alert threshold: ${budget.alertThreshold.toFixed(2)}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Add Budget Modal */}
+      <SimpleModal
+        isOpen={showAddBudgetModal}
+        onClose={() => setShowAddBudgetModal(false)}
+        title="Add New Budget"
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Budget Name *
+            </label>
+            <Input
+              value={newBudget.name || ""}
+              onChange={(e) =>
+                setNewBudget({ ...newBudget, name: e.target.value })
+              }
+              placeholder="Monthly Infrastructure Budget"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Amount *
+            </label>
+            <Input
+              type="number"
+              step="0.01"
+              min="0"
+              value={newBudget.amount || ""}
+              onChange={(e) =>
+                setNewBudget({
+                  ...newBudget,
+                  amount: parseFloat(e.target.value),
+                })
+              }
+              placeholder="1000.00"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Period
+            </label>
+            <select
+              value={newBudget.period || "monthly"}
+              onChange={(e) =>
+                setNewBudget({ ...newBudget, period: e.target.value as any })
+              }
+              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alert Threshold (%)
+            </label>
+            <Input
+              type="number"
+              min="0"
+              max="100"
+              value={newBudget.alertThreshold || ""}
+              onChange={(e) =>
+                setNewBudget({
+                  ...newBudget,
+                  alertThreshold: parseFloat(e.target.value),
+                })
+              }
+              placeholder="80"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <Button
+            variant="outline"
+            onClick={() => setShowAddBudgetModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddBudget}
+            disabled={!newBudget.name || !newBudget.amount}
+          >
+            Add Budget
+          </Button>
+        </div>
+      </SimpleModal>
+
+      {/* Add Alert Modal */}
+      <SimpleModal
+        isOpen={showAddAlertModal}
+        onClose={() => setShowAddAlertModal(false)}
+        title="Add Cost Alert"
+        maxWidth="max-w-md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Alert Name *
+            </label>
+            <Input
+              value={newAlert.name || ""}
+              onChange={(e) =>
+                setNewAlert({ ...newAlert, name: e.target.value })
+              }
+              placeholder="Budget Exceeded Alert"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Message *
+            </label>
+            <Input
+              value={newAlert.message || ""}
+              onChange={(e) =>
+                setNewAlert({ ...newAlert, message: e.target.value })
+              }
+              placeholder="Cost has exceeded the budget threshold"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Type
+              </label>
+              <select
+                value={newAlert.type || "cost_optimization"}
+                onChange={(e) =>
+                  setNewAlert({ ...newAlert, type: e.target.value as any })
+                }
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="budget_exceeded">Budget Exceeded</option>
+                <option value="unusual_spike">Unusual Spike</option>
+                <option value="idle_resource">Idle Resource</option>
+                <option value="cost_optimization">Cost Optimization</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Severity
+              </label>
+              <select
+                value={newAlert.severity || "medium"}
+                onChange={(e) =>
+                  setNewAlert({ ...newAlert, severity: e.target.value as any })
+                }
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Resource
+            </label>
+            <Input
+              value={newAlert.resource || ""}
+              onChange={(e) =>
+                setNewAlert({ ...newAlert, resource: e.target.value })
+              }
+              placeholder="EC2 instance, EKS cluster, etc."
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={() => setShowAddAlertModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleAddAlert}
+            disabled={!newAlert.name || !newAlert.message}
+          >
+            Add Alert
+          </Button>
+        </div>
+      </SimpleModal>
+    </div>
+  );
+}

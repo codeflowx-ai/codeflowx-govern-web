@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-risk">
+  <process id="dataset-risk-assessment-v1" name="Dataset Risk Assessment V1" isExecutable="true" version="1.0" activiti:candidateStarterGroups="data-engineers,governance-admins">
+    <startEvent id="startRiskAssessment" name="Start Dataset Risk Assessment">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Análisis paralelo de diferentes tipos de riesgos -->
+    <parallelGateway id="riskAnalysisFork" name="Risk Analysis Fork">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+      <outgoing>flow3</outgoing>
+      <outgoing>flow4</outgoing>
+      <outgoing>flow5</outgoing>
+      <outgoing>flow6</outgoing>
+    </parallelGateway>
+    
+    <!-- Evaluación de riesgos por tipo -->
+    <serviceTask id="assessQualityRisk" name="Assess Quality Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.AssessDatasetRiskDelegate">
+      <incoming>flow2</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+    
+    <serviceTask id="assessBiasRisk" name="Assess Bias Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.AssessDatasetRiskDelegate">
+      <incoming>flow3</incoming>
+      <outgoing>flow8</outgoing>
+    </serviceTask>
+    
+    <serviceTask id="assessSecurityRisk" name="Assess Security Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.AssessDatasetRiskDelegate">
+      <incoming>flow4</incoming>
+      <outgoing>flow9</outgoing>
+    </serviceTask>
+    
+    <serviceTask id="assessPrivacyRisk" name="Assess Privacy Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.AssessDatasetRiskDelegate">
+      <incoming>flow5</incoming>
+      <outgoing>flow10</outgoing>
+    </serviceTask>
+    
+    <serviceTask id="assessComplianceRisk" name="Assess Compliance Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.AssessDatasetRiskDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow11</outgoing>
+    </serviceTask>
+    
+    <!-- Consolidación de resultados -->
+    <parallelGateway id="riskConsolidationJoin" name="Risk Consolidation Join">
+      <incoming>flow7</incoming>
+      <incoming>flow8</incoming>
+      <incoming>flow9</incoming>
+      <incoming>flow10</incoming>
+      <incoming>flow11</incoming>
+      <outgoing>flow12</outgoing>
+    </parallelGateway>
+    
+    <!-- Calcular score de riesgo total -->
+    <serviceTask id="calculateRiskScore" name="Calculate Risk Score" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.CalculateDatasetRiskScoreDelegate">
+      <incoming>flow12</incoming>
+      <outgoing>flow13</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway de decisión basado en score -->
+    <exclusiveGateway id="riskDecisionGateway" name="Risk Decision Gateway">
+      <incoming>flow13</incoming>
+      <outgoing>flow14</outgoing>
+      <outgoing>flow15</outgoing>
+      <outgoing>flow16</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Riesgo bajo: Aprobación automática -->
+    <serviceTask id="autoApproveLowRisk" name="Auto Approve Low Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.ApproveDatasetRiskDelegate">
+      <incoming>flow14</incoming>
+      <outgoing>flow17</outgoing>
+    </serviceTask>
+    
+    <!-- Riesgo crítico: Revisión humana obligatoria -->
+    <userTask id="criticalRiskReview" name="Critical Risk Review" activiti:candidateGroups="governance-admins,risk-officers" activiti:formKey="dataset-critical-risk-review-form" activiti:priority="100">
+      <incoming>flow15</incoming>
+      <outgoing>flow18</outgoing>
+      <documentation>Revisión obligatoria para riesgos críticos (score >= 0.8). EU AI Act Art. 9</documentation>
+    </userTask>
+    
+    <!-- Riesgo medio: Revisión opcional -->
+    <userTask id="mediumRiskReview" name="Medium Risk Review (Optional)" activiti:candidateGroups="data-engineers,governance-admins" activiti:formKey="dataset-medium-risk-review-form" activiti:priority="50">
+      <incoming>flow16</incoming>
+      <outgoing>flow19</outgoing>
+      <documentation>Revisión opcional para riesgos medios. Puede ser aprobado automáticamente si no se revisa en 3 días.</documentation>
+    </userTask>
+    
+    <!-- Gateway de decisión humana -->
+    <exclusiveGateway id="humanDecisionGateway" name="Human Decision Gateway">
+      <incoming>flow18</incoming>
+      <incoming>flow19</incoming>
+      <outgoing>flow20</outgoing>
+      <outgoing>flow21</outgoing>
+      <outgoing>flow22</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Guardar evaluación de riesgo -->
+    <serviceTask id="storeRiskAssessment" name="Store Risk Assessment" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.StoreDatasetRiskAssessmentDelegate">
+      <incoming>flow17</incoming>
+      <incoming>flow20</incoming>
+      <incoming>flow21</incoming>
+      <incoming>flow22</incoming>
+      <outgoing>flow23</outgoing>
+    </serviceTask>
+    
+    <!-- Notificar resultado -->
+    <serviceTask id="notifyRiskAssessment" name="Notify Risk Assessment Result" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyDatasetRiskAssessmentDelegate">
+      <incoming>flow23</incoming>
+      <outgoing>flow24</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endRiskAssessment" name="Risk Assessment Completed">
+      <incoming>flow24</incoming>
+    </endEvent>
+    
+    <!-- Timer para revisión de riesgo medio (3 días) -->
+    <boundaryEvent id="mediumRiskTimer" name="3 Day Auto-Approve Timer" attachedToRef="mediumRiskReview" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P3D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flow25</outgoing>
+    </boundaryEvent>
+    
+    <!-- Auto-aprobación después de 3 días sin revisión -->
+    <serviceTask id="autoApproveMediumRisk" name="Auto Approve Medium Risk" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.ApproveDatasetRiskDelegate">
+      <incoming>flow25</incoming>
+      <outgoing>flow20</outgoing>
+    </serviceTask>
+    
+    <!-- Timer para revisión de riesgo crítico (7 días) -->
+    <boundaryEvent id="criticalRiskTimer" name="7 Day SLA Reminder" attachedToRef="criticalRiskReview" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P7D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flow26</outgoing>
+    </boundaryEvent>
+    
+    <!-- Recordatorio SLA para riesgo crítico -->
+    <userTask id="criticalRiskSlaReminder" name="Critical Risk SLA Reminder" activiti:candidateGroups="governance-leads" activiti:formKey="dataset-critical-risk-sla-reminder-form" activiti:priority="90">
+      <incoming>flow26</incoming>
+      <outgoing>flow27</outgoing>
+      <documentation>Revisión crítica pendiente hace 7 días. Acción requerida.</documentation>
+    </userTask>
+    
+    <exclusiveGateway id="slaDecisionGateway" name="SLA Decision Gateway">
+      <incoming>flow27</incoming>
+      <outgoing>flow28</outgoing>
+      <outgoing>flow29</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Escalar revisión -->
+    <serviceTask id="escalateRiskReview" name="Escalate Risk Review" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.EscalateDatasetRiskReviewDelegate">
+      <incoming>flow28</incoming>
+      <outgoing>flow18</outgoing>
+    </serviceTask>
+    
+    <!-- Forzar decisión -->
+    <serviceTask id="forceRiskDecision" name="Force Risk Decision" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.ForceDatasetRiskDecisionDelegate">
+      <incoming>flow29</incoming>
+      <outgoing>flow22</outgoing>
+    </serviceTask>
+    
+    <!-- Error handling -->
+    <boundaryEvent id="riskErrorEvent" name="Risk Assessment Error" attachedToRef="calculateRiskScore">
+      <errorEventDefinition errorRef="datasetRiskError"></errorEventDefinition>
+      <outgoing>flow30</outgoing>
+    </boundaryEvent>
+    
+    <serviceTask id="handleRiskError" name="Handle Risk Assessment Error" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.HandleDatasetRiskErrorDelegate">
+      <incoming>flow30</incoming>
+      <outgoing>flow31</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endError" name="Error End">
+      <incoming>flow31</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startRiskAssessment" targetRef="riskAnalysisFork"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="riskAnalysisFork" targetRef="assessQualityRisk"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="riskAnalysisFork" targetRef="assessBiasRisk"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="riskAnalysisFork" targetRef="assessSecurityRisk"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="riskAnalysisFork" targetRef="assessPrivacyRisk"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="riskAnalysisFork" targetRef="assessComplianceRisk"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="assessQualityRisk" targetRef="riskConsolidationJoin"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="assessBiasRisk" targetRef="riskConsolidationJoin"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="assessSecurityRisk" targetRef="riskConsolidationJoin"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="assessPrivacyRisk" targetRef="riskConsolidationJoin"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="assessComplianceRisk" targetRef="riskConsolidationJoin"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="riskConsolidationJoin" targetRef="calculateRiskScore"></sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="calculateRiskScore" targetRef="riskDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow14" name="LOW_RISK" sourceRef="riskDecisionGateway" targetRef="autoApproveLowRisk">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskScore < 0.5}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" name="CRITICAL_RISK" sourceRef="riskDecisionGateway" targetRef="criticalRiskReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskScore >= 0.8}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" name="MEDIUM_RISK" sourceRef="riskDecisionGateway" targetRef="mediumRiskReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskScore >= 0.5 && riskScore < 0.8}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="autoApproveLowRisk" targetRef="storeRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="criticalRiskReview" targetRef="humanDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow19" sourceRef="mediumRiskReview" targetRef="humanDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow20" name="APPROVED" sourceRef="humanDecisionGateway" targetRef="storeRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${humanDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" name="REJECTED" sourceRef="humanDecisionGateway" targetRef="storeRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${humanDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow22" name="MITIGATE" sourceRef="humanDecisionGateway" targetRef="storeRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${humanDecision == 'MITIGATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="storeRiskAssessment" targetRef="notifyRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="notifyRiskAssessment" targetRef="endRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="mediumRiskTimer" targetRef="autoApproveMediumRisk"></sequenceFlow>
+    <sequenceFlow id="flow26" sourceRef="criticalRiskTimer" targetRef="criticalRiskSlaReminder"></sequenceFlow>
+    <sequenceFlow id="flow27" sourceRef="criticalRiskSlaReminder" targetRef="slaDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow28" name="ESCALATE" sourceRef="slaDecisionGateway" targetRef="escalateRiskReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${slaDecision == 'ESCALATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow29" name="FORCE" sourceRef="slaDecisionGateway" targetRef="forceRiskDecision">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${slaDecision == 'FORCE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow30" sourceRef="riskErrorEvent" targetRef="handleRiskError"></sequenceFlow>
+    <sequenceFlow id="flow31" sourceRef="handleRiskError" targetRef="endError"></sequenceFlow>
+  </process>
+  
+  <!-- Error Definition -->
+  <error id="datasetRiskError" name="Dataset Risk Assessment Error" errorCode="DATASET_RISK_ERROR"></error>
+  
+  <!-- BPMN Diagram (simplificado - se puede expandir con herramientas visuales) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-risk-assessment-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-risk-assessment-v1" id="BPMNPlane_dataset-risk-assessment-v1">
+      <!-- Diagram elements would go here - typically generated by BPMN modeling tools -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

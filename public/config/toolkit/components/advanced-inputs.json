@@ -1,0 +1,834 @@
+{
+  "components": {
+    "file": {
+      "definition": {
+        "name": "File Upload",
+        "type": "COMPONENT",
+        "sqlType": ["BLOB", "LONGBLOB", "BYTEA"],
+        "inputType": "FILE",
+        "docType": ["FILE"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:upload",
+        "tooltip": "File upload component for images and documents",
+        "class": "FileUpload",
+        "component": "file",
+        "defaultSize": { "width": 300, "height": 100 },
+        "description": "Upload and manage files, images, and documents"
+      },
+      "propertyTabs": [
+
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        },
+        {
+          "id": "validation",
+          "name": "Validation",
+          "icon": "lucide:shield-check",
+          "order": 3
+        },
+        {
+          "id": "rules",
+          "name": "Rules",
+          "icon": "lucide:workflow",
+          "order": 4
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Upload File",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "accept",
+          "type": "input",
+          "label": "Accepted File Types",
+          "default": "*/*",
+          "placeholder": "image/*,.pdf,.doc,.docx",
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties",
+          "description": "MIME types or file extensions to accept"
+        },
+        {
+          "name": "multiple",
+          "type": "boolean",
+          "label": "Multiple Files",
+          "default": false,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "maxSize",
+          "type": "input",
+          "label": "Max File Size",
+          "default": "10MB",
+          "placeholder": "10MB, 1GB, etc.",
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "sqlType",
+          "type": "combo",
+          "label": "SQL Type",
+          "default": "BLOB",
+          "options": [
+            {"value": "BLOB", "label": "BLOB"},
+            {"value": "LONGBLOB", "label": "LONGBLOB"},
+            {"value": "BYTEA", "label": "BYTEA (PostgreSQL)"},
+            {"value": "VARBINARY", "label": "VARBINARY"}
+          ],
+          "order": 2,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "storageType",
+          "type": "combo",
+          "label": "Storage Type",
+          "default": "database",
+          "options": [
+            {"value": "database", "label": "Database BLOB"},
+            {"value": "filesystem", "label": "File System"},
+            {"value": "cloud", "label": "Cloud Storage"}
+          ],
+          "order": 3,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "required",
+          "type": "boolean",
+          "label": "Required",
+          "default": false,
+          "order": 1,
+          "group": "Validation",
+          "tab": "validation"
+        },
+        {
+          "name": "allowedTypes",
+          "type": "textarea",
+          "label": "Allowed File Types (JSON)",
+          "default": "[\"image/jpeg\", \"image/png\", \"application/pdf\"]",
+          "order": 2,
+          "group": "Validation",
+          "tab": "validation"
+        }
+      ]
+    },
+    "richtext": {
+      "definition": {
+        "name": "Rich Text Editor",
+        "type": "COMPONENT",
+        "sqlType": ["CLOB", "LONGTEXT", "TEXT"],
+        "inputType": "RICHTEXT",
+        "docType": ["RICHTEXT"],
+        "version": "1.0.0",
+        "cols": "6",
+        "icon": "lucide:align-left",
+        "tooltip": "Rich text editor with formatting options",
+        "class": "RichTextEditor",
+        "component": "richtext",
+        "defaultSize": { "width": 400, "height": 200 },
+        "description": "WYSIWYG editor for formatted text content"
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        },
+        {
+          "id": "editor",
+          "name": "Editor",
+          "icon": "lucide:edit",
+          "order": 3
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Rich Text",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "placeholder",
+          "type": "input",
+          "label": "Placeholder",
+          "default": "Enter formatted text...",
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "height",
+          "type": "number",
+          "label": "Editor Height",
+          "default": 200,
+          "min": 100,
+          "max": 800,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "sqlType",
+          "type": "combo",
+          "label": "SQL Type",
+          "default": "CLOB",
+          "options": [
+            {"value": "CLOB", "label": "CLOB"},
+            {"value": "LONGTEXT", "label": "LONGTEXT"},
+            {"value": "TEXT", "label": "TEXT"}
+          ],
+          "order": 2,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "toolbar",
+          "type": "textarea",
+          "label": "Toolbar Options (JSON)",
+          "default": "[\"bold\", \"italic\", \"underline\", \"link\", \"bulletList\", \"orderedList\"]",
+          "order": 1,
+          "group": "Editor",
+          "tab": "editor"
+        },
+        {
+          "name": "allowImages",
+          "type": "boolean",
+          "label": "Allow Images",
+          "default": true,
+          "order": 2,
+          "group": "Editor",
+          "tab": "editor"
+        },
+        {
+          "name": "allowTables",
+          "type": "boolean",
+          "label": "Allow Tables",
+          "default": false,
+          "order": 3,
+          "group": "Editor",
+          "tab": "editor"
+        }
+      ]
+    },
+    "map": {
+      "definition": {
+        "name": "Map Field",
+        "type": "COMPONENT",
+        "sqlType": ["JSON", "JSONB", "MAP"],
+        "inputType": "MAP",
+        "docType": ["MAP"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:map",
+        "tooltip": "Key-value map component",
+        "class": "MapField",
+        "component": "map",
+        "defaultSize": { "width": 350, "height": 150 },
+        "description": "Dynamic key-value pair editor"
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        },
+        {
+          "id": "validation",
+          "name": "Validation",
+          "icon": "lucide:shield-check",
+          "order": 3
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Key-Value Map",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "keyLabel",
+          "type": "input",
+          "label": "Key Label",
+          "default": "Key",
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "valueLabel",
+          "type": "input",
+          "label": "Value Label",
+          "default": "Value",
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "allowAdd",
+          "type": "boolean",
+          "label": "Allow Add New",
+          "default": true,
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "allowDelete",
+          "type": "boolean",
+          "label": "Allow Delete",
+          "default": true,
+          "order": 5,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "sqlType",
+          "type": "combo",
+          "label": "SQL Type",
+          "default": "JSON",
+          "options": [
+            {"value": "JSON", "label": "JSON"},
+            {"value": "JSONB", "label": "JSONB (PostgreSQL)"},
+            {"value": "MAP", "label": "MAP"}
+          ],
+          "order": 2,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "keyPattern",
+          "type": "input",
+          "label": "Key Pattern (Regex)",
+          "default": "",
+          "placeholder": "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          "order": 1,
+          "group": "Validation",
+          "tab": "validation"
+        },
+        {
+          "name": "maxPairs",
+          "type": "number",
+          "label": "Max Key-Value Pairs",
+          "default": 10,
+          "min": 1,
+          "max": 100,
+          "order": 2,
+          "group": "Validation",
+          "tab": "validation"
+        }
+      ]
+    },
+    "tsvector": {
+      "definition": {
+        "name": "Text Search Vector",
+        "type": "COMPONENT",
+        "sqlType": ["TSVECTOR"],
+        "inputType": "TSVECTOR",
+        "docType": ["TSVECTOR"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:search",
+        "tooltip": "PostgreSQL text search vector",
+        "class": "TSVectorField",
+        "component": "tsvector",
+        "defaultSize": { "width": 400, "height": 60 },
+        "description": "PostgreSQL full-text search vector field"
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        },
+        {
+          "id": "search",
+          "name": "Search Config",
+          "icon": "lucide:search",
+          "order": 3
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Search Vector",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "readonly",
+          "type": "boolean",
+          "label": "Read Only",
+          "default": true,
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties",
+          "description": "TSVector fields are typically auto-generated"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "sqlType",
+          "type": "combo",
+          "label": "SQL Type",
+          "default": "TSVECTOR",
+          "options": [
+            {"value": "TSVECTOR", "label": "TSVECTOR"}
+          ],
+          "order": 2,
+          "group": "Database",
+          "tab": "database"
+        },
+        {
+          "name": "sourceFields",
+          "type": "input",
+          "label": "Source Fields",
+          "default": "",
+          "placeholder": "title,description,content",
+          "order": 1,
+          "group": "Search Config",
+          "tab": "search",
+          "description": "Comma-separated list of fields to index"
+        },
+        {
+          "name": "language",
+          "type": "combo",
+          "label": "Language",
+          "default": "english",
+          "options": [
+            {"value": "english", "label": "English"},
+            {"value": "spanish", "label": "Spanish"},
+            {"value": "french", "label": "French"},
+            {"value": "german", "label": "German"},
+            {"value": "portuguese", "label": "Portuguese"},
+            {"value": "italian", "label": "Italian"}
+          ],
+          "order": 2,
+          "group": "Search Config",
+          "tab": "search"
+        },
+        {
+          "name": "weights",
+          "type": "input",
+          "label": "Field Weights",
+          "default": "A,B,C,D",
+          "placeholder": "A,B,C,D",
+          "order": 3,
+          "group": "Search Config",
+          "tab": "search",
+          "description": "Weight for each source field (A=highest, D=lowest)"
+        }
+      ]
+    },
+    "autocomplete": {
+      "definition": {
+        "name": "Autocomplete",
+        "type": "COMPONENT",
+        "sqlType": ["VARCHAR", "TEXT"],
+        "inputType": "AUTOCOMPLETE",
+        "docType": ["AUTOCOMPLETE"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:search",
+        "tooltip": "Autocomplete input with suggestions",
+        "class": "AutocompleteInput",
+        "component": "autocomplete",
+        "defaultSize": { "width": 250, "height": 40 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "data",
+          "name": "Data",
+          "icon": "lucide:database",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Autocomplete",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "placeholder",
+          "type": "input",
+          "label": "Placeholder",
+          "default": "Start typing...",
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "minChars",
+          "type": "number",
+          "label": "Min Characters",
+          "default": 2,
+          "min": 1,
+          "max": 10,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "dataSource",
+          "type": "combo",
+          "label": "Data Source",
+          "default": "api",
+          "options": [
+            {"value": "static", "label": "Static List"},
+            {"value": "api", "label": "API Endpoint"},
+            {"value": "database", "label": "Database Query"}
+          ],
+          "order": 1,
+          "group": "Data",
+          "tab": "data"
+        },
+        {
+          "name": "apiEndpoint",
+          "type": "input",
+          "label": "API Endpoint",
+          "default": "/api/search",
+          "placeholder": "/api/search?q={query}",
+          "order": 2,
+          "group": "Data",
+          "tab": "data"
+        }
+      ]
+    },
+    "rating": {
+      "definition": {
+        "name": "Rating",
+        "type": "COMPONENT",
+        "sqlType": ["INT", "DECIMAL"],
+        "inputType": "RATING",
+        "docType": ["RATING"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:star",
+        "tooltip": "Star rating component",
+        "class": "RatingInput",
+        "component": "rating",
+        "defaultSize": { "width": 150, "height": 40 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Rating",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "maxStars",
+          "type": "number",
+          "label": "Max Stars",
+          "default": 5,
+          "min": 3,
+          "max": 10,
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "allowHalf",
+          "type": "boolean",
+          "label": "Allow Half Stars",
+          "default": false,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        }
+      ]
+    },
+    "color": {
+      "definition": {
+        "name": "Color Picker",
+        "type": "COMPONENT",
+        "sqlType": ["VARCHAR", "CHAR"],
+        "inputType": "COLOR",
+        "docType": ["COLOR"],
+        "version": "1.0.0",
+        "cols": "4",
+        "icon": "lucide:palette",
+        "tooltip": "Color picker input",
+        "class": "ColorPicker",
+        "component": "color",
+        "defaultSize": { "width": 120, "height": 40 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "colSpan",
+          "type": "range",
+          "label": "Column Width",
+          "default": 4,
+          "min": 1,
+          "max": 12,
+          "step": 1,
+          "order": 1,
+          "group": "Layout",
+          "tab": "properties",
+          "description": "Width in Bootstrap columns (1-12)"
+        },
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Color",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "format",
+          "type": "combo",
+          "label": "Color Format",
+          "default": "hex",
+          "options": [
+            {"value": "hex", "label": "HEX (#FF0000)"},
+            {"value": "rgb", "label": "RGB (255,0,0)"},
+            {"value": "hsl", "label": "HSL (0,100%,50%)"}
+          ],
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "showPreview",
+          "type": "boolean",
+          "label": "Show Preview",
+          "default": true,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        }
+      ]
+    }
+  }
+}

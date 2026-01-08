@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/models">
+  
+  <process id="finetuning_approval_v1" name="Fine-Tuning Approval V1 (RESTRICTIVE)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event -->
+    <startEvent id="requestFineTuningStart" name="Request Fine-Tuning">
+      <outgoing>flowToJustify</outgoing>
+    </startEvent>
+    
+    <!-- User Task: Justify Why NOT Adapter (OBLIGATORIO) -->
+    <userTask id="justifyWhyNotAdapter" name="Justify Why NOT Adapter (Required)" 
+              activiti:candidateGroups="ml-engineers,data-scientists" 
+              activiti:formKey="justify-finetuning-form">
+      <incoming>flowToJustify</incoming>
+      <incoming>flowRetryJustification</incoming>
+      <outgoing>flowToEvaluateJustification</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Evaluate Justification with AI -->
+    <serviceTask id="evaluateJustificationAI" name="AI Evaluate Justification" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.finetuning.EvaluateFineTuningJustificationDelegate">
+      <incoming>flowToEvaluateJustification</incoming>
+      <outgoing>flowToJustificationGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Justification Score > 0.7? -->
+    <exclusiveGateway id="justificationScoreGateway" name="Justification Valid?">
+      <incoming>flowToJustificationGateway</incoming>
+      <outgoing>flowJustificationGood</outgoing>
+      <outgoing>flowJustificationPoor</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Improve Justification -->
+    <userTask id="improveJustification" name="Improve Justification (AI Feedback)" 
+              activiti:candidateGroups="ml-engineers" 
+              activiti:formKey="improve-justification-form">
+      <incoming>flowJustificationPoor</incoming>
+      <outgoing>flowFromImprove</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Improve Decision -->
+    <exclusiveGateway id="improveDecisionGateway" name="Decision?">
+      <incoming>flowFromImprove</incoming>
+      <outgoing>flowRetryJustification</outgoing>
+      <outgoing>flowSwitchToAdapter</outgoing>
+      <outgoing>flowCancelFromJustify</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowRetryJustification" name="Rewrite" sourceRef="improveDecisionGateway" targetRef="justifyWhyNotAdapter">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${improveDecision == 'REWRITE'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Call Activity: Switch to Adapter Process -->
+    <callActivity id="switchToAdapterProcess" name="Switch to Adapter Process" 
+                  calledElement="adapter_creation_approval_v1">
+      <incoming>flowSwitchToAdapter</incoming>
+      <outgoing>flowToEndSwitched</outgoing>
+    </callActivity>
+    
+    <sequenceFlow id="flowSwitchToAdapter" name="Switch to Adapter" sourceRef="improveDecisionGateway" targetRef="switchToAdapterProcess">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${improveDecision == 'SWITCH_ADAPTER'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Switched to Adapter -->
+    <endEvent id="endSwitchedToAdapter" name="Switched to Adapter">
+      <incoming>flowToEndSwitched</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowToEndSwitched" sourceRef="switchToAdapterProcess" targetRef="endSwitchedToAdapter"></sequenceFlow>
+    
+    <!-- End: Cancelled from justification -->
+    <endEvent id="endCancelledFromJustify" name="Cancelled">
+      <incoming>flowCancelFromJustify</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowCancelFromJustify" name="Cancel" sourceRef="improveDecisionGateway" targetRef="endCancelledFromJustify">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${improveDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Calculate Full Fine-Tuning Cost -->
+    <serviceTask id="calculateFineTuningCost" name="Calculate Full Fine-Tuning Cost (10-20x)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.finetuning.CalculateFineTuningCostDelegate">
+      <incoming>flowJustificationGood</incoming>
+      <outgoing>flowToCompareFinal</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Final Comparison Adapter vs Fine-Tuning -->
+    <serviceTask id="finalComparison" name="Final Comparison with Impact Analysis" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.finetuning.FinalComparisonDelegate">
+      <incoming>flowToCompareFinal</incoming>
+      <outgoing>flowToSeniorApproval</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Senior Approval (ESCALATED) -->
+    <userTask id="seniorApproval" name="Senior Approval Required (Tech Lead)" 
+              activiti:candidateGroups="tech-leads,ml-architects" 
+              activiti:formKey="senior-finetuning-approval-form">
+      <incoming>flowToSeniorApproval</incoming>
+      <outgoing>flowToFinalDecisionGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Final Decision -->
+    <exclusiveGateway id="finalDecisionGateway" name="Final Decision?">
+      <incoming>flowToFinalDecisionGateway</incoming>
+      <outgoing>flowApproveFT</outgoing>
+      <outgoing>flowSwitchAdapter</outgoing>
+      <outgoing>flowRejectFT</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Branch: Switch to Adapter -->
+    <callActivity id="switchToAdapter" name="Switch to Adapter" 
+                  calledElement="adapter_creation_approval_v1">
+      <incoming>flowSwitchAdapter</incoming>
+      <outgoing>flowToEndSwitch</outgoing>
+    </callActivity>
+    
+    <sequenceFlow id="flowSwitchAdapter" name="Switch to Adapter" sourceRef="finalDecisionGateway" targetRef="switchToAdapter">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'SWITCH_ADAPTER'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- End: Switched -->
+    <endEvent id="endSwitched" name="Switched to Adapter">
+      <incoming>flowToEndSwitch</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowToEndSwitch" sourceRef="switchToAdapter" targetRef="endSwitched"></sequenceFlow>
+    
+    <!-- End: Rejected -->
+    <endEvent id="endFineTuningRejected" name="Fine-Tuning Rejected">
+      <incoming>flowRejectFT</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowRejectFT" name="Reject" sourceRef="finalDecisionGateway" targetRef="endFineTuningRejected">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Branch: Approve Fine-Tuning (después de todas las validaciones) -->
+    <serviceTask id="validateGpaiComplianceFT" name="Validate GPAI Compliance (Art. 53)" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.finetuning.ValidateGpaiComplianceFTDelegate">
+      <incoming>flowApproveFT</incoming>
+      <outgoing>flowToCreateFT</outgoing>
+    </serviceTask>
+    
+    <sequenceFlow id="flowApproveFT" name="Approve Fine-Tuning" sourceRef="finalDecisionGateway" targetRef="validateGpaiComplianceFT">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalDecision == 'APPROVE_FINETUNING'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Create Fine-Tuning Record -->
+    <serviceTask id="createFineTuningRecord" name="Create Fine-Tuning Record" 
+                 activiti:class="com.codeflowx.govern.workflow.delegates.finetuning.CreateFineTuningRecordDelegate">
+      <incoming>flowToCreateFT</incoming>
+      <outgoing>flowToEndApproved</outgoing>
+    </serviceTask>
+    
+    <!-- End: Fine-Tuning Approved -->
+    <endEvent id="endFineTuningApproved" name="Fine-Tuning Approved">
+      <incoming>flowToEndApproved</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToJustify" sourceRef="requestFineTuningStart" targetRef="justifyWhyNotAdapter"></sequenceFlow>
+    <sequenceFlow id="flowToEvaluateJustification" sourceRef="justifyWhyNotAdapter" targetRef="evaluateJustificationAI"></sequenceFlow>
+    <sequenceFlow id="flowToJustificationGateway" sourceRef="evaluateJustificationAI" targetRef="justificationScoreGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowJustificationGood" name="Score >= 0.7" sourceRef="justificationScoreGateway" targetRef="calculateFineTuningCost">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${justificationScore >= 0.7}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowJustificationPoor" name="Score < 0.7" sourceRef="justificationScoreGateway" targetRef="improveJustification">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${justificationScore < 0.7}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFromImprove" sourceRef="improveJustification" targetRef="improveDecisionGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToCompareFinal" sourceRef="calculateFineTuningCost" targetRef="finalComparison"></sequenceFlow>
+    <sequenceFlow id="flowToSeniorApproval" sourceRef="finalComparison" targetRef="seniorApproval"></sequenceFlow>
+    <sequenceFlow id="flowToFinalDecisionGateway" sourceRef="seniorApproval" targetRef="finalDecisionGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowToCreateFT" sourceRef="validateGpaiComplianceFT" targetRef="createFineTuningRecord"></sequenceFlow>
+    <sequenceFlow id="flowToEndApproved" sourceRef="createFineTuningRecord" targetRef="endFineTuningApproved"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_finetuning_approval_v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_finetuning_approval_v1" bpmnElement="finetuning_approval_v1">
+      <!-- Diagram elements positioned by Camunda Modeler -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+
+

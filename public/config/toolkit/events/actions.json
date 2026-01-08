@@ -1,0 +1,310 @@
+{
+  "eventActions": {
+    "none": {
+      "name": "No Action",
+      "description": "Do nothing when event occurs",
+      "category": "basic",
+      "parameters": [],
+      "example": {
+        "enabled": false,
+        "action": "none"
+      }
+    },
+    "setValue": {
+      "name": "Set Value",
+      "description": "Set value of another component",
+      "category": "component",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true,
+          "description": "Component to update"
+        },
+        {
+          "name": "value",
+          "type": "input",
+          "label": "Value",
+          "required": true,
+          "description": "New value to set"
+        }
+      ],
+      "example": {
+        "enabled": true,
+        "action": "setValue",
+        "parameters": {
+          "target": "input_1",
+          "value": "Hello World"
+        }
+      }
+    },
+    "showComponent": {
+      "name": "Show Component",
+      "description": "Make a component visible",
+      "category": "visibility",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true
+        }
+      ]
+    },
+    "hideComponent": {
+      "name": "Hide Component",
+      "description": "Hide a component",
+      "category": "visibility",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true
+        }
+      ]
+    },
+    "enableComponent": {
+      "name": "Enable Component",
+      "description": "Enable a component for interaction",
+      "category": "state",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true
+        }
+      ]
+    },
+    "disableComponent": {
+      "name": "Disable Component",
+      "description": "Disable a component",
+      "category": "state",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Target Component",
+          "required": true
+        }
+      ]
+    },
+    "submitForm": {
+      "name": "Submit Form",
+      "description": "Submit the form data",
+      "category": "form",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Form Container",
+          "required": false,
+          "description": "Form to submit (optional, defaults to parent form)"
+        },
+        {
+          "name": "endpoint",
+          "type": "input",
+          "label": "Submit Endpoint",
+          "required": true,
+          "placeholder": "/api/submit"
+        },
+        {
+          "name": "method",
+          "type": "combo",
+          "label": "HTTP Method",
+          "options": [
+            {"value": "POST", "label": "POST"},
+            {"value": "PUT", "label": "PUT"},
+            {"value": "PATCH", "label": "PATCH"}
+          ],
+          "default": "POST"
+        }
+      ]
+    },
+    "navigate": {
+      "name": "Navigate",
+      "description": "Navigate to another page",
+      "category": "navigation",
+      "parameters": [
+        {
+          "name": "url",
+          "type": "input",
+          "label": "URL",
+          "required": true,
+          "placeholder": "/dashboard"
+        },
+        {
+          "name": "target",
+          "type": "combo",
+          "label": "Target",
+          "options": [
+            {"value": "_self", "label": "Same Window"},
+            {"value": "_blank", "label": "New Window"},
+            {"value": "_parent", "label": "Parent Frame"},
+            {"value": "_top", "label": "Top Frame"}
+          ],
+          "default": "_self"
+        }
+      ]
+    },
+    "showAlert": {
+      "name": "Show Alert",
+      "description": "Display an alert message",
+      "category": "feedback",
+      "parameters": [
+        {
+          "name": "message",
+          "type": "textarea",
+          "label": "Message",
+          "required": true,
+          "placeholder": "Enter alert message"
+        },
+        {
+          "name": "type",
+          "type": "combo",
+          "label": "Alert Type",
+          "options": [
+            {"value": "info", "label": "Info"},
+            {"value": "success", "label": "Success"},
+            {"value": "warning", "label": "Warning"},
+            {"value": "error", "label": "Error"}
+          ],
+          "default": "info"
+        },
+        {
+          "name": "duration",
+          "type": "number",
+          "label": "Duration (ms)",
+          "default": 3000,
+          "min": 1000,
+          "max": 10000
+        }
+      ]
+    },
+    "executeCode": {
+      "name": "Execute Code",
+      "description": "Execute custom JavaScript code",
+      "category": "advanced",
+      "parameters": [
+        {
+          "name": "code",
+          "type": "textarea",
+          "label": "JavaScript Code",
+          "required": true,
+          "placeholder": "// Your JavaScript code here\nconsole.log('Hello World');"
+        }
+      ]
+    },
+    "callAPI": {
+      "name": "Call API",
+      "description": "Make an API call",
+      "category": "data",
+      "parameters": [
+        {
+          "name": "endpoint",
+          "type": "input",
+          "label": "API Endpoint",
+          "required": true,
+          "placeholder": "/api/data"
+        },
+        {
+          "name": "method",
+          "type": "combo",
+          "label": "HTTP Method",
+          "options": [
+            {"value": "GET", "label": "GET"},
+            {"value": "POST", "label": "POST"},
+            {"value": "PUT", "label": "PUT"},
+            {"value": "DELETE", "label": "DELETE"}
+          ],
+          "default": "GET"
+        },
+        {
+          "name": "headers",
+          "type": "textarea",
+          "label": "Headers (JSON)",
+          "placeholder": "{\n  \"Content-Type\": \"application/json\"\n}",
+          "default": "{}"
+        },
+        {
+          "name": "body",
+          "type": "textarea",
+          "label": "Request Body (JSON)",
+          "placeholder": "{\n  \"key\": \"value\"\n}",
+          "default": "{}"
+        }
+      ]
+    },
+    "validateForm": {
+      "name": "Validate Form",
+      "description": "Validate form components",
+      "category": "validation",
+      "parameters": [
+        {
+          "name": "target",
+          "type": "componentSelector",
+          "label": "Form Container",
+          "required": true
+        },
+        {
+          "name": "showErrors",
+          "type": "boolean",
+          "label": "Show Error Messages",
+          "default": true
+        },
+        {
+          "name": "focusFirst",
+          "type": "boolean",
+          "label": "Focus First Error",
+          "default": true
+        }
+      ]
+    }
+  },
+  "eventTypes": {
+    "onClick": {
+      "name": "On Click",
+      "description": "Triggered when component is clicked",
+      "applicableComponents": ["button", "link", "image", "card"],
+      "defaultAction": "none"
+    },
+    "onChange": {
+      "name": "On Change",
+      "description": "Triggered when component value changes",
+      "applicableComponents": ["input", "textarea", "select", "checkbox", "radio", "toggle"],
+      "defaultAction": "none"
+    },
+    "onFocus": {
+      "name": "On Focus",
+      "description": "Triggered when component receives focus",
+      "applicableComponents": ["input", "textarea", "select"],
+      "defaultAction": "none"
+    },
+    "onBlur": {
+      "name": "On Blur",
+      "description": "Triggered when component loses focus",
+      "applicableComponents": ["input", "textarea", "select"],
+      "defaultAction": "none"
+    },
+    "onSubmit": {
+      "name": "On Submit",
+      "description": "Triggered when form is submitted",
+      "applicableComponents": ["form", "container"],
+      "defaultAction": "submitForm"
+    },
+    "onLoad": {
+      "name": "On Load",
+      "description": "Triggered when component loads",
+      "applicableComponents": ["image", "video"],
+      "defaultAction": "none"
+    },
+    "onError": {
+      "name": "On Error",
+      "description": "Triggered when component encounters an error",
+      "applicableComponents": ["image", "video", "file"],
+      "defaultAction": "showAlert"
+    }
+  }
+}

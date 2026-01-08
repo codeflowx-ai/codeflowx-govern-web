@@ -1,0 +1,490 @@
+"use client";
+
+import { useTranslation } from "@/app/config/i18n";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  CheckCircle,
+  Cloud,
+  Cpu,
+  DollarSign,
+  Monitor,
+  Rocket,
+  Server,
+  Settings,
+  Zap,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+
+export default function InfrastructurePage() {
+  const { t } = useTranslation();
+
+  const infrastructureModules = [
+    {
+      id: "providers",
+      title: t("cloudProviders", "infrastructure"),
+      description: t("cloudProvidersDesc", "infrastructure"),
+      icon: Cloud,
+      href: "/infrastructure/providers",
+      status: "operational",
+      color: "#3b82f6",
+      gradient: "from-blue-500 to-blue-600",
+      features: [
+        t("awsGcpAzure", "infrastructure"),
+        t("ovhRunpodVast", "infrastructure"),
+        t("credentialsApiKeys", "infrastructure"),
+        t("statusMonitoring", "infrastructure"),
+      ],
+      metrics: {
+        providers: "8",
+        status: "100%",
+        cost: "$2.4K/mo",
+      },
+    },
+    {
+      id: "kubernetes",
+      title: t("kubernetesClusters", "infrastructure"),
+      description: t("kubernetesDesc", "infrastructure"),
+      icon: Server,
+      href: "/infrastructure/kubernetes",
+      status: "operational",
+      color: "#10b981",
+      gradient: "from-green-500 to-green-600",
+      features: [
+        t("eksGkeAks", "infrastructure"),
+        t("ownClusters", "infrastructure"),
+        t("nodeMonitoring", "infrastructure"),
+        t("deploymentManagement", "infrastructure"),
+      ],
+      metrics: {
+        clusters: "5",
+        nodes: "24",
+        pods: "156",
+      },
+    },
+    {
+      id: "gpu-instances",
+      title: t("gpuInstances", "infrastructure"),
+      description: t("gpuInstancesDesc", "infrastructure"),
+      icon: Cpu,
+      href: "/infrastructure/gpu-instances",
+      status: "operational",
+      color: "#8b5cf6",
+      gradient: "from-purple-500 to-purple-600",
+      features: [
+        t("t4V100A100H100", "infrastructure"),
+        t("rtx40903090", "infrastructure"),
+        t("spotInstances", "infrastructure"),
+        t("costAnalysis", "infrastructure"),
+      ],
+      metrics: {
+        instances: "12",
+        gpuTypes: "6",
+        utilization: "78%",
+      },
+    },
+    {
+      id: "deployments",
+      title: t("infrastructureDeployments", "infrastructure"),
+      description: t("deploymentsDesc", "infrastructure"),
+      icon: Rocket,
+      href: "/infrastructure/deployments",
+      status: "operational",
+      color: "#f59e0b",
+      gradient: "from-orange-500 to-orange-600",
+      features: [
+        t("trainingClusters", "infrastructure"),
+        t("inferenceServices", "infrastructure"),
+        t("monitoring", "infrastructure"),
+        t("autoScaling", "infrastructure"),
+      ],
+      metrics: {
+        deployments: "8",
+        services: "15",
+        uptime: "99.9%",
+      },
+    },
+    {
+      id: "cost-management",
+      title: t("costManagement", "infrastructure"),
+      description: t("costManagementDesc", "infrastructure"),
+      icon: DollarSign,
+      href: "/infrastructure/cost-management",
+      status: "operational",
+      color: "#3b82f6",
+      gradient: "from-blue-500 to-blue-600",
+      features: [
+        t("providerAnalysis", "infrastructure"),
+        t("budgetAlerts", "infrastructure"),
+        t("reports", "infrastructure"),
+        t("optimization", "infrastructure"),
+      ],
+      metrics: {
+        monthlyCost: "$8.2K",
+        savings: "23%",
+        budget: "85%",
+      },
+    },
+    {
+      id: "monitoring",
+      title: t("systemMonitoring", "infrastructure"),
+      description: t("systemMonitoringDesc", "infrastructure"),
+      icon: Monitor,
+      href: "/infrastructure/monitoring",
+      status: "operational",
+      color: "#10b981",
+      gradient: "from-green-500 to-green-600",
+      features: [
+        t("realTimeMetrics", "infrastructure"),
+        t("automaticAlerts", "infrastructure"),
+        t("customDashboards", "infrastructure"),
+        t("centralizedLogs", "infrastructure"),
+      ],
+      metrics: {
+        alerts: "3",
+        responseTime: "45ms",
+        availability: "99.95%",
+      },
+    },
+  ];
+
+  const systemStatus = {
+    overall: "operational",
+    uptime: "99.97%",
+    lastIncident: t("twoWeeksAgo", "infrastructure"),
+    activeAlerts: 1,
+    totalResources: 89,
+  };
+
+  const quickActions = [
+    {
+      title: t("addProvider", "infrastructure"),
+      icon: Cloud,
+      color: "#3b82f6",
+      href: "/infrastructure/providers/new",
+    },
+    {
+      title: t("deployCluster", "infrastructure"),
+      icon: Rocket,
+      color: "#10b981",
+      href: "/infrastructure/kubernetes/new",
+    },
+    {
+      title: t("launchGpu", "infrastructure"),
+      icon: Cpu,
+      color: "#8b5cf6",
+      href: "/infrastructure/gpu-instances/new",
+    },
+    {
+      title: t("viewCosts", "infrastructure"),
+      icon: DollarSign,
+      color: "#f59e0b",
+      href: "/infrastructure/cost-management",
+    },
+  ];
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "operational":
+        return "bg-green-500";
+      case "warning":
+        return "bg-yellow-500";
+      case "error":
+        return "bg-red-500";
+      default:
+        return "bg-gray-500";
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case "operational":
+        return "Operational";
+      case "warning":
+        return "Warning";
+      case "error":
+        return "Error";
+      default:
+        return "Unknown";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background transition-all duration-500 relative overflow-hidden">
+
+      {/* Partículas flotantes de fondo */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div
+          className="absolute top-20 left-10 w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "0s" }}
+        />
+        <div
+          className="absolute top-40 right-20 w-1 h-1 bg-green-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
+        <div
+          className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-purple-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "2s" }}
+        />
+        <div
+          className="absolute top-80 right-1/3 w-1 h-1 bg-orange-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "3s" }}
+        />
+        <div
+          className="absolute top-32 left-1/2 w-2 h-2 bg-blue-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "4s" }}
+        />
+        <div
+          className="absolute top-96 left-1/3 w-1 h-1 bg-green-400/20 rounded-full animate-pulse"
+          style={{ animationDelay: "5s" }}
+        />
+      </div>
+
+      <div className="p-6 space-y-6 relative z-10">
+        {/* Header con título y estado del sistema */}
+        <div className="flex flex-col lg:flex-row gap-6 items-start lg:items-center justify-between">
+          <div className="space-y-2">
+            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
+              <Server className="w-8 h-8 text-blue-500" />
+              Infrastructure Management
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Gestiona toda tu infraestructura cloud, Kubernetes y recursos GPU
+              desde un solo lugar
+            </p>
+          </div>
+
+          {/* Estado general del sistema */}
+          <div className="flex items-center gap-4 p-4 rounded-xl backdrop-blur-md bg-white/10 dark:bg-black/10 border border-white/20 dark:border-black/20 shadow-lg">
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-3 h-3 rounded-full ${getStatusColor(
+                  systemStatus.overall
+                )} animate-pulse`}
+              />
+              <span className="text-sm font-medium text-foreground">
+                {getStatusText(systemStatus.overall)}
+              </span>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Uptime</p>
+              <p className="text-sm font-bold text-foreground">
+                {systemStatus.uptime}
+              </p>
+            </div>
+            <div className="h-6 w-px bg-border" />
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">Resources</p>
+              <p className="text-sm font-bold text-foreground">
+                {systemStatus.totalResources}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <Card className="bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-foreground text-lg flex items-center gap-2">
+              <Zap className="w-5 h-5 text-yellow-500" />
+              Quick Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              {quickActions.map((action, index) => (
+                <Link key={index} href={action.href}>
+                  <div className="group p-3 rounded-lg border-2 border-dashed transition-all duration-500 hover:scale-105 cursor-pointer bg-card/50 border-border hover:border-primary overflow-hidden relative hover:bg-card/70">
+                    {/* Efecto de brillo en hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                    <div className="flex flex-col items-center text-center space-y-2 relative z-10">
+                      <div
+                        className="p-2 rounded-lg transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden"
+                        style={{
+                          backgroundColor: `${action.color}20`,
+                          boxShadow: `0 0 20px ${action.color}40`,
+                        }}
+                      >
+                        {/* Efecto de partículas en el icono */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                        <action.icon
+                          className="w-4 h-4 transition-all duration-300 group-hover:scale-110 relative z-10"
+                          style={{ color: action.color }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-foreground transition-all duration-300 group-hover:scale-105">
+                        {action.title}
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Grid de módulos de infraestructura */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {infrastructureModules.map((module, index) => (
+            <div
+              key={module.id}
+              style={{
+                animationDelay: `${index * 150}ms`,
+                animation: "fadeInUp 0.8s ease-out forwards",
+              }}
+            >
+              <Card className="group transition-all duration-700 hover:scale-105 hover:shadow-2xl bg-card/80 backdrop-blur-sm border-border shadow-lg overflow-hidden relative hover:bg-card/90">
+                {/* Efecto de brillo en hover */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                {/* Efecto de borde brillante */}
+                <div
+                  className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  style={{
+                    background: `linear-gradient(45deg, ${module.color}40, transparent, ${module.color}40)`,
+                    backgroundSize: "200% 200%",
+                    animation: "shimmer 2s ease-in-out infinite",
+                  }}
+                />
+
+                <CardHeader className="pb-3 relative z-10">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-3 rounded-xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 relative overflow-hidden ${
+                          module.status === "operational"
+                            ? "animate-pulse-slow"
+                            : ""
+                        }`}
+                        style={{
+                          background: `linear-gradient(135deg, ${module.color}20, ${module.color}10)`,
+                          borderColor: module.color,
+                          borderWidth: "2px",
+                          boxShadow: `0 0 25px ${module.color}50, inset 0 0 20px ${module.color}10`,
+                        }}
+                      >
+                        {/* Efecto de partículas en el icono */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-x-[-100%] group-hover:translate-x-[100%]" />
+
+                        <module.icon
+                          className="w-6 h-6 transition-all duration-500 group-hover:scale-110 relative z-10"
+                          style={{ color: module.color }}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <CardTitle className="text-foreground text-lg group-hover:text-primary transition-colors duration-300">
+                          {module.title}
+                        </CardTitle>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div
+                            className={`w-2 h-2 rounded-full ${getStatusColor(
+                              module.status
+                            )}`}
+                          />
+                          <span className="text-xs text-muted-foreground">
+                            {getStatusText(module.status)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <CardDescription className="text-muted-foreground text-sm mt-2">
+                    {module.description}
+                  </CardDescription>
+                </CardHeader>
+
+                <CardContent className="pt-0 relative z-10">
+                  {/* Métricas del módulo */}
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {Object.entries(module.metrics || {}).map(
+                      ([key, value], idx) => (
+                        <div
+                          key={idx}
+                          className="text-center p-2 rounded-lg bg-card/50 hover:bg-card/70 transition-colors duration-300"
+                        >
+                          <p className="text-xs text-muted-foreground capitalize">
+                            {key}
+                          </p>
+                          <p className="text-sm font-bold text-foreground">
+                            {value}
+                          </p>
+                        </div>
+                      )
+                    )}
+                  </div>
+
+                  {/* Características */}
+                  <div className="space-y-2 mb-4">
+                    {module.features.map((feature, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center gap-2 text-sm"
+                      >
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span className="text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Botón de acción */}
+                  <div className="flex items-center justify-between">
+                    <Link href={module.href}>
+                      <Button
+                        className="w-full transition-all duration-300 hover:scale-105 group-hover:shadow-lg"
+                        style={{
+                          background: `linear-gradient(135deg, ${module.color}, ${module.color}dd)`,
+                          boxShadow: `0 0 20px ${module.color}40`,
+                        }}
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Manage
+                      </Button>
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer con información adicional */}
+        <Card className="bg-card/60 backdrop-blur-sm border-border shadow-lg">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div>
+                <p className="text-sm text-muted-foreground">Last Incident</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStatus.lastIncident}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Active Alerts</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStatus.activeAlerts}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">Total Resources</p>
+                <p className="text-lg font-semibold text-foreground">
+                  {systemStatus.totalResources}
+                </p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://codeflowx.com/govern/iso42001/internal-audit"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso42001InternalAuditV1"
+           name="ISO 42001 Internal Audit"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="internalAuditTimer" name="Anual">
+      <timerEventDefinition>
+        <timeCycle>R/P1Y</timeCycle>
+      </timerEventDefinition>
+      <outgoing>flowGenerateChecklist</outgoing>
+    </startEvent>
+
+    <serviceTask id="generateAuditChecklist"
+                 name="Generar checklist auditoría"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.GenerateInternalAuditChecklistDelegate">
+      <incoming>flowGenerateChecklist</incoming>
+      <outgoing>flowScheduleAudit</outgoing>
+    </serviceTask>
+
+    <userTask id="scheduleAuditTask"
+              name="Programar auditoría"
+              flowable:formKey="console/bpmn/internal-audit-scheduling-form.zul"
+              flowable:candidateGroups="compliance-coordinators,audit-leads">
+      <incoming>flowScheduleAudit</incoming>
+      <outgoing>flowExecuteAudit</outgoing>
+    </userTask>
+
+    <userTask id="conductAuditTask"
+              name="Realizar auditoría"
+              flowable:formKey="console/bpmn/internal-audit-execution-form.zul"
+              flowable:candidateGroups="auditors,compliance-officers">
+      <incoming>flowExecuteAudit</incoming>
+      <outgoing>flowCalculateCompliance</outgoing>
+    </userTask>
+
+    <serviceTask id="calculateComplianceScore"
+                 name="Calcular score cumplimiento"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.CalculateInternalAuditComplianceScoreDelegate">
+      <incoming>flowCalculateCompliance</incoming>
+      <outgoing>flowNonConformityGateway</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="nonConformityGateway" name="¿No conformidades?">
+      <incoming>flowNonConformityGateway</incoming>
+      <outgoing>flowCreateNonConformities</outgoing>
+      <outgoing>flowSkipNonConformities</outgoing>
+    </exclusiveGateway>
+
+    <serviceTask id="createNonConformities"
+                 name="Crear no conformidades"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.CreateInternalAuditNonConformitiesDelegate">
+      <incoming>flowCreateNonConformities</incoming>
+      <outgoing>flowRecordResults</outgoing>
+    </serviceTask>
+
+    <serviceTask id="recordAuditResults"
+                 name="Registrar resultados auditoría"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.RecordInternalAuditResultsDelegate">
+      <incoming>flowSkipNonConformities</incoming>
+      <incoming>flowRecordResults</incoming>
+      <outgoing>flowEndInternalAudit</outgoing>
+    </serviceTask>
+
+    <endEvent id="endInternalAudit" name="Auditoría completada">
+      <incoming>flowEndInternalAudit</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowGenerateChecklist"
+                  sourceRef="internalAuditTimer"
+                  targetRef="generateAuditChecklist"/>
+    <sequenceFlow id="flowScheduleAudit"
+                  sourceRef="generateAuditChecklist"
+                  targetRef="scheduleAuditTask"/>
+    <sequenceFlow id="flowExecuteAudit"
+                  sourceRef="scheduleAuditTask"
+                  targetRef="conductAuditTask"/>
+    <sequenceFlow id="flowCalculateCompliance"
+                  sourceRef="conductAuditTask"
+                  targetRef="calculateComplianceScore"/>
+    <sequenceFlow id="flowNonConformityGateway"
+                  sourceRef="calculateComplianceScore"
+                  targetRef="nonConformityGateway"/>
+    <sequenceFlow id="flowCreateNonConformities"
+                  sourceRef="nonConformityGateway"
+                  targetRef="createNonConformities">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${auditHasNonConformities}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowSkipNonConformities"
+                  sourceRef="nonConformityGateway"
+                  targetRef="recordAuditResults">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!auditHasNonConformities}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowRecordResults"
+                  sourceRef="createNonConformities"
+                  targetRef="recordAuditResults"/>
+    <sequenceFlow id="flowEndInternalAudit"
+                  sourceRef="recordAuditResults"
+                  targetRef="endInternalAudit"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso42001InternalAudit">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso42001InternalAudit" bpmnElement="iso42001InternalAuditV1"/>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+

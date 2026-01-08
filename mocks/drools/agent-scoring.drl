@@ -1,0 +1,161 @@
+package com.codeflowx.govern.workflow.drools.agent;
+
+import com.codeflowx.govern.workflow.drools.facts.AgentApprovalFact;
+
+global org.slf4j.Logger logger;
+
+// ============================================
+// REGLA 1: AUTO-APPROVE (High Confidence 90-100)
+// ============================================
+rule "Auto-Approve Agent - High Confidence"
+    salience 100
+    when
+        $fact : AgentApprovalFact(
+            riskScore >= 90,
+            complianceScore >= 90,
+            ethicsScore >= 90
+        )
+    then
+        logger.info("🟢 DROOLS: Auto-Approve - All scores >= 90");
+
+        $fact.setDecision("AUTO_APPROVE");
+        $fact.setConfidenceLevel("HIGH");
+        $fact.setRequiresHumanReview(false);
+        $fact.setJustification(String.format(
+            "✅ Aprobación automática - Todos los scores son excelentes (Risk: %d, Compliance: %d, Ethics: %d)",
+            $fact.getRiskScore(), $fact.getComplianceScore(), $fact.getEthicsScore()
+        ));
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 2: HITL REQUIRED (Medium Confidence 70-89)
+// ============================================
+rule "HITL Required - Medium Confidence"
+    salience 90
+    when
+        $fact : AgentApprovalFact(
+            minScore >= 70,
+            minScore < 90,
+            decision == null
+        )
+    then
+        logger.warn("🟡 DROOLS: HITL Required - Score en zona gris (70-89)");
+
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setConfidenceLevel("MEDIUM");
+        $fact.setRequiresHumanReview(true);
+        $fact.setJustification(String.format(
+            "⚠️ Revisión humana requerida - Confidence score: %d (70-89 range). " +
+            "Risk: %d, Compliance: %d, Ethics: %d",
+            $fact.getMinScore(), $fact.getRiskScore(), $fact.getComplianceScore(), $fact.getEthicsScore()
+        ));
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 3: AUTO-REJECT (Low Confidence 0-69)
+// ============================================
+rule "Auto-Reject Agent - Low Confidence"
+    salience 80
+    when
+        $fact : AgentApprovalFact(
+            minScore < 70,
+            decision == null
+        )
+    then
+        logger.error("🔴 DROOLS: Auto-Reject - Score demasiado bajo (<70)");
+
+        $fact.setDecision("AUTO_REJECT");
+        $fact.setConfidenceLevel("LOW");
+        $fact.setRequiresHumanReview(false);
+        $fact.setJustification(String.format(
+            "❌ Rechazo automático - Score insuficiente: %d (<70). " +
+            "Risk: %d, Compliance: %d, Ethics: %d. No cumple estándares mínimos.",
+            $fact.getMinScore(), $fact.getRiskScore(), $fact.getComplianceScore(), $fact.getEthicsScore()
+        ));
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 4: CRITICAL RISK OVERRIDE (Score alto pero risk crítico)
+// ============================================
+rule "Critical Risk Override - Force HITL"
+    salience 110  // Mayor prioridad
+    when
+        $fact : AgentApprovalFact(
+            riskCategory == "CRITICAL" || riskCategory == "UNACCEPTABLE",
+            decision != "AUTO_REJECT"
+        )
+    then
+        logger.warn("⚠️ DROOLS: Critical Risk detected - Forcing HITL despite scores");
+
+        $fact.setDecision("HITL_REQUIRED");
+        $fact.setConfidenceLevel("MEDIUM");
+        $fact.setRequiresHumanReview(true);
+        $fact.setJustification(
+            "🚨 HITL FORZADO - Riesgo crítico detectado (" + $fact.getRiskCategory() + "). " +
+            "Requiere aprobación de Governance Admin independientemente de scores."
+        );
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 5: NON-COMPLIANT OVERRIDE
+// ============================================
+rule "Non-Compliant Override - Force Reject or HITL"
+    salience 105
+    when
+        $fact : AgentApprovalFact(
+            compliant == false,
+            complianceScore < 80
+        )
+    then
+        logger.error("🔴 DROOLS: Non-compliant agent - Forcing rejection or HITL");
+
+        if ($fact.getComplianceScore() < 60) {
+            // Muy bajo = AUTO_REJECT
+            $fact.setDecision("AUTO_REJECT");
+            $fact.setRequiresHumanReview(false);
+            $fact.setJustification(
+                "❌ Rechazo automático - No cumple compliance básico (score: " +
+                $fact.getComplianceScore() + ")"
+            );
+        } else {
+            // Bajo pero no crítico = HITL
+            $fact.setDecision("HITL_REQUIRED");
+            $fact.setRequiresHumanReview(true);
+            $fact.setJustification(
+                "⚠️ HITL por non-compliance - Score: " + $fact.getComplianceScore() +
+                " (60-80). Governance debe revisar violations."
+            );
+        }
+
+        $fact.setConfidenceLevel("LOW");
+        update($fact);
+end
+
+// ============================================
+// REGLA 6: CALCULAR MIN SCORE (Pre-procesamiento)
+// ============================================
+rule "Calculate Min Score"
+    salience 200  // Ejecutar PRIMERO
+    when
+        $fact : AgentApprovalFact(
+            riskScore != null,
+            complianceScore != null,
+            ethicsScore != null,
+            minScore == null
+        )
+    then
+        int min = Math.min(Math.min($fact.getRiskScore(), $fact.getComplianceScore()), $fact.getEthicsScore());
+
+        logger.info("📊 DROOLS: MinScore calculated = {}", min);
+
+        $fact.setMinScore(min);
+        update($fact);
+end

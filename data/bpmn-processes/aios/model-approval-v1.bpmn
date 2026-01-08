@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.flowable.org/test">
+  <process id="model-approval-v1" name="Model Approval V1" isExecutable="true" flowable:candidateStarterGroups="ml-engineers,governance-admins">
+    <documentation>Proceso de aprobación de Model ML - VERSIÓN OPTIMIZADA
+
+ELEMENTOS AVANZADOS:
+✅ ParallelGateway - Validaciones en paralelo (3x más rápido)
+✅ BusinessRuleTask - Drools para decisión final
+✅ Error Boundaries - Resiliencia ante fallos
+✅ Timer Boundary - SLA 3 días en Governance Review
+✅ MailTask - Notificaciones automáticas
+
+PROPORCIÓN: 60% Automatizado - 40% HITL (ML Review + Governance Review)
+
+FLUJO:
+1. Start → Submit Request (User Task)
+2. ParallelGateway → 3 validaciones simultáneas
+3. Join → ML Engineer Review (User Task)
+4. Governance Review (User Task) + Timer SLA 3 días
+5. BusinessRuleTask (Drools scoring)
+6. Decision → APPROVED / CONDITIONAL / REJECTED</documentation>
+    <startEvent id="start" name="Inicio" />
+    <userTask id="submitTask" name="Submit Model for Approval" flowable:candidateGroups="ml-engineers" flowable:formKey="plataforma/workflow/model-approval-request-form.zul" flowable:priority="60">
+      <documentation>Usuario ML Engineer solicita aprobación del modelo.
+
+Input:
+- modelId, versionId
+- approvalType: NEW_MODEL, VERSION_UPDATE, REDEPLOYMENT
+- targetEnvironment: STAGING, PRODUCTION
+- businessJustification</documentation>
+    </userTask>
+    <parallelGateway id="fork" name="Fork Validaciones" />
+    <serviceTask id="performanceTask" name="Performance Validation" flowable:class="com.codeflowx.govern.workflow.delegates.ModelValidationDelegate">
+      <documentation>Valida performance del modelo.
+Llama a: leka-server-serving-evaluation
+Output: performanceScore (0-100)</documentation>
+    </serviceTask>
+    <boundaryEvent id="perfError" name="Error" attachedToRef="performanceTask">
+      <errorEventDefinition />
+    </boundaryEvent>
+    <scriptTask id="handlePerfError" name="Score Conservador" scriptFormat="javascript" flowable:autoStoreVariables="false">
+      <script>execution.setVariable('performanceScore', 70);</script>
+    </scriptTask>
+    <serviceTask id="biasTask" name="Bias Detection" flowable:class="com.codeflowx.govern.workflow.delegates.BiasDetectionDelegate">
+      <documentation>Detecta bias en modelo.
+Llama a: leka-server-serving-evaluation
+Output: biasScore (0-100)</documentation>
+    </serviceTask>
+    <serviceTask id="complianceTask" name="Compliance Check" flowable:class="com.codeflowx.govern.workflow.delegates.ComplianceCheckDelegate">
+      <documentation>Verifica compliance regulatorio.
+Output: complianceScore (0-100)</documentation>
+    </serviceTask>
+    <parallelGateway id="join" name="Join Validaciones" />
+    <userTask id="mlReviewTask" name="ML Engineer Review" flowable:candidateGroups="ml-engineers,senior-ml-engineers" flowable:formKey="plataforma/workflow/model-ml-review-form.zul" flowable:priority="75">
+      <documentation>Revisión técnica por ML Engineer.
+
+Output:
+- mlApproval: APPROVED, REJECTED, NEEDS_CHANGES
+- reviewNotes</documentation>
+    </userTask>
+    <userTask id="govReviewTask" name="Governance Review" flowable:candidateGroups="governance-admins" flowable:formKey="plataforma/workflow/model-governance-review-form.zul" flowable:priority="75">
+      <documentation>Revisión de governance (ética, riesgos, compliance).
+
+Output:
+- governanceApproval: APPROVED, REJECTED, CONDITIONAL
+- riskAssessment: LOW, MEDIUM, HIGH</documentation>
+    </userTask>
+    <boundaryEvent id="govTimer" name="SLA 3 días" cancelActivity="false" attachedToRef="govReviewTask">
+      <timerEventDefinition>
+        <timeDuration>P3D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="slaReminder" name="SLA Reminder" flowable:candidateGroups="governance-leads" flowable:formKey="bpmn/model-approval-reminder-form.zul" flowable:priority="85">
+      <documentation>Recordatorio SLA excedido (3 días).</documentation>
+    </userTask>
+    <businessRuleTask id="droolsScore" name="Calculate Final Decision (Drools)" flowable:ruleVariablesInput="${modelApprovalFact}" flowable:rules="model-approval-scoring" flowable:resultVariable="finalDecision">
+      <documentation>Ejecuta reglas Drools para decisión final.
+
+INPUT:
+- ModelApprovalFact con:
+  · performanceScore, biasScore, complianceScore
+  · mlEngineerApproval, governanceApproval
+  · targetEnvironment
+
+DROOLS DRL: model-approval-scoring.drl (12 reglas)
+
+OUTPUT:
+- finalDecision: APPROVED / CONDITIONAL_APPROVAL / REJECTED
+- minScore, confidenceLevel, justification
+- requiresMonitoring</documentation>
+    </businessRuleTask>
+    <exclusiveGateway id="gateway" name="Decisión Final" />
+    <serviceTask id="approveTask" name="Mark Production Ready" flowable:class="com.codeflowx.govern.workflow.delegates.MarkModelProductionDelegate">
+      <documentation>Marca modelo como listo para producción.</documentation>
+    </serviceTask>
+    <serviceTask id="mailApprove" name="Email: Model Approved" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:expression>${approverEmail}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string>governance@company.com</flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:expression>Model Approved: ${modelName}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression>Model approved for ${targetEnvironment}. Score: ${minScore}/100. Monitoring: ${requiresMonitoring}</flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="endApproved" name="Model Approved" />
+    <serviceTask id="conditionalTask" name="Mark Conditional Approval" flowable:class="com.codeflowx.govern.workflow.delegates.MarkModelConditionalDelegate">
+      <documentation>Marca modelo como aprobado CON CONDICIONES.
+Requiere monitorización adicional.</documentation>
+    </serviceTask>
+    <serviceTask id="mailConditional" name="Email: Conditional Approval" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:expression>${approverEmail}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string>governance@company.com</flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:expression>Model Conditionally Approved: ${modelName}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression>Model conditionally approved. Enhanced monitoring REQUIRED. Score: ${minScore}/100</flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="endConditional" name="Conditional Approval" />
+    <serviceTask id="rejectTask" name="Reject Model" flowable:class="com.codeflowx.govern.workflow.delegates.RejectModelDelegate">
+      <documentation>Marca modelo como rechazado.</documentation>
+    </serviceTask>
+    <serviceTask id="mailReject" name="Email: Model Rejected" flowable:type="mail">
+      <extensionElements>
+        <flowable:field name="to">
+          <flowable:expression>${approverEmail}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="from">
+          <flowable:string>governance@company.com</flowable:string>
+        </flowable:field>
+        <flowable:field name="subject">
+          <flowable:expression>Model Rejected: ${modelName}</flowable:expression>
+        </flowable:field>
+        <flowable:field name="html">
+          <flowable:expression>Model rejected. Reason: ${justification}</flowable:expression>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="endRejected" name="Model Rejected" />
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="submitTask" />
+    <sequenceFlow id="flow2" sourceRef="submitTask" targetRef="fork" />
+    <sequenceFlow id="flow3a" sourceRef="fork" targetRef="performanceTask" />
+    <sequenceFlow id="flow3b" sourceRef="fork" targetRef="biasTask" />
+    <sequenceFlow id="flow3c" sourceRef="fork" targetRef="complianceTask" />
+    <sequenceFlow id="flowPerfError" sourceRef="perfError" targetRef="handlePerfError" />
+    <sequenceFlow id="flowPerfErrorToJoin" sourceRef="handlePerfError" targetRef="join" />
+    <sequenceFlow id="flow4a" sourceRef="performanceTask" targetRef="join" />
+    <sequenceFlow id="flow4b" sourceRef="biasTask" targetRef="join" />
+    <sequenceFlow id="flow4c" sourceRef="complianceTask" targetRef="join" />
+    <sequenceFlow id="flow5" sourceRef="join" targetRef="mlReviewTask" />
+    <sequenceFlow id="flow6" sourceRef="mlReviewTask" targetRef="govReviewTask" />
+    <sequenceFlow id="flowTimer" sourceRef="govTimer" targetRef="slaReminder" />
+    <sequenceFlow id="flowReminder" sourceRef="slaReminder" targetRef="droolsScore" />
+    <sequenceFlow id="flow7" sourceRef="govReviewTask" targetRef="droolsScore" />
+    <sequenceFlow id="flow8" sourceRef="droolsScore" targetRef="gateway" />
+    <sequenceFlow id="flowApprove" name="APPROVED" sourceRef="gateway" targetRef="approveTask">
+      <conditionExpression xsi:type="tFormalExpression">${finalDecision == 'APPROVED'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowApprove2" sourceRef="approveTask" targetRef="mailApprove" />
+    <sequenceFlow id="flowApprove3" sourceRef="mailApprove" targetRef="endApproved" />
+    <sequenceFlow id="flowConditional" name="CONDITIONAL" sourceRef="gateway" targetRef="conditionalTask">
+      <conditionExpression xsi:type="tFormalExpression">${finalDecision == 'CONDITIONAL_APPROVAL'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowConditional2" sourceRef="conditionalTask" targetRef="mailConditional" />
+    <sequenceFlow id="flowConditional3" sourceRef="mailConditional" targetRef="endConditional" />
+    <sequenceFlow id="flowReject" name="REJECTED" sourceRef="gateway" targetRef="rejectTask">
+      <conditionExpression xsi:type="tFormalExpression">${finalDecision == 'REJECTED'}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowReject2" sourceRef="rejectTask" targetRef="mailReject" />
+    <sequenceFlow id="flowReject3" sourceRef="mailReject" targetRef="endRejected" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_model-approval-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_model-approval-v1" bpmnElement="model-approval-v1">
+      <bpmndi:BPMNShape id="BPMNShape_start" bpmnElement="start">
+        <omgdc:Bounds x="50" y="299" width="35" height="35" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_submitTask" bpmnElement="submitTask">
+        <omgdc:Bounds x="150" y="287" width="131" height="67" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_fork" bpmnElement="fork">
+        <omgdc:Bounds x="340" y="297" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_performanceTask" bpmnElement="performanceTask">
+        <omgdc:Bounds x="440" y="50" width="130" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_biasTask" bpmnElement="biasTask">
+        <omgdc:Bounds x="450" y="287" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_complianceTask" bpmnElement="complianceTask">
+        <omgdc:Bounds x="450" y="489" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_join" bpmnElement="join">
+        <omgdc:Bounds x="650" y="297" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mlReviewTask" bpmnElement="mlReviewTask">
+        <omgdc:Bounds x="750" y="280" width="120" height="75" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_govReviewTask" bpmnElement="govReviewTask">
+        <omgdc:Bounds x="940" y="287" width="120" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_slaReminder" bpmnElement="slaReminder">
+        <omgdc:Bounds x="980" y="430" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_droolsScore" bpmnElement="droolsScore">
+        <omgdc:Bounds x="1120" y="287" width="131" height="67" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_gateway" bpmnElement="gateway" isMarkerVisible="true">
+        <omgdc:Bounds x="1300" y="297" width="40" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approveTask" bpmnElement="approveTask">
+        <omgdc:Bounds x="1490" y="145" width="131" height="65" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mailApprove" bpmnElement="mailApprove">
+        <omgdc:Bounds x="1660" y="148" width="130" height="62" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endApproved" bpmnElement="endApproved">
+        <omgdc:Bounds x="1830" y="162" width="35" height="35" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_conditionalTask" bpmnElement="conditionalTask">
+        <omgdc:Bounds x="1489" y="283" width="133" height="68" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mailConditional" bpmnElement="mailConditional">
+        <omgdc:Bounds x="1660" y="287" width="130" height="67" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endConditional" bpmnElement="endConditional">
+        <omgdc:Bounds x="1830" y="299" width="35" height="35" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rejectTask" bpmnElement="rejectTask">
+        <omgdc:Bounds x="1490" y="424" width="120" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mailReject" bpmnElement="mailReject">
+        <omgdc:Bounds x="1660" y="424" width="132" height="66" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRejected" bpmnElement="endRejected">
+        <omgdc:Bounds x="1830" y="436" width="35" height="35" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_handlePerfError" bpmnElement="handlePerfError">
+        <omgdc:Bounds x="759" y="76" width="141" height="70" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_govTimer" bpmnElement="govTimer">
+        <omgdc:Bounds x="1030" y="340" width="30" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_perfError" bpmnElement="perfError">
+        <omgdc:Bounds x="530" y="110" width="30" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85" y="316" />
+        <omgdi:waypoint x="150" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="281" y="320" />
+        <omgdi:waypoint x="340" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3a" bpmnElement="flow3a">
+        <omgdi:waypoint x="360" y="297" />
+        <omgdi:waypoint x="360" y="87" />
+        <omgdi:waypoint x="440" y="87" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3b" bpmnElement="flow3b">
+        <omgdi:waypoint x="380" y="317" />
+        <omgdi:waypoint x="450" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3c" bpmnElement="flow3c">
+        <omgdi:waypoint x="360" y="337" />
+        <omgdi:waypoint x="360" y="518" />
+        <omgdi:waypoint x="450" y="519" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowPerfError" bpmnElement="flowPerfError">
+        <omgdi:waypoint x="560" y="126" />
+        <omgdi:waypoint x="652" y="126" />
+        <omgdi:waypoint x="652" y="104" />
+        <omgdi:waypoint x="759" y="104" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowPerfErrorToJoin" bpmnElement="flowPerfErrorToJoin">
+        <omgdi:waypoint x="830" y="146" />
+        <omgdi:waypoint x="830" y="210" />
+        <omgdi:waypoint x="670" y="220" />
+        <omgdi:waypoint x="670" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4a" bpmnElement="flow4a">
+        <omgdi:waypoint x="505" y="125" />
+        <omgdi:waypoint x="505" y="220" />
+        <omgdi:waypoint x="670" y="220" />
+        <omgdi:waypoint x="670" y="297" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4b" bpmnElement="flow4b">
+        <omgdi:waypoint x="570" y="317" />
+        <omgdi:waypoint x="650" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4c" bpmnElement="flow4c">
+        <omgdi:waypoint x="510" y="489" />
+        <omgdi:waypoint x="670" y="454" />
+        <omgdi:waypoint x="670" y="337" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="690" y="317" />
+        <omgdi:waypoint x="750" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="870" y="317" />
+        <omgdi:waypoint x="940" y="321" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTimer" bpmnElement="flowTimer">
+        <omgdi:waypoint x="1045" y="370" />
+        <omgdi:waypoint x="1040" y="430" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReminder" bpmnElement="flowReminder">
+        <omgdi:waypoint x="1100" y="460" />
+        <omgdi:waypoint x="1185" y="459" />
+        <omgdi:waypoint x="1185" y="354" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="1060" y="321" />
+        <omgdi:waypoint x="1120" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow8" bpmnElement="flow8">
+        <omgdi:waypoint x="1251" y="320" />
+        <omgdi:waypoint x="1300" y="317" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApprove" bpmnElement="flowApprove">
+        <omgdi:waypoint x="1320" y="297" />
+        <omgdi:waypoint x="1320" y="180" />
+        <omgdi:waypoint x="1490" y="177" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1330" y="221" width="100" height="16" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApprove2" bpmnElement="flowApprove2">
+        <omgdi:waypoint x="1621" y="177" />
+        <omgdi:waypoint x="1660" y="179" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApprove3" bpmnElement="flowApprove3">
+        <omgdi:waypoint x="1790" y="179" />
+        <omgdi:waypoint x="1830" y="179" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConditional" bpmnElement="flowConditional">
+        <omgdi:waypoint x="1340" y="317" />
+        <omgdi:waypoint x="1489" y="317" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1340" y="317" width="100" height="16" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConditional2" bpmnElement="flowConditional2">
+        <omgdi:waypoint x="1622" y="317" />
+        <omgdi:waypoint x="1660" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConditional3" bpmnElement="flowConditional3">
+        <omgdi:waypoint x="1790" y="320" />
+        <omgdi:waypoint x="1830" y="316" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReject" bpmnElement="flowReject">
+        <omgdi:waypoint x="1320" y="337" />
+        <omgdi:waypoint x="1320" y="454" />
+        <omgdi:waypoint x="1490" y="454" />
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds x="1330" y="399" width="100" height="16" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReject2" bpmnElement="flowReject2">
+        <omgdi:waypoint x="1610" y="454" />
+        <omgdi:waypoint x="1660" y="457" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReject3" bpmnElement="flowReject3">
+        <omgdi:waypoint x="1792" y="457" />
+        <omgdi:waypoint x="1830" y="453" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://codeflowx.com/govern/iso42001/management-review"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso42001ManagementReviewV1"
+           name="ISO 42001 Management Review"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="managementReviewTimer" name="Trimestral">
+      <timerEventDefinition>
+        <timeCycle>R/PT2160H</timeCycle>
+      </timerEventDefinition>
+      <outgoing>flowPreparePerformance</outgoing>
+    </startEvent>
+
+    <serviceTask id="preparePerformanceData"
+                 name="Preparar datos de desempeño"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.PreparePerformanceDataDelegate">
+      <incoming>flowPreparePerformance</incoming>
+      <outgoing>flowGenerateReport</outgoing>
+    </serviceTask>
+
+    <serviceTask id="generateManagementReviewReport"
+                 name="Generar informe de revisión"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.GenerateManagementReviewReportDelegate">
+      <incoming>flowGenerateReport</incoming>
+      <outgoing>flowScheduleMeeting</outgoing>
+    </serviceTask>
+
+    <userTask id="scheduleManagementReviewMeeting"
+              name="Planificar reunión"
+              flowable:formKey="console/bpmn/management-review-schedule-form.zul"
+              flowable:candidateGroups="compliance-coordinators">
+      <incoming>flowScheduleMeeting</incoming>
+      <outgoing>flowConductReview</outgoing>
+    </userTask>
+
+    <userTask id="conductManagementReview"
+              name="Realizar revisión"
+              flowable:formKey="console/bpmn/management-review-form.zul"
+              flowable:candidateGroups="top-management">
+      <incoming>flowConductReview</incoming>
+      <outgoing>flowRecordDecisions</outgoing>
+    </userTask>
+
+    <serviceTask id="recordManagementDecisions"
+                 name="Registrar decisiones"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.RecordManagementDecisionsDelegate">
+      <incoming>flowRecordDecisions</incoming>
+      <outgoing>flowSplitActions</outgoing>
+    </serviceTask>
+
+    <parallelGateway id="actionsGateway">
+      <incoming>flowSplitActions</incoming>
+      <outgoing>flowAssignActionItems</outgoing>
+      <outgoing>flowNotifyStakeholders</outgoing>
+    </parallelGateway>
+
+    <userTask id="assignActionItems"
+              name="Asignar acciones"
+              flowable:formKey="console/bpmn/management-review-actions-form.zul"
+              flowable:candidateGroups="compliance-coordinators">
+      <incoming>flowAssignActionItems</incoming>
+      <outgoing>flowJoinActions</outgoing>
+    </userTask>
+
+    <serviceTask id="notifyStakeholders"
+                 name="Notificar stakeholders"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.NotifyManagementStakeholdersDelegate">
+      <incoming>flowNotifyStakeholders</incoming>
+      <outgoing>flowJoinNotifications</outgoing>
+    </serviceTask>
+
+    <parallelGateway id="joinGateway">
+      <incoming>flowJoinActions</incoming>
+      <incoming>flowJoinNotifications</incoming>
+      <outgoing>flowArchive</outgoing>
+    </parallelGateway>
+
+    <serviceTask id="archiveReview"
+                 name="Archivar revisión"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.ArchiveManagementReviewDelegate">
+      <incoming>flowArchive</incoming>
+      <outgoing>flowEnd</outgoing>
+    </serviceTask>
+
+    <endEvent id="endManagementReview" name="Completado">
+      <incoming>flowEnd</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowPreparePerformance" sourceRef="managementReviewTimer" targetRef="preparePerformanceData"/>
+    <sequenceFlow id="flowGenerateReport" sourceRef="preparePerformanceData" targetRef="generateManagementReviewReport"/>
+    <sequenceFlow id="flowScheduleMeeting" sourceRef="generateManagementReviewReport" targetRef="scheduleManagementReviewMeeting"/>
+    <sequenceFlow id="flowConductReview" sourceRef="scheduleManagementReviewMeeting" targetRef="conductManagementReview"/>
+    <sequenceFlow id="flowRecordDecisions" sourceRef="conductManagementReview" targetRef="recordManagementDecisions"/>
+    <sequenceFlow id="flowSplitActions" sourceRef="recordManagementDecisions" targetRef="actionsGateway"/>
+    <sequenceFlow id="flowAssignActionItems" sourceRef="actionsGateway" targetRef="assignActionItems"/>
+    <sequenceFlow id="flowNotifyStakeholders" sourceRef="actionsGateway" targetRef="notifyStakeholders"/>
+    <sequenceFlow id="flowJoinActions" sourceRef="assignActionItems" targetRef="joinGateway"/>
+    <sequenceFlow id="flowJoinNotifications" sourceRef="notifyStakeholders" targetRef="joinGateway"/>
+    <sequenceFlow id="flowArchive" sourceRef="joinGateway" targetRef="archiveReview"/>
+    <sequenceFlow id="flowEnd" sourceRef="archiveReview" targetRef="endManagementReview"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso42001ManagementReview">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso42001ManagementReview" bpmnElement="iso42001ManagementReviewV1">
+      <bpmndi:BPMNShape id="BPMNShape_managementReviewTimer" bpmnElement="managementReviewTimer">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_preparePerformanceData" bpmnElement="preparePerformanceData">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateManagementReviewReport" bpmnElement="generateManagementReviewReport">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_scheduleManagementReviewMeeting" bpmnElement="scheduleManagementReviewMeeting">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_conductManagementReview" bpmnElement="conductManagementReview">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_recordManagementDecisions" bpmnElement="recordManagementDecisions">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_actionsGateway" bpmnElement="actionsGateway">
+        <omgdc:Bounds x="175" y="1155" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assignActionItems" bpmnElement="assignActionItems">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyStakeholders" bpmnElement="notifyStakeholders">
+        <omgdc:Bounds x="350" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_joinGateway" bpmnElement="joinGateway">
+        <omgdc:Bounds x="175" y="1515" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_archiveReview" bpmnElement="archiveReview">
+        <omgdc:Bounds x="150" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endManagementReview" bpmnElement="endManagementReview">
+        <omgdc:Bounds x="182" y="1882" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowPreparePerformance" bpmnElement="flowPreparePerformance">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowGenerateReport" bpmnElement="flowGenerateReport">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowScheduleMeeting" bpmnElement="flowScheduleMeeting">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConductReview" bpmnElement="flowConductReview">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRecordDecisions" bpmnElement="flowRecordDecisions">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSplitActions" bpmnElement="flowSplitActions">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="175" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAssignActionItems" bpmnElement="flowAssignActionItems">
+        <omgdi:waypoint x="225" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNotifyStakeholders" bpmnElement="flowNotifyStakeholders">
+        <omgdi:waypoint x="225" y="1180" />
+        <omgdi:waypoint x="350" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowJoinActions" bpmnElement="flowJoinActions">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="175" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowJoinNotifications" bpmnElement="flowJoinNotifications">
+        <omgdi:waypoint x="450" y="1360" />
+        <omgdi:waypoint x="175" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowArchive" bpmnElement="flowArchive">
+        <omgdi:waypoint x="225" y="1540" />
+        <omgdi:waypoint x="150" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEnd" bpmnElement="flowEnd">
+        <omgdi:waypoint x="250" y="1720" />
+        <omgdi:waypoint x="182" y="1900" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-lineage">
+  <process id="dataset-lineage-tracking-v1" name="Dataset Lineage Tracking V1" isExecutable="true" version="1.0" activiti:candidateStarterGroups="data-engineers">
+    <startEvent id="startLineageTracking" name="Start Lineage Tracking">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Registrar transformación -->
+    <serviceTask id="recordTransformation" name="Record Transformation" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.RecordTransformationDelegate">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </serviceTask>
+    
+    <!-- Actualizar lineage -->
+    <serviceTask id="updateLineage" name="Update Lineage" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.UpdateLineageDelegate">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    
+    <!-- Verificar dependencias -->
+    <serviceTask id="checkDependencies" name="Check Dependencies" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.CheckLineageDependenciesDelegate">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: ¿Hay dependencias afectadas? -->
+    <exclusiveGateway id="dependenciesGateway" name="Dependencies Affected?">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+      <outgoing>flow6</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Hay dependencias: Notificar stakeholders -->
+    <serviceTask id="notifyStakeholders" name="Notify Affected Stakeholders" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyLineageStakeholdersDelegate">
+      <incoming>flow5</incoming>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    
+    <!-- Guardar lineage -->
+    <serviceTask id="saveLineage" name="Save Lineage" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.SaveLineageDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endLineageTracking" name="Lineage Tracking Completed">
+      <incoming>flow7</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startLineageTracking" targetRef="recordTransformation"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="recordTransformation" targetRef="updateLineage"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="updateLineage" targetRef="checkDependencies"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="checkDependencies" targetRef="dependenciesGateway"></sequenceFlow>
+    <sequenceFlow id="flow5" name="Yes" sourceRef="dependenciesGateway" targetRef="notifyStakeholders">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hasDependencies == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" name="No" sourceRef="dependenciesGateway" targetRef="saveLineage">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${hasDependencies == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="notifyStakeholders" targetRef="saveLineage"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="saveLineage" targetRef="endLineageTracking"></sequenceFlow>
+  </process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-lineage-tracking-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-lineage-tracking-v1" id="BPMNPlane_dataset-lineage-tracking-v1">
+      <!-- Diagram elements would go here -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

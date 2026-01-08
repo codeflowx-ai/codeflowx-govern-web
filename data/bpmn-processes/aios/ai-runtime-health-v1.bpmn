@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://codeflowx.com/govern/aios">
+    <process id="ai_runtime_health_v1"
+             name="AI Runtime Health Monitor"
+             isExecutable="true">
+
+        <startEvent id="start_runtime_health" name="Health Trigger">
+            <outgoing>flow_start_collect</outgoing>
+        </startEvent>
+
+        <serviceTask id="task_collect_telemetry"
+                     name="Collect Telemetry Snapshot"
+                     camunda:delegateExpression="#{aioTelemetryCollectorDelegate}">
+            <!-- @todo implement client for aio-telemetry-service -->
+            <incoming>flow_start_collect</incoming>
+            <outgoing>flow_collect_kpi</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_evaluate_kpis"
+                     name="Evaluate KPIs"
+                     camunda:delegateExpression="#{runtimeKpiEvaluatorDelegate}">
+            <incoming>flow_collect_kpi</incoming>
+            <outgoing>flow_kpi_parallel</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_health_parallel" name="Publish Health Artifacts">
+            <incoming>flow_kpi_parallel</incoming>
+            <outgoing>flow_parallel_rules</outgoing>
+            <outgoing>flow_parallel_dashboard</outgoing>
+        </parallelGateway>
+
+        <serviceTask id="task_health_rules"
+                     name="Determine Health State"
+                     camunda:delegateExpression="#{runtimeHealthRulesDelegate}">
+            <incoming>flow_parallel_rules</incoming>
+            <outgoing>flow_rules_to_join</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_update_dashboard"
+                     name="Update Health Dashboard"
+                     camunda:delegateExpression="#{updateRuntimeDashboardDelegate}">
+            <incoming>flow_parallel_dashboard</incoming>
+            <outgoing>flow_dashboard_to_join</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_health_join" name="Join Health Branches">
+            <incoming>flow_rules_to_join</incoming>
+            <incoming>flow_dashboard_to_join</incoming>
+            <outgoing>flow_join_to_gateway</outgoing>
+        </parallelGateway>
+
+        <exclusiveGateway id="gateway_health_state" name="Health State?">
+            <incoming>flow_rules_gateway</incoming>
+            <outgoing>flow_state_green</outgoing>
+            <outgoing>flow_state_yellow</outgoing>
+            <outgoing>flow_state_red</outgoing>
+        </exclusiveGateway>
+
+        <endEvent id="end_green" name="State Green">
+            <incoming>flow_state_green</incoming>
+        </endEvent>
+
+        <serviceTask id="task_warning_ticket"
+                     name="Create Warning Ticket"
+                     camunda:delegateExpression="#{createRuntimeWarningTicketDelegate}">
+            <incoming>flow_state_yellow</incoming>
+            <outgoing>flow_warning_end</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_trigger_incident"
+                     name="Trigger Incident Process"
+                     camunda:delegateExpression="#{runtimeIncidentTriggerDelegate}">
+            <incoming>flow_state_red</incoming>
+            <outgoing>flow_incident_end</outgoing>
+        </serviceTask>
+
+        <endEvent id="end_warning" name="Warning Emitted">
+            <incoming>flow_warning_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_incident" name="Incident Triggered">
+            <incoming>flow_incident_end</incoming>
+        </endEvent>
+
+        <sequenceFlow id="flow_start_collect" sourceRef="start_runtime_health" targetRef="task_collect_telemetry"/>
+        <sequenceFlow id="flow_collect_kpi" sourceRef="task_collect_telemetry" targetRef="task_evaluate_kpis"/>
+        <sequenceFlow id="flow_kpi_parallel" sourceRef="task_evaluate_kpis" targetRef="gateway_health_parallel"/>
+        <sequenceFlow id="flow_parallel_rules" sourceRef="gateway_health_parallel" targetRef="task_health_rules"/>
+        <sequenceFlow id="flow_parallel_dashboard" sourceRef="gateway_health_parallel" targetRef="task_update_dashboard"/>
+        <sequenceFlow id="flow_rules_to_join" sourceRef="task_health_rules" targetRef="gateway_health_join"/>
+        <sequenceFlow id="flow_dashboard_to_join" sourceRef="task_update_dashboard" targetRef="gateway_health_join"/>
+        <sequenceFlow id="flow_join_to_gateway" sourceRef="gateway_health_join" targetRef="gateway_health_state"/>
+        <sequenceFlow id="flow_state_green" sourceRef="gateway_health_state" targetRef="end_green">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${healthState == 'GREEN'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_state_yellow" sourceRef="gateway_health_state" targetRef="task_warning_ticket">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${healthState == 'YELLOW'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_state_red" sourceRef="gateway_health_state" targetRef="task_trigger_incident">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${healthState == 'RED'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_warning_end" sourceRef="task_warning_ticket" targetRef="end_warning"/>
+        <sequenceFlow id="flow_incident_end" sourceRef="task_trigger_incident" targetRef="end_incident"/>
+    </process>
+</definitions>
+

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/risk-assessment">
+  <process id="risk-assessment-v1" name="Risk Assessment Process V1" version="1.0" isExecutable="true">
+    <startEvent id="startRiskAssessment" name="Start Risk Assessment">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <parallelGateway id="riskAnalysisGateway" name="Risk Analysis Gateway">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+      <outgoing>flow3</outgoing>
+      <outgoing>flow4</outgoing>
+    </parallelGateway>
+    <serviceTask id="technicalRiskAssessment" name="Technical Risk Assessment" activiti:delegateExpression="${technicalRiskAssessmentDelegate}">
+      <incoming>flow2</incoming>
+      <outgoing>flow5</outgoing>
+    </serviceTask>
+    <serviceTask id="businessRiskAssessment" name="Business Risk Assessment" activiti:delegateExpression="${businessRiskAssessmentDelegate}">
+      <incoming>flow3</incoming>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    <serviceTask id="complianceRiskAssessment" name="Compliance Risk Assessment" activiti:delegateExpression="${complianceRiskAssessmentDelegate}">
+      <incoming>flow4</incoming>
+      <outgoing>flow7</outgoing>
+    </serviceTask>
+    <parallelGateway id="riskConsolidationGateway" name="Risk Consolidation Gateway">
+      <incoming>flow5</incoming>
+      <incoming>flow6</incoming>
+      <incoming>flow7</incoming>
+      <outgoing>flow8</outgoing>
+    </parallelGateway>
+    <businessRuleTask id="calculateRiskScore" name="Calculate Risk Score" activiti:ruleVariablesInput="${riskAssessmentFact}" activiti:resultVariable="riskResult">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+    </businessRuleTask>
+    <exclusiveGateway id="riskDecisionGateway" name="Risk Decision Gateway">
+      <incoming>flow9</incoming>
+      <outgoing>flow10</outgoing>
+      <outgoing>flow11</outgoing>
+      <outgoing>flow12</outgoing>
+    </exclusiveGateway>
+    <userTask id="riskReviewTask" name="Risk Review Task" activiti:candidateGroups="governance-admins,risk-officers" activiti:formKey="console/bpmn/risk-review-form.zul">
+      <incoming>flow11</incoming>
+      <incoming>flow21</incoming>
+      <incoming>flow22</incoming>
+      <outgoing>flow13</outgoing>
+    </userTask>
+    <serviceTask id="storeRiskAssessment" name="Store Risk Assessment" activiti:delegateExpression="${storeRiskAssessmentDelegate}">
+      <incoming>flow10</incoming>
+      <incoming>flow12</incoming>
+      <incoming>flow13</incoming>
+      <incoming>flow23</incoming>
+      <outgoing>flow14</outgoing>
+    </serviceTask>
+    <serviceTask id="notifyRiskDecision" name="Notify Risk Decision" activiti:delegateExpression="${notifyRiskDecisionDelegate}">
+      <incoming>flow14</incoming>
+      <outgoing>flow15</outgoing>
+    </serviceTask>
+    <endEvent id="endRiskAssessment" name="End Risk Assessment">
+      <incoming>flow15</incoming>
+    </endEvent>
+    <boundaryEvent id="riskReviewTimer" name="Risk Review Timer" attachedToRef="riskReviewTask" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P3D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flow16</outgoing>
+    </boundaryEvent>
+    <userTask id="riskSlaReminder" name="Risk SLA Reminder" activiti:candidateGroups="governance-leads" activiti:formKey="console/bpmn/risk-sla-reminder-form.zul">
+      <incoming>flow16</incoming>
+      <outgoing>flow17</outgoing>
+    </userTask>
+    <exclusiveGateway id="slaDecisionGateway" name="SLA Decision Gateway">
+      <incoming>flow17</incoming>
+      <outgoing>flow18</outgoing>
+      <outgoing>flow19</outgoing>
+      <outgoing>flow20</outgoing>
+    </exclusiveGateway>
+    <serviceTask id="escalateRiskReview" name="Escalate Risk Review" activiti:delegateExpression="${escalateRiskReviewDelegate}">
+      <incoming>flow18</incoming>
+      <outgoing>flow21</outgoing>
+    </serviceTask>
+    <serviceTask id="extendRiskReview" name="Extend Risk Review" activiti:delegateExpression="${extendRiskReviewDelegate}">
+      <incoming>flow19</incoming>
+      <outgoing>flow22</outgoing>
+    </serviceTask>
+    <serviceTask id="forceRiskDecision" name="Force Risk Decision" activiti:delegateExpression="${forceRiskDecisionDelegate}">
+      <incoming>flow20</incoming>
+      <outgoing>flow23</outgoing>
+    </serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startRiskAssessment" targetRef="riskAnalysisGateway"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="riskAnalysisGateway" targetRef="technicalRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="riskAnalysisGateway" targetRef="businessRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="riskAnalysisGateway" targetRef="complianceRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="technicalRiskAssessment" targetRef="riskConsolidationGateway"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="businessRiskAssessment" targetRef="riskConsolidationGateway"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="complianceRiskAssessment" targetRef="riskConsolidationGateway"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="riskConsolidationGateway" targetRef="calculateRiskScore"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="calculateRiskScore" targetRef="riskDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow10" name="LOW_RISK" sourceRef="riskDecisionGateway" targetRef="storeRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult.decision == 'LOW_RISK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" name="MEDIUM_RISK" sourceRef="riskDecisionGateway" targetRef="riskReviewTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult.decision == 'MEDIUM_RISK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" name="HIGH_RISK" sourceRef="riskDecisionGateway" targetRef="storeRiskAssessment">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${riskResult.decision == 'HIGH_RISK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="riskReviewTask" targetRef="storeRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="storeRiskAssessment" targetRef="notifyRiskDecision"></sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="notifyRiskDecision" targetRef="endRiskAssessment"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="riskReviewTimer" targetRef="riskSlaReminder"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="riskSlaReminder" targetRef="slaDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow18" name="ESCALATE" sourceRef="slaDecisionGateway" targetRef="escalateRiskReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${slaDecision == 'ESCALATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow19" name="EXTEND" sourceRef="slaDecisionGateway" targetRef="extendRiskReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${slaDecision == 'EXTEND'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow20" name="FORCE_DECISION" sourceRef="slaDecisionGateway" targetRef="forceRiskDecision">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${slaDecision == 'FORCE_DECISION'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="escalateRiskReview" targetRef="riskReviewTask"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="extendRiskReview" targetRef="riskReviewTask"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="forceRiskDecision" targetRef="storeRiskAssessment"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_risk-assessment-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_risk-assessment-v1" bpmnElement="risk-assessment-v1">
+      <bpmndi:BPMNShape id="BPMNShape_startRiskAssessment" bpmnElement="startRiskAssessment">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskAnalysisGateway" bpmnElement="riskAnalysisGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="150.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_technicalRiskAssessment" bpmnElement="technicalRiskAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_businessRiskAssessment" bpmnElement="businessRiskAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_complianceRiskAssessment" bpmnElement="complianceRiskAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="250.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskConsolidationGateway" bpmnElement="riskConsolidationGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="400.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_calculateRiskScore" bpmnElement="calculateRiskScore">
+        <omgdc:Bounds height="80.0" width="100.0" x="500.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskDecisionGateway" bpmnElement="riskDecisionGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="650.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskReviewTask" bpmnElement="riskReviewTask">
+        <omgdc:Bounds height="80.0" width="100.0" x="750.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_storeRiskAssessment" bpmnElement="storeRiskAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="950.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyRiskDecision" bpmnElement="notifyRiskDecision">
+        <omgdc:Bounds height="80.0" width="100.0" x="1100.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endRiskAssessment" bpmnElement="endRiskAssessment">
+        <omgdc:Bounds height="35.0" width="35.0" x="1250.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskReviewTimer" bpmnElement="riskReviewTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="800.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_riskSlaReminder" bpmnElement="riskSlaReminder">
+        <omgdc:Bounds height="80.0" width="100.0" x="850.0" y="80.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_slaDecisionGateway" bpmnElement="slaDecisionGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="1000.0" y="95.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_escalateRiskReview" bpmnElement="escalateRiskReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="1100.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_extendRiskReview" bpmnElement="extendRiskReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="1100.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_forceRiskDecision" bpmnElement="forceRiskDecision">
+        <omgdc:Bounds height="80.0" width="100.0" x="1100.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="175.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="200.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="175.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="350.0" y="160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="242.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="350.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="350.0" y="380.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="292.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow8" bpmnElement="flow8">
+        <omgdi:waypoint x="450.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow9" bpmnElement="flow9">
+        <omgdi:waypoint x="600.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow10" bpmnElement="flow10">
+        <omgdi:waypoint x="675.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="675.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="267.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="52.0" x="700.0" y="210.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow11" bpmnElement="flow11">
+        <omgdi:waypoint x="700.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="267.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="72.0" x="705.0" y="250.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow12" bpmnElement="flow12">
+        <omgdi:waypoint x="675.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="675.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="267.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="56.0" x="700.0" y="310.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow13" bpmnElement="flow13">
+        <omgdi:waypoint x="850.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="950.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow14" bpmnElement="flow14">
+        <omgdi:waypoint x="1050.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow15" bpmnElement="flow15">
+        <omgdi:waypoint x="1200.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1250.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow16" bpmnElement="flow16">
+        <omgdi:waypoint x="815.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow17" bpmnElement="flow17">
+        <omgdi:waypoint x="950.0" y="120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow18" bpmnElement="flow18">
+        <omgdi:waypoint x="1025.0" y="95.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="90.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="56.0" x="1030.0" y="75.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow19" bpmnElement="flow19">
+        <omgdi:waypoint x="1025.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="190.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="40.0" x="1030.0" y="160.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow20" bpmnElement="flow20">
+        <omgdi:waypoint x="1025.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1100.0" y="390.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="88.0" x="1030.0" y="250.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow21" bpmnElement="flow21">
+        <omgdi:waypoint x="1100.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="227.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow22" bpmnElement="flow22">
+        <omgdi:waypoint x="1100.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="800.0" y="227.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow23" bpmnElement="flow23">
+        <omgdi:waypoint x="1150.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

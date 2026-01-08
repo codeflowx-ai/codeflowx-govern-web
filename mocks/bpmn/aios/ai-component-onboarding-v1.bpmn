@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:camunda="http://camunda.org/schema/1.0/bpmn"
+             targetNamespace="http://codeflowx.com/govern/aios">
+    <process id="ai_component_onboarding_v1"
+             name="AI Component Onboarding"
+             isExecutable="true">
+
+        <startEvent id="start_request" name="Onboarding Request">
+            <outgoing>flow_start_validate</outgoing>
+        </startEvent>
+
+        <serviceTask id="task_validate_metadata"
+                     name="Validate Component Metadata"
+                     camunda:delegateExpression="#{validateComponentMetadataDelegate}">
+            <incoming>flow_start_validate</incoming>
+            <outgoing>flow_validate_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_metadata_valid" name="Metadata Valid?">
+            <incoming>flow_validate_gateway</incoming>
+            <outgoing>flow_metadata_yes</outgoing>
+            <outgoing>flow_metadata_no</outgoing>
+        </exclusiveGateway>
+
+        <userTask id="task_fix_metadata"
+                  name="Fix Metadata"
+                  camunda:formKey="zul:aios/component_metadata_fix.zul"
+                  camunda:candidateGroups="AIOS_ADMIN">
+            <incoming>flow_metadata_no</incoming>
+            <outgoing>flow_fix_to_validate</outgoing>
+        </userTask>
+
+        <serviceTask id="task_security_compliance"
+                     name="Run Security &amp; Compliance Checks"
+                     camunda:delegateExpression="#{componentSecurityComplianceDelegate}">
+            <!-- @todo implement client for leka-bias-detection-service -->
+            <!-- @todo implement client for leka-llm-evaluation -->
+            <incoming>flow_metadata_yes</incoming>
+            <outgoing>flow_checks_to_parallel</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_provision_parallel" name="Provision Resources">
+            <incoming>flow_checks_to_parallel</incoming>
+            <outgoing>flow_parallel_fact_sheet</outgoing>
+            <outgoing>flow_parallel_log</outgoing>
+            <outgoing>flow_parallel_policies</outgoing>
+        </parallelGateway>
+
+        <serviceTask id="task_register_fact_sheet"
+                     name="Register Component Fact Sheet"
+                     camunda:delegateExpression="#{registerComponentFactSheetDelegate}">
+            <incoming>flow_parallel_fact_sheet</incoming>
+            <outgoing>flow_fact_sheet_join</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_create_immutable_log"
+                     name="Create Immutable Log Entry"
+                     camunda:delegateExpression="#{createComponentImmutableLogDelegate}">
+            <incoming>flow_parallel_log</incoming>
+            <outgoing>flow_log_join</outgoing>
+        </serviceTask>
+
+        <serviceTask id="task_attach_policies"
+                     name="Attach Policies"
+                     camunda:delegateExpression="#{attachDefaultPoliciesDelegate}">
+            <incoming>flow_parallel_policies</incoming>
+            <outgoing>flow_policies_join</outgoing>
+        </serviceTask>
+
+        <parallelGateway id="gateway_post_provision_join" name="Join Provisioning">
+            <incoming>flow_fact_sheet_join</incoming>
+            <incoming>flow_log_join</incoming>
+            <incoming>flow_policies_join</incoming>
+            <outgoing>flow_join_to_rules</outgoing>
+        </parallelGateway>
+
+        <serviceTask id="task_onboarding_rules"
+                     name="Onboarding Decision"
+                     camunda:delegateExpression="#{aiComponentOnboardingRulesDelegate}">
+            <incoming>flow_join_to_rules</incoming>
+            <outgoing>flow_rules_to_gateway</outgoing>
+        </serviceTask>
+
+        <exclusiveGateway id="gateway_onboarding_decision" name="Decision">
+            <incoming>flow_rules_to_gateway</incoming>
+            <outgoing>flow_decision_approve</outgoing>
+            <outgoing>flow_decision_conditional</outgoing>
+            <outgoing>flow_decision_reject</outgoing>
+        </exclusiveGateway>
+
+        <serviceTask id="task_activate_component"
+                     name="Activate Component"
+                     camunda:delegateExpression="#{activateComponentDelegate}">
+            <incoming>flow_decision_approve</incoming>
+            <outgoing>flow_activate_end</outgoing>
+        </serviceTask>
+
+        <userTask id="task_conditional_review"
+                  name="Conditional Approval Review"
+                  camunda:formKey="zul:aios/component_conditional_review.zul"
+                  camunda:candidateGroups="AIOS_ADMIN">
+            <incoming>flow_decision_conditional</incoming>
+            <outgoing>flow_conditional_to_end</outgoing>
+        </userTask>
+
+        <serviceTask id="task_reject_component"
+                     name="Reject Component"
+                     camunda:delegateExpression="#{rejectComponentDelegate}">
+            <incoming>flow_decision_reject</incoming>
+            <outgoing>flow_reject_end</outgoing>
+        </serviceTask>
+
+        <endEvent id="end_onboarded" name="Component Onboarded">
+            <incoming>flow_activate_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_conditional" name="Conditional Decision">
+            <incoming>flow_conditional_to_end</incoming>
+        </endEvent>
+
+        <endEvent id="end_rejected" name="Component Rejected">
+            <incoming>flow_reject_end</incoming>
+        </endEvent>
+
+        <sequenceFlow id="flow_start_validate" sourceRef="start_request" targetRef="task_validate_metadata"/>
+        <sequenceFlow id="flow_validate_gateway" sourceRef="task_validate_metadata" targetRef="gateway_metadata_valid"/>
+        <sequenceFlow id="flow_metadata_yes" sourceRef="gateway_metadata_valid" targetRef="task_security_compliance">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${metadataValid == true}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_metadata_no" sourceRef="gateway_metadata_valid" targetRef="task_fix_metadata">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${metadataValid == false}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_fix_to_validate" sourceRef="task_fix_metadata" targetRef="task_validate_metadata"/>
+        <sequenceFlow id="flow_checks_to_parallel" sourceRef="task_security_compliance" targetRef="gateway_provision_parallel"/>
+        <sequenceFlow id="flow_parallel_fact_sheet" sourceRef="gateway_provision_parallel" targetRef="task_register_fact_sheet"/>
+        <sequenceFlow id="flow_parallel_log" sourceRef="gateway_provision_parallel" targetRef="task_create_immutable_log"/>
+        <sequenceFlow id="flow_parallel_policies" sourceRef="gateway_provision_parallel" targetRef="task_attach_policies"/>
+        <sequenceFlow id="flow_fact_sheet_join" sourceRef="task_register_fact_sheet" targetRef="gateway_post_provision_join"/>
+        <sequenceFlow id="flow_log_join" sourceRef="task_create_immutable_log" targetRef="gateway_post_provision_join"/>
+        <sequenceFlow id="flow_policies_join" sourceRef="task_attach_policies" targetRef="gateway_post_provision_join"/>
+        <sequenceFlow id="flow_join_to_rules" sourceRef="gateway_post_provision_join" targetRef="task_onboarding_rules"/>
+        <sequenceFlow id="flow_rules_to_gateway" sourceRef="task_onboarding_rules" targetRef="gateway_onboarding_decision"/>
+        <sequenceFlow id="flow_decision_approve" sourceRef="gateway_onboarding_decision" targetRef="task_activate_component">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'APPROVE'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_conditional" sourceRef="gateway_onboarding_decision" targetRef="task_conditional_review">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'CONDITIONAL'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_decision_reject" sourceRef="gateway_onboarding_decision" targetRef="task_reject_component">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decision == 'REJECT'}]]></conditionExpression>
+        </sequenceFlow>
+        <sequenceFlow id="flow_activate_end" sourceRef="task_activate_component" targetRef="end_onboarded"/>
+        <sequenceFlow id="flow_conditional_to_end" sourceRef="task_conditional_review" targetRef="end_conditional"/>
+        <sequenceFlow id="flow_reject_end" sourceRef="task_reject_component" targetRef="end_rejected"/>
+    </process>
+</definitions>
+

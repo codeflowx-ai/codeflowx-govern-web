@@ -1,0 +1,101 @@
+package com.codeflowx.govern.workflow.drools.evaluation;
+
+import com.codeflowx.govern.workflow.drools.facts.EvaluationScoreFact;
+
+global org.slf4j.Logger logger;
+
+// ============================================
+// REGLA 1: AUTO-APPROVE (Score >= 80%)
+// ============================================
+rule "Auto-Approve LLM Evaluation - Excellent Score"
+    salience 100
+    when
+        $fact : EvaluationScoreFact(
+            evaluationType == "LLM",
+            overallScore >= threshold
+        )
+    then
+        logger.info("🟢 DROOLS: Auto-Approve LLM - Score {}", $fact.getOverallScore());
+
+        $fact.setDecision("AUTO_APPROVE");
+        $fact.setMeetsThreshold(true);
+        $fact.setRecommendation("✅ Evaluación aprobada - Score cumple umbral");
+        $fact.setActionRequired("NONE");
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 2: REQUIRES REVIEW (Score 70-79%)
+// ============================================
+rule "LLM Evaluation Requires Review - Borderline Score"
+    salience 90
+    when
+        $fact : EvaluationScoreFact(
+            evaluationType == "LLM",
+            overallScore >= (threshold * 0.875),  // 70% del threshold (0.80)
+            overallScore < threshold,
+            decision == null
+        )
+    then
+        logger.warn("🟡 DROOLS: LLM Requires Review - Borderline score {}", $fact.getOverallScore());
+
+        $fact.setDecision("REQUIRES_REVIEW");
+        $fact.setMeetsThreshold(false);
+        $fact.setRecommendation(String.format(
+            "⚠️ Score %.2f está cerca del umbral %.2f. Revisar métricas individuales.",
+            $fact.getOverallScore(), $fact.getThreshold()
+        ));
+        $fact.setActionRequired("HUMAN_REVIEW");
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 3: AUTO-REJECT (Score < 70%)
+// ============================================
+rule "Auto-Reject LLM Evaluation - Poor Score"
+    salience 80
+    when
+        $fact : EvaluationScoreFact(
+            evaluationType == "LLM",
+            overallScore < (threshold * 0.875),
+            decision == null
+        )
+    then
+        logger.error("🔴 DROOLS: Auto-Reject LLM - Poor score {}", $fact.getOverallScore());
+
+        $fact.setDecision("AUTO_REJECT");
+        $fact.setMeetsThreshold(false);
+        $fact.setRecommendation(String.format(
+            "❌ Score %.2f significativamente inferior al umbral %.2f. Modelo no apto.",
+            $fact.getOverallScore(), $fact.getThreshold()
+        ));
+        $fact.setActionRequired("REJECT_OR_RETRAIN");
+
+        update($fact);
+end
+
+// ============================================
+// REGLA 4: LOW PASS RATE OVERRIDE
+// ============================================
+rule "Low Pass Rate Override - Force Review"
+    salience 110
+    when
+        $fact : EvaluationScoreFact(
+            evaluationType == "LLM",
+            passRate < 0.80,
+            decision == "AUTO_APPROVE"
+        )
+    then
+        logger.warn("⚠️ DROOLS: Pass rate too low {} - Overriding to REVIEW", $fact.getPassRate());
+
+        $fact.setDecision("REQUIRES_REVIEW");
+        $fact.setRecommendation(String.format(
+            "⚠️ Pass rate demasiado bajo: %.1f%%. Revisar test cases fallidos.",
+            $fact.getPassRate() * 100
+        ));
+        $fact.setActionRequired("ANALYZE_FAILURES");
+
+        update($fact);
+end

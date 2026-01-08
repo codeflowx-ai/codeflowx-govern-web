@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://codeflowx.com/govern/iso42001/competence-gap"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso42001CompetenceGapV1"
+           name="ISO 42001 Competence Gap Closure"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="gapIdentifiedStart" name="Gap de competencias detectado">
+      <outgoing>flowAssessGap</outgoing>
+    </startEvent>
+
+    <userTask id="assessCompetenceGapTask"
+              name="Evaluar gap de competencias"
+              flowable:formKey="console/bpmn/competence-gap-assessment-form.zul"
+              flowable:candidateGroups="hr-managers,compliance-officers">
+      <incoming>flowAssessGap</incoming>
+      <outgoing>flowPlanTraining</outgoing>
+    </userTask>
+
+    <serviceTask id="generateTrainingPlanTask"
+                 name="Generar plan de capacitación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.GenerateCompetenceTrainingPlanDelegate">
+      <incoming>flowPlanTraining</incoming>
+      <outgoing>flowTrainingApproval</outgoing>
+    </serviceTask>
+
+    <userTask id="approveTrainingPlanTask"
+              name="Aprobar plan de capacitación"
+              flowable:formKey="console/bpmn/competence-gap-approval-form.zul"
+              flowable:candidateGroups="top-management,hr-directors">
+      <incoming>flowTrainingApproval</incoming>
+      <outgoing>flowExecutePlanGateway</outgoing>
+    </userTask>
+
+    <exclusiveGateway id="approvalGateway" name="¿Plan aprobado?">
+      <incoming>flowExecutePlanGateway</incoming>
+      <outgoing>flowReworkPlan</outgoing>
+      <outgoing>flowExecutePlan</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="reworkTrainingPlanTask"
+              name="Ajustar plan de capacitación"
+              flowable:formKey="console/bpmn/competence-gap-rework-form.zul"
+              flowable:candidateGroups="hr-managers,compliance-officers">
+      <incoming>flowReworkPlan</incoming>
+      <outgoing>flowPlanTraining</outgoing>
+    </userTask>
+
+    <userTask id="executeTrainingPlanTask"
+              name="Ejecutar plan de capacitación"
+              flowable:formKey="console/bpmn/competence-gap-implementation-form.zul"
+              flowable:candidateGroups="training-coordinators">
+      <incoming>flowExecutePlan</incoming>
+      <outgoing>flowVerifyEffectiveness</outgoing>
+    </userTask>
+
+    <serviceTask id="evaluateTrainingEffectivenessTask"
+                 name="Evaluar efectividad"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.EvaluateCompetenceTrainingEffectivenessDelegate">
+      <incoming>flowVerifyEffectiveness</incoming>
+      <outgoing>flowEffectivenessGateway</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="effectivenessGateway" name="¿Efectivo?">
+      <incoming>flowEffectivenessGateway</incoming>
+      <outgoing>flowNeedAdditionalActions</outgoing>
+      <outgoing>flowCloseGap</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="defineAdditionalActionsTask"
+              name="Definir acciones adicionales"
+              flowable:formKey="console/bpmn/competence-gap-additional-actions-form.zul"
+              flowable:candidateGroups="hr-managers,training-coordinators">
+      <incoming>flowNeedAdditionalActions</incoming>
+      <outgoing>flowExecutePlan</outgoing>
+    </userTask>
+
+    <serviceTask id="closeCompetenceGapTask"
+                 name="Cerrar gap de competencias"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.CloseCompetenceGapDelegate">
+      <incoming>flowCloseGap</incoming>
+      <outgoing>flowEndCompetenceGap</outgoing>
+    </serviceTask>
+
+    <endEvent id="competenceGapClosed" name="Gap cerrado">
+      <incoming>flowEndCompetenceGap</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowAssessGap"
+                  sourceRef="gapIdentifiedStart"
+                  targetRef="assessCompetenceGapTask"/>
+    <sequenceFlow id="flowPlanTraining"
+                  sourceRef="assessCompetenceGapTask"
+                  targetRef="generateTrainingPlanTask"/>
+    <sequenceFlow id="flowTrainingApproval"
+                  sourceRef="generateTrainingPlanTask"
+                  targetRef="approveTrainingPlanTask"/>
+    <sequenceFlow id="flowExecutePlanGateway"
+                  sourceRef="approveTrainingPlanTask"
+                  targetRef="approvalGateway"/>
+    <sequenceFlow id="flowReworkPlan"
+                  sourceRef="approvalGateway"
+                  targetRef="reworkTrainingPlanTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${trainingPlanApproved == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowExecutePlan"
+                  sourceRef="approvalGateway"
+                  targetRef="executeTrainingPlanTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${trainingPlanApproved == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowVerifyEffectiveness"
+                  sourceRef="executeTrainingPlanTask"
+                  targetRef="evaluateTrainingEffectivenessTask"/>
+    <sequenceFlow id="flowEffectivenessGateway"
+                  sourceRef="evaluateTrainingEffectivenessTask"
+                  targetRef="effectivenessGateway"/>
+    <sequenceFlow id="flowNeedAdditionalActions"
+                  sourceRef="effectivenessGateway"
+                  targetRef="defineAdditionalActionsTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${trainingEffective == false}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowCloseGap"
+                  sourceRef="effectivenessGateway"
+                  targetRef="closeCompetenceGapTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${trainingEffective == true}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowEndCompetenceGap"
+                  sourceRef="closeCompetenceGapTask"
+                  targetRef="competenceGapClosed"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso42001CompetenceGap">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso42001CompetenceGap" bpmnElement="iso42001CompetenceGapV1"/>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+

@@ -1,0 +1,714 @@
+{
+  "templateCategories": [
+    {
+      "id": "forms",
+      "name": "Form Templates",
+      "icon": "lucide:file-text",
+      "order": 1,
+      "description": "Pre-built form layouts for common use cases"
+    },
+    {
+      "id": "layouts",
+      "name": "Layout Templates",
+      "icon": "lucide:layout",
+      "order": 2,
+      "description": "Page layout structures and containers"
+    },
+    {
+      "id": "components",
+      "name": "Component Groups",
+      "icon": "lucide:package",
+      "order": 3,
+      "description": "Reusable component combinations"
+    },
+    {
+      "id": "enterprise",
+      "name": "Enterprise Templates",
+      "icon": "lucide:building",
+      "order": 4,
+      "description": "Business application templates"
+    }
+  ],
+  "templates": {
+    "user-registration": {
+      "id": "user-registration",
+      "name": "User Registration Form",
+      "description": "Complete user registration with validation and terms",
+      "category": "forms",
+      "icon": "lucide:user-plus",
+      "tags": ["form", "registration", "user", "validation"],
+      "preview": "/templates/previews/user-registration.png",
+      "size": { "width": 450, "height": 600 },
+      "metadata": {
+        "author": "Enterprise Team",
+        "created": "2024-01-15",
+        "complexity": "medium",
+        "estimatedTime": "5 minutes"
+      },
+      "components": [
+        {
+          "id": "registration_container",
+          "type": "container",
+          "position": { "x": 0, "y": 0 },
+          "size": { "width": 450, "height": 600 },
+          "properties": {
+            "title": "User Registration",
+            "layoutType": "flex",
+            "flexDirection": "column",
+            "gap": 16,
+            "padding": 32,
+            "backgroundColor": "#ffffff",
+            "borderRadius": 12,
+            "shadow": "lg"
+          },
+          "children": [
+            {
+              "id": "title_text",
+              "type": "input",
+              "properties": {
+                "value": "Create Your Account",
+                "readonly": true,
+                "className": "text-2xl font-bold text-center",
+                "showLabel": false
+              }
+            },
+            {
+              "id": "first_name",
+              "type": "input",
+              "properties": {
+                "label": "First Name",
+                "placeholder": "Enter your first name",
+                "required": true,
+                "minLength": 2,
+                "pattern": "^[a-zA-Z\\s]+$",
+                "validationMessage": "Please enter a valid first name"
+              }
+            },
+            {
+              "id": "last_name",
+              "type": "input",
+              "properties": {
+                "label": "Last Name",
+                "placeholder": "Enter your last name",
+                "required": true,
+                "minLength": 2,
+                "pattern": "^[a-zA-Z\\s]+$"
+              }
+            },
+            {
+              "id": "email",
+              "type": "input",
+              "properties": {
+                "label": "Email Address",
+                "placeholder": "your.email@example.com",
+                "inputType": "email",
+                "required": true,
+                "unique": true,
+                "validationMessage": "Please enter a valid email address"
+              }
+            },
+            {
+              "id": "password",
+              "type": "input",
+              "properties": {
+                "label": "Password",
+                "placeholder": "Create a strong password",
+                "inputType": "password",
+                "required": true,
+                "minLength": 8,
+                "pattern": "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]",
+                "validationMessage": "Password must contain uppercase, lowercase, number and special character"
+              }
+            },
+            {
+              "id": "confirm_password",
+              "type": "input",
+              "properties": {
+                "label": "Confirm Password",
+                "placeholder": "Confirm your password",
+                "inputType": "password",
+                "required": true
+              }
+            },
+            {
+              "id": "birth_date",
+              "type": "date",
+              "properties": {
+                "label": "Date of Birth",
+                "required": true,
+                "maxDate": "today",
+                "minDate": "1900-01-01"
+              }
+            },
+            {
+              "id": "terms_checkbox",
+              "type": "checkbox",
+              "properties": {
+                "label": "I agree to the Terms of Service and Privacy Policy",
+                "required": true
+              }
+            },
+            {
+              "id": "newsletter_checkbox",
+              "type": "checkbox",
+              "properties": {
+                "label": "Subscribe to newsletter (optional)",
+                "checked": false
+              }
+            },
+            {
+              "id": "register_button",
+              "type": "button",
+              "properties": {
+                "text": "Create Account",
+                "variant": "primary",
+                "fullWidth": true,
+                "onClick": {
+                  "enabled": true,
+                  "action": "submitForm",
+                  "parameters": {
+                    "endpoint": "/api/auth/register",
+                    "method": "POST",
+                    "successMessage": "Account created successfully!",
+                    "redirectUrl": "/dashboard"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "name": "Password Match Validation",
+          "condition": "fieldValue",
+          "parameters": {
+            "field": "confirm_password",
+            "operator": "notEquals",
+            "compareField": "password"
+          },
+          "action": "showError",
+          "actionParameters": {
+            "message": "Passwords do not match"
+          }
+        }
+      ]
+    },
+    "contact-form": {
+      "id": "contact-form",
+      "name": "Contact Form",
+      "description": "Professional contact form with subject categories",
+      "category": "forms",
+      "icon": "lucide:mail",
+      "tags": ["form", "contact", "communication", "support"],
+      "preview": "/templates/previews/contact-form.png",
+      "size": { "width": 500, "height": 450 },
+      "components": [
+        {
+          "id": "contact_container",
+          "type": "container",
+          "position": { "x": 0, "y": 0 },
+          "size": { "width": 500, "height": 450 },
+          "properties": {
+            "title": "Contact Us",
+            "layoutType": "flex",
+            "flexDirection": "column",
+            "gap": 20,
+            "padding": 24
+          },
+          "children": [
+            {
+              "id": "contact_title",
+              "type": "input",
+              "properties": {
+                "value": "Get in Touch",
+                "readonly": true,
+                "className": "text-xl font-semibold text-center",
+                "showLabel": false
+              }
+            },
+            {
+              "id": "full_name",
+              "type": "input",
+              "properties": {
+                "label": "Full Name",
+                "placeholder": "Your full name",
+                "required": true,
+                "minLength": 2
+              }
+            },
+            {
+              "id": "email_address",
+              "type": "input",
+              "properties": {
+                "label": "Email Address",
+                "placeholder": "your.email@example.com",
+                "inputType": "email",
+                "required": true
+              }
+            },
+            {
+              "id": "subject_category",
+              "type": "select",
+              "properties": {
+                "label": "Subject Category",
+                "placeholder": "Select a category",
+                "required": true,
+                "staticOptions": "[\n  {\"value\": \"general\", \"label\": \"General Inquiry\"},\n  {\"value\": \"support\", \"label\": \"Technical Support\"},\n  {\"value\": \"sales\", \"label\": \"Sales Question\"},\n  {\"value\": \"billing\", \"label\": \"Billing Issue\"},\n  {\"value\": \"feedback\", \"label\": \"Feedback\"}\n]"
+              }
+            },
+            {
+              "id": "message_text",
+              "type": "textarea",
+              "properties": {
+                "label": "Message",
+                "placeholder": "Please describe your inquiry in detail...",
+                "required": true,
+                "minLength": 10,
+                "rows": 6
+              }
+            },
+            {
+              "id": "urgent_checkbox",
+              "type": "checkbox",
+              "properties": {
+                "label": "This is urgent",
+                "checked": false
+              }
+            },
+            {
+              "id": "submit_button",
+              "type": "button",
+              "properties": {
+                "text": "Send Message",
+                "variant": "primary",
+                "fullWidth": true,
+                "onClick": {
+                  "enabled": true,
+                  "action": "submitForm",
+                  "parameters": {
+                    "endpoint": "/api/contact/submit",
+                    "method": "POST"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "invoice-form": {
+      "id": "invoice-form",
+      "name": "Invoice Creation Form",
+      "description": "Professional invoice form with line items and calculations",
+      "category": "enterprise",
+      "icon": "lucide:receipt",
+      "tags": ["invoice", "billing", "business", "calculation"],
+      "preview": "/templates/previews/invoice-form.png",
+      "size": { "width": 700, "height": 800 },
+      "components": [
+        {
+          "id": "invoice_container",
+          "type": "container",
+          "position": { "x": 0, "y": 0 },
+          "size": { "width": 700, "height": 800 },
+          "properties": {
+            "title": "Create Invoice",
+            "layoutType": "flex",
+            "flexDirection": "column",
+            "gap": 16,
+            "padding": 24
+          },
+          "children": [
+            {
+              "id": "invoice_header",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "row",
+                "justifyContent": "space-between"
+              },
+              "children": [
+                {
+                  "id": "invoice_title",
+                  "type": "input",
+                  "properties": {
+                    "value": "INVOICE",
+                    "readonly": true,
+                    "className": "text-3xl font-bold",
+                    "showLabel": false
+                  }
+                },
+                {
+                  "id": "invoice_number",
+                  "type": "input",
+                  "properties": {
+                    "label": "Invoice #",
+                    "placeholder": "INV-001",
+                    "required": true
+                  }
+                }
+              ]
+            },
+            {
+              "id": "client_info",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "row",
+                "gap": 20
+              },
+              "children": [
+                {
+                  "id": "client_name",
+                  "type": "input",
+                  "properties": {
+                    "label": "Client Name",
+                    "placeholder": "Client or Company Name",
+                    "required": true
+                  }
+                },
+                {
+                  "id": "client_email",
+                  "type": "input",
+                  "properties": {
+                    "label": "Client Email",
+                    "placeholder": "client@company.com",
+                    "inputType": "email",
+                    "required": true
+                  }
+                }
+              ]
+            },
+            {
+              "id": "invoice_dates",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "row",
+                "gap": 20
+              },
+              "children": [
+                {
+                  "id": "invoice_date",
+                  "type": "date",
+                  "properties": {
+                    "label": "Invoice Date",
+                    "required": true,
+                    "value": "today"
+                  }
+                },
+                {
+                  "id": "due_date",
+                  "type": "date",
+                  "properties": {
+                    "label": "Due Date",
+                    "required": true
+                  }
+                }
+              ]
+            },
+            {
+              "id": "line_items_section",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "column",
+                "gap": 12
+              },
+              "children": [
+                {
+                  "id": "items_title",
+                  "type": "input",
+                  "properties": {
+                    "value": "Line Items",
+                    "readonly": true,
+                    "className": "text-lg font-semibold",
+                    "showLabel": false
+                  }
+                },
+                {
+                  "id": "item_1",
+                  "type": "container",
+                  "properties": {
+                    "layoutType": "flex",
+                    "flexDirection": "row",
+                    "gap": 12
+                  },
+                  "children": [
+                    {
+                      "id": "item_1_description",
+                      "type": "input",
+                      "properties": {
+                        "label": "Description",
+                        "placeholder": "Service or product description"
+                      }
+                    },
+                    {
+                      "id": "item_1_quantity",
+                      "type": "number",
+                      "properties": {
+                        "label": "Qty",
+                        "value": 1,
+                        "min": 0
+                      }
+                    },
+                    {
+                      "id": "item_1_rate",
+                      "type": "currency",
+                      "properties": {
+                        "label": "Rate",
+                        "currency": "USD",
+                        "value": 0
+                      }
+                    },
+                    {
+                      "id": "item_1_total",
+                      "type": "currency",
+                      "properties": {
+                        "label": "Total",
+                        "readonly": true,
+                        "currency": "USD"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": "totals_section",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "column",
+                "alignItems": "flex-end",
+                "gap": 8
+              },
+              "children": [
+                {
+                  "id": "subtotal",
+                  "type": "currency",
+                  "properties": {
+                    "label": "Subtotal",
+                    "readonly": true,
+                    "currency": "USD"
+                  }
+                },
+                {
+                  "id": "tax_rate",
+                  "type": "percentage",
+                  "properties": {
+                    "label": "Tax Rate",
+                    "value": 10,
+                    "max": 100
+                  }
+                },
+                {
+                  "id": "tax_amount",
+                  "type": "currency",
+                  "properties": {
+                    "label": "Tax Amount",
+                    "readonly": true,
+                    "currency": "USD"
+                  }
+                },
+                {
+                  "id": "total_amount",
+                  "type": "currency",
+                  "properties": {
+                    "label": "Total Amount",
+                    "readonly": true,
+                    "currency": "USD",
+                    "className": "text-xl font-bold"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "notes_section",
+              "type": "textarea",
+              "properties": {
+                "label": "Notes",
+                "placeholder": "Additional notes or payment terms...",
+                "rows": 3
+              }
+            },
+            {
+              "id": "action_buttons",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "row",
+                "gap": 12,
+                "justifyContent": "flex-end"
+              },
+              "children": [
+                {
+                  "id": "save_draft_button",
+                  "type": "button",
+                  "properties": {
+                    "text": "Save Draft",
+                    "variant": "secondary"
+                  }
+                },
+                {
+                  "id": "send_invoice_button",
+                  "type": "button",
+                  "properties": {
+                    "text": "Send Invoice",
+                    "variant": "primary",
+                    "onClick": {
+                      "enabled": true,
+                      "action": "submitForm",
+                      "parameters": {
+                        "endpoint": "/api/invoices/create",
+                        "method": "POST"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "name": "Calculate Line Item Total",
+          "condition": "fieldChange",
+          "parameters": {
+            "fields": ["item_1_quantity", "item_1_rate"]
+          },
+          "action": "calculateValue",
+          "actionParameters": {
+            "target": "item_1_total",
+            "formula": "item_1_quantity * item_1_rate"
+          }
+        },
+        {
+          "name": "Calculate Tax Amount",
+          "condition": "fieldChange",
+          "parameters": {
+            "fields": ["subtotal", "tax_rate"]
+          },
+          "action": "calculateValue",
+          "actionParameters": {
+            "target": "tax_amount",
+            "formula": "subtotal * (tax_rate / 100)"
+          }
+        },
+        {
+          "name": "Calculate Total Amount",
+          "condition": "fieldChange",
+          "parameters": {
+            "fields": ["subtotal", "tax_amount"]
+          },
+          "action": "calculateValue",
+          "actionParameters": {
+            "target": "total_amount",
+            "formula": "subtotal + tax_amount"
+          }
+        }
+      ]
+    },
+    "dashboard-layout": {
+      "id": "dashboard-layout",
+      "name": "Executive Dashboard",
+      "description": "Complete dashboard layout with sidebar and widget areas",
+      "category": "layouts",
+      "icon": "lucide:layout-dashboard",
+      "tags": ["layout", "dashboard", "admin", "widgets"],
+      "preview": "/templates/previews/dashboard-layout.png",
+      "size": { "width": 1200, "height": 800 },
+      "components": [
+        {
+          "id": "main_container",
+          "type": "container",
+          "position": { "x": 0, "y": 0 },
+          "size": { "width": 1200, "height": 800 },
+          "properties": {
+            "layoutType": "flex",
+            "flexDirection": "row",
+            "gap": 0
+          },
+          "children": [
+            {
+              "id": "sidebar",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "column",
+                "backgroundColor": "#1f2937",
+                "padding": 16,
+                "width": 250
+              },
+              "children": [
+                {
+                  "id": "logo_section",
+                  "type": "container",
+                  "properties": {
+                    "padding": 16,
+                    "textAlign": "center"
+                  }
+                },
+                {
+                  "id": "navigation_menu",
+                  "type": "container",
+                  "properties": {
+                    "layoutType": "flex",
+                    "flexDirection": "column",
+                    "gap": 8
+                  }
+                }
+              ]
+            },
+            {
+              "id": "main_content",
+              "type": "container",
+              "properties": {
+                "layoutType": "flex",
+                "flexDirection": "column",
+                "backgroundColor": "#f9fafb",
+                "padding": 24,
+                "flexGrow": 1
+              },
+              "children": [
+                {
+                  "id": "header_section",
+                  "type": "container",
+                  "properties": {
+                    "layoutType": "flex",
+                    "flexDirection": "row",
+                    "justifyContent": "space-between",
+                    "alignItems": "center",
+                    "marginBottom": 24
+                  }
+                },
+                {
+                  "id": "stats_row",
+                  "type": "container",
+                  "properties": {
+                    "layoutType": "flex",
+                    "flexDirection": "row",
+                    "gap": 16,
+                    "marginBottom": 24
+                  }
+                },
+                {
+                  "id": "charts_section",
+                  "type": "container",
+                  "properties": {
+                    "layoutType": "flex",
+                    "flexDirection": "row",
+                    "gap": 16,
+                    "flexGrow": 1
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

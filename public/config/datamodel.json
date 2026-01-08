@@ -1,0 +1,347 @@
+{
+  "entities": [
+    {
+      "id": "users",
+      "name": "Users",
+      "table": "users",
+      "primaryKey": "id",
+      "fields": [
+        {
+          "id": "id",
+          "name": "ID",
+          "type": "number",
+          "sqlType": "INT",
+          "required": true,
+          "unique": true,
+          "primaryKey": true,
+          "autoIncrement": true
+        },
+        {
+          "id": "first_name",
+          "name": "First Name",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "last_name",
+          "name": "Last Name",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "email",
+          "name": "Email",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": true
+        },
+        {
+          "id": "password_hash",
+          "name": "Password Hash",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "birth_date",
+          "name": "Birth Date",
+          "type": "date",
+          "sqlType": "DATE",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "profile_image",
+          "name": "Profile Image",
+          "type": "file",
+          "sqlType": "BLOB",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "bio",
+          "name": "Biography",
+          "type": "richtext",
+          "sqlType": "CLOB",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "preferences",
+          "name": "User Preferences",
+          "type": "map",
+          "sqlType": "JSON",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "search_vector",
+          "name": "Search Vector",
+          "type": "tsvector",
+          "sqlType": "TSVECTOR",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "is_active",
+          "name": "Is Active",
+          "type": "checkbox",
+          "sqlType": "BOOLEAN",
+          "required": true,
+          "unique": false,
+          "defaultValue": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "datetime",
+          "sqlType": "TIMESTAMP",
+          "required": true,
+          "unique": false,
+          "defaultValue": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "foreignKeys": [],
+      "ascendingRelations": [
+        {
+          "entityId": "orders",
+          "fieldId": "user_id",
+          "relationName": "User Orders"
+        }
+      ]
+    },
+    {
+      "id": "categories",
+      "name": "Categories",
+      "table": "categories",
+      "primaryKey": "id",
+      "fields": [
+        {
+          "id": "id",
+          "name": "Category ID",
+          "type": "number",
+          "sqlType": "INT",
+          "required": true,
+          "unique": true,
+          "primaryKey": true,
+          "autoIncrement": true
+        },
+        {
+          "id": "name",
+          "name": "Category Name",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": true
+        },
+        {
+          "id": "description",
+          "name": "Description",
+          "type": "textarea",
+          "sqlType": "TEXT",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "parent_id",
+          "name": "Parent Category",
+          "type": "select",
+          "sqlType": "INT",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "is_active",
+          "name": "Is Active",
+          "type": "checkbox",
+          "sqlType": "BOOLEAN",
+          "required": true,
+          "unique": false,
+          "defaultValue": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "datetime",
+          "sqlType": "TIMESTAMP",
+          "required": true,
+          "unique": false,
+          "defaultValue": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "fieldId": "parent_id",
+          "referencedEntity": "categories",
+          "referencedField": "id",
+          "relationName": "Parent Category"
+        }
+      ],
+      "ascendingRelations": [
+        {
+          "entityId": "products",
+          "fieldId": "category_id",
+          "relationName": "Category Products"
+        },
+        {
+          "entityId": "categories",
+          "fieldId": "parent_id",
+          "relationName": "Subcategories"
+        }
+      ]
+    },
+    {
+      "id": "products",
+      "name": "Products",
+      "table": "products",
+      "primaryKey": "id",
+      "fields": [
+        {
+          "id": "id",
+          "name": "Product ID",
+          "type": "number",
+          "sqlType": "INT",
+          "required": true,
+          "unique": true,
+          "primaryKey": true,
+          "autoIncrement": true
+        },
+        {
+          "id": "name",
+          "name": "Product Name",
+          "type": "input",
+          "sqlType": "VARCHAR",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "description",
+          "name": "Description",
+          "type": "textarea",
+          "sqlType": "TEXT",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "rich_description",
+          "name": "Rich Description",
+          "type": "richtext",
+          "sqlType": "CLOB",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "price",
+          "name": "Price",
+          "type": "currency",
+          "sqlType": "DECIMAL",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "discount_percentage",
+          "name": "Discount Percentage",
+          "type": "percentage",
+          "sqlType": "DECIMAL",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "stock_quantity",
+          "name": "Stock Quantity",
+          "type": "number",
+          "sqlType": "INT",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "weight",
+          "name": "Weight (kg)",
+          "type": "number",
+          "sqlType": "FLOAT",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "category_id",
+          "name": "Category",
+          "type": "select",
+          "sqlType": "INT",
+          "required": true,
+          "unique": false
+        },
+        {
+          "id": "images",
+          "name": "Product Images",
+          "type": "map",
+          "sqlType": "JSON",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "specifications",
+          "name": "Specifications",
+          "type": "map",
+          "sqlType": "MAP",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "manual_pdf",
+          "name": "Product Manual",
+          "type": "file",
+          "sqlType": "BLOB",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "search_keywords",
+          "name": "Search Keywords",
+          "type": "tsvector",
+          "sqlType": "TSVECTOR",
+          "required": false,
+          "unique": false
+        },
+        {
+          "id": "in_stock",
+          "name": "In Stock",
+          "type": "checkbox",
+          "sqlType": "BOOLEAN",
+          "required": true,
+          "unique": false,
+          "defaultValue": true
+        },
+        {
+          "id": "created_at",
+          "name": "Created At",
+          "type": "datetime",
+          "sqlType": "TIMESTAMP",
+          "required": true,
+          "unique": false,
+          "defaultValue": "CURRENT_TIMESTAMP"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "fieldId": "category_id",
+          "referencedEntity": "categories",
+          "referencedField": "id",
+          "relationName": "Product Category"
+        }
+      ],
+      "ascendingRelations": [
+        {
+          "entityId": "order_items",
+          "fieldId": "product_id",
+          "relationName": "Product Orders"
+        }
+      ]
+    }
+  ]
+}

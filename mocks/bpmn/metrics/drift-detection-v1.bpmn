@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="drift-detection-v1" name="Drift Detection V1" isExecutable="true" version="1.0">
+    <startEvent id="startDriftCheck" name="Start Drift Check">
+      <timerEventDefinition>
+        <timeCycle>R/PT1H</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+    <serviceTask id="loadBaselineMetrics" name="Load Baseline Metrics" activiti:delegateExpression="${loadBaselineMetricsDelegate}"></serviceTask>
+    <serviceTask id="captureCurrentMetrics" name="Capture Current Metrics" activiti:delegateExpression="${captureCurrentMetricsDelegate}"></serviceTask>
+    <serviceTask id="analyzeDrift" name="Analyze Drift" activiti:delegateExpression="${analyzeDriftDelegate}"></serviceTask>
+    <businessRuleTask id="calculateDriftScore" name="Calculate Drift Score (Drools)" activiti:ruleVariablesInput="${driftDetectionFact}" activiti:resultVariable="driftResult"></businessRuleTask>
+    <exclusiveGateway id="driftDecisionGateway" name="Drift Decision Gateway"></exclusiveGateway>
+    <serviceTask id="saveMetricsNoDrift" name="Save Metrics (No Drift)" activiti:delegateExpression="${saveDriftResultsDelegate}"></serviceTask>
+    <serviceTask id="createDriftAlert" name="Create Drift Alert" activiti:delegateExpression="${createDriftAlertDelegate}"></serviceTask>
+    <serviceTask id="notifyDriftCritical" name="Notify Drift Critical" activiti:delegateExpression="${notifyDriftDelegate}"></serviceTask>
+    <userTask id="analyzeDriftCause" name="Analyze Drift Cause" activiti:candidateGroups="ml-engineers,mlops-engineers" activiti:formKey="console/bpmn/drift-analysis-form.zul"></userTask>
+    <exclusiveGateway id="actionGateway" name="Action Gateway"></exclusiveGateway>
+    <serviceTask id="triggerRetraining" name="Trigger Retraining" activiti:delegateExpression="${triggerRetrainingDelegate}"></serviceTask>
+    <serviceTask id="rollbackModel" name="Rollback Model" activiti:delegateExpression="${rollbackModelDelegate}"></serviceTask>
+    <serviceTask id="tuneThresholds" name="Tune Thresholds" activiti:delegateExpression="${tuneThresholdsDelegate}"></serviceTask>
+    <serviceTask id="saveDriftResults" name="Save Drift Results" activiti:delegateExpression="${saveDriftResultsDelegate}"></serviceTask>
+    <endEvent id="endDriftCheck" name="End Drift Check"></endEvent>
+    <boundaryEvent id="driftReviewTimer" name="Drift Review Timer (48h)" attachedToRef="analyzeDriftCause" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P2D</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="driftReviewDecision" name="Drift Review Decision (SLA)" activiti:candidateGroups="ml-leads,mlops-engineers" activiti:formKey="console/bpmn/drift-review-decision-form.zul" activiti:priority="90"></userTask>
+    <exclusiveGateway id="reviewDecisionGateway" name="Review Decision Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="startDriftCheck" targetRef="loadBaselineMetrics"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="loadBaselineMetrics" targetRef="captureCurrentMetrics"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="captureCurrentMetrics" targetRef="analyzeDrift"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="analyzeDrift" targetRef="calculateDriftScore"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="calculateDriftScore" targetRef="driftDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow6" name="NO_DRIFT" sourceRef="driftDecisionGateway" targetRef="saveMetricsNoDrift">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${driftResult.decision == 'NO_DRIFT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" name="DRIFT_DETECTED" sourceRef="driftDecisionGateway" targetRef="createDriftAlert">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${driftResult.decision == 'DRIFT_DETECTED'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" name="CRITICAL_DRIFT" sourceRef="driftDecisionGateway" targetRef="notifyDriftCritical">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${driftResult.decision == 'CRITICAL_DRIFT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="saveMetricsNoDrift" targetRef="endDriftCheck"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="createDriftAlert" targetRef="analyzeDriftCause"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="notifyDriftCritical" targetRef="analyzeDriftCause"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="analyzeDriftCause" targetRef="actionGateway"></sequenceFlow>
+    <sequenceFlow id="flow13" name="RETRAIN" sourceRef="actionGateway" targetRef="triggerRetraining">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action_plan == 'retrain' || action_plan == 'RETRAIN'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow14" name="ROLLBACK" sourceRef="actionGateway" targetRef="rollbackModel">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action_plan == 'rollback' || action_plan == 'ROLLBACK'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" name="TUNE" sourceRef="actionGateway" targetRef="tuneThresholds">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action_plan == 'tune_threshold' || action_plan == 'TUNE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" name="RETRAIN" sourceRef="reviewDecisionGateway" targetRef="triggerRetraining">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'RETRAIN'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow17" name="WAIT_MORE_DATA" sourceRef="reviewDecisionGateway" targetRef="saveDriftResults">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'WAIT_MORE_DATA'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow18" name="ACCEPT_DRIFT" sourceRef="reviewDecisionGateway" targetRef="saveDriftResults">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reviewDecision == 'ACCEPT_DRIFT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow19" name="INVESTIGATE" sourceRef="actionGateway" targetRef="saveDriftResults">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${action_plan == 'investigate' || action_plan == 'INVESTIGATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow20" sourceRef="triggerRetraining" targetRef="saveDriftResults"></sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="rollbackModel" targetRef="saveDriftResults"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="tuneThresholds" targetRef="saveDriftResults"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="saveDriftResults" targetRef="endDriftCheck"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="driftReviewTimer" targetRef="driftReviewDecision"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="driftReviewDecision" targetRef="reviewDecisionGateway"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_drift-detection-v1">
+    <bpmndi:BPMNPlane bpmnElement="drift-detection-v1" id="BPMNPlane_drift-detection-v1">
+      <bpmndi:BPMNShape bpmnElement="startDriftCheck" id="BPMNShape_startDriftCheck">
+        <omgdc:Bounds height="35.0" width="35.0" x="90.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="loadBaselineMetrics" id="BPMNShape_loadBaselineMetrics">
+        <omgdc:Bounds height="80.0" width="100.0" x="191.0" y="238.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="captureCurrentMetrics" id="BPMNShape_captureCurrentMetrics">
+        <omgdc:Bounds height="80.0" width="100.0" x="350.0" y="237.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="analyzeDrift" id="BPMNShape_analyzeDrift">
+        <omgdc:Bounds height="80.0" width="100.0" x="510.0" y="237.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="calculateDriftScore" id="BPMNShape_calculateDriftScore">
+        <omgdc:Bounds height="80.0" width="100.0" x="670.0" y="237.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="driftDecisionGateway" id="BPMNShape_driftDecisionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="850.0" y="247.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="saveMetricsNoDrift" id="BPMNShape_saveMetricsNoDrift">
+        <omgdc:Bounds height="80.0" width="100.0" x="960.0" y="70.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="createDriftAlert" id="BPMNShape_createDriftAlert">
+        <omgdc:Bounds height="80.0" width="100.0" x="1000.0" y="228.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="notifyDriftCritical" id="BPMNShape_notifyDriftCritical">
+        <omgdc:Bounds height="80.0" width="100.0" x="1011.0" y="356.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="analyzeDriftCause" id="BPMNShape_analyzeDriftCause">
+        <omgdc:Bounds height="80.0" width="100.0" x="1165.0" y="311.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="driftReviewTimer" id="BPMNShape_driftReviewTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="1225.0" y="321.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="actionGateway" id="BPMNShape_actionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1330.0" y="315.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="triggerRetraining" id="BPMNShape_triggerRetraining">
+        <omgdc:Bounds height="80.0" width="100.0" x="1506.0" y="168.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="rollbackModel" id="BPMNShape_rollbackModel">
+        <omgdc:Bounds height="80.0" width="100.0" x="1500.0" y="342.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="tuneThresholds" id="BPMNShape_tuneThresholds">
+        <omgdc:Bounds height="80.0" width="100.0" x="1510.0" y="470.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="saveDriftResults" id="BPMNShape_saveDriftResults">
+        <omgdc:Bounds height="80.0" width="100.0" x="1710.0" y="296.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endDriftCheck" id="BPMNShape_endDriftCheck">
+        <omgdc:Bounds height="35.0" width="35.0" x="1850.0" y="318.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="driftReviewDecision" id="BPMNShape_driftReviewDecision">
+        <omgdc:Bounds height="80.0" width="100.0" x="1188.0" y="151.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="reviewDecisionGateway" id="BPMNShape_reviewDecisionGateway">
+        <omgdc:Bounds height="40.0" width="40.0" x="1330.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="125.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="191.0" y="278.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="291.0" y="278.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="277.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="450.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="277.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="610.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="670.0" y="277.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="770.0" y="277.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="267.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="870.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="869.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="960.0" y="110.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="68.0" x="881.0" y="173.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="890.0" y="267.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="268.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="890.0" y="267.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="870.0" y="287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="870.0" y="399.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1011.0" y="396.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="880.0" y="348.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="1060.0" y="110.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1867.0" y="109.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1867.0" y="318.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="1100.0" y="268.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1215.0" y="311.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="1111.0" y="396.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1165.0" y="351.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="1265.0" y="351.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1330.0" y="335.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="1350.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1556.0" y="248.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="60.0" x="1429.0" y="272.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="1350.0" y="355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1378.0" y="381.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1500.0" y="382.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="73.0" x="1380.0" y="385.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="1350.0" y="355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1349.0" y="509.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1510.0" y="510.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="36.0" x="1350.0" y="427.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="1370.0" y="190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1506.0" y="208.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="60.0" x="1419.0" y="236.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="1350.0" y="210.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1350.0" y="285.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1757.0" y="285.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1760.0" y="296.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="1310.0" y="227.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="1350.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1350.0" y="164.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1759.0" y="164.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1760.0" y="296.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="1379.0" y="124.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="1370.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1710.0" y="336.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="89.0" x="1582.0" y="307.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="1606.0" y="208.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1759.0" y="208.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1760.0" y="296.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="1600.0" y="382.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1710.0" y="336.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="1610.0" y="510.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1764.0" y="510.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1760.0" y="376.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="1810.0" y="336.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1850.0" y="335.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="1240.0" y="321.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1238.0" y="231.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="1288.0" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1330.0" y="190.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/dataset-documentation">
+  <process id="dataset-documentation-v1" name="Dataset Documentation V1" isExecutable="true" version="1.0" activiti:candidateStarterGroups="data-engineers,governance-admins">
+    <startEvent id="startDocumentation" name="Start Documentation">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    
+    <!-- Capturar contexto de decisión -->
+    <userTask id="captureDecisionContext" name="Capture Decision Context" activiti:candidateGroups="data-engineers,governance-admins" activiti:formKey="dataset-decision-context-form" activiti:priority="40">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+      <documentation>Capturar contexto y detalles de la decisión tomada sobre el dataset</documentation>
+    </userTask>
+    
+    <!-- Generar documentación -->
+    <serviceTask id="generateDocumentation" name="Generate Documentation" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.GenerateDatasetDocumentationDelegate">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    
+    <!-- Revisión de documentación -->
+    <userTask id="reviewDocumentation" name="Review Documentation" activiti:candidateGroups="governance-admins,data-stewards" activiti:formKey="dataset-documentation-review-form" activiti:priority="50">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+      <documentation>Revisar documentación generada antes de publicar</documentation>
+    </userTask>
+    
+    <!-- Gateway: ¿Documentación aprobada? -->
+    <exclusiveGateway id="documentationDecisionGateway" name="Documentation Approved?">
+      <incoming>flow4</incoming>
+      <outgoing>flow5</outgoing>
+      <outgoing>flow6</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Documentación rechazada: Solicitar correcciones -->
+    <userTask id="requestCorrections" name="Request Corrections" activiti:candidateGroups="data-engineers" activiti:formKey="dataset-documentation-corrections-form" activiti:priority="30">
+      <incoming>flow5</incoming>
+      <outgoing>flow7</outgoing>
+      <documentation>Solicitar correcciones a la documentación</documentation>
+    </userTask>
+    
+    <!-- Volver a generar con correcciones -->
+    <sequenceFlow id="flow7" sourceRef="requestCorrections" targetRef="generateDocumentation"></sequenceFlow>
+    
+    <!-- Documentación aprobada: Publicar -->
+    <serviceTask id="publishDocumentation" name="Publish Documentation" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.PublishDatasetDocumentationDelegate">
+      <incoming>flow6</incoming>
+      <outgoing>flow8</outgoing>
+    </serviceTask>
+    
+    <!-- Notificar publicación -->
+    <serviceTask id="notifyPublication" name="Notify Documentation Published" activiti:class="com.codeflowx.govern.workflow.delegates.dataset.NotifyDatasetDocumentationPublishedDelegate">
+      <incoming>flow8</incoming>
+      <outgoing>flow9</outgoing>
+    </serviceTask>
+    
+    <endEvent id="endDocumentation" name="Documentation Completed">
+      <incoming>flow9</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="startDocumentation" targetRef="captureDecisionContext"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="captureDecisionContext" targetRef="generateDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="generateDocumentation" targetRef="reviewDocumentation"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="reviewDocumentation" targetRef="documentationDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flow5" name="Rejected" sourceRef="documentationDecisionGateway" targetRef="requestCorrections">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentationDecision == 'REJECT'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" name="Approved" sourceRef="documentationDecisionGateway" targetRef="publishDocumentation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${documentationDecision == 'APPROVE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="publishDocumentation" targetRef="notifyPublication"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="notifyPublication" targetRef="endDocumentation"></sequenceFlow>
+  </process>
+  
+  <!-- BPMN Diagram -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_dataset-documentation-v1">
+    <bpmndi:BPMNPlane bpmnElement="dataset-documentation-v1" id="BPMNPlane_dataset-documentation-v1">
+      <!-- Diagram elements would go here -->
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+

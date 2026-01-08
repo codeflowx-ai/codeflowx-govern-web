@@ -1,0 +1,194 @@
+{
+  "validationRules": {
+    "required": {
+      "name": "Required Field",
+      "description": "Field must have a value",
+      "category": "basic",
+      "message": "This field is required",
+      "validator": "function(value) { return value !== null && value !== undefined && value !== ''; }",
+      "parameters": []
+    },
+    "email": {
+      "name": "Email Format",
+      "description": "Must be a valid email address",
+      "category": "format",
+      "message": "Please enter a valid email address",
+      "validator": "function(value) { return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(value); }",
+      "parameters": []
+    },
+    "url": {
+      "name": "URL Format",
+      "description": "Must be a valid URL",
+      "category": "format",
+      "message": "Please enter a valid URL",
+      "validator": "function(value) { return /^https?:\\/\\/.+/.test(value); }",
+      "parameters": []
+    },
+    "minLength": {
+      "name": "Minimum Length",
+      "description": "Minimum number of characters",
+      "category": "length",
+      "message": "Must be at least {min} characters long",
+      "validator": "function(value, min) { return value && value.length >= min; }",
+      "parameters": [
+        {
+          "name": "min",
+          "type": "number",
+          "label": "Minimum Length",
+          "required": true,
+          "min": 0
+        }
+      ]
+    },
+    "maxLength": {
+      "name": "Maximum Length",
+      "description": "Maximum number of characters",
+      "category": "length",
+      "message": "Must be no more than {max} characters long",
+      "validator": "function(value, max) { return !value || value.length <= max; }",
+      "parameters": [
+        {
+          "name": "max",
+          "type": "number",
+          "label": "Maximum Length",
+          "required": true,
+          "min": 1
+        }
+      ]
+    },
+    "pattern": {
+      "name": "Pattern Match",
+      "description": "Must match specified pattern",
+      "category": "format",
+      "message": "Invalid format",
+      "validator": "function(value, pattern) { return new RegExp(pattern).test(value); }",
+      "parameters": [
+        {
+          "name": "pattern",
+          "type": "input",
+          "label": "Regular Expression",
+          "required": true,
+          "placeholder": "^[a-zA-Z0-9]+$"
+        }
+      ]
+    },
+    "numeric": {
+      "name": "Numeric Only",
+      "description": "Must contain only numbers",
+      "category": "format",
+      "message": "Please enter only numbers",
+      "validator": "function(value) { return /^\\d+$/.test(value); }",
+      "parameters": []
+    },
+    "alphanumeric": {
+      "name": "Alphanumeric Only",
+      "description": "Must contain only letters and numbers",
+      "category": "format",
+      "message": "Please enter only letters and numbers",
+      "validator": "function(value) { return /^[a-zA-Z0-9]+$/.test(value); }",
+      "parameters": []
+    },
+    "dateRange": {
+      "name": "Date Range",
+      "description": "Date must be within specified range",
+      "category": "date",
+      "message": "Date must be between {min} and {max}",
+      "validator": "function(value, min, max) { const date = new Date(value); return date >= new Date(min) && date <= new Date(max); }",
+      "parameters": [
+        {
+          "name": "min",
+          "type": "input",
+          "label": "Minimum Date",
+          "placeholder": "YYYY-MM-DD"
+        },
+        {
+          "name": "max",
+          "type": "input",
+          "label": "Maximum Date",
+          "placeholder": "YYYY-MM-DD"
+        }
+      ]
+    },
+    "uniqueValue": {
+      "name": "Unique Value",
+      "description": "Value must be unique in database",
+      "category": "database",
+      "message": "This value already exists",
+      "validator": "function(value, table, field) { return checkUnique(value, table, field); }",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "input",
+          "label": "Table Name",
+          "required": true
+        },
+        {
+          "name": "field",
+          "type": "input",
+          "label": "Field Name",
+          "required": true
+        }
+      ]
+    },
+    "foreignKeyExists": {
+      "name": "Foreign Key Exists",
+      "description": "Referenced record must exist",
+      "category": "database",
+      "message": "Referenced record does not exist",
+      "validator": "function(value, table, field) { return checkForeignKey(value, table, field); }",
+      "parameters": [
+        {
+          "name": "table",
+          "type": "input",
+          "label": "Referenced Table",
+          "required": true
+        },
+        {
+          "name": "field",
+          "type": "input",
+          "label": "Referenced Field",
+          "required": true
+        }
+      ]
+    },
+    "custom": {
+      "name": "Custom Validation",
+      "description": "Custom JavaScript validation function",
+      "category": "advanced",
+      "message": "Validation failed",
+      "validator": "function(value, customFunction) { return eval(customFunction)(value); }",
+      "parameters": [
+        {
+          "name": "customFunction",
+          "type": "textarea",
+          "label": "Custom Function",
+          "required": true,
+          "placeholder": "function(value) {\n  // Your validation logic\n  return true;\n}"
+        }
+      ]
+    }
+  },
+  "validationGroups": {
+    "form-validation": {
+      "name": "Form Validation",
+      "description": "Validate entire form",
+      "rules": ["required", "email", "minLength"],
+      "stopOnFirst": false,
+      "showSummary": true
+    },
+    "real-time": {
+      "name": "Real-time Validation",
+      "description": "Validate on input change",
+      "rules": ["pattern", "maxLength"],
+      "debounce": 300,
+      "showInline": true
+    },
+    "database-constraints": {
+      "name": "Database Constraints",
+      "description": "Database-level validation",
+      "rules": ["uniqueValue", "foreignKeyExists"],
+      "async": true,
+      "showProgress": true
+    }
+  }
+}

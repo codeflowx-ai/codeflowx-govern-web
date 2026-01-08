@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             targetNamespace="http://codeflowx.com/govern/iso42001/ai-decommissioning"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             typeLanguage="http://www.w3.org/2001/XMLSchema">
+
+  <process id="iso42001AIDecommissioningV1"
+           name="ISO 42001 AI System Decommissioning"
+           isExecutable="true"
+           versionTag="1.0">
+
+    <startEvent id="decommissionRequestStart" name="Solicitud de decommission">
+      <outgoing>flowSubmitRequest</outgoing>
+    </startEvent>
+
+    <userTask id="submitDecommissionRequestTask"
+              name="Registrar solicitud de decommission"
+              flowable:formKey="console/bpmn/ai-decommission-request-form.zul"
+              flowable:candidateGroups="operations,ai-owners">
+      <incoming>flowSubmitRequest</incoming>
+      <outgoing>flowAssessImpact</outgoing>
+    </userTask>
+
+    <serviceTask id="assessImpactTask"
+                 name="Evaluar impacto y dependencias"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.AssessAIDecommissionImpactDelegate">
+      <incoming>flowAssessImpact</incoming>
+      <outgoing>flowImpactGateway</outgoing>
+    </serviceTask>
+
+    <exclusiveGateway id="impactGateway" name="¿Impacto Alto?">
+      <incoming>flowImpactGateway</incoming>
+      <outgoing>flowNeedsApproval</outgoing>
+      <outgoing>flowSkipApproval</outgoing>
+    </exclusiveGateway>
+
+    <userTask id="approveDecommissionTask"
+              name="Aprobación dirección"
+              flowable:formKey="console/bpmn/ai-decommission-approval-form.zul"
+              flowable:candidateGroups="top-management,compliance-managers">
+      <incoming>flowNeedsApproval</incoming>
+      <outgoing>flowPlanDecommission</outgoing>
+    </userTask>
+
+    <serviceTask id="planDecommissionTask"
+                 name="Planificar decommission"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.PlanAIDecommissionDelegate">
+      <incoming>flowSkipApproval</incoming>
+      <incoming>flowPlanDecommission</incoming>
+      <outgoing>flowRetentionPlan</outgoing>
+    </serviceTask>
+
+    <userTask id="dataRetentionTask"
+              name="Plan de retención de datos"
+              flowable:formKey="console/bpmn/ai-decommission-retention-form.zul"
+              flowable:candidateGroups="data-governance,compliance-officers">
+      <incoming>flowRetentionPlan</incoming>
+      <outgoing>flowExecuteDecommission</outgoing>
+    </userTask>
+
+    <serviceTask id="executeDecommissionTask"
+                 name="Ejecutar decommission"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.ExecuteAIDecommissionDelegate">
+      <incoming>flowExecuteDecommission</incoming>
+      <outgoing>flowVerifyDecommission</outgoing>
+    </serviceTask>
+
+    <userTask id="verifyDecommissionTask"
+              name="Verificar desmantelamiento"
+              flowable:formKey="console/bpmn/ai-decommission-verification-form.zul"
+              flowable:candidateGroups="quality-engineers,compliance-officers">
+      <incoming>flowVerifyDecommission</incoming>
+      <outgoing>flowArchiveDocumentation</outgoing>
+    </userTask>
+
+    <serviceTask id="archiveDocumentationTask"
+                 name="Archivar documentación"
+                 flowable:class="com.codeflowx.govern.workflow.delegates.iso42001.ArchiveAIDecommissionDelegate">
+      <incoming>flowArchiveDocumentation</incoming>
+      <outgoing>flowEndDecommission</outgoing>
+    </serviceTask>
+
+    <endEvent id="decommissionCompleted" name="Decommission completado">
+      <incoming>flowEndDecommission</incoming>
+    </endEvent>
+
+    <sequenceFlow id="flowSubmitRequest"
+                  sourceRef="decommissionRequestStart"
+                  targetRef="submitDecommissionRequestTask"/>
+    <sequenceFlow id="flowAssessImpact"
+                  sourceRef="submitDecommissionRequestTask"
+                  targetRef="assessImpactTask"/>
+    <sequenceFlow id="flowImpactGateway"
+                  sourceRef="assessImpactTask"
+                  targetRef="impactGateway"/>
+    <sequenceFlow id="flowNeedsApproval"
+                  sourceRef="impactGateway"
+                  targetRef="approveDecommissionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decommissionImpact == 'HIGH'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowSkipApproval"
+                  sourceRef="impactGateway"
+                  targetRef="planDecommissionTask">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${decommissionImpact != 'HIGH'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowPlanDecommission"
+                  sourceRef="approveDecommissionTask"
+                  targetRef="planDecommissionTask"/>
+    <sequenceFlow id="flowRetentionPlan"
+                  sourceRef="planDecommissionTask"
+                  targetRef="dataRetentionTask"/>
+    <sequenceFlow id="flowExecuteDecommission"
+                  sourceRef="dataRetentionTask"
+                  targetRef="executeDecommissionTask"/>
+    <sequenceFlow id="flowVerifyDecommission"
+                  sourceRef="executeDecommissionTask"
+                  targetRef="verifyDecommissionTask"/>
+    <sequenceFlow id="flowArchiveDocumentation"
+                  sourceRef="verifyDecommissionTask"
+                  targetRef="archiveDocumentationTask"/>
+    <sequenceFlow id="flowEndDecommission"
+                  sourceRef="archiveDocumentationTask"
+                  targetRef="decommissionCompleted"/>
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="BPMNDiagram_iso42001AIDecommissioning">
+    <bpmndi:BPMNPlane id="BPMNPlane_iso42001AIDecommissioning" bpmnElement="iso42001AIDecommissioningV1">
+      <bpmndi:BPMNShape id="BPMNShape_decommissionRequestStart" bpmnElement="decommissionRequestStart">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_submitDecommissionRequestTask" bpmnElement="submitDecommissionRequestTask">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_assessImpactTask" bpmnElement="assessImpactTask">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_impactGateway" bpmnElement="impactGateway">
+        <omgdc:Bounds x="175" y="615" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approveDecommissionTask" bpmnElement="approveDecommissionTask">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_planDecommissionTask" bpmnElement="planDecommissionTask">
+        <omgdc:Bounds x="350" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_dataRetentionTask" bpmnElement="dataRetentionTask">
+        <omgdc:Bounds x="150" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeDecommissionTask" bpmnElement="executeDecommissionTask">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyDecommissionTask" bpmnElement="verifyDecommissionTask">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_archiveDocumentationTask" bpmnElement="archiveDocumentationTask">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_decommissionCompleted" bpmnElement="decommissionCompleted">
+        <omgdc:Bounds x="182" y="1702" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSubmitRequest" bpmnElement="flowSubmitRequest">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAssessImpact" bpmnElement="flowAssessImpact">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowImpactGateway" bpmnElement="flowImpactGateway">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="175" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNeedsApproval" bpmnElement="flowNeedsApproval">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSkipApproval" bpmnElement="flowSkipApproval">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="350" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowPlanDecommission" bpmnElement="flowPlanDecommission">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="350" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetentionPlan" bpmnElement="flowRetentionPlan">
+        <omgdi:waypoint x="450" y="820" />
+        <omgdi:waypoint x="150" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowExecuteDecommission" bpmnElement="flowExecuteDecommission">
+        <omgdi:waypoint x="250" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowVerifyDecommission" bpmnElement="flowVerifyDecommission">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowArchiveDocumentation" bpmnElement="flowArchiveDocumentation">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEndDecommission" bpmnElement="flowEndDecommission">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="182" y="1720" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
+
+

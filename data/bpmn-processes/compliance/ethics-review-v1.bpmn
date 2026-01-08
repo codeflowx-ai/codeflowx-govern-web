@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://codeflowx.com/govern/ethics-review">
+  <process id="ethics-review-v1" name="Ethics Review Process V1" isExecutable="true" version="1.0">
+    <startEvent id="start" name="Ethics Review Requested">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <userTask id="requestEthicsReview" name="Request Ethics Review" flowable:candidateGroups="ml-engineers,governance-admins" flowable:formKey="ethics-review-request-form">
+      <incoming>flow1</incoming>
+      <outgoing>flow2</outgoing>
+    </userTask>
+    <serviceTask id="aiImpactAssessment" name="AI Impact Assessment" flowable:class="com.codeflowx.govern.workflow.delegates.AIImpactAssessmentDelegate">
+      <incoming>flow2</incoming>
+      <outgoing>flow3</outgoing>
+    </serviceTask>
+    <businessRuleTask id="ethicsScoring" name="Ethics Scoring (Drools)" flowable:ruleVariablesInput="${ethicsReviewFact}" flowable:resultVariable="ethicsReviewResult">
+      <incoming>flow3</incoming>
+      <outgoing>flow4</outgoing>
+    </businessRuleTask>
+    <exclusiveGateway id="violationsGateway" name="Requires Committee?">
+      <incoming>flow4</incoming>
+      <outgoing>flowNoViolations</outgoing>
+      <outgoing>flowViolations</outgoing>
+    </exclusiveGateway>
+    <userTask id="ethicsCommitteeReview" name="Ethics Committee Review" flowable:candidateGroups="ethics-committee" flowable:formKey="ethics-committee-review-form">
+      <incoming>flowViolations</incoming>
+      <incoming>flowExtend</incoming>
+      <outgoing>flow5</outgoing>
+    </userTask>
+    <exclusiveGateway id="committeeDecisionGateway" name="Committee Decision">
+      <incoming>flow5</incoming>
+      <incoming>flowCompleteNow</incoming>
+      <outgoing>flowApprove</outgoing>
+      <outgoing>flowConditional</outgoing>
+      <outgoing>flowReject</outgoing>
+    </exclusiveGateway>
+    <userTask id="defineMitigationPlan" name="Define Mitigation Plan" flowable:candidateGroups="governance-admins" flowable:formKey="ethics-mitigation-plan-form">
+      <incoming>flowConditional</incoming>
+      <outgoing>flow7</outgoing>
+    </userTask>
+    <serviceTask id="saveEthicsEvidence" name="Save Ethics Evidence" flowable:class="com.codeflowx.govern.workflow.delegates.SaveEthicsEvidenceDelegate">
+      <incoming>flowNoViolations</incoming>
+      <incoming>flowApprove</incoming>
+      <incoming>flow7</incoming>
+      <incoming>flowEscalate</incoming>
+      <outgoing>flow8</outgoing>
+    </serviceTask>
+    <serviceTask id="rejectEthicsReview" name="Reject AI System" flowable:class="com.codeflowx.govern.workflow.delegates.RejectEthicsDelegate">
+      <incoming>flowReject</incoming>
+      <outgoing>flow9</outgoing>
+    </serviceTask>
+    <endEvent id="ethicsReviewCompleted" name="Review Completed">
+      <incoming>flow8</incoming>
+    </endEvent>
+    <endEvent id="ethicsReviewRejected" name="System Rejected">
+      <incoming>flow9</incoming>
+    </endEvent>
+    <boundaryEvent id="ethicsReviewTimer" name="14 Day Reminder" attachedToRef="ethicsCommitteeReview" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>P14D</timeDuration>
+      </timerEventDefinition>
+      <outgoing>flowTimerToReminder</outgoing>
+    </boundaryEvent>
+    <userTask id="ethicsReviewReminder" name="Ethics Review Reminder" flowable:candidateGroups="ethics-committee,governance-admins" flowable:formKey="ethics-review-reminder-form" flowable:priority="90">
+      <documentation>Han pasado 14 días y la revisión ética sigue pendiente.</documentation>
+      <incoming>flowTimerToReminder</incoming>
+      <outgoing>flowReminderToGateway</outgoing>
+    </userTask>
+    <exclusiveGateway id="ethicsReminderGateway" name="Reminder Action">
+      <incoming>flowReminderToGateway</incoming>
+      <outgoing>flowCompleteNow</outgoing>
+      <outgoing>flowEscalate</outgoing>
+      <outgoing>flowExtend</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="requestEthicsReview"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="requestEthicsReview" targetRef="aiImpactAssessment"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="aiImpactAssessment" targetRef="ethicsScoring"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="ethicsScoring" targetRef="violationsGateway"></sequenceFlow>
+    <sequenceFlow id="flowNoViolations" name="No Committee Required" sourceRef="violationsGateway" targetRef="saveEthicsEvidence">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!ethicsReviewResult.requiresCommitteeReview}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowViolations" name="Committee Required" sourceRef="violationsGateway" targetRef="ethicsCommitteeReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${ethicsReviewResult.requiresCommitteeReview}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="ethicsCommitteeReview" targetRef="committeeDecisionGateway"></sequenceFlow>
+    <sequenceFlow id="flowApprove" name="Approve" sourceRef="committeeDecisionGateway" targetRef="saveEthicsEvidence">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${committee_decision == 'approve'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowConditional" name="Conditional" sourceRef="committeeDecisionGateway" targetRef="defineMitigationPlan">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${committee_decision == 'conditional_approve'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowReject" name="Reject" sourceRef="committeeDecisionGateway" targetRef="rejectEthicsReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${committee_decision == 'reject'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="defineMitigationPlan" targetRef="saveEthicsEvidence"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="saveEthicsEvidence" targetRef="ethicsReviewCompleted"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="rejectEthicsReview" targetRef="ethicsReviewRejected"></sequenceFlow>
+    <sequenceFlow id="flowTimerToReminder" sourceRef="ethicsReviewTimer" targetRef="ethicsReviewReminder"></sequenceFlow>
+    <sequenceFlow id="flowReminderToGateway" sourceRef="ethicsReviewReminder" targetRef="ethicsReminderGateway"></sequenceFlow>
+    <sequenceFlow id="flowCompleteNow" name="Complete Now" sourceRef="ethicsReminderGateway" targetRef="committeeDecisionGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reminderAction == 'COMPLETE_NOW'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowEscalate" name="Escalate" sourceRef="ethicsReminderGateway" targetRef="saveEthicsEvidence">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reminderAction == 'ESCALATE'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flowExtend" name="Extend 7 Days" sourceRef="ethicsReminderGateway" targetRef="ethicsCommitteeReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${reminderAction == 'EXTEND'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ethics-review-v1">
+    <bpmndi:BPMNPlane id="BPMNPlane_ethics-review-v1" bpmnElement="ethics-review-v1">
+      <bpmndi:BPMNShape id="BPMNShape_start" bpmnElement="start">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_requestEthicsReview" bpmnElement="requestEthicsReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="150.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_aiImpactAssessment" bpmnElement="aiImpactAssessment">
+        <omgdc:Bounds height="80.0" width="100.0" x="300.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsScoring" bpmnElement="ethicsScoring">
+        <omgdc:Bounds height="80.0" width="100.0" x="450.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_violationsGateway" bpmnElement="violationsGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="600.0" y="242.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsCommitteeReview" bpmnElement="ethicsCommitteeReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="700.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_committeeDecisionGateway" bpmnElement="committeeDecisionGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="900.0" y="335.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_defineMitigationPlan" bpmnElement="defineMitigationPlan">
+        <omgdc:Bounds height="80.0" width="100.0" x="1000.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_saveEthicsEvidence" bpmnElement="saveEthicsEvidence">
+        <omgdc:Bounds height="80.0" width="100.0" x="1150.0" y="227.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rejectEthicsReview" bpmnElement="rejectEthicsReview">
+        <omgdc:Bounds height="80.0" width="100.0" x="1000.0" y="500.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsReviewCompleted" bpmnElement="ethicsReviewCompleted">
+        <omgdc:Bounds height="35.0" width="35.0" x="1300.0" y="250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsReviewRejected" bpmnElement="ethicsReviewRejected">
+        <omgdc:Bounds height="35.0" width="35.0" x="1150.0" y="522.5"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsReviewTimer" bpmnElement="ethicsReviewTimer">
+        <omgdc:Bounds height="30.0" width="30.0" x="750.0" y="385.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsReviewReminder" bpmnElement="ethicsReviewReminder">
+        <omgdc:Bounds height="80.0" width="100.0" x="700.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ethicsReminderGateway" bpmnElement="ethicsReminderGateway">
+        <omgdc:Bounds height="50.0" width="50.0" x="900.0" y="65.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="85.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="250.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="400.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="550.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNoViolations" bpmnElement="flowNoViolations">
+        <omgdi:waypoint x="625.0" y="242.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1150.0" y="267.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="80.0" x="850.0" y="200.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowViolations" bpmnElement="flowViolations">
+        <omgdi:waypoint x="625.0" y="292.5"></omgdi:waypoint>
+        <omgdi:waypoint x="700.0" y="360.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="72.0" x="630.0" y="310.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="800.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApprove" bpmnElement="flowApprove">
+        <omgdi:waypoint x="925.0" y="335.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1150.0" y="267.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="40.0" x="930.0" y="290.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowConditional" bpmnElement="flowConditional">
+        <omgdi:waypoint x="925.0" y="385.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="440.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="56.0" x="930.0" y="410.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReject" bpmnElement="flowReject">
+        <omgdi:waypoint x="925.0" y="385.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1000.0" y="540.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="32.0" x="930.0" y="460.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow7" bpmnElement="flow7">
+        <omgdi:waypoint x="1100.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="307.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow8" bpmnElement="flow8">
+        <omgdi:waypoint x="1250.0" y="267.5"></omgdi:waypoint>
+        <omgdi:waypoint x="1300.0" y="267.5"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow9" bpmnElement="flow9">
+        <omgdi:waypoint x="1100.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1150.0" y="540.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowTimerToReminder" bpmnElement="flowTimerToReminder">
+        <omgdi:waypoint x="765.0" y="400.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowReminderToGateway" bpmnElement="flowReminderToGateway">
+        <omgdi:waypoint x="800.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="900.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowCompleteNow" bpmnElement="flowCompleteNow">
+        <omgdi:waypoint x="925.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="925.0" y="335.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="56.0" x="930.0" y="200.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEscalate" bpmnElement="flowEscalate">
+        <omgdi:waypoint x="950.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1200.0" y="227.5"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="40.0" x="1050.0" y="70.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowExtend" bpmnElement="flowExtend">
+        <omgdi:waypoint x="900.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="90.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="32.0" width="60.0" x="860.0" y="150.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

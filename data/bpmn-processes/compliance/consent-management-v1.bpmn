@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+             xmlns:flowable="http://flowable.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://www.flowable.org/compliance">
+  
+  <process id="consent-management-v1" name="Consent Management V1" isExecutable="true" flowable:candidateStarterGroups="data-subjects,users">
+    <documentation>Proceso de gestión de consentimientos (GDPR Art. 7, ISO 27701)
+    
+CUMPLE CON:
+- GDPR Art. 7 (Condiciones para el consentimiento)
+- GDPR Art. 7.1 (Demostrar consentimiento)
+- GDPR Art. 7.3 (Derecho a retirar consentimiento)
+- ISO 27701:2019 Control 6.2.1
+
+FLUJO:
+1. Recepción de solicitud de consentimiento
+2. Validación de datos
+3. Registro de consentimiento con evidencia
+4. Notificación al usuario
+</documentation>
+
+    <!-- Start Event -->
+    <startEvent id="start" name="Inicio">
+      <documentation>Inicio del proceso de consent management</documentation>
+    </startEvent>
+
+    <!-- Validate Consent Request -->
+    <serviceTask id="validateConsent" name="Validate Consent Request" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.ValidateConsentDelegate">
+      <documentation>Valida que la solicitud de consentimiento tenga todos los datos requeridos.
+      
+Input:
+- dataSubjectEmail: String
+- processingPurpose: String
+- granularConsents: Map
+- consentText: String
+
+Output:
+- validationStatus: VALID / INVALID
+- validationErrors: String (si INVALID)
+</documentation>
+    </serviceTask>
+
+    <!-- Gateway: Valid? -->
+    <exclusiveGateway id="gatewayValid" name="¿Válido?"></exclusiveGateway>
+
+    <!-- Record Consent -->
+    <serviceTask id="recordConsent" name="Record Consent" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.RecordConsentDelegate">
+      <documentation>Registra el consentimiento en la base de datos con toda la evidencia requerida (GDPR Art. 7.1).
+      
+Output:
+- consentId: Long
+- consentStatus: GIVEN
+- consentTimestamp: Timestamp
+</documentation>
+    </serviceTask>
+
+    <!-- Notify Data Subject -->
+    <serviceTask id="notifyDataSubject" name="Notify Data Subject" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.NotifyConsentDelegate">
+      <documentation>Envía notificación al data subject confirmando el registro del consentimiento.
+      
+Incluye:
+- Confirmación de consentimiento
+- Derechos del interesado (GDPR Art. 13.2.b)
+- Cómo retirar el consentimiento (GDPR Art. 7.3)
+</documentation>
+    </serviceTask>
+
+    <!-- Timer: Check Expiration (cada 30 días) -->
+    <intermediateCatchEvent id="timerCheckExpiration" name="Check Expiration (30d)">
+      <documentation>Timer que verifica periódicamente si hay consentimientos expirados</documentation>
+      <timerEventDefinition>
+        <timeCycle>R/P30D</timeCycle>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+
+    <!-- Check Expiration -->
+    <serviceTask id="checkExpiration" name="Check Consent Expiration" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.compliance.CheckConsentExpirationDelegate">
+      <documentation>Verifica si el consentimiento ha expirado según las políticas configuradas</documentation>
+    </serviceTask>
+
+    <!-- End Event: Consent Recorded -->
+    <endEvent id="endConsentRecorded" name="Consent Recorded"></endEvent>
+
+    <!-- End Event: Consent Invalid -->
+    <endEvent id="endConsentInvalid" name="Consent Invalid">
+      <documentation>El consentimiento no pudo registrarse porque los datos eran inválidos</documentation>
+    </endEvent>
+
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="validateConsent"></sequenceFlow>
+    
+    <sequenceFlow id="flow2" sourceRef="validateConsent" targetRef="gatewayValid"></sequenceFlow>
+    
+    <sequenceFlow id="flowValid" name="VALID" sourceRef="gatewayValid" targetRef="recordConsent">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationStatus == 'VALID'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowInvalid" name="INVALID" sourceRef="gatewayValid" targetRef="endConsentInvalid">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${validationStatus == 'INVALID'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flow3" sourceRef="recordConsent" targetRef="notifyDataSubject"></sequenceFlow>
+    
+    <sequenceFlow id="flow4" sourceRef="notifyDataSubject" targetRef="timerCheckExpiration"></sequenceFlow>
+    
+    <sequenceFlow id="flow5" sourceRef="timerCheckExpiration" targetRef="checkExpiration"></sequenceFlow>
+    
+    <sequenceFlow id="flow6" sourceRef="checkExpiration" targetRef="endConsentRecorded"></sequenceFlow>
+
+  </process>
+
+  <!-- BPMN Diagram (sin coordenadas visuales por simplicidad) -->
+  <bpmndi:BPMNDiagram id="BPMNDiagram_consent-management-v1">
+    <bpmndi:BPMNPlane bpmnElement="consent-management-v1" id="BPMNPlane_consent-management-v1">
+      <bpmndi:BPMNShape id="BPMNShape_start" bpmnElement="start">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_validateConsent" bpmnElement="validateConsent">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_gatewayValid" bpmnElement="gatewayValid">
+        <omgdc:Bounds x="175" y="435" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_recordConsent" bpmnElement="recordConsent">
+        <omgdc:Bounds x="150" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyDataSubject" bpmnElement="notifyDataSubject">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_timerCheckExpiration" bpmnElement="timerCheckExpiration">
+        <omgdc:Bounds x="182" y="982" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_checkExpiration" bpmnElement="checkExpiration">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endConsentRecorded" bpmnElement="endConsentRecorded">
+        <omgdc:Bounds x="182" y="1342" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endConsentInvalid" bpmnElement="endConsentInvalid">
+        <omgdc:Bounds x="382" y="622" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="175" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowValid" bpmnElement="flowValid">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="150" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowInvalid" bpmnElement="flowInvalid">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="382" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow3" bpmnElement="flow3">
+        <omgdi:waypoint x="250" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="182" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5">
+        <omgdi:waypoint x="218" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="182" y="1360" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+
+</definitions>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

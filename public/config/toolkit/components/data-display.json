@@ -1,0 +1,520 @@
+{
+  "components": {
+    "table": {
+      "definition": {
+        "name": "Data Table",
+        "type": "COMPONENT",
+        "sqlType": [],
+        "inputType": "TABLE",
+        "docType": ["TABLE"],
+        "version": "1.0.0",
+        "icon": "lucide:table",
+        "tooltip": "Data table with sorting and pagination",
+        "class": "DataTable",
+        "component": "table",
+        "defaultSize": { "width": 600, "height": 300 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "data",
+          "name": "Data",
+          "icon": "lucide:database",
+          "order": 2
+        },
+        {
+          "id": "features",
+          "name": "Features",
+          "icon": "lucide:zap",
+          "order": 3
+        }
+      ],
+      "properties": [
+        {
+          "name": "title",
+          "type": "input",
+          "label": "Table Title",
+          "default": "Data Table",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "striped",
+          "type": "boolean",
+          "label": "Striped Rows",
+          "default": true,
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "bordered",
+          "type": "boolean",
+          "label": "Bordered",
+          "default": true,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "hover",
+          "type": "boolean",
+          "label": "Hover Effect",
+          "default": true,
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "dataSource",
+          "type": "combo",
+          "label": "Data Source",
+          "default": "api",
+          "options": [
+            {"value": "static", "label": "Static Data"},
+            {"value": "api", "label": "API Endpoint"},
+            {"value": "database", "label": "Database Query"}
+          ],
+          "order": 1,
+          "group": "Data",
+          "tab": "data"
+        },
+        {
+          "name": "apiEndpoint",
+          "type": "input",
+          "label": "API Endpoint",
+          "default": "/api/data",
+          "placeholder": "/api/users",
+          "order": 2,
+          "group": "Data",
+          "tab": "data"
+        },
+        {
+          "name": "columns",
+          "type": "textarea",
+          "label": "Columns (JSON)",
+          "default": "[\n  {\"key\": \"id\", \"title\": \"ID\", \"sortable\": true},\n  {\"key\": \"name\", \"title\": \"Name\", \"sortable\": true},\n  {\"key\": \"email\", \"title\": \"Email\", \"sortable\": false}\n]",
+          "order": 3,
+          "group": "Data",
+          "tab": "data"
+        },
+        {
+          "name": "sortable",
+          "type": "boolean",
+          "label": "Enable Sorting",
+          "default": true,
+          "order": 1,
+          "group": "Features",
+          "tab": "features"
+        },
+        {
+          "name": "filterable",
+          "type": "boolean",
+          "label": "Enable Filtering",
+          "default": true,
+          "order": 2,
+          "group": "Features",
+          "tab": "features"
+        },
+        {
+          "name": "pagination",
+          "type": "boolean",
+          "label": "Enable Pagination",
+          "default": true,
+          "order": 3,
+          "group": "Features",
+          "tab": "features"
+        },
+        {
+          "name": "pageSize",
+          "type": "number",
+          "label": "Page Size",
+          "default": 10,
+          "min": 5,
+          "max": 100,
+          "order": 4,
+          "group": "Features",
+          "tab": "features"
+        },
+        {
+          "name": "selectable",
+          "type": "boolean",
+          "label": "Row Selection",
+          "default": false,
+          "order": 5,
+          "group": "Features",
+          "tab": "features"
+        }
+      ]
+    },
+    "list": {
+      "definition": {
+        "name": "List View",
+        "type": "COMPONENT",
+        "sqlType": [],
+        "inputType": "LIST",
+        "docType": ["LIST"],
+        "version": "1.0.0",
+        "icon": "lucide:list",
+        "tooltip": "Vertical list component",
+        "class": "ListView",
+        "component": "list",
+        "defaultSize": { "width": 300, "height": 200 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "data",
+          "name": "Data",
+          "icon": "lucide:database",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "title",
+          "type": "input",
+          "label": "List Title",
+          "default": "List",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "itemHeight",
+          "type": "number",
+          "label": "Item Height",
+          "default": 40,
+          "min": 20,
+          "max": 100,
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "showBorder",
+          "type": "boolean",
+          "label": "Show Item Borders",
+          "default": true,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "dataSource",
+          "type": "combo",
+          "label": "Data Source",
+          "default": "static",
+          "options": [
+            {"value": "static", "label": "Static Data"},
+            {"value": "api", "label": "API Endpoint"},
+            {"value": "database", "label": "Database Query"}
+          ],
+          "order": 1,
+          "group": "Data",
+          "tab": "data"
+        },
+        {
+          "name": "items",
+          "type": "textarea",
+          "label": "List Items (JSON)",
+          "default": "[\n  {\"id\": 1, \"text\": \"Item 1\", \"value\": \"item1\"},\n  {\"id\": 2, \"text\": \"Item 2\", \"value\": \"item2\"}\n]",
+          "order": 2,
+          "group": "Data",
+          "tab": "data"
+        }
+      ]
+    },
+    "card": {
+      "definition": {
+        "name": "Card",
+        "type": "COMPONENT",
+        "sqlType": [],
+        "inputType": "CARD",
+        "docType": ["CARD"],
+        "version": "1.0.0",
+        "icon": "lucide:credit-card",
+        "tooltip": "Card container component",
+        "class": "Card",
+        "component": "card",
+        "defaultSize": { "width": 300, "height": 200 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "styles",
+          "name": "Styles",
+          "icon": "lucide:palette",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "title",
+          "type": "input",
+          "label": "Card Title",
+          "default": "Card Title",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "subtitle",
+          "type": "input",
+          "label": "Card Subtitle",
+          "default": "",
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "content",
+          "type": "textarea",
+          "label": "Card Content",
+          "default": "Card content goes here...",
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "showHeader",
+          "type": "boolean",
+          "label": "Show Header",
+          "default": true,
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "showFooter",
+          "type": "boolean",
+          "label": "Show Footer",
+          "default": false,
+          "order": 5,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "backgroundColor",
+          "type": "colorPicker",
+          "label": "Background Color",
+          "default": "#ffffff",
+          "order": 1,
+          "group": "Styling",
+          "tab": "styles"
+        },
+        {
+          "name": "borderColor",
+          "type": "colorPicker",
+          "label": "Border Color",
+          "default": "#e5e7eb",
+          "order": 2,
+          "group": "Styling",
+          "tab": "styles"
+        },
+        {
+          "name": "shadow",
+          "type": "combo",
+          "label": "Shadow",
+          "default": "md",
+          "options": [
+            {"value": "none", "label": "None"},
+            {"value": "sm", "label": "Small"},
+            {"value": "md", "label": "Medium"},
+            {"value": "lg", "label": "Large"},
+            {"value": "xl", "label": "Extra Large"}
+          ],
+          "order": 3,
+          "group": "Styling",
+          "tab": "styles"
+        }
+      ]
+    },
+    "badge": {
+      "definition": {
+        "name": "Badge",
+        "type": "COMPONENT",
+        "sqlType": [],
+        "inputType": "BADGE",
+        "docType": ["BADGE"],
+        "version": "1.0.0",
+        "icon": "lucide:tag",
+        "tooltip": "Badge/tag component",
+        "class": "Badge",
+        "component": "badge",
+        "defaultSize": { "width": 80, "height": 25 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        }
+      ],
+      "properties": [
+        {
+          "name": "text",
+          "type": "input",
+          "label": "Badge Text",
+          "default": "Badge",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "variant",
+          "type": "combo",
+          "label": "Variant",
+          "default": "primary",
+          "options": [
+            {"value": "primary", "label": "Primary"},
+            {"value": "secondary", "label": "Secondary"},
+            {"value": "success", "label": "Success"},
+            {"value": "danger", "label": "Danger"},
+            {"value": "warning", "label": "Warning"},
+            {"value": "info", "label": "Info"}
+          ],
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "size",
+          "type": "combo",
+          "label": "Size",
+          "default": "medium",
+          "options": [
+            {"value": "small", "label": "Small"},
+            {"value": "medium", "label": "Medium"},
+            {"value": "large", "label": "Large"}
+          ],
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "rounded",
+          "type": "boolean",
+          "label": "Rounded",
+          "default": true,
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        }
+      ]
+    },
+    "progress": {
+      "definition": {
+        "name": "Progress Bar",
+        "type": "COMPONENT",
+        "sqlType": ["INT", "DECIMAL"],
+        "inputType": "PROGRESS",
+        "docType": ["PROGRESS"],
+        "version": "1.0.0",
+        "icon": "lucide:trending-up",
+        "tooltip": "Progress bar component",
+        "class": "ProgressBar",
+        "component": "progress",
+        "defaultSize": { "width": 200, "height": 20 }
+      },
+      "propertyTabs": [
+        {
+          "id": "properties",
+          "name": "Properties",
+          "icon": "lucide:settings",
+          "order": 1
+        },
+        {
+          "id": "database",
+          "name": "Database",
+          "icon": "lucide:database",
+          "order": 2
+        }
+      ],
+      "properties": [
+        {
+          "name": "label",
+          "type": "input",
+          "label": "Label",
+          "default": "Progress",
+          "order": 1,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "value",
+          "type": "number",
+          "label": "Current Value",
+          "default": 50,
+          "min": 0,
+          "max": 100,
+          "order": 2,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "max",
+          "type": "number",
+          "label": "Maximum Value",
+          "default": 100,
+          "min": 1,
+          "order": 3,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "showPercentage",
+          "type": "boolean",
+          "label": "Show Percentage",
+          "default": true,
+          "order": 4,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "color",
+          "type": "combo",
+          "label": "Color",
+          "default": "primary",
+          "options": [
+            {"value": "primary", "label": "Primary"},
+            {"value": "success", "label": "Success"},
+            {"value": "warning", "label": "Warning"},
+            {"value": "danger", "label": "Danger"},
+            {"value": "info", "label": "Info"}
+          ],
+          "order": 5,
+          "group": "Basic",
+          "tab": "properties"
+        },
+        {
+          "name": "fieldMapping",
+          "type": "input",
+          "label": "Database Field",
+          "default": "",
+          "placeholder": "table.column",
+          "order": 1,
+          "group": "Database",
+          "tab": "database"
+        }
+      ]
+    }
+  }
+}

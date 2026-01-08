@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:flowable="http://flowable.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="incident_reporting_process" name="Incident Reporting & Resolution Process" isExecutable="true" version="1.0">
+    
+    <!-- Start Event: Incident Detected (Manual or Signal) -->
+    <startEvent id="incidentDetectedStart" name="Incident Detected">
+      <outgoing>flowToClassify</outgoing>
+    </startEvent>
+    
+    <!-- Service Task: Classify Incident Severity -->
+    <serviceTask id="classifyIncidentSeverity" name="Classify Incident Severity" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.ClassifyIncidentSeverityDelegate">
+      <incoming>flowToClassify</incoming>
+      <outgoing>flowToSeriousGateway</outgoing>
+    </serviceTask>
+    
+    <!-- Gateway: Serious Incident? (Art. 73) -->
+    <exclusiveGateway id="seriousIncidentGateway" name="Serious Incident? (Art. 73)">
+      <incoming>flowToSeriousGateway</incoming>
+      <outgoing>flowSerious</outgoing>
+      <outgoing>flowNormal</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Branch: Serious Incident - Parallel Notifications -->
+    <parallelGateway id="seriousIncidentParallelGateway" name="Parallel Notifications">
+      <incoming>flowSerious</incoming>
+      <outgoing>flowToNotifyAuthority</outgoing>
+      <outgoing>flowToNotifyUsers</outgoing>
+      <outgoing>flowToDocumentSerious</outgoing>
+    </parallelGateway>
+    
+    <!-- Service Task: Notify Market Surveillance Authority (IMMEDIATE - Art. 73.1) -->
+    <serviceTask id="notifyMarketSurveillanceAuthority" name="Notify Authority Immediately (Art. 73.1)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.NotifyMarketSurveillanceAuthorityDelegate">
+      <incoming>flowToNotifyAuthority</incoming>
+      <outgoing>flowFromNotifyAuthority</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Notify Affected Users -->
+    <serviceTask id="notifyAffectedUsers" name="Notify Affected Users" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.NotifyAffectedUsersDelegate">
+      <incoming>flowToNotifyUsers</incoming>
+      <outgoing>flowFromNotifyUsers</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Document Incident Details -->
+    <userTask id="documentIncidentDetails" name="Document Incident Details" 
+              flowable:candidateGroups="compliance-officers,tech-team" 
+              flowable:formKey="document-incident-details-form">
+      <incoming>flowToDocumentSerious</incoming>
+      <outgoing>flowFromDocumentSerious</outgoing>
+    </userTask>
+    
+    <!-- Join Parallel Branch -->
+    <parallelGateway id="joinSeriousNotifications" name="Join Notifications">
+      <incoming>flowFromNotifyAuthority</incoming>
+      <incoming>flowFromNotifyUsers</incoming>
+      <incoming>flowFromDocumentSerious</incoming>
+      <outgoing>flowToRCA</outgoing>
+    </parallelGateway>
+    
+    <!-- Branch: Normal Incident -->
+    <userTask id="categorizeAndDocument" name="Categorize and Document" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="categorize-incident-form">
+      <incoming>flowNormal</incoming>
+      <outgoing>flowFromCategorize</outgoing>
+    </userTask>
+    
+    <!-- Merge Both Branches -->
+    <exclusiveGateway id="mergeBranchesGateway" name="Merge">
+      <incoming>flowToRCA</incoming>
+      <incoming>flowFromCategorize</incoming>
+      <outgoing>flowToRCATask</outgoing>
+    </exclusiveGateway>
+    
+    <!-- User Task: Root Cause Analysis (Art. 20) -->
+    <userTask id="rootCauseAnalysis" name="Root Cause Analysis (Art. 20)" 
+              flowable:candidateGroups="tech-team,compliance-officers" 
+              flowable:formKey="root-cause-analysis-form">
+      <incoming>flowToRCATask</incoming>
+      <outgoing>flowToRCAService</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Call RCA Microservice -->
+    <serviceTask id="executeRCAMicroservice" name="Execute RCA Microservice" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.ExecuteRCADelegate">
+      <incoming>flowToRCAService</incoming>
+      <outgoing>flowToCorrectiveActions</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Define Corrective Actions (Art. 20) -->
+    <userTask id="defineCorrectiveActions" name="Define Corrective Actions (Art. 20)" 
+              flowable:candidateGroups="tech-lead,compliance" 
+              flowable:formKey="define-corrective-actions-form">
+      <incoming>flowToCorrectiveActions</incoming>
+      <outgoing>flowToCreateTasks</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Create Corrective Action Tasks -->
+    <serviceTask id="createCorrectiveActionTasks" name="Create Corrective Action Tasks" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.CreateCorrectiveActionTasksDelegate">
+      <incoming>flowToCreateTasks</incoming>
+      <outgoing>flowToExecuteActions</outgoing>
+    </serviceTask>
+    
+    <!-- Parallel Gateway: Execute Actions + Follow-up -->
+    <parallelGateway id="executeActionsParallelGateway" name="Execute Actions">
+      <incoming>flowToExecuteActions</incoming>
+      <outgoing>flowToMultiInstance</outgoing>
+      <outgoing>flowToFollowUpTimer</outgoing>
+    </parallelGateway>
+    
+    <!-- Multi-Instance: Execute Corrective Actions (one per action) -->
+    <userTask id="executeCorrectiveAction" name="Execute Corrective Action" 
+              flowable:candidateGroups="tech-team" 
+              flowable:formKey="execute-corrective-action-form">
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${correctiveActionsCount}</loopCardinality>
+      </multiInstanceLoopCharacteristics>
+      <incoming>flowToMultiInstance</incoming>
+      <outgoing>flowFromMultiInstance</outgoing>
+    </userTask>
+    
+    <!-- Timer: Follow-up Reminder (every 48h) -->
+    <intermediateCatchEvent id="followUpTimer" name="Follow-up Reminder (48h)">
+      <timerEventDefinition>
+        <timeDuration>P2D</timeDuration>
+      </timerEventDefinition>
+      <incoming>flowToFollowUpTimer</incoming>
+      <outgoing>flowFromFollowUpTimer</outgoing>
+    </intermediateCatchEvent>
+    
+    <!-- Join: All Actions Complete -->
+    <parallelGateway id="joinAllActions" name="All Actions Complete">
+      <incoming>flowFromMultiInstance</incoming>
+      <incoming>flowFromFollowUpTimer</incoming>
+      <outgoing>flowToVerifyResolution</outgoing>
+    </parallelGateway>
+    
+    <!-- User Task: Verify Resolution -->
+    <userTask id="verifyIncidentResolution" name="Verify Resolution" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="verify-incident-resolution-form">
+      <incoming>flowToVerifyResolution</incoming>
+      <outgoing>flowToResolvedGateway</outgoing>
+    </userTask>
+    
+    <!-- Gateway: Resolved? -->
+    <exclusiveGateway id="resolvedGateway" name="Resolved?">
+      <incoming>flowToResolvedGateway</incoming>
+      <outgoing>flowResolved</outgoing>
+      <outgoing>flowNotResolved</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Close Incident -->
+    <serviceTask id="closeIncident" name="Close Incident" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.CloseIncidentDelegate">
+      <incoming>flowResolved</incoming>
+      <outgoing>flowToEndResolved</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Escalate -->
+    <serviceTask id="escalateIncident" name="Escalate Incident" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.incident.EscalateIncidentDelegate">
+      <incoming>flowNotResolved</incoming>
+      <outgoing>flowEscalateLoop</outgoing>
+    </serviceTask>
+    
+    <!-- Loop back to Define Corrective Actions -->
+    <sequenceFlow id="flowEscalateLoop" sourceRef="escalateIncident" targetRef="defineCorrectiveActions"></sequenceFlow>
+    
+    <!-- End Events -->
+    <endEvent id="endIncidentResolved" name="Incident Resolved">
+      <incoming>flowToEndResolved</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToClassify" sourceRef="incidentDetectedStart" targetRef="classifyIncidentSeverity"></sequenceFlow>
+    <sequenceFlow id="flowToSeriousGateway" sourceRef="classifyIncidentSeverity" targetRef="seriousIncidentGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowSerious" name="Serious" sourceRef="seriousIncidentGateway" targetRef="seriousIncidentParallelGateway">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSerious == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowNormal" name="Normal" sourceRef="seriousIncidentGateway" targetRef="categorizeAndDocument">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isSerious == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Parallel Notifications -->
+    <sequenceFlow id="flowToNotifyAuthority" sourceRef="seriousIncidentParallelGateway" targetRef="notifyMarketSurveillanceAuthority"></sequenceFlow>
+    <sequenceFlow id="flowToNotifyUsers" sourceRef="seriousIncidentParallelGateway" targetRef="notifyAffectedUsers"></sequenceFlow>
+    <sequenceFlow id="flowToDocumentSerious" sourceRef="seriousIncidentParallelGateway" targetRef="documentIncidentDetails"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromNotifyAuthority" sourceRef="notifyMarketSurveillanceAuthority" targetRef="joinSeriousNotifications"></sequenceFlow>
+    <sequenceFlow id="flowFromNotifyUsers" sourceRef="notifyAffectedUsers" targetRef="joinSeriousNotifications"></sequenceFlow>
+    <sequenceFlow id="flowFromDocumentSerious" sourceRef="documentIncidentDetails" targetRef="joinSeriousNotifications"></sequenceFlow>
+    
+    <sequenceFlow id="flowToRCA" sourceRef="joinSeriousNotifications" targetRef="mergeBranchesGateway"></sequenceFlow>
+    
+    <!-- Normal Branch -->
+    <sequenceFlow id="flowFromCategorize" sourceRef="categorizeAndDocument" targetRef="mergeBranchesGateway"></sequenceFlow>
+    
+    <!-- RCA Flow -->
+    <sequenceFlow id="flowToRCATask" sourceRef="mergeBranchesGateway" targetRef="rootCauseAnalysis"></sequenceFlow>
+    <sequenceFlow id="flowToRCAService" sourceRef="rootCauseAnalysis" targetRef="executeRCAMicroservice"></sequenceFlow>
+    <sequenceFlow id="flowToCorrectiveActions" sourceRef="executeRCAMicroservice" targetRef="defineCorrectiveActions"></sequenceFlow>
+    <sequenceFlow id="flowToCreateTasks" sourceRef="defineCorrectiveActions" targetRef="createCorrectiveActionTasks"></sequenceFlow>
+    
+    <!-- Execute Actions -->
+    <sequenceFlow id="flowToExecuteActions" sourceRef="createCorrectiveActionTasks" targetRef="executeActionsParallelGateway"></sequenceFlow>
+    <sequenceFlow id="flowToMultiInstance" sourceRef="executeActionsParallelGateway" targetRef="executeCorrectiveAction"></sequenceFlow>
+    <sequenceFlow id="flowToFollowUpTimer" sourceRef="executeActionsParallelGateway" targetRef="followUpTimer"></sequenceFlow>
+    
+    <sequenceFlow id="flowFromMultiInstance" sourceRef="executeCorrectiveAction" targetRef="joinAllActions"></sequenceFlow>
+    <sequenceFlow id="flowFromFollowUpTimer" sourceRef="followUpTimer" targetRef="joinAllActions"></sequenceFlow>
+    
+    <!-- Verify Resolution -->
+    <sequenceFlow id="flowToVerifyResolution" sourceRef="joinAllActions" targetRef="verifyIncidentResolution"></sequenceFlow>
+    <sequenceFlow id="flowToResolvedGateway" sourceRef="verifyIncidentResolution" targetRef="resolvedGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowResolved" name="Yes" sourceRef="resolvedGateway" targetRef="closeIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResolved == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowNotResolved" name="No" sourceRef="resolvedGateway" targetRef="escalateIncident">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${incidentResolved == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToEndResolved" sourceRef="closeIncident" targetRef="endIncidentResolved"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_incident_reporting_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_incident_reporting_process" bpmnElement="incident_reporting_process">
+      <bpmndi:BPMNShape id="BPMNShape_incidentDetectedStart" bpmnElement="incidentDetectedStart">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_classifyIncidentSeverity" bpmnElement="classifyIncidentSeverity">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_seriousIncidentGateway" bpmnElement="seriousIncidentGateway">
+        <omgdc:Bounds x="175" y="435" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_seriousIncidentParallelGateway" bpmnElement="seriousIncidentParallelGateway">
+        <omgdc:Bounds x="175" y="615" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyMarketSurveillanceAuthority" bpmnElement="notifyMarketSurveillanceAuthority">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_notifyAffectedUsers" bpmnElement="notifyAffectedUsers">
+        <omgdc:Bounds x="350" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_documentIncidentDetails" bpmnElement="documentIncidentDetails">
+        <omgdc:Bounds x="550" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_joinSeriousNotifications" bpmnElement="joinSeriousNotifications">
+        <omgdc:Bounds x="175" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_categorizeAndDocument" bpmnElement="categorizeAndDocument">
+        <omgdc:Bounds x="350" y="600" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_mergeBranchesGateway" bpmnElement="mergeBranchesGateway">
+        <omgdc:Bounds x="775" y="795" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_rootCauseAnalysis" bpmnElement="rootCauseAnalysis">
+        <omgdc:Bounds x="350" y="960" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeRCAMicroservice" bpmnElement="executeRCAMicroservice">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_defineCorrectiveActions" bpmnElement="defineCorrectiveActions">
+        <omgdc:Bounds x="150" y="1320" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_createCorrectiveActionTasks" bpmnElement="createCorrectiveActionTasks">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeActionsParallelGateway" bpmnElement="executeActionsParallelGateway">
+        <omgdc:Bounds x="175" y="1695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_executeCorrectiveAction" bpmnElement="executeCorrectiveAction">
+        <omgdc:Bounds x="150" y="1860" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_followUpTimer" bpmnElement="followUpTimer">
+        <omgdc:Bounds x="382" y="1882" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_joinAllActions" bpmnElement="joinAllActions">
+        <omgdc:Bounds x="175" y="2055" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyIncidentResolution" bpmnElement="verifyIncidentResolution">
+        <omgdc:Bounds x="150" y="2220" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_resolvedGateway" bpmnElement="resolvedGateway">
+        <omgdc:Bounds x="175" y="2415" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_closeIncident" bpmnElement="closeIncident">
+        <omgdc:Bounds x="150" y="2580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_escalateIncident" bpmnElement="escalateIncident">
+        <omgdc:Bounds x="350" y="2580" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endIncidentResolved" bpmnElement="endIncidentResolved">
+        <omgdc:Bounds x="182" y="2782" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowEscalateLoop" bpmnElement="flowEscalateLoop">
+        <omgdi:waypoint x="450" y="2620" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToClassify" bpmnElement="flowToClassify">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSeriousGateway" bpmnElement="flowToSeriousGateway">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="175" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowSerious" bpmnElement="flowSerious">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="175" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNormal" bpmnElement="flowNormal">
+        <omgdi:waypoint x="225" y="460" />
+        <omgdi:waypoint x="350" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToNotifyAuthority" bpmnElement="flowToNotifyAuthority">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToNotifyUsers" bpmnElement="flowToNotifyUsers">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="350" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDocumentSerious" bpmnElement="flowToDocumentSerious">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="550" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromNotifyAuthority" bpmnElement="flowFromNotifyAuthority">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromNotifyUsers" bpmnElement="flowFromNotifyUsers">
+        <omgdi:waypoint x="450" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromDocumentSerious" bpmnElement="flowFromDocumentSerious">
+        <omgdi:waypoint x="650" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRCA" bpmnElement="flowToRCA">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="775" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromCategorize" bpmnElement="flowFromCategorize">
+        <omgdi:waypoint x="450" y="640" />
+        <omgdi:waypoint x="775" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRCATask" bpmnElement="flowToRCATask">
+        <omgdi:waypoint x="825" y="820" />
+        <omgdi:waypoint x="350" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRCAService" bpmnElement="flowToRCAService">
+        <omgdi:waypoint x="450" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToCorrectiveActions" bpmnElement="flowToCorrectiveActions">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="150" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToCreateTasks" bpmnElement="flowToCreateTasks">
+        <omgdi:waypoint x="250" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToExecuteActions" bpmnElement="flowToExecuteActions">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="175" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToMultiInstance" bpmnElement="flowToMultiInstance">
+        <omgdi:waypoint x="225" y="1720" />
+        <omgdi:waypoint x="150" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToFollowUpTimer" bpmnElement="flowToFollowUpTimer">
+        <omgdi:waypoint x="225" y="1720" />
+        <omgdi:waypoint x="382" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromMultiInstance" bpmnElement="flowFromMultiInstance">
+        <omgdi:waypoint x="250" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromFollowUpTimer" bpmnElement="flowFromFollowUpTimer">
+        <omgdi:waypoint x="418" y="1900" />
+        <omgdi:waypoint x="175" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToVerifyResolution" bpmnElement="flowToVerifyResolution">
+        <omgdi:waypoint x="225" y="2080" />
+        <omgdi:waypoint x="150" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToResolvedGateway" bpmnElement="flowToResolvedGateway">
+        <omgdi:waypoint x="250" y="2260" />
+        <omgdi:waypoint x="175" y="2440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowResolved" bpmnElement="flowResolved">
+        <omgdi:waypoint x="225" y="2440" />
+        <omgdi:waypoint x="150" y="2620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowNotResolved" bpmnElement="flowNotResolved">
+        <omgdi:waypoint x="225" y="2440" />
+        <omgdi:waypoint x="350" y="2620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToEndResolved" bpmnElement="flowToEndResolved">
+        <omgdi:waypoint x="250" y="2620" />
+        <omgdi:waypoint x="182" y="2800" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+

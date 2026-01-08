@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:flowable="http://flowable.org/bpmn" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             targetNamespace="http://codeflowx.com/govern/compliance">
+  
+  <process id="conformity_assessment_process" name="Conformity Assessment Process (Annex VI)" isExecutable="true" version="1.0">
+    
+    <!-- Start Event -->
+    <startEvent id="startConformityAssessment" name="Initiate Assessment">
+      <outgoing>flowToInitiate</outgoing>
+    </startEvent>
+    
+    <!-- User Task: Initiate Conformity Assessment -->
+    <userTask id="initiateAssessment" name="Initiate Conformity Assessment" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="initiate-conformity-assessment-form">
+      <incoming>flowToInitiate</incoming>
+      <outgoing>flowToVerifyQms</outgoing>
+    </userTask>
+    
+    <!-- Service Task: Step 2 - Verify QMS Compliance (Art. 17) -->
+    <serviceTask id="verifyQmsCompliance" name="Step 2: Verify QMS Compliance (Art. 17)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyQmsComplianceDelegate">
+      <incoming>flowToVerifyQms</incoming>
+      <incoming>flowRetryQms</incoming>
+      <outgoing>flowToQmsGateway</outgoing>
+    </serviceTask>
+    
+    <exclusiveGateway id="qmsCompliantGateway" name="QMS Compliant?">
+      <incoming>flowToQmsGateway</incoming>
+      <outgoing>flowQmsCompliant</outgoing>
+      <outgoing>flowQmsNonCompliant</outgoing>
+    </exclusiveGateway>
+    
+    <userTask id="reviewQmsGaps" name="Review QMS Gaps" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="review-qms-gaps-form">
+      <incoming>flowQmsNonCompliant</incoming>
+      <outgoing>flowFromQmsGapsReview</outgoing>
+    </userTask>
+    
+    <exclusiveGateway id="qmsGapsDecision" name="Decision?">
+      <incoming>flowFromQmsGapsReview</incoming>
+      <outgoing>flowQmsRetry</outgoing>
+      <outgoing>flowQmsCancel</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowQmsRetry" name="Fix and Retry" sourceRef="qmsGapsDecision" targetRef="verifyQmsCompliance">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qmsGapsDecision == 'RETRY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowRetryQms" sourceRef="qmsGapsDecision" targetRef="verifyQmsCompliance"></sequenceFlow>
+    
+    <endEvent id="endAssessmentFailed" name="Assessment Failed">
+      <incoming>flowQmsCancel</incoming>
+    </endEvent>
+    
+    <sequenceFlow id="flowQmsCancel" name="Cancel" sourceRef="qmsGapsDecision" targetRef="endAssessmentFailed">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qmsGapsDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Step 3 - Review Technical Documentation (Annex IV) -->
+    <serviceTask id="reviewTechnicalDocumentation" name="Step 3: Review Technical Documentation (Annex IV)" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.ReviewTechnicalDocumentationDelegate">
+      <incoming>flowQmsCompliant</incoming>
+      <incoming>flowRetryDoc</incoming>
+      <outgoing>flowToDocGateway</outgoing>
+    </serviceTask>
+    
+    <exclusiveGateway id="docCompleteGateway" name="Doc Complete?">
+      <incoming>flowToDocGateway</incoming>
+      <outgoing>flowDocComplete</outgoing>
+      <outgoing>flowDocIncomplete</outgoing>
+    </exclusiveGateway>
+    
+    <userTask id="completeDocumentation" name="Complete Documentation" 
+              flowable:candidateGroups="compliance-officers,tech-team" 
+              flowable:formKey="complete-documentation-form">
+      <incoming>flowDocIncomplete</incoming>
+      <outgoing>flowFromCompleteDoc</outgoing>
+    </userTask>
+    
+    <exclusiveGateway id="docCompletionDecision" name="Decision?">
+      <incoming>flowFromCompleteDoc</incoming>
+      <outgoing>flowDocRetry</outgoing>
+      <outgoing>flowDocCancel</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowDocRetry" name="Retry" sourceRef="docCompletionDecision" targetRef="reviewTechnicalDocumentation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${docCompletionDecision == 'RETRY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowRetryDoc" sourceRef="docCompletionDecision" targetRef="reviewTechnicalDocumentation"></sequenceFlow>
+    
+    <sequenceFlow id="flowDocCancel" name="Cancel" sourceRef="docCompletionDecision" targetRef="endAssessmentFailed">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${docCompletionDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Step 4 - Verify Process Consistency -->
+    <serviceTask id="verifyProcessConsistency" name="Step 4: Verify Process Consistency" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.VerifyProcessConsistencyDelegate">
+      <incoming>flowDocComplete</incoming>
+      <outgoing>flowToConsistencyGateway</outgoing>
+    </serviceTask>
+    
+    <exclusiveGateway id="allStepsPassGateway" name="All Steps Pass?">
+      <incoming>flowToConsistencyGateway</incoming>
+      <outgoing>flowAllStepsPass</outgoing>
+      <outgoing>flowStepsFail</outgoing>
+    </exclusiveGateway>
+    
+    <userTask id="finalReview" name="Final Review" 
+              flowable:candidateGroups="compliance-officers" 
+              flowable:formKey="final-review-form">
+      <incoming>flowStepsFail</incoming>
+      <outgoing>flowFromFinalReview</outgoing>
+    </userTask>
+    
+    <exclusiveGateway id="finalReviewDecision" name="Decision?">
+      <incoming>flowFromFinalReview</incoming>
+      <outgoing>flowFinalRetry</outgoing>
+      <outgoing>flowFinalCancel</outgoing>
+    </exclusiveGateway>
+    
+    <sequenceFlow id="flowFinalRetry" name="Retry" sourceRef="finalReviewDecision" targetRef="verifyQmsCompliance">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewDecision == 'RETRY'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFinalCancel" name="Cancel" sourceRef="finalReviewDecision" targetRef="endAssessmentFailed">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${finalReviewDecision == 'CANCEL'}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <!-- Service Task: Generate Conformity Report -->
+    <serviceTask id="generateConformityReport" name="Generate Conformity Report" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.GenerateConformityReportDelegate">
+      <incoming>flowAllStepsPass</incoming>
+      <outgoing>flowToApproval</outgoing>
+    </serviceTask>
+    
+    <!-- User Task: Approve Conformity Assessment -->
+    <userTask id="approveConformityAssessment" name="Approve Conformity Assessment" 
+              flowable:candidateGroups="compliance-officers,management" 
+              flowable:formKey="approve-conformity-assessment-form">
+      <incoming>flowToApproval</incoming>
+      <outgoing>flowToApprovalGateway</outgoing>
+    </userTask>
+    
+    <exclusiveGateway id="approvalGateway" name="Approved?">
+      <incoming>flowToApprovalGateway</incoming>
+      <outgoing>flowApproved</outgoing>
+      <outgoing>flowRejected</outgoing>
+    </exclusiveGateway>
+    
+    <!-- Service Task: Mark as Conformity Assessed -->
+    <serviceTask id="markAsConformityAssessed" name="Mark as Conformity Assessed" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.MarkAsConformityAssessedDelegate">
+      <incoming>flowApproved</incoming>
+      <outgoing>flowToSuccess</outgoing>
+    </serviceTask>
+    
+    <!-- Service Task: Document Rejection -->
+    <serviceTask id="documentRejection" name="Document Rejection" 
+                 flowable:class="com.codeflowx.govern.workflow.delegates.conformity.DocumentRejectionDelegate">
+      <incoming>flowRejected</incoming>
+      <outgoing>flowToRejected</outgoing>
+    </serviceTask>
+    
+    <!-- End Events -->
+    <endEvent id="endAssessmentComplete" name="Assessment Complete">
+      <incoming>flowToSuccess</incoming>
+    </endEvent>
+    
+    <endEvent id="endAssessmentRejected" name="Assessment Rejected">
+      <incoming>flowToRejected</incoming>
+    </endEvent>
+    
+    <!-- Sequence Flows -->
+    <sequenceFlow id="flowToInitiate" sourceRef="startConformityAssessment" targetRef="initiateAssessment"></sequenceFlow>
+    <sequenceFlow id="flowToVerifyQms" sourceRef="initiateAssessment" targetRef="verifyQmsCompliance"></sequenceFlow>
+    <sequenceFlow id="flowToQmsGateway" sourceRef="verifyQmsCompliance" targetRef="qmsCompliantGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowQmsCompliant" name="Yes" sourceRef="qmsCompliantGateway" targetRef="reviewTechnicalDocumentation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qmsCompliant == true && qmsScore >= 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowQmsNonCompliant" name="No" sourceRef="qmsCompliantGateway" targetRef="reviewQmsGaps">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${qmsCompliant == false || qmsScore < 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFromQmsGapsReview" sourceRef="reviewQmsGaps" targetRef="qmsGapsDecision"></sequenceFlow>
+    
+    <sequenceFlow id="flowToDocGateway" sourceRef="reviewTechnicalDocumentation" targetRef="docCompleteGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowDocComplete" name="Yes" sourceRef="docCompleteGateway" targetRef="verifyProcessConsistency">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${docComplete == true && docScore >= 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowDocIncomplete" name="No" sourceRef="docCompleteGateway" targetRef="completeDocumentation">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${docComplete == false || docScore < 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFromCompleteDoc" sourceRef="completeDocumentation" targetRef="docCompletionDecision"></sequenceFlow>
+    
+    <sequenceFlow id="flowToConsistencyGateway" sourceRef="verifyProcessConsistency" targetRef="allStepsPassGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowAllStepsPass" name="Yes" sourceRef="allStepsPassGateway" targetRef="generateConformityReport">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${processConsistent == true && overallScore >= 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowStepsFail" name="No" sourceRef="allStepsPassGateway" targetRef="finalReview">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${processConsistent == false || overallScore < 0.90}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowFromFinalReview" sourceRef="finalReview" targetRef="finalReviewDecision"></sequenceFlow>
+    
+    <sequenceFlow id="flowToApproval" sourceRef="generateConformityReport" targetRef="approveConformityAssessment"></sequenceFlow>
+    <sequenceFlow id="flowToApprovalGateway" sourceRef="approveConformityAssessment" targetRef="approvalGateway"></sequenceFlow>
+    
+    <sequenceFlow id="flowApproved" name="Approve" sourceRef="approvalGateway" targetRef="markAsConformityAssessed">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == true}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowRejected" name="Reject" sourceRef="approvalGateway" targetRef="documentRejection">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approved == false}]]></conditionExpression>
+    </sequenceFlow>
+    
+    <sequenceFlow id="flowToSuccess" sourceRef="markAsConformityAssessed" targetRef="endAssessmentComplete"></sequenceFlow>
+    <sequenceFlow id="flowToRejected" sourceRef="documentRejection" targetRef="endAssessmentRejected"></sequenceFlow>
+    
+  </process>
+  
+  <bpmndi:BPMNDiagram id="BPMNDiagram_conformity_assessment_process">
+    <bpmndi:BPMNPlane id="BPMNPlane_conformity_assessment_process" bpmnElement="conformity_assessment_process">
+      <bpmndi:BPMNShape id="BPMNShape_startConformityAssessment" bpmnElement="startConformityAssessment">
+        <omgdc:Bounds x="182" y="100" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_initiateAssessment" bpmnElement="initiateAssessment">
+        <omgdc:Bounds x="150" y="240" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyQmsCompliance" bpmnElement="verifyQmsCompliance">
+        <omgdc:Bounds x="150" y="420" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_qmsCompliantGateway" bpmnElement="qmsCompliantGateway">
+        <omgdc:Bounds x="175" y="615" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewQmsGaps" bpmnElement="reviewQmsGaps">
+        <omgdc:Bounds x="350" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_qmsGapsDecision" bpmnElement="qmsGapsDecision">
+        <omgdc:Bounds x="375" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endAssessmentFailed" bpmnElement="endAssessmentFailed">
+        <omgdc:Bounds x="582" y="1162" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_reviewTechnicalDocumentation" bpmnElement="reviewTechnicalDocumentation">
+        <omgdc:Bounds x="150" y="780" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_docCompleteGateway" bpmnElement="docCompleteGateway">
+        <omgdc:Bounds x="175" y="975" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_completeDocumentation" bpmnElement="completeDocumentation">
+        <omgdc:Bounds x="350" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_docCompletionDecision" bpmnElement="docCompletionDecision">
+        <omgdc:Bounds x="375" y="1335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_verifyProcessConsistency" bpmnElement="verifyProcessConsistency">
+        <omgdc:Bounds x="150" y="1140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_allStepsPassGateway" bpmnElement="allStepsPassGateway">
+        <omgdc:Bounds x="175" y="1335" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalReview" bpmnElement="finalReview">
+        <omgdc:Bounds x="350" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_finalReviewDecision" bpmnElement="finalReviewDecision">
+        <omgdc:Bounds x="375" y="1695" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_generateConformityReport" bpmnElement="generateConformityReport">
+        <omgdc:Bounds x="150" y="1500" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approveConformityAssessment" bpmnElement="approveConformityAssessment">
+        <omgdc:Bounds x="150" y="1680" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_approvalGateway" bpmnElement="approvalGateway">
+        <omgdc:Bounds x="175" y="1875" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_markAsConformityAssessed" bpmnElement="markAsConformityAssessed">
+        <omgdc:Bounds x="150" y="2040" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_documentRejection" bpmnElement="documentRejection">
+        <omgdc:Bounds x="350" y="2040" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endAssessmentComplete" bpmnElement="endAssessmentComplete">
+        <omgdc:Bounds x="182" y="2242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endAssessmentRejected" bpmnElement="endAssessmentRejected">
+        <omgdc:Bounds x="382" y="2242" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowQmsRetry" bpmnElement="flowQmsRetry">
+        <omgdi:waypoint x="425" y="1000" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetryQms" bpmnElement="flowRetryQms">
+        <omgdi:waypoint x="425" y="1000" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowQmsCancel" bpmnElement="flowQmsCancel">
+        <omgdi:waypoint x="425" y="1000" />
+        <omgdi:waypoint x="582" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDocRetry" bpmnElement="flowDocRetry">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRetryDoc" bpmnElement="flowRetryDoc">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDocCancel" bpmnElement="flowDocCancel">
+        <omgdi:waypoint x="425" y="1360" />
+        <omgdi:waypoint x="582" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFinalRetry" bpmnElement="flowFinalRetry">
+        <omgdi:waypoint x="425" y="1720" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFinalCancel" bpmnElement="flowFinalCancel">
+        <omgdi:waypoint x="425" y="1720" />
+        <omgdi:waypoint x="582" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToInitiate" bpmnElement="flowToInitiate">
+        <omgdi:waypoint x="218" y="118" />
+        <omgdi:waypoint x="150" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToVerifyQms" bpmnElement="flowToVerifyQms">
+        <omgdi:waypoint x="250" y="280" />
+        <omgdi:waypoint x="150" y="460" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToQmsGateway" bpmnElement="flowToQmsGateway">
+        <omgdi:waypoint x="250" y="460" />
+        <omgdi:waypoint x="175" y="640" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowQmsCompliant" bpmnElement="flowQmsCompliant">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="150" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowQmsNonCompliant" bpmnElement="flowQmsNonCompliant">
+        <omgdi:waypoint x="225" y="640" />
+        <omgdi:waypoint x="350" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromQmsGapsReview" bpmnElement="flowFromQmsGapsReview">
+        <omgdi:waypoint x="450" y="820" />
+        <omgdi:waypoint x="375" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToDocGateway" bpmnElement="flowToDocGateway">
+        <omgdi:waypoint x="250" y="820" />
+        <omgdi:waypoint x="175" y="1000" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDocComplete" bpmnElement="flowDocComplete">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="150" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowDocIncomplete" bpmnElement="flowDocIncomplete">
+        <omgdi:waypoint x="225" y="1000" />
+        <omgdi:waypoint x="350" y="1180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromCompleteDoc" bpmnElement="flowFromCompleteDoc">
+        <omgdi:waypoint x="450" y="1180" />
+        <omgdi:waypoint x="375" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToConsistencyGateway" bpmnElement="flowToConsistencyGateway">
+        <omgdi:waypoint x="250" y="1180" />
+        <omgdi:waypoint x="175" y="1360" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowAllStepsPass" bpmnElement="flowAllStepsPass">
+        <omgdi:waypoint x="225" y="1360" />
+        <omgdi:waypoint x="150" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowStepsFail" bpmnElement="flowStepsFail">
+        <omgdi:waypoint x="225" y="1360" />
+        <omgdi:waypoint x="350" y="1540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowFromFinalReview" bpmnElement="flowFromFinalReview">
+        <omgdi:waypoint x="450" y="1540" />
+        <omgdi:waypoint x="375" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToApproval" bpmnElement="flowToApproval">
+        <omgdi:waypoint x="250" y="1540" />
+        <omgdi:waypoint x="150" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToApprovalGateway" bpmnElement="flowToApprovalGateway">
+        <omgdi:waypoint x="250" y="1720" />
+        <omgdi:waypoint x="175" y="1900" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowApproved" bpmnElement="flowApproved">
+        <omgdi:waypoint x="225" y="1900" />
+        <omgdi:waypoint x="150" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowRejected" bpmnElement="flowRejected">
+        <omgdi:waypoint x="225" y="1900" />
+        <omgdi:waypoint x="350" y="2080" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToSuccess" bpmnElement="flowToSuccess">
+        <omgdi:waypoint x="250" y="2080" />
+        <omgdi:waypoint x="182" y="2260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flowToRejected" bpmnElement="flowToRejected">
+        <omgdi:waypoint x="450" y="2080" />
+        <omgdi:waypoint x="382" y="2260" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  
+</definitions>
+
